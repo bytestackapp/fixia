@@ -1,0 +1,12 @@
+{
+  "name": "fixia",
+  "version": "1.0.0",
+  "description": "Fixia — Service Marketplace by ByteStack Labs",
+  "private": true,
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.9"
+  }
+}
