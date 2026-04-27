@@ -450,6 +450,28 @@
       border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;
       vertical-align:middle; margin-left:4px;
     }
+
+    /* ── GUEST BANNER ────────────────────────────────────────── */
+    .guest-banner {
+      background:linear-gradient(90deg,#FF5A1F,#D94200);
+      padding:9px 16px; display:flex; align-items:center; gap:10px;
+    }
+    .guest-banner-text { flex:1; font-size:0.72rem; color:#fff; line-height:1.4; }
+    .guest-banner-text strong { font-size:0.78rem; display:block; margin-bottom:1px; }
+    .guest-btn-login { background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.4); color:#fff; font-size:0.68rem; font-weight:700; padding:5px 11px; border-radius:20px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .guest-btn-signup { background:#fff; color:var(--brand); border:none; font-size:0.68rem; font-weight:800; padding:5px 11px; border-radius:20px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .gate-overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); align-items:flex-end; justify-content:center; }
+    .gate-overlay.active { display:flex; animation:fadeIn 0.2s; }
+    .gate-sheet { background:var(--card); width:100%; max-width:480px; border-radius:var(--radius-lg) var(--radius-lg) 0 0; padding:0 0 36px; animation:slideUp 0.3s ease; }
+    .gate-handle { width:36px; height:4px; border-radius:2px; background:var(--border); margin:12px auto 0; }
+    .gate-icon { font-size:2.5rem; text-align:center; margin:16px 0 6px; }
+    .gate-title { font-size:1.05rem; font-weight:800; color:var(--navy); text-align:center; margin-bottom:4px; }
+    .gate-sub { font-size:0.78rem; color:var(--text-3); text-align:center; line-height:1.6; margin-bottom:18px; padding:0 24px; }
+    .gate-actions { padding:0 20px; display:flex; flex-direction:column; gap:8px; }
+    .gate-btn-primary { width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#FF5A1F,#D94200); color:#fff; font-size:0.92rem; font-weight:800; cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(255,90,31,0.3); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .gate-btn-secondary { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--navy); font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .gate-dismiss { text-align:center; margin-top:10px; font-size:0.72rem; color:var(--text-3); cursor:pointer; padding:4px; }
+    .gate-dismiss:hover { color:var(--brand); }
   </style>
 </head>
 <body>
@@ -467,6 +489,18 @@
   </button>
 </nav>
 
+
+<!-- ── GUEST BANNER (hidden for logged-in users) ─────────── -->
+<div class="guest-banner" id="guestBanner" style="display:none;">
+  <div class="guest-banner-text">
+    <strong>👋 Welcome to Fixia!</strong>
+    Sign in to see providers, search services, and contact professionals.
+  </div>
+  <div style="display:flex;gap:6px;flex-shrink:0;">
+    <button class="guest-btn-login" onclick="window.location.href='login.html'">Log In</button>
+    <button class="guest-btn-signup" onclick="window.location.href='signup.html'">Sign Up</button>
+  </div>
+</div>
 <!-- ── LOCATION BAR ──────────────────────────────────────────── -->
 <div class="loc-bar" onclick="openLocationModal()">
   <i class="fa-solid fa-location-dot"></i>
@@ -834,6 +868,25 @@
   </div>
 </div>
 
+
+<!-- ── GATE OVERLAY (sign-in prompt for guests) ─────────────── -->
+<div class="gate-overlay" id="gateOverlay" onclick="handleGateOverlayClick(event)">
+  <div class="gate-sheet">
+    <div class="gate-handle"></div>
+    <div class="gate-icon" id="gateIcon">🔒</div>
+    <div class="gate-title" id="gateTitle">Sign In to Continue</div>
+    <div class="gate-sub" id="gateSub">Create a free account to browse providers, search services, and get in touch with professionals near you.</div>
+    <div class="gate-actions">
+      <button class="gate-btn-primary" onclick="window.location.href='signup.html'">
+        <i class="fa-solid fa-user-plus"></i> Create Free Account
+      </button>
+      <button class="gate-btn-secondary" onclick="window.location.href='login.html'">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </button>
+    </div>
+    <div class="gate-dismiss" onclick="closeGate()">Maybe later</div>
+  </div>
+</div>
 <!-- ── BOTTOM NAV ────────────────────────────────────────────── -->
 <nav class="bottom-nav">
   <a class="bnav-item active" href="index.html">
@@ -841,7 +894,7 @@
     Home
   </a>
   <a class="bnav-item" href="browse.html">
-    <i class="fa-solid fa-grid-2"></i>
+    <i class="fa-solid fa-border-all"></i>
     Browse
   </a>
   <div class="bnav-center">
@@ -853,7 +906,7 @@
     <i class="fa-regular fa-bookmark"></i>
     Saved
   </a>
-  <a class="bnav-item" href="profile.html">
+  <a class="bnav-item" href="javascript:void(0)" onclick="IS_GUEST ? window.location.href='login.html' : window.location.href='profile.html'">
     <i class="fa-regular fa-user"></i>
     Profile
   </a>
@@ -1216,6 +1269,24 @@ function useGPS() {
 }
 
 /* ── Init ──────────────────────────────────────────────────── */
+/* ── Guest mode ────────────────────────────────────────────── */
+const IS_GUEST = !FX.getSession();
+
+function gate(icon, title, sub) {
+  if (!IS_GUEST) return false;
+  document.getElementById('gateIcon').textContent  = icon  || '🔒';
+  document.getElementById('gateTitle').textContent = title || 'Sign In to Continue';
+  document.getElementById('gateSub').textContent   = sub   || 'Create a free account to access this feature.';
+  document.getElementById('gateOverlay').classList.add('active');
+  return true;
+}
+function closeGate() {
+  document.getElementById('gateOverlay').classList.remove('active');
+}
+function handleGateOverlayClick(e) {
+  if (e.target === document.getElementById('gateOverlay')) closeGate();
+}
+
 (function init() {
   // Restore saved location
   try {
@@ -1226,14 +1297,65 @@ function useGPS() {
   // Pre-load regions for modal
   loadRegions();
 
-  // Search input handler
+  // Show guest banner
+  if (IS_GUEST) {
+    document.getElementById('guestBanner').style.display = 'flex';
+  }
+
+  // Search — gated for guests
+  document.getElementById('searchInput').addEventListener('focus', () => {
+    if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) {
+      document.getElementById('searchInput').blur();
+    }
+  });
   document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       const q = e.target.value.trim();
-      if (q) window.location.href = `search.html?q=${encodeURIComponent(q)}`;
+      if (!q) return;
+      if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) return;
+      window.location.href = `search.html?q=${encodeURIComponent(q)}`;
     }
   });
+
+  // Pop-up ads — only for logged-in free regular users
+  const sess = FX.getSession();
+  if (sess && sess.role === 'regular' && !sess.adsFree) {
+    FX.initAds();
+  }
 })();
+
+/* ── Gate wrappers — override functions defined above ────────── */
+const _openProvider = openProvider;
+openProvider = function(id) {
+  if (gate('👷', 'See Full Provider Details', 'Sign in to view contact info, portfolio, and ratings — then get in touch directly.')) return;
+  _openProvider(id);
+};
+
+const _setFilter = setFilter;
+setFilter = function(el, key) {
+  if (IS_GUEST && ['nearby','top','verified'].includes(key)) {
+    gate('📍', 'Filter is for Members', 'Sign in to filter providers by location, rating, and availability.');
+    return;
+  }
+  _setFilter(el, key);
+};
+
+const _browseSubcat = browseSubcat;
+browseSubcat = function(cat, sub) {
+  if (gate('🔎', 'Browse Providers', 'Create a free account to browse all providers by category near you.')) return;
+  _browseSubcat(cat, sub);
+};
+
+const _openSearch = openSearch;
+openSearch = function() {
+  if (gate('🔍', 'Search is for Members', 'Sign in to search for any service or provider.')) return;
+  _openSearch();
+};
+
+openNotif = function() {
+  if (gate('🔔', 'Sign In for Notifications', 'Log in to see your activity and updates.')) return;
+  window.location.href = 'notifications.html';
+};
 </script>
 
 </body>

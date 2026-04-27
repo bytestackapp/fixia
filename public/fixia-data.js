@@ -55,8 +55,8 @@
 'use strict';
 
 /* ── Config — replace with your Supabase project values ─────── */
-const SUPA_URL = 'https://YOUR_PROJECT_REF.supabase.co';
-const SUPA_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const SUPA_URL = 'https://jqycouhbatdmssfqcyio.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeWNvdWhiYXRkbXNzZnFjeWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjMwOTYsImV4cCI6MjA5MjgzOTA5Nn0.SaPsXj_b1LlxLQPv1YrWm2A2KaU8fDx4PbbQV-etUKk';
 const APP_URL  = window.location.origin;
 
 /* ── API endpoints ───────────────────────────────────────────── */

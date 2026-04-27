@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Notifications Page
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Notifications — Fixia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--brand:#FF5A1F;--navy:#0F1B2D;--navy-mid:#1E3048;--text:#1A2332;--text-2:#4A5568;--text-3:#8896A5;--bg:#F0F2F5;--card:#fff;--border:#E8ECF0;--green:#10B981;--gold:#F59E0B;--radius-md:12px;--nav-h:56px;--bottom-h:62px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;}
+    .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .nav-title{font-size:0.95rem;font-weight:700;color:#fff;}
+    .notif-item{background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background 0.15s;}
+    .notif-item:hover{background:#FAFBFC;}
+    .notif-item.unread{background:#FFF8F5;}
+    .notif-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+    .notif-body{flex:1;min-width:0;}
+    .notif-title{font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+    .notif-sub{font-size:0.75rem;color:var(--text-3);line-height:1.5;}
+    .notif-time{font-size:0.65rem;color:var(--text-3);margin-top:3px;}
+    .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:4px;}
+    .empty-state{text-align:center;padding:4rem 1rem;}
+    .empty-icon{font-size:3rem;margin-bottom:10px;}
+    .empty-title{font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:4px;}
+    .empty-sub{font-size:0.8rem;color:var(--text-3);line-height:1.6;}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:var(--bottom-h);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;border:none;background:none;font-family:inherit;text-decoration:none;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <button class="nav-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <div class="nav-title">Notifications</div>
+</nav>
+
+<div id="notifList"></div>
+
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="browse.html"><i class="fa-solid fa-border-all"></i>Browse</a>
+  <a class="bnav-item" href="search.html"><i class="fa-solid fa-magnifying-glass"></i>Search</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="fixia-data.js"></script>
+<script>
+const session = FX.getSession();
+
+/* Sample notifications — replace with real DB notifications in future */
+const SAMPLE = [
+  { icon:'⭐', bg:'#FFFBEB', title:'Rating Reminder', sub:'You recently transacted with Mang Larry Plumbing. Tap to leave a rating and help others!', time:'2 hours ago', unread:true, href:'provider.html?id=mang-larry' },
+  { icon:'🔔', bg:'#EFF6FF', title:'Welcome to Fixia!', sub:'Your account is set up. Start browsing services near you.', time:'Yesterday', unread:false, href:'homepage.html' },
+  { icon:'✨', bg:'var(--brand-light)', title:'Upgrade to Fixia Plus', sub:'Remove pop-up ads and enjoy uninterrupted browsing. Upgrade anytime.', time:'2 days ago', unread:false, href:'signup-regular.html' },
+];
+
+(function init() {
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  const list = document.getElementById('notifList');
+
+  if (!SAMPLE.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔔</div>
+        <div class="empty-title">No Notifications Yet</div>
+        <div class="empty-sub">You'll see updates here — rating reminders, account alerts, and Fixia news.</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = SAMPLE.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="window.location.href='${n.href || '#'}'">
+      <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.sub}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      ${n.unread ? '<div class="unread-dot"></div>' : ''}
+    </div>`).join('');
+})();
+</script>
+</body>
+</html>
