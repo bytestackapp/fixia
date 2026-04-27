@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Signup — Provider
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Provider Signup — Fixia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F5F7FA; --card:#FFFFFF; --border:#E8ECF0;
+      --green:#10B981; --gold:#F59E0B;
+      --radius-sm:8px; --radius-md:14px; --radius-lg:20px;
+      --shadow-lg:0 20px 40px rgba(0,0,0,0.15);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background:linear-gradient(160deg, #0F1B2D 0%, #1E3048 50%, #FF5A1F22 100%);
+      min-height:100vh; display:flex; align-items:flex-start;
+      justify-content:center; padding:1.5rem 1rem 3rem;
+      -webkit-font-smoothing:antialiased;
+    }
+    .bg-shapes { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .shape { position:absolute; border-radius:50%; background:rgba(255,90,31,0.06); animation:float 9s ease-in-out infinite; }
+    .shape:nth-child(1){width:220px;height:220px;top:5%;left:-5%;animation-delay:0s;}
+    .shape:nth-child(2){width:140px;height:140px;bottom:10%;right:-4%;animation-delay:2.5s;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-22px);}}
+
+    .container { position:relative; z-index:1; width:100%; max-width:480px; }
+    .card { background:rgba(255,255,255,0.98); border-radius:var(--radius-lg); padding:2rem 1.75rem; box-shadow:var(--shadow-lg); animation:slideUp 0.45s ease; }
+    @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+    /* ── Step indicator ──────────────────────────────────────── */
+    .steps { display:flex; align-items:center; margin-bottom:1.75rem; overflow-x:auto; padding-bottom:2px; }
+    .steps::-webkit-scrollbar { display:none; }
+    .step { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
+    .step-circle {
+      width:30px; height:30px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; border:2px solid var(--border);
+      background:#fff; color:var(--text-3); transition:all 0.3s;
+    }
+    .step.active .step-circle { background:linear-gradient(135deg,#FF5A1F,#D94200); border-color:transparent; color:#fff; box-shadow:0 4px 12px rgba(255,90,31,0.35); }
+    .step.done   .step-circle { background:var(--green); border-color:transparent; color:#fff; }
+    .step-label { font-size:0.58rem; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .step.active .step-label { color:var(--brand); }
+    .step.done   .step-label { color:var(--green); }
+    .step-line { flex:1; min-width:10px; height:2px; background:var(--border); margin:0 4px 18px; transition:background 0.3s; }
+    .step-line.done { background:var(--green); }
+
+    /* ── Panel ───────────────────────────────────────────────── */
+    .panel { display:none; }
+    .panel.active { display:block; animation:fadeIn 0.25s; }
+    .panel-title { font-size:1.05rem; font-weight:800; color:var(--navy); margin-bottom:2px; }
+    .panel-sub   { font-size:0.78rem; color:var(--text-3); margin-bottom:1.2rem; line-height:1.5; }
+
+    /* ── Form ────────────────────────────────────────────────── */
+    .form-group { margin-bottom:0.85rem; }
+    .form-label { display:block; margin-bottom:0.35rem; font-size:0.72rem; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.05em; }
+    .form-label .opt { font-weight:400; color:var(--text-3); text-transform:none; letter-spacing:0; }
+    .form-input {
+      width:100%; padding:0.7rem 0.95rem; border:1.5px solid var(--border);
+      border-radius:var(--radius-sm); font-size:0.88rem; transition:all 0.2s;
+      background:#fff; color:var(--text); font-family:inherit;
+    }
+    .form-input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(255,90,31,0.1); }
+    .form-input.err { border-color:#dc3545; }
+    .form-select {
+      width:100%; padding:0.7rem 0.95rem; border:1.5px solid var(--border);
+      border-radius:var(--radius-sm); font-size:0.88rem; font-family:inherit;
+      background:#fff; color:var(--text); appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238896A5' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 12px center;
+      transition:all 0.2s;
+    }
+    .form-select:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(255,90,31,0.1); }
+    .form-select:disabled { opacity:0.5; cursor:not-allowed; }
+    .form-select.err { border-color:#dc3545; }
+    .form-textarea {
+      width:100%; padding:0.7rem 0.95rem; border:1.5px solid var(--border);
+      border-radius:var(--radius-sm); font-size:0.88rem; font-family:inherit;
+      resize:vertical; min-height:80px; transition:all 0.2s; color:var(--text);
+    }
+    .form-textarea:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(255,90,31,0.1); }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .pw-wrap { position:relative; }
+    .pw-toggle { position:absolute; right:11px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-3); font-size:0.9rem; }
+    .field-err { font-size:11px; color:#dc3545; margin-top:3px; display:none; }
+    .field-err.show { display:block; }
+    .char-count { font-size:11px; color:var(--text-3); text-align:right; margin-top:3px; }
+
+    /* ── Strength ────────────────────────────────────────────── */
+    .strength-bar { height:3px; border-radius:2px; background:var(--border); margin-top:5px; overflow:hidden; }
+    .strength-fill { height:100%; border-radius:2px; width:0; transition:all 0.3s; }
+
+    /* ── Upload zone ─────────────────────────────────────────── */
+    .upload-zone {
+      border:2px dashed var(--border); border-radius:var(--radius-md);
+      padding:1.2rem 1rem; text-align:center; cursor:pointer;
+      transition:all 0.2s; background:#fff; position:relative;
+    }
+    .upload-zone:hover { border-color:var(--brand); background:var(--brand-light); }
+    .upload-zone.has-file { border-color:var(--green); background:#f0fdf4; }
+    .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-icon { font-size:1.6rem; margin-bottom:6px; }
+    .upload-label { font-size:0.78rem; font-weight:700; color:var(--text-2); }
+    .upload-sub   { font-size:0.68rem; color:var(--text-3); margin-top:2px; }
+    .upload-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .preview-thumb {
+      width:60px; height:60px; border-radius:8px; object-fit:cover;
+      border:1.5px solid var(--border); position:relative;
+    }
+    .preview-thumb-wrap { position:relative; width:60px; height:60px; }
+    .preview-thumb-wrap img { width:100%; height:100%; border-radius:8px; object-fit:cover; border:1.5px solid var(--border); }
+    .preview-remove {
+      position:absolute; top:-5px; right:-5px; width:16px; height:16px;
+      background:#dc3545; color:#fff; border-radius:50%; border:none;
+      font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    }
+
+    /* ── Info note ───────────────────────────────────────────── */
+    .info-note {
+      background:var(--brand-light); border:1px solid rgba(255,90,31,0.2);
+      border-radius:var(--radius-sm); padding:10px 12px;
+      font-size:0.75rem; color:var(--brand-dark); line-height:1.6;
+      margin-bottom:1rem; display:flex; gap:8px; align-items:flex-start;
+    }
+    .info-note i { flex-shrink:0; margin-top:2px; }
+
+    /* ── Package cards ───────────────────────────────────────── */
+    .pkg-list { display:flex; flex-direction:column; gap:10px; margin-bottom:1.1rem; }
+    .pkg-card {
+      border:2px solid var(--border); border-radius:var(--radius-md);
+      padding:1rem 1.1rem; cursor:pointer; transition:all 0.2s; background:#fff;
+      position:relative; display:flex; align-items:center; gap:12px;
+    }
+    .pkg-card:hover { border-color:var(--brand); background:var(--brand-light); }
+    .pkg-card.selected { border-color:var(--brand); background:var(--brand-light); box-shadow:0 4px 14px rgba(255,90,31,0.15); }
+    .pkg-card.selected::after { content:'✓'; position:absolute; top:10px; right:12px; color:var(--brand); font-weight:800; font-size:14px; }
+    .pkg-popular-flag { position:absolute; top:-10px; left:14px; background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; }
+    .pkg-icon-big { font-size:2rem; flex-shrink:0; }
+    .pkg-body { flex:1; }
+    .pkg-head { display:flex; align-items:baseline; gap:8px; margin-bottom:3px; }
+    .pkg-name { font-size:0.95rem; font-weight:800; color:var(--navy); }
+    .pkg-price-tag { font-size:1rem; font-weight:800; color:var(--brand); }
+    .pkg-period-tag { font-size:0.68rem; color:var(--text-3); }
+    .pkg-perks { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+    .perk-tag { font-size:0.65rem; background:#F5F7FA; border:1px solid var(--border); border-radius:20px; padding:2px 8px; color:var(--text-2); font-weight:600; }
+    .elite-banner {
+      background:linear-gradient(135deg, #7B4F00, #F59E0B);
+      border-radius:var(--radius-md); padding:14px;
+      text-align:center; margin-bottom:1rem; color:#fff;
+    }
+    .elite-banner .crown { font-size:1.8rem; margin-bottom:4px; }
+    .elite-banner .et { font-size:0.85rem; font-weight:800; }
+    .elite-banner .es { font-size:0.72rem; opacity:0.85; margin-top:3px; line-height:1.5; }
+
+    /* ── Payment section ─────────────────────────────────────── */
+    .pay-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+    .pay-opt {
+      border:2px solid var(--border); border-radius:var(--radius-sm);
+      padding:10px 8px; text-align:center; cursor:pointer; background:#fff;
+      transition:all 0.15s;
+    }
+    .pay-opt:hover, .pay-opt.selected { border-color:var(--brand); background:var(--brand-light); }
+    .pay-opt-icon { font-size:1.3rem; margin-bottom:4px; }
+    .pay-opt-label { font-size:0.72rem; font-weight:700; color:var(--text-2); }
+
+    /* ── Alert ───────────────────────────────────────────────── */
+    .alert { border-radius:var(--radius-sm); padding:0.65rem 0.9rem; font-size:0.82rem; margin-bottom:0.9rem; display:none; line-height:1.5; }
+    .alert.show { display:block; animation:fadeIn 0.2s; }
+    .alert-error   { background:rgba(220,53,69,0.08); border:1px solid rgba(220,53,69,0.25); color:#dc3545; }
+    .alert-success { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); color:#065f46; }
+    .alert-info    { background:rgba(255,90,31,0.07); border:1px solid rgba(255,90,31,0.2); color:var(--brand-dark); }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn { width:100%; padding:0.85rem; border:none; border-radius:var(--radius-sm); font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+    .btn-brand { background:linear-gradient(135deg,#FF5A1F,#D94200); color:#fff; box-shadow:0 4px 14px rgba(255,90,31,0.3); }
+    .btn-brand:hover { transform:translateY(-2px); }
+    .btn-brand:disabled { opacity:0.65; cursor:not-allowed; transform:none; }
+    .btn-back { background:#F5F7FA; color:var(--text-2); border:1.5px solid var(--border); }
+    .btn-back:hover { background:var(--border); }
+    .btn-row { display:flex; gap:8px; }
+    .btn-row .btn { flex:1; }
+    .spinner { width:15px; height:15px; display:none; border:2.5px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; }
+    .spinner.on { display:inline-block; }
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    .login-row { text-align:center; margin-top:1rem; font-size:0.8rem; color:var(--text-3); }
+    .login-row button { background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-family:inherit; font-size:0.8rem; }
+
+    .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(80px); z-index:9999; background:var(--navy); color:#fff; border-radius:var(--radius-sm); padding:0.75rem 1.5rem; font-size:0.83rem; font-weight:600; opacity:0; transition:all 0.35s; white-space:nowrap; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+    .toast.success { background:#065f46; }
+    .toast.error   { background:#dc3545; }
+  </style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div></div>
+
+<div class="container">
+  <div class="card">
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" id="s1"><div class="step-circle" id="sc1">1</div><div class="step-label">Account</div></div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step" id="s2"><div class="step-circle" id="sc2">2</div><div class="step-label">Business</div></div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step" id="s3"><div class="step-circle" id="sc3">3</div><div class="step-label">Location</div></div>
+      <div class="step-line" id="sl3"></div>
+      <div class="step" id="s4"><div class="step-circle" id="sc4">4</div><div class="step-label">Documents</div></div>
+      <div class="step-line" id="sl4"></div>
+      <div class="step" id="s5"><div class="step-circle" id="sc5">5</div><div class="step-label">Package</div></div>
+    </div>
+
+    <!-- ── STEP 1: Account Info ───────────────────────────────── -->
+    <div id="p1" class="panel active">
+      <div class="panel-title">Create Provider Account</div>
+      <div class="panel-sub">Offer your services and reach customers in your area.</div>
+      <div id="a1" class="alert"></div>
+
+      <div class="row2">
+        <div class="form-group">
+          <label class="form-label">First Name <span style="color:#dc3545">*</span></label>
+          <input id="fn" class="form-input" placeholder="Juan"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span style="color:#dc3545">*</span></label>
+          <input id="ln" class="form-input" placeholder="dela Cruz"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address <span style="color:#dc3545">*</span></label>
+        <input id="em" class="form-input" type="email" placeholder="juan@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number <span style="color:#dc3545">*</span></label>
+        <input id="ph" class="form-input" type="tel" placeholder="09XX XXX XXXX"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username <span style="color:#dc3545">*</span></label>
+        <input id="un" class="form-input" placeholder="juandelacruz" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span style="color:#dc3545">*</span></label>
+        <div class="pw-wrap">
+          <input id="pw" type="password" class="form-input" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+          <button type="button" class="pw-toggle" onclick="togglePwd('pw','pwi1')"><i id="pwi1" class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password <span style="color:#dc3545">*</span></label>
+        <div class="pw-wrap">
+          <input id="cf" type="password" class="form-input" placeholder="Re-enter password"/>
+          <button type="button" class="pw-toggle" onclick="togglePwd('cf','pwi2')"><i id="pwi2" class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button class="btn btn-brand" onclick="go(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">Sign In</button></div>
+    </div>
+
+    <!-- ── STEP 2: Business Info ──────────────────────────────── -->
+    <div id="p2" class="panel">
+      <div class="panel-title">Your Business / Service</div>
+      <div class="panel-sub">Tell customers what you do. Freelancers and sideline workers are welcome!</div>
+      <div id="a2" class="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Shop / Business Name <span style="color:#dc3545">*</span></label>
+        <input id="bizName" class="form-input" placeholder="e.g. Juan's Plumbing Works"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Provider Type <span style="color:#dc3545">*</span></label>
+        <select id="provType" class="form-select">
+          <option value="">Select type…</option>
+          <option value="business">Registered Business</option>
+          <option value="freelance">Freelancer / Independent</option>
+          <option value="sideline">Sideline / Part-time</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Main Service Category <span style="color:#dc3545">*</span></label>
+        <select id="catMain" class="form-select" onchange="loadSubcats()">
+          <option value="">Select category…</option>
+          <option value="home">Home Services</option>
+          <option value="auto">Automotive</option>
+          <option value="garden">Garden & Lawn</option>
+          <option value="elec">Electrical</option>
+          <option value="beauty">Beauty & Wellness</option>
+          <option value="health">Health & Care</option>
+          <option value="tech">Tech & IT</option>
+          <option value="build">Construction</option>
+          <option value="clean">Cleaning</option>
+          <option value="pet">Pet Services</option>
+          <option value="event">Events</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Specific Service <span style="color:#dc3545">*</span></label>
+        <select id="catSub" class="form-select" disabled>
+          <option value="">Select main category first…</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Short Description <span style="color:#dc3545">*</span></label>
+        <textarea id="bizDesc" class="form-textarea" placeholder="Describe your services, experience, and what makes you stand out…" maxlength="300" oninput="updateCount()"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/300</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Years of Experience <span class="opt">(optional)</span></label>
+        <select id="experience" class="form-select">
+          <option value="">Select…</option>
+          <option value="<1">Less than 1 year</option>
+          <option value="1-3">1 – 3 years</option>
+          <option value="3-5">3 – 5 years</option>
+          <option value="5-10">5 – 10 years</option>
+          <option value="10+">10+ years</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="go(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-brand" onclick="go(3)">Next <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Location ───────────────────────────────────── -->
+    <div id="p3" class="panel">
+      <div class="panel-title">Your Service Location</div>
+      <div class="panel-sub">Customers will find you based on your area. Select as specific as you can.</div>
+      <div id="a3" class="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Region <span style="color:#dc3545">*</span></label>
+        <select id="selRegion" class="form-select" onchange="loadProvinces()">
+          <option value="">Select Region…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Province <span style="color:#dc3545">*</span></label>
+        <select id="selProvince" class="form-select" onchange="loadCities()" disabled>
+          <option value="">Select Province…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / Municipality <span style="color:#dc3545">*</span></label>
+        <select id="selCity" class="form-select" onchange="loadBarangays()" disabled>
+          <option value="">Select City / Municipality…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Barangay <span class="opt">(optional but recommended)</span></label>
+        <select id="selBrgy" class="form-select" disabled>
+          <option value="">Select Barangay…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Street Address <span class="opt">(optional)</span></label>
+        <input id="streetAddr" class="form-input" placeholder="House/Unit No., Street Name"/>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="go(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-brand" onclick="go(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: Documents & Portfolio ─────────────────────── -->
+    <div id="p4" class="panel">
+      <div class="panel-title">ID & Portfolio</div>
+      <div class="panel-sub">Help customers trust you. A government ID is required. Portfolio photos are optional but highly recommended.</div>
+      <div id="a4" class="alert"></div>
+
+      <div class="info-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Your ID is used <strong>only for identity verification</strong>. It will not be shown publicly to customers.</span>
+      </div>
+
+      <!-- Government ID -->
+      <div class="form-group">
+        <label class="form-label">Government-Issued ID <span style="color:#dc3545">*</span></label>
+        <select id="idType" class="form-select" style="margin-bottom:8px;">
+          <option value="">Select ID type…</option>
+          <option>PhilSys / National ID</option>
+          <option>Driver's License</option>
+          <option>Passport</option>
+          <option>SSS / GSIS ID</option>
+          <option>Postal ID</option>
+          <option>Voter's ID</option>
+          <option>PRC ID</option>
+          <option>TIN ID</option>
+          <option>Other Government ID</option>
+        </select>
+        <div class="upload-zone" id="idZone">
+          <input type="file" id="idFile" accept="image/*,.pdf" onchange="handleIdUpload(this)"/>
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label">Tap to upload your ID</div>
+          <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
+          <div id="idPreviewWrap" style="margin-top:8px;display:none;">
+            <img id="idPreview" style="max-width:100%;max-height:120px;border-radius:8px;border:1.5px solid var(--border);"/>
+            <div style="font-size:11px;color:var(--green);margin-top:4px;font-weight:700;"><i class="fa-solid fa-check"></i> ID uploaded</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Photos -->
+      <div class="form-group">
+        <label class="form-label">Portfolio Photos <span class="opt">(optional · up to 5)</span></label>
+        <div class="upload-zone" id="portZone">
+          <input type="file" id="portFiles" accept="image/*" multiple onchange="handlePortfolio(this)"/>
+          <div class="upload-icon">📸</div>
+          <div class="upload-label">Tap to add portfolio photos</div>
+          <div class="upload-sub">Show your best work · JPG or PNG</div>
+        </div>
+        <div class="upload-preview" id="portPreview"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="go(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-brand" onclick="go(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ── STEP 5: Package ────────────────────────────────────── -->
+    <div id="p5" class="panel">
+      <div class="panel-title">Choose Your Provider Plan</div>
+      <div class="panel-sub">All plans include account approval and a public listing. Upgrade anytime.</div>
+      <div id="a5" class="alert"></div>
+
+      <!-- Fixia Elite note -->
+      <div class="elite-banner">
+        <div class="crown">👑</div>
+        <div class="et">Fixia Elite</div>
+        <div class="es">This exclusive tier is admin-granted — earned through competitions, top performance, or special promotions. It cannot be purchased.</div>
+      </div>
+
+      <div class="pkg-list" id="provPkgList">
+        <!-- Loaded dynamically -->
+      </div>
+
+      <!-- Payment section -->
+      <div id="provPaySection" style="display:none;">
+        <div style="background:var(--brand-light);border:1px solid rgba(255,90,31,0.2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;font-size:0.75rem;color:var(--brand-dark);line-height:1.6;">
+          <i class="fa-solid fa-circle-info"></i> Selected: <strong id="provPkgLabel">—</strong>. Complete payment to proceed.
+        </div>
+        <div class="pay-grid">
+          <div class="pay-opt" onclick="pickPayment('gcash')" id="pp_gcash"><div class="pay-opt-icon">📱</div><div class="pay-opt-label">GCash</div></div>
+          <div class="pay-opt" onclick="pickPayment('maya')"  id="pp_maya"><div class="pay-opt-icon">💳</div><div class="pay-opt-label">Maya</div></div>
+          <div class="pay-opt" onclick="pickPayment('bank')"  id="pp_bank"><div class="pay-opt-icon">🏦</div><div class="pay-opt-label">Bank Transfer</div></div>
+          <div class="pay-opt" onclick="pickPayment('paypal')" id="pp_paypal"><div class="pay-opt-icon">🌐</div><div class="pay-opt-label">PayPal</div></div>
+        </div>
+        <div id="provRefSection" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Reference / Transaction No. <span style="color:#dc3545">*</span></label>
+            <input id="provPayRef" class="form-input" placeholder="Enter payment reference number"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="go(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-brand" id="provSubmitBtn" onclick="doProviderSubmit()">
+          <span class="spinner" id="provSpinner"></span>
+          <span id="provSubmitText">Submit Application <i class="fa-solid fa-paper-plane"></i></span>
+        </button>
+      </div>
+
+      <div class="login-row" style="margin-top:0.75rem;">
+        <span style="font-size:0.72rem;color:var(--text-3);">By submitting, you agree to Fixia's <a href="#" style="color:var(--brand);">Terms of Service</a> and <a href="#" style="color:var(--brand);">Privacy Policy</a>.</span>
+      </div>
+    </div>
+
+    <!-- ── STEP DONE ──────────────────────────────────────────── -->
+    <div id="pDone" class="panel" style="text-align:center;padding:1rem 0;">
+      <div style="font-size:3.5rem;margin-bottom:1rem;">📋</div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:8px;">Application Submitted!</div>
+      <div id="doneMsg" style="font-size:0.83rem;color:var(--text-3);line-height:1.75;margin-bottom:1.5rem;"></div>
+      <button class="btn btn-brand" onclick="window.location.href='login.html'">
+        <i class="fa-solid fa-right-to-bracket"></i> Go to Login
+      </button>
+    </div>
+
+  </div><!-- /card -->
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="fixia-data.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   SUBCATEGORIES
+══════════════════════════════════════════════════════════════ */
+const SUBCATS = {
+  home:   ['Plumbing','Aircon Service','Electrical','Painting','Carpentry','Waterproofing','Door & Window Repair','Gas & LPG','Deep Cleaning','Pest Control'],
+  auto:   ['General Auto Repair','Car Aircon','Tires & Wheels','PMS / Oil Change','Battery','Car Wash & Detailing','Car Locksmith','Towing','Window Tint'],
+  garden: ['Lawn Mowing','Tree Trimming','Landscaping','Pest Control','Irrigation','Garden Design'],
+  elec:   ['Wiring & Rewiring','Solar Installation','Lighting','CCTV Installation','Network / Internet Setup','Generator Service'],
+  beauty: ['Haircut & Styling','Nails','Facial & Skincare','Massage','Personal Training','Makeup Artist'],
+  health: ['Home Nursing','Home Laboratory','Elder Care','Baby Care','Medicine Delivery','Dental (Home Visit)'],
+  tech:   ['Laptop Repair','Desktop Repair','Network Setup','Printer Repair','Phone Repair','Data Recovery'],
+  build:  ['Renovation','Civil / Structural Engineering','Architecture','Masonry','Drainage Works','Driveway & Flooring'],
+  clean:  ['House Cleaning','Office Cleaning','Upholstery Cleaning','Carpet Cleaning','Laundry','Junk Removal'],
+  pet:    ['Pet Grooming','Pet Sitting','Veterinary (Home Visit)','Dog Walking','Pet Hotel','Vaccination'],
+  event:  ['Photography','DJ / Live Band','Catering','Event Host / MC','Tent & Tables Rental','Decorations'],
+};
+
+function loadSubcats() {
+  const cat = document.getElementById('catMain').value;
+  const sub = document.getElementById('catSub');
+  sub.innerHTML = '<option value="">Select specific service…</option>';
+  if (!cat || !SUBCATS[cat]) { sub.disabled = true; return; }
+  sub.disabled = false;
+  SUBCATS[cat].forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s; sub.appendChild(o);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PSGC LOCATION
+══════════════════════════════════════════════════════════════ */
+const PSGC = 'https://psgc.gitlab.io/api';
+let regionsLoaded = false;
+
+async function loadRegions() {
+  if (regionsLoaded) return;
+  const sel = document.getElementById('selRegion');
+  try {
+    const r = await fetch(`${PSGC}/regions/`);
+    const d = await r.json();
+    d.sort((a,b)=>a.name.localeCompare(b.name));
+    d.forEach(reg => {
+      const o = document.createElement('option');
+      o.value = reg.code; o.textContent = reg.name; sel.appendChild(o);
+    });
+    regionsLoaded = true;
+  } catch(e) { console.error('PSGC regions:', e); }
+}
+
+async function loadProvinces() {
+  const regCode = document.getElementById('selRegion').value;
+  const sp = document.getElementById('selProvince');
+  const sc = document.getElementById('selCity');
+  const sb = document.getElementById('selBrgy');
+  resetSel(sp,'Select Province…'); resetSel(sc,'Select City / Municipality…'); resetSel(sb,'Select Barangay…');
+  sc.disabled=true; sb.disabled=true;
+  if (!regCode) { sp.disabled=true; return; }
+  sp.disabled=false;
+  try {
+    const r = await fetch(`${PSGC}/regions/${regCode}/provinces/`);
+    const d = await r.json();
+    d.sort((a,b)=>a.name.localeCompare(b.name));
+    if (!d.length) { sp.disabled=true; await loadCitiesForRegion(regCode); return; }
+    d.forEach(p=>{ const o=document.createElement('option'); o.value=p.code; o.textContent=p.name; sp.appendChild(o); });
+  } catch(e) {}
+}
+
+async function loadCitiesForRegion(regCode) {
+  const sc = document.getElementById('selCity');
+  sc.disabled=false;
+  try {
+    const r = await fetch(`${PSGC}/regions/${regCode}/cities-municipalities/`);
+    const d = await r.json();
+    d.sort((a,b)=>a.name.localeCompare(b.name));
+    d.forEach(c=>{ const o=document.createElement('option'); o.value=c.code; o.textContent=c.name; sc.appendChild(o); });
+  } catch(e) {}
+}
+
+async function loadCities() {
+  const pc = document.getElementById('selProvince').value;
+  const sc = document.getElementById('selCity');
+  const sb = document.getElementById('selBrgy');
+  resetSel(sc,'Select City / Municipality…'); resetSel(sb,'Select Barangay…'); sb.disabled=true;
+  if (!pc) { sc.disabled=true; return; }
+  sc.disabled=false;
+  try {
+    const r = await fetch(`${PSGC}/provinces/${pc}/cities-municipalities/`);
+    const d = await r.json();
+    d.sort((a,b)=>a.name.localeCompare(b.name));
+    d.forEach(c=>{ const o=document.createElement('option'); o.value=c.code; o.textContent=c.name; sc.appendChild(o); });
+  } catch(e) {}
+}
+
+async function loadBarangays() {
+  const cc = document.getElementById('selCity').value;
+  const sb = document.getElementById('selBrgy');
+  resetSel(sb,'Select Barangay…');
+  if (!cc) { sb.disabled=true; return; }
+  sb.disabled=false;
+  try {
+    const r = await fetch(`${PSGC}/cities-municipalities/${cc}/barangays/`);
+    const d = await r.json();
+    d.sort((a,b)=>a.name.localeCompare(b.name));
+    d.forEach(b=>{ const o=document.createElement('option'); o.value=b.code; o.textContent=b.name; sb.appendChild(o); });
+  } catch(e) {}
+}
+
+function resetSel(sel, ph) { sel.innerHTML=`<option value="">${ph}</option>`; }
+
+/* ══════════════════════════════════════════════════════════════
+   FILE UPLOADS
+══════════════════════════════════════════════════════════════ */
+let idFileData    = null;
+let portFilesData = [];
+
+function handleIdUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { showToast('File too large. Max 5MB.','error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    idFileData = { name: file.name, type: file.type, data: e.target.result };
+    document.getElementById('idZone').classList.add('has-file');
+    const prev = document.getElementById('idPreviewWrap');
+    if (file.type.startsWith('image/')) {
+      document.getElementById('idPreview').src = e.target.result;
+      prev.style.display = 'block';
+    } else {
+      prev.style.display = 'block';
+      document.getElementById('idPreview').style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function handlePortfolio(input) {
+  const files = Array.from(input.files).slice(0, 5 - portFilesData.length);
+  files.forEach(file => {
+    if (portFilesData.length >= 5) return;
+    if (file.size > 5*1024*1024) { showToast('One file exceeds 5MB, skipped.','error'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      portFilesData.push({ name: file.name, type: file.type, data: e.target.result });
+      renderPortPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPortPreviews() {
+  const wrap = document.getElementById('portPreview');
+  wrap.innerHTML = portFilesData.map((f,i) => `
+    <div class="preview-thumb-wrap">
+      <img src="${f.data}" alt="Portfolio ${i+1}"/>
+      <button class="preview-remove" onclick="removePort(${i})">×</button>
+    </div>`).join('');
+  if (portFilesData.length >= 5) document.getElementById('portZone').style.display = 'none';
+}
+
+function removePort(i) {
+  portFilesData.splice(i,1);
+  document.getElementById('portZone').style.display = 'block';
+  renderPortPreviews();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PACKAGES
+══════════════════════════════════════════════════════════════ */
+let selPkg = null;
+let selPkgData = null;
+let selPayment = null;
+
+async function loadProviderPackages() {
+  const list = document.getElementById('provPkgList');
+  list.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:0.83rem;padding:1rem;">Loading plans…</div>';
+  try {
+    const pkgs = await FX.getProviderPackages();
+    renderProviderPackages(pkgs);
+  } catch(e) {
+    // Fallback
+    renderProviderPackages([
+      { id:'basic',   name:'Basic',   price:299,  period:'month', listings:5,  icon:'🔵', popular:false,
+        perks:['5 service listings','Standard placement','Basic analytics'] },
+      { id:'pro',     name:'Pro',     price:799,  period:'month', listings:10, icon:'🟠', popular:true,
+        perks:['10 service listings','Featured strip','Priority search','Portfolio showcase'] },
+      { id:'premium', name:'Premium', price:1499, period:'month', listings:999, icon:'🟣', popular:false,
+        perks:['Unlimited listings','Top of featured','Ad boost slot','Full analytics','Verified badge'] },
+    ]);
+  }
+}
+
+function renderProviderPackages(pkgs) {
+  const list = document.getElementById('provPkgList');
+  list.innerHTML = '';
+  pkgs.forEach(pkg => {
+    const card = document.createElement('div');
+    card.className = 'pkg-card';
+    card.id = `pp_${pkg.id}`;
+    card.onclick = () => pickPkg(pkg);
+    const listingLabel = pkg.listings >= 999 ? 'Unlimited listings' : `${pkg.listings} service listings`;
+    card.innerHTML = `
+      ${pkg.popular ? '<div class="pkg-popular-flag">⭐ Most Popular</div>' : ''}
+      <div class="pkg-icon-big">${pkg.icon || '📦'}</div>
+      <div class="pkg-body">
+        <div class="pkg-head">
+          <span class="pkg-name">${pkg.name}</span>
+          <span class="pkg-price-tag">₱${pkg.price}</span>
+          <span class="pkg-period-tag">/ ${pkg.period}</span>
+        </div>
+        <div class="pkg-perks">
+          <span class="perk-tag">📋 ${listingLabel}</span>
+          ${(pkg.perks||[]).slice(1).map(p=>`<span class="perk-tag">${p}</span>`).join('')}
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function pickPkg(pkg) {
+  document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('selected'));
+  const el = document.getElementById(`pp_${pkg.id}`);
+  if (el) el.classList.add('selected');
+  selPkg = pkg.id; selPkgData = pkg;
+  document.getElementById('provPkgLabel').textContent = `${pkg.name} — ₱${pkg.price}/${pkg.period}`;
+  document.getElementById('provPaySection').style.display = 'block';
+  selPayment = null;
+  document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('provRefSection').style.display = 'none';
+}
+
+function pickPayment(method) {
+  document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('pp_'+method).classList.add('selected');
+  selPayment = method;
+  document.getElementById('provRefSection').style.display = method!=='paypal' ? 'block' : 'none';
+  if (method==='paypal') document.getElementById('provPayRef').value='';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP NAVIGATION
+══════════════════════════════════════════════════════════════ */
+const TOTAL = 5;
+let currentStep = 1;
+
+function go(n) {
+  // Validate current before moving forward
+  if (n > currentStep) {
+    if (!validateStep(currentStep)) return;
+  }
+  // Load data for target step
+  if (n === 3 && !regionsLoaded) loadRegions();
+  if (n === 5) loadProviderPackages();
+
+  // Update panels
+  for (let i=1;i<=TOTAL;i++) {
+    const p = document.getElementById('p'+i);
+    if (p) p.classList.toggle('active', i===n);
+  }
+  document.getElementById('pDone')?.classList.remove('active');
+
+  // Update step indicator
+  for (let i=1;i<=TOTAL;i++) {
+    const s  = document.getElementById('s'+i);
+    const sc = document.getElementById('sc'+i);
+    if (i < n)  { s.className='step done';   sc.innerHTML='<i class="fa-solid fa-check" style="font-size:9px;"></i>'; }
+    if (i===n)  { s.className='step active'; sc.textContent=i; }
+    if (i > n)  { s.className='step';        sc.textContent=i; }
+    if (i < TOTAL) {
+      const sl = document.getElementById('sl'+i);
+      if (sl) sl.classList.toggle('done', i<n);
+    }
+  }
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VALIDATION
+══════════════════════════════════════════════════════════════ */
+function validateStep(n) {
+  const alertId = 'a'+n;
+  hideAlert(alertId);
+
+  if (n===1) {
+    const fn=document.getElementById('fn').value.trim();
+    const ln=document.getElementById('ln').value.trim();
+    const em=document.getElementById('em').value.trim();
+    const ph=document.getElementById('ph').value.trim();
+    const un=document.getElementById('un').value.trim();
+    const pw=document.getElementById('pw').value;
+    const cf=document.getElementById('cf').value;
+    if (!fn||!ln)                          { showAlert(alertId,'First and last name are required.'); return false; }
+    if (!em||!/\S+@\S+\.\S+/.test(em))    { showAlert(alertId,'A valid email address is required.'); return false; }
+    if (!ph||ph.length<10)                 { showAlert(alertId,'A valid Philippine phone number is required.'); return false; }
+    if (!un||un.length<3)                  { showAlert(alertId,'Username must be at least 3 characters.'); return false; }
+    if (!pw||pw.length<8)                  { showAlert(alertId,'Password must be at least 8 characters.'); return false; }
+    if (pw!==cf)                           { showAlert(alertId,'Passwords do not match.'); return false; }
+  }
+
+  if (n===2) {
+    if (!document.getElementById('bizName').value.trim()) { showAlert(alertId,'Please enter your business or service name.'); return false; }
+    if (!document.getElementById('provType').value)       { showAlert(alertId,'Please select your provider type.'); return false; }
+    if (!document.getElementById('catMain').value)        { showAlert(alertId,'Please select a main service category.'); return false; }
+    if (!document.getElementById('catSub').value)         { showAlert(alertId,'Please select a specific service.'); return false; }
+    const desc = document.getElementById('bizDesc').value.trim();
+    if (!desc||desc.length<20)                            { showAlert(alertId,'Please write a short description (at least 20 characters).'); return false; }
+  }
+
+  if (n===3) {
+    const city = document.getElementById('selCity');
+    if (!city.value) { showAlert(alertId,'Please select at least a City or Municipality.'); return false; }
+  }
+
+  if (n===4) {
+    if (!document.getElementById('idType').value) { showAlert(alertId,'Please select your ID type.'); return false; }
+    if (!idFileData)                              { showAlert(alertId,'Please upload a photo of your government ID.'); return false; }
+  }
+
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUBMIT
+══════════════════════════════════════════════════════════════ */
+async function doProviderSubmit() {
+  hideAlert('a5');
+  if (!selPkg)     { showAlert('a5','Please choose a provider package.'); return; }
+  if (!selPayment) { showAlert('a5','Please select a payment method.'); return; }
+  if (selPayment!=='paypal' && !document.getElementById('provPayRef').value.trim()) {
+    showAlert('a5','Please enter your payment reference number.'); return;
+  }
+
+  const btn=document.getElementById('provSubmitBtn');
+  const sp=document.getElementById('provSpinner');
+  const bt=document.getElementById('provSubmitText');
+  btn.disabled=true; sp.classList.add('on'); bt.style.display='none';
+
+  const cityEl   = document.getElementById('selCity');
+  const brgyEl   = document.getElementById('selBrgy');
+  const provEl   = document.getElementById('selProvince');
+  const regionEl = document.getElementById('selRegion');
+
+  const cityName   = cityEl.options[cityEl.selectedIndex]?.text   || '';
+  const brgyName   = brgyEl.options[brgyEl.selectedIndex]?.text   || '';
+  const provName   = provEl.options[provEl.selectedIndex]?.text   || '';
+  const regionName = regionEl.options[regionEl.selectedIndex]?.text || '';
+
+  const formData = {
+    firstName:    document.getElementById('fn').value.trim(),
+    lastName:     document.getElementById('ln').value.trim(),
+    email:        document.getElementById('em').value.trim(),
+    phone:        document.getElementById('ph').value.trim(),
+    username:     document.getElementById('un').value.trim(),
+    password:     document.getElementById('pw').value,
+    role:         'provider',
+    status:       'pending',
+    bizName:      document.getElementById('bizName').value.trim(),
+    provType:     document.getElementById('provType').value,
+    catMain:      document.getElementById('catMain').value,
+    catSub:       document.getElementById('catSub').value,
+    bizDesc:      document.getElementById('bizDesc').value.trim(),
+    experience:   document.getElementById('experience').value,
+    region:       regionEl.value,   regionName,
+    province:     provEl.value,     provName,
+    city:         cityEl.value,     cityName,
+    barangay:     brgyEl.value,     brgyName,
+    streetAddr:   document.getElementById('streetAddr').value.trim(),
+    idType:       document.getElementById('idType').value,
+    idFile:       idFileData,
+    portfolio:    portFilesData,
+    package:      selPkg,
+    packageName:  selPkgData?.name || selPkg,
+    paymentMethod:    selPayment,
+    paymentReference: document.getElementById('provPayRef')?.value?.trim() || '',
+    paymentAmount:    selPkgData?.price || 0,
+    paymentStatus:    'pending',
+  };
+
+  // PayPal redirect
+  if (selPayment==='paypal') {
+    sessionStorage.setItem('fixia_provider_signup', JSON.stringify({...formData, idFile:null, portfolio:[]}));
+    try {
+      const r = await fetch('/api/create-paypal-checkout', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ package: selPkg, type:'provider' })
+      });
+      const d = await r.json();
+      if (d.approvalUrl) { window.location.href=d.approvalUrl; return; }
+      throw new Error(d.error||'PayPal error');
+    } catch(e) {
+      showAlert('a5','PayPal checkout failed: '+e.message);
+      btn.disabled=false; sp.classList.remove('on'); bt.style.display='';
+      return;
+    }
+  }
+
+  try {
+    await FX.registerProvider(formData);
+
+    // Notify owner
+    await FX.sendEmail('provider_signup_notify', {
+      fullName:         `${formData.firstName} ${formData.lastName}`,
+      email:            formData.email,
+      bizName:          formData.bizName,
+      provType:         formData.provType,
+      service:          formData.catSub,
+      location:         `${cityName}${provName ? ', '+provName : ''}`,
+      package:          formData.packageName,
+      paymentMethod:    formData.paymentMethod,
+      paymentReference: formData.paymentReference,
+      paymentAmount:    '₱'+formData.paymentAmount,
+    });
+
+    // Confirmation to provider
+    await FX.sendEmail('provider_signup_confirm', {
+      fullName: `${formData.firstName} ${formData.lastName}`,
+      email:    formData.email,
+      bizName:  formData.bizName,
+      package:  formData.packageName,
+    });
+
+    document.getElementById('doneMsg').innerHTML =
+      `Thank you, <strong>${formData.firstName}</strong>! Your application for <strong>${formData.bizName}</strong> has been submitted.<br/><br/>
+       Our team will review your ID and details within <strong>24-48 hours</strong>. You'll receive an email at <strong>${formData.email}</strong> once approved.`;
+
+    // Show done panel
+    for (let i=1;i<=TOTAL;i++) document.getElementById('p'+i)?.classList.remove('active');
+    document.getElementById('pDone').classList.add('active');
+    // Mark all steps done
+    for (let i=1;i<=TOTAL;i++) {
+      document.getElementById('s'+i).className='step done';
+      document.getElementById('sc'+i).innerHTML='<i class="fa-solid fa-check" style="font-size:9px;"></i>';
+      if (i<TOTAL) document.getElementById('sl'+i)?.classList.add('done');
+    }
+
+  } catch(e) {
+    showAlert('a5','Submission failed: '+(e.message||'Please try again.'));
+  } finally {
+    btn.disabled=false; sp.classList.remove('on'); bt.style.display='';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════════ */
+function togglePwd(iId, icId) {
+  const inp=document.getElementById(iId); const ico=document.getElementById(icId);
+  inp.type=inp.type==='password'?'text':'password';
+  ico.className=inp.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';
+}
+function checkStrength(pw) {
+  const fill=document.getElementById('strengthFill');
+  let s=0;
+  if(pw.length>=8)s++; if(/[A-Z]/.test(pw))s++; if(/[0-9]/.test(pw))s++; if(/[^A-Za-z0-9]/.test(pw))s++;
+  fill.style.width=['0','25%','50%','75%','100%'][s];
+  fill.style.background=['transparent','#dc3545','#f59e0b','#f59e0b','#10B981'][s];
+}
+function updateCount() {
+  document.getElementById('charCount').textContent = document.getElementById('bizDesc').value.length;
+}
+function showAlert(id, msg, type='error') {
+  const el=document.getElementById(id); if(!el) return;
+  el.className=`alert alert-${type} show`; el.textContent=msg;
+}
+function hideAlert(id) {
+  const el=document.getElementById(id); if(el) el.className='alert';
+}
+let toastTimer;
+function showToast(msg,type='') {
+  const el=document.getElementById('toast'); el.textContent=msg;
+  el.className=`toast show ${type}`;
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

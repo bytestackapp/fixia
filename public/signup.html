@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Signup — Choose Account Type
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Join Fixia — Create Account</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F5F7FA; --card:#FFFFFF; --border:#E8ECF0;
+      --green:#10B981;
+      --radius-sm:8px; --radius-md:14px; --radius-lg:20px;
+      --shadow-lg:0 20px 40px rgba(0,0,0,0.15);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background:linear-gradient(160deg, #0F1B2D 0%, #1E3048 50%, #FF5A1F22 100%);
+      min-height:100vh; display:flex; align-items:center;
+      justify-content:center; padding:1.5rem 1rem;
+      -webkit-font-smoothing:antialiased;
+    }
+    .bg-shapes { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .shape { position:absolute; border-radius:50%; background:rgba(255,90,31,0.06); animation:float 9s ease-in-out infinite; }
+    .shape:nth-child(1){width:220px;height:220px;top:5%;left:-5%;animation-delay:0s;}
+    .shape:nth-child(2){width:140px;height:140px;top:60%;right:-4%;animation-delay:2.5s;}
+    .shape:nth-child(3){width:80px;height:80px;top:35%;right:12%;animation-delay:5s;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-22px);}}
+
+    .container { position:relative; z-index:1; width:100%; max-width:420px; }
+    .card {
+      background:rgba(255,255,255,0.98); border-radius:var(--radius-lg);
+      padding:2.25rem 1.75rem; box-shadow:var(--shadow-lg); animation:slideUp 0.45s ease;
+    }
+    @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+
+    .logo-wrap { text-align:center; margin-bottom:1.75rem; }
+    .logo-name { font-size:1.6rem; font-weight:800; color:var(--navy); letter-spacing:-0.04em; }
+    .logo-name span { color:var(--brand); }
+    .logo-sub { font-size:0.83rem; color:var(--text-3); margin-top:3px; }
+    .page-title { font-size:1.15rem; font-weight:800; color:var(--navy); margin-bottom:4px; text-align:center; }
+    .page-sub { font-size:0.82rem; color:var(--text-3); text-align:center; margin-bottom:1.5rem; }
+
+    /* ── Type cards ──────────────────────────────────────────── */
+    .type-card {
+      border:2px solid var(--border); border-radius:var(--radius-md);
+      padding:1.25rem 1.1rem; cursor:pointer;
+      transition:all 0.2s; margin-bottom:0.9rem;
+      display:flex; align-items:flex-start; gap:1rem;
+      background:#fff;
+    }
+    .type-card:hover { border-color:var(--brand); background:var(--brand-light); }
+    .type-card:active { transform:scale(0.98); }
+    .type-card-icon {
+      width:52px; height:52px; border-radius:14px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    }
+    .icon-regular  { background:#EFF6FF; }
+    .icon-provider { background:#FFF0EB; }
+    .type-card-body { flex:1; }
+    .type-card-title { font-size:1rem; font-weight:800; color:var(--navy); margin-bottom:3px; }
+    .type-card-desc { font-size:0.78rem; color:var(--text-3); line-height:1.6; }
+    .type-card-perks { margin-top:8px; display:flex; flex-direction:column; gap:3px; }
+    .perk { font-size:0.73rem; color:var(--text-2); display:flex; align-items:center; gap:5px; }
+    .perk i { color:var(--green); font-size:10px; }
+    .type-card-arrow { color:var(--text-3); font-size:1rem; align-self:center; }
+
+    .login-row { text-align:center; margin-top:1.1rem; font-size:0.82rem; color:var(--text-3); }
+    .login-row button { background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-family:inherit; font-size:0.82rem; }
+    .login-row button:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+
+<div class="container">
+  <div class="card">
+
+    <div class="logo-wrap">
+      <div class="logo-name">fix<span>ia</span></div>
+      <div class="logo-sub">Find any service near you</div>
+    </div>
+
+    <div class="page-title">Join Fixia</div>
+    <div class="page-sub">Choose the account type that fits you</div>
+
+    <!-- Regular -->
+    <div class="type-card" onclick="window.location.href='signup-regular.html'">
+      <div class="type-card-icon icon-regular">🔍</div>
+      <div class="type-card-body">
+        <div class="type-card-title">I'm Looking for Services</div>
+        <div class="type-card-desc">Browse and find trusted providers near you — plumbing, aircon, auto repair, and more.</div>
+        <div class="type-card-perks">
+          <div class="perk"><i class="fa-solid fa-check"></i> Free to sign up</div>
+          <div class="perk"><i class="fa-solid fa-check"></i> Browse all providers</div>
+          <div class="perk"><i class="fa-solid fa-check"></i> Rate and review providers</div>
+        </div>
+      </div>
+      <div class="type-card-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+
+    <!-- Provider -->
+    <div class="type-card" onclick="window.location.href='signup-provider.html'">
+      <div class="type-card-icon icon-provider">🔧</div>
+      <div class="type-card-body">
+        <div class="type-card-title">I Offer Services</div>
+        <div class="type-card-desc">List your business or freelance skills and get discovered by thousands of customers in your area.</div>
+        <div class="type-card-perks">
+          <div class="perk"><i class="fa-solid fa-check"></i> Create a service listing</div>
+          <div class="perk"><i class="fa-solid fa-check"></i> Reach local customers</div>
+          <div class="perk"><i class="fa-solid fa-check"></i> Build your reputation</div>
+        </div>
+      </div>
+      <div class="type-card-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+
+    <div class="login-row">
+      Already have an account? <button onclick="window.location.href='login.html'">Sign In</button>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
