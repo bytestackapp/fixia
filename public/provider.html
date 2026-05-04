@@ -166,6 +166,10 @@
     .modal-overlay.active{display:flex;animation:fadeIn 0.2s;}
     .modal-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 28px;max-height:90vh;overflow-y:auto;}
     .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+	
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
   </style>
 </head>
 <body>
@@ -173,9 +177,9 @@
 <!-- TOP NAV -->
 <nav class="topnav">
   <button class="nav-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
-  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="max-width:150px;flex:1;">
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span style="color:rgba(255,255,255,0.45);font-size:0.8rem;font-family:inherit;" id="navTitle">Loading…</span>
+    <span id="navTitle" style="color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Loading…</span>
   </div>
   <button class="nav-share" id="saveBtn" onclick="toggleSave()" title="Save"><i class="fa-regular fa-bookmark"></i></button>
   <button class="nav-share" onclick="shareProfile()" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
@@ -294,9 +298,8 @@
       <i class="fa-solid fa-border-all"></i>
     </button>
   </div>
-  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+  <a class="bnav-item" href="bookings.html">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -685,16 +688,16 @@ function fmtDate(d) {
 </script>
 
 <script>
-// Load booking badge count
-(async function loadBookingBadge() {
+// Load notification bell badge
+(async function loadNotifBadge() {
   const sess = FX.getSession();
   if (!sess || sess.role !== 'regular') return;
   try {
     const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
+    const badge = document.getElementById('notifBellBadge');
     if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
     }
   } catch(e) {}
 })();
@@ -756,17 +759,21 @@ async function submitInquiry() {
     await FX.createInquiry(sess.userId, provider.id, msg);
     closeInquire();
     FX.adTrigger('inquiry_sent');
-    // Show success toast
+	// Show success toast
     let toast = document.getElementById('inquireToast');
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'inquireToast';
-      toast.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%);z-index:9999;background:#065f46;color:#fff;border-radius:8px;padding:0.75rem 1.4rem;font-size:0.82rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);';
+      toast.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:#065f46;color:#fff;border-radius:8px;padding:0.75rem 1.4rem;font-size:0.82rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;';
       document.body.appendChild(toast);
     }
     toast.textContent = "✅ Inquiry sent! We'll notify you when the provider replies.";
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    toast.style.opacity = '1';
+    setTimeout(() => {
+      toast.style.transform = 'translateX(-50%) translateY(80px)';
+      toast.style.opacity = '0';
+    }, 3500);
   } catch(e) {
     alertEl.textContent = e.message || 'Failed to send inquiry. Please try again.';
     alertEl.style.display = 'block';

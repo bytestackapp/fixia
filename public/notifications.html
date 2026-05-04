@@ -40,16 +40,23 @@
     .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;border:none;background:none;font-family:inherit;text-decoration:none;}
     .bnav-item i{font-size:1.05rem;}
     .bnav-item.active{color:var(--brand);}
+	
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
   </style>
 </head>
 <body>
 
 <nav class="topnav">
   <button class="nav-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
-  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="max-width:180px;">
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span style="color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;">Search…</span>
+    <span style="color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;">Search services…</span>
   </div>
+  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+    <i class="fa-solid fa-right-from-bracket"></i>
+  </button>
 </nav>
 
 <div id="notifList"></div>
@@ -80,22 +87,49 @@ const SAMPLE = [
   { icon:'✨', bg:'var(--brand-light)', title:'Upgrade to Fixia Plus', sub:'Remove pop-up ads and enjoy uninterrupted browsing. Upgrade anytime.', time:'2 days ago', unread:false, href:'signup-regular.html' },
 ];
 
-(function init() {
+(async function init() {
   if (!session) { window.location.href = 'login.html'; return; }
 
   const list = document.getElementById('notifList');
 
-  if (!SAMPLE.length) {
+  // Fetch real inquiry updates
+  let liveNotifs = [];
+  try {
+    const inquiries = await FX.getUserInquiries(session.userId);
+    const unread = inquiries.filter(i => i.user_has_unread);
+    const STATUS_LABEL = {
+      replied:   { icon:'💬', bg:'#EFF6FF', title:'Provider Replied', msg: i => `Your inquiry has a new reply. Tap to view and decide.` },
+      declined:  { icon:'❌', bg:'#FFF5F5', title:'Inquiry Declined', msg: i => `A provider declined your inquiry.` },
+      active:    { icon:'✅', bg:'#ECFDF5', title:'Booking Confirmed', msg: i => `Your booking is now active!` },
+      done:      { icon:'🏁', bg:'#FFFBEB', title:'Service Completed', msg: i => `The provider marked your service as done. Tap to confirm and rate.` },
+    };
+    liveNotifs = unread.map(i => {
+      const s = STATUS_LABEL[i.status] || { icon:'🔔', bg:'var(--brand-light)', title:'Update', msg: () => 'Your inquiry was updated.' };
+      return { icon: s.icon, bg: s.bg, title: s.title, sub: s.msg(i), time: 'New', unread: true, href: `bookings.html` };
+    });
+    // Mark as read now that user has seen them
+    await FX.markReadUser(session.userId);
+  } catch(e) {}
+
+  const SAMPLE = [
+    { icon:'⭐', bg:'#FFFBEB', title:'Rating Reminder', sub:'You recently transacted with Mang Larry Plumbing. Tap to leave a rating and help others!', time:'2 hours ago', unread:false, href:'provider.html?id=mang-larry' },
+    { icon:'🔔', bg:'#EFF6FF', title:'Welcome to Fixia!', sub:'Your account is set up. Start browsing services near you.', time:'Yesterday', unread:false, href:'homepage.html' },
+    { icon:'✨', bg:'var(--brand-light)', title:'Upgrade to Fixia Plus', sub:'Remove pop-up ads and enjoy uninterrupted browsing. Upgrade anytime.', time:'2 days ago', unread:false, href:'signup-regular.html' },
+  ];
+
+  const all = [...liveNotifs, ...SAMPLE];
+
+  if (!all.length) {
     list.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">🔔</div>
         <div class="empty-title">No Notifications Yet</div>
-        <div class="empty-sub">You'll see updates here — rating reminders, account alerts, and Fixia news.</div>
+        <div class="empty-sub">You'll see updates here — inquiry replies, booking confirmations, and Fixia news.</div>
       </div>`;
     return;
   }
 
-  list.innerHTML = SAMPLE.map(n => `
+  list.innerHTML = all.map(n => `
     <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="window.location.href='${n.href || '#'}'">
       <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
       <div class="notif-body">
@@ -105,22 +139,6 @@ const SAMPLE = [
       </div>
       ${n.unread ? '<div class="unread-dot"></div>' : ''}
     </div>`).join('');
-})();
-</script>
-
-<script>
-// Load booking badge count
-(async function loadBookingBadge() {
-  const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
-  try {
-    const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
-    if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
-    }
-  } catch(e) {}
 })();
 </script>
 </body>

@@ -73,18 +73,6 @@
     }
     .nav-search input::placeholder { color:rgba(255,255,255,0.45); }
     .nav-search i { color:rgba(255,255,255,0.45); font-size:13px; }
-    .nav-btn {
-      width:36px; height:36px; border-radius:10px;
-      border:none; cursor:pointer; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(255,255,255,0.10); color:#fff; font-size:15px;
-      position:relative;
-    }
-    .nav-btn .badge {
-      position:absolute; top:4px; right:4px;
-      width:8px; height:8px; border-radius:50%;
-      background:var(--brand); border:1.5px solid var(--navy);
-    }
 
     /* ── LOCATION BAR ────────────────────────────────────────── */
     .loc-bar {
@@ -232,9 +220,11 @@
     .stars-row span { font-size:0.7rem; color:var(--text-2); font-weight:600; }
 
     .provider-action {
-      display:flex; align-items:center;
-      justify-content:space-between;
+      display:flex; flex-direction:column;
+      align-items:flex-end; justify-content:space-between;
+      flex-shrink:0;
     }
+	
     .verified-badge {
       background:#ECFDF5; color:#065F46;
       font-size:0.6rem; font-weight:700; letter-spacing:0.04em;
@@ -378,6 +368,9 @@
     .gate-btn-secondary { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--navy); font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; }
     .gate-dismiss { text-align:center; margin-top:10px; font-size:0.72rem; color:var(--text-3); cursor:pointer; padding:4px; }
     .gate-dismiss:hover { color:var(--brand); }
+
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
 	
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -390,13 +383,16 @@
 <!-- ── TOP NAV ──────────────────────────────────────────────── -->
 <nav class="topnav">
   <div class="nav-logo">fix<span>ia</span></div>
-  <div class="nav-search">
+  <div class="nav-search" style="flex:1;">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <input type="text" placeholder="Search plumber, aircon, car repair…" id="searchInput"/>
+    <input type="text" id="searchInput" placeholder="Search services, providers…" autocomplete="off"/>
   </div>
-  <button class="nav-btn" onclick="openNotif()">
+  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
     <i class="fa-regular fa-bell"></i>
-    <div class="badge"></div>
+    <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
+  </button>
+  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+    <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
 
@@ -537,9 +533,8 @@
       <i class="fa-solid fa-border-all"></i>
     </button>
   </div>
-  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+  <a class="bnav-item" href="bookings.html">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -808,20 +803,18 @@ function renderNearbyCard(p) {
   ).join('');
   return `
     <div class="provider-card" onclick="openProvider('${p.id}')">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
-          <div style="font-size:1.25rem;">${emoji}</div>
-          ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
-        </div>
-        <div class="provider-info">
-          <div class="provider-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
-          <div class="provider-service">${p.cat_sub || '—'}</div>
-        </div>
+      <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
+        <div style="font-size:1.25rem;">${emoji}</div>
+        ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>
-      <div class="provider-meta">
-        <div class="stars-row">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
-        <div class="pmeta-item" style="font-size:0.65rem;color:var(--text-3);">
-          <i class="fa-solid fa-location-dot" style="font-size:9px;"></i> ${p.city_name || '—'}
+      <div class="provider-info">
+        <div class="provider-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
+        <div class="provider-service">${p.cat_sub || '—'}</div>
+        <div class="provider-meta">
+          <div class="stars-row">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
+          <div class="pmeta-item" style="font-size:0.65rem;color:var(--text-3);">
+            <i class="fa-solid fa-location-dot" style="font-size:9px;"></i> ${p.city_name || '—'}
+          </div>
         </div>
       </div>
       <div class="provider-action">
@@ -986,16 +979,16 @@ openNotif = function() {
 
 
 <script>
-// Load booking badge count
-(async function loadBookingBadge() {
+// Load notification bell badge
+(async function loadNotifBadge() {
   const sess = FX.getSession();
   if (!sess || sess.role !== 'regular') return;
   try {
     const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
+    const badge = document.getElementById('notifBellBadge');
     if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
     }
   } catch(e) {}
 })();

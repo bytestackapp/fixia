@@ -191,9 +191,8 @@
       <i class="fa-solid fa-border-all"></i>
     </button>
   </div>
-  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+  <a class="bnav-item" href="bookings.html">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -398,16 +397,16 @@ function clearSearch() {
 </script>
 
 <script>
-// Load booking badge count
-(async function loadBookingBadge() {
+// Load notification bell badge
+(async function loadNotifBadge() {
   const sess = FX.getSession();
   if (!sess || sess.role !== 'regular') return;
   try {
     const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
+    const badge = document.getElementById('notifBellBadge');
     if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
     }
   } catch(e) {}
 })();

@@ -33,7 +33,6 @@
     .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
     .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
     .nav-logo span{color:var(--brand);}
-    .nav-spacer{flex:1;}
     .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:38px;gap:8px;cursor:pointer;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);}
     .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:13px;}
@@ -98,6 +97,10 @@
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
     .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
+
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
   </style>
 </head>
 <body>
@@ -105,11 +108,17 @@
 <!-- TOP NAV -->
 <nav class="topnav">
   <div class="nav-logo">fix<span>ia</span></div>
-  <div class="nav-spacer"></div>
-  <div class="nav-search-wrap" onclick="window.location.href='search.html'">
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span>Search services…</span>
   </div>
+  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
+    <i class="fa-regular fa-bell"></i>
+    <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
+  </button>
+  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+    <i class="fa-solid fa-right-from-bracket"></i>
+  </button>
 </nav>
 
 <!-- PAGE HEADER -->
