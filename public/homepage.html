@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Homepage / Discover
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Fixia — Find Any Service Near You</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:       #FF5A1F;
+      --brand-dark:  #D94200;
+      --brand-light: #FFF0EB;
+      --navy:        #0F1B2D;
+      --navy-mid:    #1E3048;
+      --text:        #1A2332;
+      --text-2:      #4A5568;
+      --text-3:      #8896A5;
+      --bg:          #F5F7FA;
+      --card:        #FFFFFF;
+      --border:      #E8ECF0;
+      --gold:        #F59E0B;
+      --green:       #10B981;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-sm:   0 1px 4px rgba(0,0,0,0.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:   0 8px 32px rgba(0,0,0,0.13);
+      --nav-h:       60px;
+      --bottom-h:    64px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding-bottom:calc(var(--bottom-h) + 16px);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav {
+      position:sticky; top:0; z-index:100;
+      background:var(--navy);
+      height:var(--nav-h);
+      display:flex; align-items:center;
+      padding:0 16px; gap:10px;
+    }
+    .nav-logo {
+      font-size:1.45rem; font-weight:800;
+      color:#fff; letter-spacing:-0.04em; flex-shrink:0;
+    }
+    .nav-logo span { color:var(--brand); }
+    .nav-search {
+      flex:1; display:flex; align-items:center;
+      background:rgba(255,255,255,0.10);
+      border:1.5px solid rgba(255,255,255,0.15);
+      border-radius:10px; padding:0 12px; height:38px; gap:8px;
+    }
+    .nav-search input {
+      flex:1; background:none; border:none; outline:none;
+      color:#fff; font-size:0.875rem; font-family:inherit;
+    }
+    .nav-search input::placeholder { color:rgba(255,255,255,0.45); }
+    .nav-search i { color:rgba(255,255,255,0.45); font-size:13px; }
+    .nav-btn {
+      width:36px; height:36px; border-radius:10px;
+      border:none; cursor:pointer; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,0.10); color:#fff; font-size:15px;
+      position:relative;
+    }
+    .nav-btn .badge {
+      position:absolute; top:4px; right:4px;
+      width:8px; height:8px; border-radius:50%;
+      background:var(--brand); border:1.5px solid var(--navy);
+    }
+
+    /* ── LOCATION BAR ────────────────────────────────────────── */
+    .loc-bar {
+      background:var(--navy-mid);
+      padding:8px 16px;
+      display:flex; align-items:center; gap:6px;
+      font-size:0.78rem; color:rgba(255,255,255,0.75);
+      cursor:pointer;
+    }
+    .loc-bar i { color:var(--brand); font-size:12px; }
+    .loc-bar strong { color:#fff; }
+    .loc-bar .change { margin-left:auto; color:var(--brand); font-size:0.75rem; font-weight:600; }
+
+    /* ── MAIN SCROLL AREA ────────────────────────────────────── */
+    .main { padding:0 0 8px; }
+
+    /* ── FEATURED BANNER ─────────────────────────────────────── */
+    .featured-section { padding:14px 16px 0; }
+    .section-label {
+      font-size:0.7rem; font-weight:700; letter-spacing:0.1em;
+      text-transform:uppercase; color:var(--text-3);
+      margin-bottom:10px; display:flex; align-items:center; gap:6px;
+    }
+    .section-label .dot { width:6px; height:6px; border-radius:50%; background:var(--brand); }
+
+    /* Featured 2-per-row grid */
+    #featuredList {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .featured-card {
+      background:var(--navy);
+      border-radius:var(--radius-lg);
+      overflow:hidden;
+      position:relative; cursor:pointer;
+      display:flex; flex-direction:column;
+    }
+    .featured-card .fc-img-placeholder {
+      width:100%; height:100px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.5rem;
+    }
+    .fc-img-placeholder.plumbing { background:linear-gradient(135deg,#1e3c72,#2a5298); }
+    .fc-img-placeholder.aircon   { background:linear-gradient(135deg,#0f4c75,#1b6ca8); }
+    .fc-img-placeholder.auto     { background:linear-gradient(135deg,#1a1a2e,#16213e); }
+    .fc-img-placeholder.elec     { background:linear-gradient(135deg,#2d3561,#c05b2f); }
+
+    .featured-card .fc-badge {
+      position:absolute; top:10px; left:10px;
+      background:var(--gold); color:#7B4F00;
+      font-size:0.65rem; font-weight:700; letter-spacing:0.06em;
+      padding:3px 8px; border-radius:20px; text-transform:uppercase;
+    }
+    .featured-card .fc-body {
+      padding:10px 12px 12px;
+    }
+    .fc-name { font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fc-service { font-size:0.68rem; color:rgba(255,255,255,0.55); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fc-row { display:flex; align-items:center; justify-content:space-between; }
+    .fc-stars { display:flex; align-items:center; gap:2px; font-size:0.68rem; }
+    .fc-stars i { color:var(--gold); font-size:11px; }
+    .fc-stars span { color:rgba(255,255,255,0.7); }
+    .fc-loc { font-size:0.72rem; color:rgba(255,255,255,0.45); display:flex; align-items:center; gap:3px; }
+    .fc-loc i { color:var(--brand); font-size:10px; }
+    .fc-cta {
+      background:var(--brand); color:#fff;
+      border:none; border-radius:8px;
+      font-size:0.72rem; font-weight:700;
+      padding:5px 12px; cursor:pointer; font-family:inherit;
+    }
+
+    /* ── AD BANNER ───────────────────────────────────────────── */
+    .ad-banner {
+      margin:14px 16px 0;
+      background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius:var(--radius-md);
+      padding:12px 16px;
+      display:flex; align-items:center; gap:12px;
+      cursor:pointer; position:relative; overflow:hidden;
+    }
+    .ad-banner::before {
+      content:''; position:absolute; right:-20px; top:-20px;
+      width:100px; height:100px; border-radius:50%;
+      background:rgba(255,255,255,0.08);
+    }
+    .ad-banner .ad-icon { font-size:2rem; flex-shrink:0; }
+    .ad-banner .ad-text { flex:1; }
+    .ad-banner .ad-label {
+      font-size:0.6rem; font-weight:700; letter-spacing:0.1em;
+      color:rgba(255,255,255,0.5); text-transform:uppercase; margin-bottom:2px;
+    }
+    .ad-banner .ad-title { font-size:0.9rem; font-weight:700; color:#fff; line-height:1.3; }
+    .ad-banner .ad-sub { font-size:0.72rem; color:rgba(255,255,255,0.7); margin-top:2px; }
+    .ad-banner .ad-btn {
+      background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.3);
+      color:#fff; font-size:0.7rem; font-weight:700;
+      padding:5px 12px; border-radius:20px; cursor:pointer; font-family:inherit;
+      flex-shrink:0;
+    }
+
+    /* ── CATEGORY GRID ───────────────────────────────────────── */
+    /* ── NEARBY PROVIDERS ────────────────────────────────────── */
+    .nearby-section { padding:18px 16px 0; }
+
+    .provider-card {
+      background:var(--card);
+      border-radius:var(--radius-md);
+      border:1px solid var(--border);
+      padding:14px;
+      display:flex; gap:12px;
+      margin-bottom:10px;
+      cursor:pointer;
+      box-shadow:var(--shadow-sm);
+      transition:box-shadow 0.15s;
+      position:relative;
+    }
+    .provider-card:active { box-shadow:var(--shadow-md); }
+
+    .provider-avatar {
+      width:44px; height:44px; border-radius:12px;
+      background:var(--bg); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.25rem; position:relative; overflow:hidden;
+    }
+    .provider-avatar img { width:100%; height:100%; object-fit:cover; border-radius:14px; }
+    .provider-avatar .online-dot {
+      position:absolute; bottom:3px; right:3px;
+      width:10px; height:10px; border-radius:50%;
+      background:var(--green); border:2px solid var(--card);
+    }
+
+    .provider-info { flex:1; min-width:0; }
+    .provider-name {
+      font-size:0.78rem; font-weight:700; color:var(--text);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .provider-service { font-size:0.65rem; color:var(--brand); font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .provider-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .pmeta-item { display:flex; align-items:center; gap:3px; font-size:0.7rem; color:var(--text-3); }
+    .pmeta-item i { font-size:10px; }
+    .stars-row { display:flex; align-items:center; gap:2px; }
+    .stars-row i { color:var(--gold); font-size:10px; }
+    .stars-row span { font-size:0.7rem; color:var(--text-2); font-weight:600; }
+
+    .provider-action {
+      display:flex; align-items:center;
+      justify-content:space-between;
+    }
+    .verified-badge {
+      background:#ECFDF5; color:#065F46;
+      font-size:0.6rem; font-weight:700; letter-spacing:0.04em;
+      padding:3px 7px; border-radius:20px; text-transform:uppercase;
+      display:flex; align-items:center; gap:3px;
+    }
+    .contact-btn {
+      background:var(--brand); color:#fff;
+      border:none; border-radius:8px;
+      font-size:0.65rem; font-weight:700;
+      padding:5px 10px; cursor:pointer; font-family:inherit;
+      display:flex; align-items:center; gap:3px;
+    }
+
+    .ad-inline {
+      background:linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+      border-radius:var(--radius-md);
+      padding:12px 14px;
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:10px; cursor:pointer;
+    }
+    .ad-inline .ai-label { font-size:0.55rem; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.35); text-transform:uppercase; }
+    .ad-inline .ai-title { font-size:0.82rem; font-weight:700; color:#fff; }
+    .ad-inline .ai-sub { font-size:0.68rem; color:rgba(255,255,255,0.55); }
+    .ad-inline .ai-icon { font-size:1.8rem; flex-shrink:0; }
+    .ad-inline .ai-btn { margin-left:auto; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.68rem; font-weight:700; padding:5px 10px; border-radius:20px; cursor:pointer; flex-shrink:0; font-family:inherit; }
+
+    /* ── LOCATION MODAL ──────────────────────────────────────── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,0.5); backdrop-filter:blur(3px);
+      align-items:flex-end; justify-content:center;
+    }
+    .modal-overlay.active { display:flex; animation:fadeIn 0.2s; }
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+    .modal-sheet {
+      background:var(--card); width:100%; max-width:480px;
+      border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+      padding:0 0 32px;
+      animation:slideUp 0.3s ease;
+    }
+    @keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+
+    .modal-handle {
+      width:36px; height:4px; border-radius:2px;
+      background:var(--border); margin:12px auto 0;
+    }
+    .modal-title {
+      font-size:1.05rem; font-weight:700; padding:16px 20px 12px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px;
+    }
+    .modal-title i { color:var(--brand); }
+    .modal-body { padding:16px 20px; }
+
+    .loc-field { margin-bottom:12px; }
+    .loc-label { font-size:0.75rem; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; }
+    .loc-select {
+      width:100%; padding:10px 14px;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-size:0.9rem; font-family:inherit; color:var(--text);
+      background:var(--bg); outline:none; appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238896A5' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 14px center;
+    }
+    .loc-select:focus { border-color:var(--brand); }
+    .loc-select:disabled { opacity:0.5; cursor:not-allowed; }
+
+    .loc-apply-btn {
+      width:100%; padding:13px;
+      background:var(--brand); color:#fff;
+      border:none; border-radius:12px; font-size:0.95rem;
+      font-weight:700; cursor:pointer; font-family:inherit;
+      margin-top:4px; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .loc-or { text-align:center; color:var(--text-3); font-size:0.78rem; margin:10px 0; }
+    .gps-btn {
+      width:100%; padding:11px;
+      background:var(--card); color:var(--brand);
+      border:1.5px solid var(--brand); border-radius:12px;
+      font-size:0.88rem; font-weight:700; cursor:pointer; font-family:inherit;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0; z-index:100;
+      background:var(--card); border-top:1px solid var(--border);
+      height:var(--bottom-h);
+      display:flex; align-items:center;
+      box-shadow:0 -4px 20px rgba(0,0,0,0.07);
+    }
+    .bnav-item {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      gap:3px; cursor:pointer; padding:6px 0;
+      color:var(--text-3); font-size:0.6rem; font-weight:600;
+      transition:color 0.15s; text-decoration:none;
+    }
+    .bnav-item i { font-size:1.15rem; }
+    .bnav-item.active { color:var(--brand); }
+    .bnav-center {
+      flex:0 0 68px; display:flex; align-items:center; justify-content:center;
+    }
+    .bnav-center-btn {
+      width:52px; height:52px; border-radius:16px;
+      background:var(--brand); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem; box-shadow:0 4px 14px rgba(255,90,31,0.4);
+      cursor:pointer; border:none;
+      transform:translateY(-8px);
+    }
+
+    /* ── EMPTY / UTILITY ─────────────────────────────────────── */
+    .spacer { height:16px; }
+    .tag-new {
+      background:var(--brand); color:#fff;
+      font-size:0.55rem; font-weight:800; padding:2px 5px;
+      border-radius:4px; text-transform:uppercase; letter-spacing:0.05em;
+      vertical-align:middle; margin-left:4px;
+    }
+
+    /* ── GUEST BANNER ────────────────────────────────────────── */
+    .guest-banner {
+      background:linear-gradient(90deg,#FF5A1F,#D94200);
+      padding:9px 16px; display:flex; align-items:center; gap:10px;
+    }
+    .guest-banner-text { flex:1; font-size:0.72rem; color:#fff; line-height:1.4; }
+    .guest-banner-text strong { font-size:0.78rem; display:block; margin-bottom:1px; }
+    .guest-btn-login { background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.4); color:#fff; font-size:0.68rem; font-weight:700; padding:5px 11px; border-radius:20px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .guest-btn-signup { background:#fff; color:var(--brand); border:none; font-size:0.68rem; font-weight:800; padding:5px 11px; border-radius:20px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .gate-overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); align-items:flex-end; justify-content:center; }
+    .gate-overlay.active { display:flex; animation:fadeIn 0.2s; }
+    .gate-sheet { background:var(--card); width:100%; max-width:480px; border-radius:var(--radius-lg) var(--radius-lg) 0 0; padding:0 0 36px; animation:slideUp 0.3s ease; }
+    .gate-handle { width:36px; height:4px; border-radius:2px; background:var(--border); margin:12px auto 0; }
+    .gate-icon { font-size:2.5rem; text-align:center; margin:16px 0 6px; }
+    .gate-title { font-size:1.05rem; font-weight:800; color:var(--navy); text-align:center; margin-bottom:4px; }
+    .gate-sub { font-size:0.78rem; color:var(--text-3); text-align:center; line-height:1.6; margin-bottom:18px; padding:0 24px; }
+    .gate-actions { padding:0 20px; display:flex; flex-direction:column; gap:8px; }
+    .gate-btn-primary { width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#FF5A1F,#D94200); color:#fff; font-size:0.92rem; font-weight:800; cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(255,90,31,0.3); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .gate-btn-secondary { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--navy); font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .gate-dismiss { text-align:center; margin-top:10px; font-size:0.72rem; color:var(--text-3); cursor:pointer; padding:4px; }
+    .gate-dismiss:hover { color:var(--brand); }
+	
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }	
+	
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAV ──────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-logo">fix<span>ia</span></div>
+  <div class="nav-search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" placeholder="Search plumber, aircon, car repair…" id="searchInput"/>
+  </div>
+  <button class="nav-btn" onclick="openNotif()">
+    <i class="fa-regular fa-bell"></i>
+    <div class="badge"></div>
+  </button>
+</nav>
+
+
+<!-- ── GUEST BANNER (hidden for logged-in users) ─────────── -->
+<div class="guest-banner" id="guestBanner" style="display:none;">
+  <div class="guest-banner-text">
+    <strong>👋 Welcome to Fixia!</strong>
+    Sign in to see providers, search services, and contact professionals.
+  </div>
+  <div style="display:flex;gap:6px;flex-shrink:0;">
+    <button class="guest-btn-login" onclick="window.location.href='login.html'">Log In</button>
+    <button class="guest-btn-signup" onclick="window.location.href='signup.html'">Sign Up</button>
+  </div>
+</div>
+<!-- ── LOCATION BAR ──────────────────────────────────────────── -->
+<div class="loc-bar" onclick="openLocationModal()">
+  <i class="fa-solid fa-location-dot"></i>
+  <span>Showing services in: <strong id="locDisplay">All Areas</strong></span>
+  <span class="change"><i class="fa-solid fa-chevron-down"></i> Change</span>
+</div>
+
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Featured Providers -->
+  <section class="featured-section">
+    <div class="section-label"><div class="dot"></div> Featured Providers</div>
+    <div id="featuredList">
+      <!-- Loaded dynamically from Supabase -->
+      <div style="text-align:center;padding:1.5rem 0;color:var(--text-3);font-size:0.82rem;">
+        <div style="width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div>
+        Loading featured providers…
+      </div>
+    </div>
+  </section>
+
+  <!-- Ad Banner — loaded dynamically -->
+  <div id="homepageAdBanner" style="margin:14px 16px 0;"></div>
+
+  <!-- Nearby Providers -->
+  <section class="nearby-section">
+    <div class="section-header">
+      <div class="section-title">Providers Near You</div>
+      <a href="browse.html" class="see-all">See all</a>
+    </div>
+
+    <div class="providers-grid" id="nearbyGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:1.5rem 0;color:var(--text-3);font-size:0.82rem;">
+        <div style="width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div>
+        Loading providers…
+      </div>
+    </div>
+
+    <!-- Inline Ad — loaded dynamically -->
+    <div id="homepageInlineAd" style="margin-top:10px;"></div>
+
+    <div class="spacer"></div>
+  </section>
+
+</main>
+
+<!-- ── LOCATION MODAL ────────────────────────────────────────── -->
+<div class="modal-overlay" id="locationModal" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">
+      <i class="fa-solid fa-location-dot"></i> Set Your Location
+    </div>
+    <div class="modal-body">
+
+      <div class="loc-field">
+        <div class="loc-label">Region</div>
+        <select class="loc-select" id="selRegion" onchange="loadProvinces()">
+          <option value="">Select Region</option>
+        </select>
+      </div>
+
+      <div class="loc-field">
+        <div class="loc-label">Province</div>
+        <select class="loc-select" id="selProvince" onchange="loadCities()" disabled>
+          <option value="">Select Province</option>
+        </select>
+      </div>
+
+      <div class="loc-field">
+        <div class="loc-label">City / Municipality</div>
+        <select class="loc-select" id="selCity" onchange="loadBarangays()" disabled>
+          <option value="">Select City / Municipality</option>
+        </select>
+      </div>
+
+      <div class="loc-field">
+        <div class="loc-label">Barangay <span style="color:var(--text-3);font-weight:400;">(optional)</span></div>
+        <select class="loc-select" id="selBarangay" disabled>
+          <option value="">Select Barangay</option>
+        </select>
+      </div>
+
+      <button class="loc-apply-btn" onclick="applyLocation()">
+        <i class="fa-solid fa-check"></i> Apply Location
+      </button>
+
+      <div class="loc-or">— or —</div>
+
+      <button class="gps-btn" onclick="useGPS()">
+        <i class="fa-solid fa-crosshairs"></i> Use My Current Location
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ── GATE OVERLAY (sign-in prompt for guests) ─────────────── -->
+<div class="gate-overlay" id="gateOverlay" onclick="handleGateOverlayClick(event)">
+  <div class="gate-sheet">
+    <div class="gate-handle"></div>
+    <div class="gate-icon" id="gateIcon">🔒</div>
+    <div class="gate-title" id="gateTitle">Sign In to Continue</div>
+    <div class="gate-sub" id="gateSub">Create a free account to browse providers, search services, and get in touch with professionals near you.</div>
+    <div class="gate-actions">
+      <button class="gate-btn-primary" onclick="window.location.href='signup.html'">
+        <i class="fa-solid fa-user-plus"></i> Create Free Account
+      </button>
+      <button class="gate-btn-secondary" onclick="window.location.href='login.html'">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </button>
+    </div>
+    <div class="gate-dismiss" onclick="closeGate()">Maybe later</div>
+  </div>
+</div>
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+    <i class="fa-solid fa-clipboard-list"></i>Bookings
+    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
+  </a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="fixia-data.js"></script>
+
+<script>
+
+/* ── Provider / Search ─────────────────────────────────────── */
+function openProvider(id) {
+  window.location.href = `provider.html?id=${id}`;
+}
+function openSearch() {
+  document.getElementById('searchInput').focus();
+}
+function openNotif() {
+  window.location.href = 'notifications.html';
+}
+
+/* ── Location Modal ────────────────────────────────────────── */
+const PSGC_BASE = 'https://psgc.gitlab.io/api';
+
+function openLocationModal() {
+  document.getElementById('locationModal').classList.add('active');
+  if (!document.getElementById('selRegion').options.length > 1) return;
+  loadRegions();
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('locationModal')) closeLocationModal();
+}
+
+function closeLocationModal() {
+  document.getElementById('locationModal').classList.remove('active');
+}
+
+async function loadRegions() {
+  const sel = document.getElementById('selRegion');
+  if (sel.options.length > 1) return; // already loaded
+  try {
+    const r = await fetch(`${PSGC_BASE}/regions/`);
+    const data = await r.json();
+    data.sort((a,b) => a.name.localeCompare(b.name));
+    data.forEach(reg => {
+      const opt = document.createElement('option');
+      opt.value = reg.code;
+      opt.textContent = reg.name;
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.error('PSGC regions error:', e); }
+}
+
+async function loadProvinces() {
+  const regCode = document.getElementById('selRegion').value;
+  const selProv = document.getElementById('selProvince');
+  const selCity = document.getElementById('selCity');
+  const selBrgy = document.getElementById('selBarangay');
+
+  resetSelect(selProv, 'Select Province');
+  resetSelect(selCity, 'Select City / Municipality');
+  resetSelect(selBrgy, 'Select Barangay');
+  selCity.disabled = true; selBrgy.disabled = true;
+
+  if (!regCode) { selProv.disabled = true; return; }
+
+  selProv.disabled = false;
+  try {
+    const r = await fetch(`${PSGC_BASE}/regions/${regCode}/provinces/`);
+    const data = await r.json();
+    data.sort((a,b) => a.name.localeCompare(b.name));
+    data.forEach(prov => {
+      const opt = document.createElement('option');
+      opt.value = prov.code;
+      opt.textContent = prov.name;
+      selProv.appendChild(opt);
+    });
+
+    // NCR has no provinces — load cities directly
+    if (!data.length) {
+      selProv.disabled = true;
+      await loadCitiesForRegion(regCode);
+    }
+  } catch(e) { console.error('PSGC provinces error:', e); }
+}
+
+async function loadCitiesForRegion(regCode) {
+  const selCity = document.getElementById('selCity');
+  selCity.disabled = false;
+  try {
+    const r = await fetch(`${PSGC_BASE}/regions/${regCode}/cities-municipalities/`);
+    const data = await r.json();
+    data.sort((a,b) => a.name.localeCompare(b.name));
+    data.forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city.code;
+      opt.textContent = city.name;
+      selCity.appendChild(opt);
+    });
+  } catch(e) { console.error('PSGC cities error:', e); }
+}
+
+async function loadCities() {
+  const provCode = document.getElementById('selProvince').value;
+  const selCity  = document.getElementById('selCity');
+  const selBrgy  = document.getElementById('selBarangay');
+
+  resetSelect(selCity, 'Select City / Municipality');
+  resetSelect(selBrgy, 'Select Barangay');
+  selBrgy.disabled = true;
+
+  if (!provCode) { selCity.disabled = true; return; }
+  selCity.disabled = false;
+
+  try {
+    const r = await fetch(`${PSGC_BASE}/provinces/${provCode}/cities-municipalities/`);
+    const data = await r.json();
+    data.sort((a,b) => a.name.localeCompare(b.name));
+    data.forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city.code;
+      opt.textContent = city.name;
+      selCity.appendChild(opt);
+    });
+  } catch(e) { console.error('PSGC cities error:', e); }
+}
+
+async function loadBarangays() {
+  const cityCode = document.getElementById('selCity').value;
+  const selBrgy  = document.getElementById('selBarangay');
+
+  resetSelect(selBrgy, 'Select Barangay');
+  if (!cityCode) { selBrgy.disabled = true; return; }
+  selBrgy.disabled = false;
+
+  try {
+    const r = await fetch(`${PSGC_BASE}/cities-municipalities/${cityCode}/barangays/`);
+    const data = await r.json();
+    data.sort((a,b) => a.name.localeCompare(b.name));
+    data.forEach(brgy => {
+      const opt = document.createElement('option');
+      opt.value = brgy.code;
+      opt.textContent = brgy.name;
+      selBrgy.appendChild(opt);
+    });
+  } catch(e) { console.error('PSGC barangays error:', e); }
+}
+
+function resetSelect(sel, placeholder) {
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+}
+
+function applyLocation() {
+  const city = document.getElementById('selCity');
+  const brgy = document.getElementById('selBarangay');
+  const prov = document.getElementById('selProvince');
+
+  const cityName = city.options[city.selectedIndex]?.text;
+  const brgyName = brgy.options[brgy.selectedIndex]?.text;
+  const provName = prov.options[prov.selectedIndex]?.text;
+
+  if (!cityName || cityName.startsWith('Select')) {
+    alert('Please select at least a City or Municipality.');
+    return;
+  }
+
+  const display = brgyName && !brgyName.startsWith('Select')
+    ? `${brgyName}, ${cityName}`
+    : `${cityName}${provName && !provName.startsWith('Select') ? ', ' + provName : ''}`;
+
+  document.getElementById('locDisplay').textContent = display;
+  localStorage.setItem('fixia_location', JSON.stringify({
+    city: city.value, cityName,
+    brgy: brgy.value || '', brgyName: brgyName || '',
+    display
+  }));
+
+  closeLocationModal();
+}
+
+function useGPS() {
+  if (!navigator.geolocation) { alert('GPS not supported on this device.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      document.getElementById('locDisplay').textContent = `Near you (${latitude.toFixed(3)}, ${longitude.toFixed(3)})`;
+      localStorage.setItem('fixia_location', JSON.stringify({ lat: latitude, lng: longitude, display: 'Near you' }));
+      closeLocationModal();
+    },
+    err => alert('Could not get your location. Please select manually.')
+  );
+}
+
+/* ── Init ──────────────────────────────────────────────────── */
+/* ── Guest mode ────────────────────────────────────────────── */
+const IS_GUEST = !FX.getSession();
+
+function gate(icon, title, sub) {
+  if (!IS_GUEST) return false;
+  document.getElementById('gateIcon').textContent  = icon  || '🔒';
+  document.getElementById('gateTitle').textContent = title || 'Sign In to Continue';
+  document.getElementById('gateSub').textContent   = sub   || 'Create a free account to access this feature.';
+  document.getElementById('gateOverlay').classList.add('active');
+  return true;
+}
+function closeGate() {
+  document.getElementById('gateOverlay').classList.remove('active');
+}
+function handleGateOverlayClick(e) {
+  if (e.target === document.getElementById('gateOverlay')) closeGate();
+}
+
+/* ── Category emoji map ─────────────────────────────────────── */
+const CAT_EMOJI = {
+  home:'🏠', auto:'🚗', garden:'🌿', elec:'⚡',
+  beauty:'💇', health:'🩺', tech:'💻', build:'🔨',
+  clean:'🧹', pet:'🐾', event:'🎉'
+};
+
+/* ── Render a featured provider card ────────────────────────── */
+function renderFeaturedCard(p) {
+  const emoji = CAT_EMOJI[p.cat_main] || '🔧';
+  const bgMap = {
+    home:'linear-gradient(135deg,#1e3c72,#2a5298)',
+    auto:'linear-gradient(135deg,#1a1a2e,#16213e)',
+    garden:'linear-gradient(135deg,#134e5e,#71b280)',
+    elec:'linear-gradient(135deg,#2d3561,#c05b2f)',
+    beauty:'linear-gradient(135deg,#4a0072,#9c27b0)',
+    health:'linear-gradient(135deg,#004d40,#00897b)',
+    tech:'linear-gradient(135deg,#0d47a1,#1565c0)',
+    build:'linear-gradient(135deg,#4e342e,#8d6e63)',
+    clean:'linear-gradient(135deg,#006064,#00acc1)',
+    pet:'linear-gradient(135deg,#e65100,#ff9800)',
+    event:'linear-gradient(135deg,#4a148c,#7b1fa2)',
+  };
+  const bg = bgMap[p.cat_main] || 'linear-gradient(135deg,#0F1B2D,#1E3048)';
+  const stars = Array.from({length:5}, (_,i) =>
+    `<i class="fa-${i < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
+  ).join('');
+  const eliteBadge = p.is_elite
+    ? '<div class="fc-badge" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;">👑 Elite</div>'
+    : '<div class="fc-badge">⭐ Featured</div>';
+
+  return `
+    <div class="featured-card" onclick="openProvider('${p.id}')">
+      ${eliteBadge}
+      <div class="fc-img-placeholder" style="background:${bg};">${emoji}</div>
+      <div class="fc-body">
+        <div class="fc-name">${p.biz_name}</div>
+        <div class="fc-service">${p.cat_sub || '—'}</div>
+        <div class="fc-row">
+          <div>
+            <div class="fc-stars">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
+            <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${p.city_name || '—'}</div>
+          </div>
+          <button class="fc-cta">View</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── Render a nearby provider card ──────────────────────────── */
+function renderNearbyCard(p) {
+  const emoji = CAT_EMOJI[p.cat_main] || '🔧';
+  const stars = Array.from({length:5}, (_,i) =>
+    `<i class="fa-${i < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
+  ).join('');
+  return `
+    <div class="provider-card" onclick="openProvider('${p.id}')">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
+          <div style="font-size:1.25rem;">${emoji}</div>
+          ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
+        </div>
+        <div class="provider-info">
+          <div class="provider-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
+          <div class="provider-service">${p.cat_sub || '—'}</div>
+        </div>
+      </div>
+      <div class="provider-meta">
+        <div class="stars-row">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
+        <div class="pmeta-item" style="font-size:0.65rem;color:var(--text-3);">
+          <i class="fa-solid fa-location-dot" style="font-size:9px;"></i> ${p.city_name || '—'}
+        </div>
+      </div>
+      <div class="provider-action">
+        <div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>
+        <button class="contact-btn"><i class="fa-solid fa-eye"></i> View</button>
+      </div>
+    </div>`;
+}
+
+/* ── Load everything dynamically ─────────────────────────────── */
+async function loadHomepageData() {
+  try {
+    // Load featured providers (weighted rotation)
+    const featuredList = document.getElementById('featuredList');
+    const featured = await FX.getFeaturedProviders();
+    if (featured.length) {
+      featuredList.innerHTML = featured.map(renderFeaturedCard).join('');
+    } else {
+      featuredList.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-3);font-size:0.8rem;grid-column:1/-1;">No featured providers yet.</div>';
+    }
+  } catch(e) {
+    console.error('[Homepage] Featured load error:', e.message);
+    document.getElementById('featuredList').innerHTML =
+      `<div style="text-align:center;padding:1rem;color:var(--text-3);font-size:0.8rem;">
+        ${e.message.includes('not configured')
+          ? '⚠️ Supabase not configured. Update SUPA_URL and SUPA_KEY in fixia-data.js'
+          : 'Could not load featured providers.'
+        }
+       </div>`;
+  }
+
+  try {
+    // Load inline ad for banner slot (first inline ad)
+    const inlineAds = await FX.getAds('inline');
+    if (inlineAds.length) {
+      // Banner ad (first slot — full width above nearby)
+      const bannerEl = document.getElementById('homepageAdBanner');
+      if (bannerEl) {
+        const ad = inlineAds[0];
+        bannerEl.innerHTML = `
+          <div class="ad-banner" onclick="window.open('${ad.link_url || '#'}','_blank')"
+               style="background:linear-gradient(135deg,${ad.bg_color || '#667eea'},${ad.bg_color || '#764ba2'});">
+            <div class="ad-icon">${ad.icon || '📢'}</div>
+            <div class="ad-text">
+              <div class="ad-label">Sponsored</div>
+              <div class="ad-title">${ad.title}</div>
+              <div class="ad-sub">${ad.description || ''}</div>
+            </div>
+            <button class="ad-btn">${ad.cta_label || 'Learn More'}</button>
+          </div>`;
+      }
+      // Inline ad between nearby cards (second slot)
+      const inlineEl = document.getElementById('homepageInlineAd');
+      if (inlineEl && inlineAds.length > 1) {
+        inlineEl.innerHTML = FX.renderInlineAd(inlineAds[1]);
+      } else if (inlineEl && inlineAds.length > 0) {
+        inlineEl.innerHTML = FX.renderInlineAd(inlineAds[0]);
+      }
+    }
+    // Load popup ads into memory for the session
+    await FX.loadPopupAds();
+  } catch(e) {
+    console.warn('[Fixia] Ad load failed:', e.message);
+  }
+
+  try {
+    // Load nearby providers (approved, sorted by rating)
+    const sess = FX.getSession();
+    const savedLoc = JSON.parse(localStorage.getItem('fixia_location') || '{}');
+    const filters = { limit: 8 };
+    if (savedLoc.city) filters.city = savedLoc.city;
+
+    const nearby = await FX.getProviders(filters);
+    const grid = document.getElementById('nearbyGrid');
+    if (!grid) return;
+
+    if (!nearby.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:1.5rem;color:var(--text-3);font-size:0.82rem;">No providers in your area yet. <a href="browse.html" style="color:var(--brand);font-weight:700;">Browse all</a></div>';
+      return;
+    }
+
+    // Render 4 providers (2 rows of 2)
+    const show = nearby.slice(0, 4);
+    grid.innerHTML = show.map(renderNearbyCard).join('');
+  } catch(e) {
+    console.error('[Homepage] Nearby load error:', e.message);
+    const grid = document.getElementById('nearbyGrid');
+    if (grid) grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-3);font-size:0.82rem;">
+      ${e.message.includes('not configured')
+        ? '⚠️ Supabase not configured. Update fixia-data.js'
+        : 'Could not load providers. Check your connection.'
+      }
+    </div>`;
+  }
+}
+
+(function init() {
+  // Restore saved location
+  try {
+    const saved = JSON.parse(localStorage.getItem('fixia_location'));
+    if (saved?.display) document.getElementById('locDisplay').textContent = saved.display;
+  } catch(e) {}
+
+  // Pre-load regions for modal
+  loadRegions();
+
+  // Show guest banner
+  if (IS_GUEST) {
+    document.getElementById('guestBanner').style.display = 'flex';
+  }
+
+  // Search — gated for guests
+  document.getElementById('searchInput').addEventListener('focus', () => {
+    if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) {
+      document.getElementById('searchInput').blur();
+    }
+  });
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim();
+      if (!q) return;
+      if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) return;
+      window.location.href = `search.html?q=${encodeURIComponent(q)}`;
+    }
+  });
+
+  // Load dynamic content
+  loadHomepageData();
+})();
+
+/* ── Gate wrappers — override functions defined above ────────── */
+const _openProvider = openProvider;
+openProvider = function(id) {
+  if (gate('👷', 'See Full Provider Details', 'Sign in to view contact info, portfolio, and ratings — then get in touch directly.')) return;
+  _openProvider(id);
+};
+
+function setFilter(el, key) {
+  if (IS_GUEST && ['nearby','top','verified'].includes(key)) {
+    gate('📍', 'Filter is for Members', 'Sign in to filter providers by location, rating, and availability.');
+    return;
+  }
+  // Add your actual filter logic here when ready
+}
+
+function browseSubcat(cat, sub) {
+  if (gate('🔎', 'Browse Providers', 'Create a free account to browse all providers by category near you.')) return;
+  window.location.href = `search.html?cat=${cat}&sub=${encodeURIComponent(sub)}`;
+}
+
+const _openSearch = openSearch;
+openSearch = function() {
+  if (gate('🔍', 'Search is for Members', 'Sign in to search for any service or provider.')) return;
+  _openSearch();
+};
+
+openNotif = function() {
+  if (gate('🔔', 'Sign In for Notifications', 'Log in to see your activity and updates.')) return;
+  window.location.href = 'notifications.html';
+};
+</script>
+
+
+<script>
+// Load booking badge count
+(async function loadBookingBadge() {
+  const sess = FX.getSession();
+  if (!sess || sess.role !== 'regular') return;
+  try {
+    const count = await FX.getUnreadCount('regular', sess.userId);
+    const badge = document.getElementById('navBadge');
+    if (badge && count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'block';
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

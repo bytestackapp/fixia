@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Saved Providers Page
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Saved — Fixia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F0F2F5; --card:#FFFFFF; --border:#E8ECF0;
+      --green:#10B981; --green-bg:#ECFDF5; --green-text:#065F46;
+      --gold:#F59E0B;
+      --red:#DC3545; --red-bg:#FFF5F5; --red-text:#991B1B;
+      --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.07);
+      --nav-h:56px; --bottom-h:62px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+    /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;}
+    .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
+    .nav-logo span{color:var(--brand);}
+    .nav-title{font-size:0.9rem;font-weight:700;color:#fff;flex:1;}
+    .nav-search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;flex-shrink:0;}
+    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+    .nav-clear-all{background:none;border:none;color:rgba(255,255,255,0.55);font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;}
+    .nav-clear-all:hover{color:var(--brand);}
+
+    /* ── BODY ────────────────────────────────────────────────── */
+    .body{padding:14px 16px;animation:fadeIn 0.25s;}
+
+    /* ── PROVIDER CARD 2-COL ─────────────────────────────────── */
+    .saved-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .provider-card{
+      background:var(--card);border-radius:var(--radius-md);
+      border:1px solid var(--border);padding:12px;
+      display:flex;flex-direction:column;gap:8px;
+      cursor:pointer;box-shadow:var(--shadow-sm);
+      transition:box-shadow 0.15s;position:relative;
+      animation:slideUp 0.3s ease both;
+    }
+    .provider-card:active{box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+    .card-top{display:flex;align-items:center;gap:8px;}
+    .provider-avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-light);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.25rem;position:relative;}
+    .online-dot{position:absolute;bottom:2px;right:2px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--card);}
+    .provider-info{flex:1;min-width:0;}
+    .provider-name{font-size:0.78rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .provider-service{font-size:0.65rem;color:var(--brand);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .stars-row{display:flex;align-items:center;gap:2px;}
+    .stars-row i{color:var(--gold);font-size:10px;}
+    .stars-row span{font-size:0.65rem;color:var(--text-2);font-weight:600;margin-left:2px;}
+    .card-actions{display:flex;align-items:center;justify-content:space-between;}
+    .view-btn{background:var(--brand);color:#fff;border:none;border-radius:7px;font-size:0.65rem;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;}
+    .unsave-btn{background:none;border:none;color:var(--text-3);font-size:0.85rem;cursor:pointer;padding:4px;border-radius:6px;}
+    .unsave-btn:hover{color:var(--red);background:var(--red-bg);}
+
+    /* ── GUEST WALL ──────────────────────────────────────────── */
+    .guest-wall{text-align:center;padding:3rem 1.5rem;}
+    .guest-wall-icon{font-size:3rem;margin-bottom:12px;}
+    .guest-wall-title{font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
+    .guest-wall-sub{font-size:0.82rem;color:var(--text-3);line-height:1.7;margin-bottom:1.25rem;}
+    .guest-wall-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:12px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(255,90,31,0.3);}
+    .guest-wall-login{display:block;margin-top:10px;font-size:0.8rem;color:var(--text-3);}
+    .guest-wall-login a{color:var(--brand);font-weight:700;text-decoration:none;}
+
+    /* ── EMPTY STATE ─────────────────────────────────────────── */
+    .empty-state{text-align:center;padding:3rem 1rem;}
+    .empty-icon{font-size:3rem;margin-bottom:10px;}
+    .empty-title{font-size:0.95rem;font-weight:800;color:var(--navy);margin-bottom:4px;}
+    .empty-sub{font-size:0.8rem;color:var(--text-3);line-height:1.6;margin-bottom:1.25rem;}
+    .empty-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:12px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    /* ── SECTION HEADER ──────────────────────────────────────── */
+    .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .sec-title{font-size:0.88rem;font-weight:800;color:var(--navy);}
+    .sec-count{font-size:0.72rem;color:var(--text-3);font-weight:600;}
+
+    /* ── TOAST ───────────────────────────────────────────────── */
+    .toast{position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--navy);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1.4rem;font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .toast.success{background:#065f46;}
+
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:var(--bottom-h);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo">fix<span>ia</span></div>
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="max-width:160px;">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span style="color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;">Search…</span>
+  </div>
+  <button class="nav-clear-all" id="clearAllBtn" onclick="clearAll()" style="display:none;">Clear all</button>
+</nav>
+
+<!-- BODY -->
+<div class="body" id="bodyContent">
+  <!-- Rendered by JS -->
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+    <i class="fa-solid fa-clipboard-list"></i>Bookings
+    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
+  </a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="fixia-data.js"></script>
+<script>
+/*
+ * Saved providers are stored in localStorage as an array of provider objects.
+ * Key: 'fixia_saved'
+ * Value: [{id, bizName, catSub, avgRating, totalRatings, cityName, isElite, isOnline}]
+ *
+ * To save a provider from provider.html, call:
+ *   FX.saveProvider(providerObj)
+ * To unsave:
+ *   FX.unsaveProvider(providerId)
+ * Both are defined below and should also be added to fixia-data.js.
+ */
+
+const session = FX.getSession();
+
+/* ── Save/unsave helpers (localStorage-based) ───────────────── */
+FX.getSaved = function() {
+  try { return JSON.parse(localStorage.getItem('fixia_saved') || '[]'); }
+  catch { return []; }
+};
+FX.saveProvider = function(p) {
+  const saved = this.getSaved();
+  if (saved.find(s => s.id === p.id)) return; // already saved
+  saved.unshift({
+    id:           p.id,
+    bizName:      p.biz_name,
+    catSub:       p.cat_sub,
+    catMain:      p.cat_main,
+    avgRating:    p.avg_rating,
+    totalRatings: p.total_ratings,
+    cityName:     p.city_name,
+    isElite:      p.is_elite,
+    savedAt:      new Date().toISOString(),
+  });
+  localStorage.setItem('fixia_saved', JSON.stringify(saved));
+};
+FX.unsaveProvider = function(id) {
+  const saved = this.getSaved().filter(s => s.id !== id);
+  localStorage.setItem('fixia_saved', JSON.stringify(saved));
+};
+FX.isSaved = function(id) {
+  return this.getSaved().some(s => s.id === id);
+};
+
+/* ── Init ───────────────────────────────────────────────────── */
+(function init() {
+  if (session && session.role === 'regular' && !session.adsFree) FX.initAds();
+  render();
+})();
+
+function render() {
+  const body = document.getElementById('bodyContent');
+
+  // Guest wall
+  if (!session) {
+    body.innerHTML = `
+      <div class="guest-wall">
+        <div class="guest-wall-icon">🔖</div>
+        <div class="guest-wall-title">Save Your Favourite Providers</div>
+        <div class="guest-wall-sub">
+          Sign in to bookmark providers you like and find them quickly next time — no more scrolling through search results again.
+        </div>
+        <button class="guest-wall-btn" onclick="window.location.href='signup.html'">
+          <i class="fa-solid fa-user-plus"></i> Create Free Account
+        </button>
+        <div class="guest-wall-login">Already have an account? <a href="login.html">Sign In</a></div>
+      </div>`;
+    return;
+  }
+
+  const saved = FX.getSaved();
+
+  // Empty state
+  if (!saved.length) {
+    body.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔖</div>
+        <div class="empty-title">No Saved Providers Yet</div>
+        <div class="empty-sub">
+          When you find a provider you like, tap the bookmark icon on their profile to save them here for quick access later.
+        </div>
+        <button class="empty-btn" onclick="window.location.href='browse.html'">
+          <i class="fa-solid fa-border-all"></i> Browse Providers
+        </button>
+      </div>`;
+    return;
+  }
+
+  // Show clear all button
+  document.getElementById('clearAllBtn').style.display = 'block';
+
+  body.innerHTML = `
+    <div class="sec-header">
+      <div class="sec-title">Saved Providers</div>
+      <div class="sec-count">${saved.length} saved</div>
+    </div>
+    <div class="saved-grid" id="savedGrid"></div>`;
+
+  renderCards(saved);
+}
+
+function renderCards(saved) {
+  const grid = document.getElementById('savedGrid');
+  if (!grid) return;
+  grid.innerHTML = saved.map((p, i) => {
+    const stars = Array.from({length:5}, (_,idx) =>
+      `<i class="fa-${idx < Math.round(p.avgRating) ? 'solid' : 'regular'} fa-star"></i>`
+    ).join('');
+    return `
+      <div class="provider-card" style="animation-delay:${i*0.05}s">
+        <div class="card-top">
+          <div class="provider-avatar">
+            ${catEmoji(p.catMain)}
+          </div>
+          <div class="provider-info">
+            <div class="provider-name">${p.isElite ? '👑 ' : ''}${p.bizName}</div>
+            <div class="provider-service">${p.catSub || '—'}</div>
+          </div>
+        </div>
+        <div class="stars-row">
+          ${stars}
+          <span>${p.avgRating || 0} (${p.totalRatings || 0})</span>
+        </div>
+        <div style="font-size:0.65rem;color:var(--text-3);"><i class="fa-solid fa-location-dot" style="color:var(--brand);font-size:9px;"></i> ${p.cityName || '—'}</div>
+        <div class="card-actions">
+          <button class="view-btn" onclick="event.stopPropagation();window.location.href='provider.html?id=${p.id}'">
+            <i class="fa-solid fa-eye"></i> View
+          </button>
+          <button class="unsave-btn" title="Remove" onclick="event.stopPropagation();unsave('${p.id}')">
+            <i class="fa-solid fa-bookmark-slash"></i>
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function unsave(id) {
+  FX.unsaveProvider(id);
+  const saved = FX.getSaved();
+  showToast('Removed from saved');
+  if (!saved.length) {
+    render();
+    document.getElementById('clearAllBtn').style.display = 'none';
+  } else {
+    document.querySelector('.sec-count').textContent = `${saved.length} saved`;
+    renderCards(saved);
+  }
+}
+
+function clearAll() {
+  if (!confirm('Remove all saved providers?')) return;
+  localStorage.removeItem('fixia_saved');
+  render();
+  document.getElementById('clearAllBtn').style.display = 'none';
+  showToast('All saved providers cleared');
+}
+
+function catEmoji(cat) {
+  const map = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
+  return map[cat] || '🔧';
+}
+
+let toastTimer;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast show ${type}`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+
+<script>
+// Load booking badge count
+(async function loadBookingBadge() {
+  const sess = FX.getSession();
+  if (!sess || sess.role !== 'regular') return;
+  try {
+    const count = await FX.getUnreadCount('regular', sess.userId);
+    const badge = document.getElementById('navBadge');
+    if (badge && count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'block';
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<!--
+  FIXIA — Debug / Diagnostic Page
+  Open this locally to test your Supabase connection and password hash.
+  DELETE this file before going live.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fixia Debug</title>
+  <style>
+    body { font-family: monospace; background: #0F1B2D; color: #fff; padding: 20px; }
+    h2   { color: #FF5A1F; margin: 20px 0 10px; }
+    .card { background: #1E3048; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+    input, button { padding: 8px 14px; border-radius: 6px; border: none; font-family: monospace; font-size: 14px; margin: 4px 2px; }
+    input  { background: #0F1B2D; color: #fff; border: 1px solid #374151; width: 280px; }
+    button { background: #FF5A1F; color: #fff; cursor: pointer; }
+    button:hover { background: #D94200; }
+    .result { margin-top: 10px; padding: 10px; background: #0F1B2D; border-radius: 6px; font-size: 13px; line-height: 1.7; word-break: break-all; }
+    .ok  { color: #34D399; }
+    .err { color: #FC8181; }
+    .dim { color: #8896A5; }
+    label { display: block; margin-bottom: 4px; color: #8896A5; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<h1 style="color:#FF5A1F;">🔧 Fixia Debug Panel</h1>
+<p style="color:#8896A5;margin-bottom:20px;">⚠️ Delete this file before going live.</p>
+
+<!-- ── 1. Hash generator ─────────────────────────────────── -->
+<h2>1. Password Hash Generator</h2>
+<div class="card">
+  <label>Enter any password to get its hash:</label>
+  <input id="hashInput" type="text" placeholder="e.g. Admin@Fixia2025" value="Admin@Fixia2025"/>
+  <button onclick="generateHash()">Generate Hash</button>
+  <div class="result" id="hashResult">—</div>
+  <div style="margin-top:8px;font-size:12px;color:#8896A5;">
+    Copy this hash → paste into Supabase → users table → password_hash column for the admin row.
+  </div>
+</div>
+
+<!-- ── 2. Supabase connection test ───────────────────────── -->
+<h2>2. Supabase Connection Test</h2>
+<div class="card">
+  <button onclick="testConnection()">Test Supabase Connection</button>
+  <div class="result" id="connResult">—</div>
+</div>
+
+<!-- ── 3. Find user by username ─────────────────────────── -->
+<h2>3. Look Up User in Supabase</h2>
+<div class="card">
+  <label>Username or Email:</label>
+  <input id="lookupInput" type="text" placeholder="fixia_admin"/>
+  <button onclick="lookupUser()">Look Up</button>
+  <div class="result" id="lookupResult">—</div>
+</div>
+
+<!-- ── 4. Simulate login ─────────────────────────────────── -->
+<h2>4. Simulate Login</h2>
+<div class="card">
+  <label>Username:</label>
+  <input id="simUser" type="text" placeholder="fixia_admin" value="fixia_admin"/>
+  <label>Password:</label>
+  <input id="simPass" type="password" placeholder="Admin@Fixia2025" value="Admin@Fixia2025"/>
+  <button onclick="simulateLogin()">Simulate Login</button>
+  <div class="result" id="simResult">—</div>
+</div>
+
+<!-- ── 5. List all users ─────────────────────────────────── -->
+<h2>5. List All Users in Supabase</h2>
+<div class="card">
+  <button onclick="listUsers()">List Users</button>
+  <div class="result" id="usersResult">—</div>
+</div>
+
+<script src="fixia-data.js"></script>
+<script>
+/* ── Hash generator ──────────────────────────────────────── */
+function generateHash() {
+  const pw  = document.getElementById('hashInput').value;
+  const h   = fxHash(pw);
+  document.getElementById('hashResult').innerHTML =
+    `<span class="dim">Password:</span> <span class="ok">${pw}</span><br/>` +
+    `<span class="dim">Hash:</span>     <span class="ok" style="font-size:1.2em;letter-spacing:2px;">${h}</span><br/><br/>` +
+    `<span class="dim">→ Paste this into Supabase users table, password_hash column for your admin row.</span>`;
+}
+
+/* ── Supabase connection ─────────────────────────────────── */
+async function testConnection() {
+  const el = document.getElementById('connResult');
+  el.innerHTML = '<span class="dim">Testing…</span>';
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/packages?limit=1`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      el.innerHTML = `<span class="ok">✅ Connected to Supabase!</span><br/>
+        <span class="dim">URL:</span> ${SUPA_URL}<br/>
+        <span class="dim">Status:</span> ${res.status}<br/>
+        <span class="dim">Packages found:</span> ${data.length}`;
+    } else {
+      const err = await res.json().catch(() => ({}));
+      el.innerHTML = `<span class="err">❌ Connection failed: ${res.status}</span><br/>${JSON.stringify(err)}`;
+    }
+  } catch(e) {
+    el.innerHTML = `<span class="err">❌ Error: ${e.message}</span><br/>
+      <span class="dim">Check that SUPA_URL and SUPA_KEY are set correctly in fixia-data.js</span>`;
+  }
+}
+
+/* ── Look up user ────────────────────────────────────────── */
+async function lookupUser() {
+  const el  = document.getElementById('lookupResult');
+  const val = document.getElementById('lookupInput').value.trim();
+  el.innerHTML = '<span class="dim">Looking up…</span>';
+  try {
+    const user = val.includes('@')
+      ? await FX.getUserByEmail(val)
+      : await FX.getUserByUsername(val);
+    if (!user) {
+      el.innerHTML = `<span class="err">❌ No user found for "${val}"</span>`;
+      return;
+    }
+    el.innerHTML = `
+      <span class="ok">✅ User found!</span><br/>
+      <span class="dim">ID:</span>            ${user.id}<br/>
+      <span class="dim">Email:</span>         ${user.email}<br/>
+      <span class="dim">Username:</span>      ${user.username}<br/>
+      <span class="dim">Role:</span>          ${user.role}<br/>
+      <span class="dim">Status:</span>        ${user.status}<br/>
+      <span class="dim">Password Hash:</span> <span style="color:#FBBF24;">${user.password_hash}</span><br/>
+      <span class="dim">Package:</span>       ${user.package_id || '—'}`;
+  } catch(e) {
+    el.innerHTML = `<span class="err">❌ Error: ${e.message}</span>`;
+  }
+}
+
+/* ── Simulate login ──────────────────────────────────────── */
+async function simulateLogin() {
+  const el   = document.getElementById('simResult');
+  const user = document.getElementById('simUser').value.trim();
+  const pass = document.getElementById('simPass').value;
+  el.innerHTML = '<span class="dim">Simulating login…</span>';
+  try {
+    // Step 1: fetch user
+    const found = user.includes('@')
+      ? await FX.getUserByEmail(user)
+      : await FX.getUserByUsername(user);
+
+    if (!found) {
+      el.innerHTML = `<span class="err">❌ Step 1 FAILED: No user found for "${user}"</span><br/>
+        <span class="dim">→ Check users table in Supabase for this username/email.</span>`;
+      return;
+    }
+    el.innerHTML += `<br/><span class="ok">✅ Step 1 PASSED: User found</span>`;
+
+    // Step 2: check hash
+    const inputHash  = fxHash(pass);
+    const storedHash = found.password_hash;
+    el.innerHTML += `<br/><span class="dim">Input password hash:</span>  <span style="color:#FBBF24;">${inputHash}</span>`;
+    el.innerHTML += `<br/><span class="dim">Stored password hash:</span> <span style="color:#FBBF24;">${storedHash}</span>`;
+
+    if (inputHash !== storedHash) {
+      el.innerHTML += `<br/><span class="err">❌ Step 2 FAILED: Hashes do not match!</span><br/>
+        <span class="dim">→ Use the Hash Generator above to get the correct hash for your password,<br/>
+           then update it in Supabase → users → password_hash.</span>`;
+      return;
+    }
+    el.innerHTML += `<br/><span class="ok">✅ Step 2 PASSED: Password hash matches</span>`;
+
+    // Step 3: check status
+    if (found.status !== 'active') {
+      el.innerHTML += `<br/><span class="err">❌ Step 3 FAILED: Account status is "${found.status}" not "active"</span><br/>
+        <span class="dim">→ Update status to "active" in Supabase → users table.</span>`;
+      return;
+    }
+    el.innerHTML += `<br/><span class="ok">✅ Step 3 PASSED: Account is active</span>`;
+    el.innerHTML += `<br/><br/><span class="ok" style="font-size:1.1em;">🎉 Login should work! Role: ${found.role}</span>`;
+
+  } catch(e) {
+    el.innerHTML = `<span class="err">❌ Error: ${e.message}</span>`;
+  }
+}
+
+/* ── List all users ──────────────────────────────────────── */
+async function listUsers() {
+  const el = document.getElementById('usersResult');
+  el.innerHTML = '<span class="dim">Loading…</span>';
+  try {
+    const users = await FX.getAllUsers();
+    if (!users.length) {
+      el.innerHTML = '<span class="err">No users found in database.</span>';
+      return;
+    }
+    el.innerHTML = users.map(u =>
+      `<span class="ok">${u.username}</span> · ${u.email} · <span class="dim">${u.role} · ${u.status}</span> · hash: <span style="color:#FBBF24;">${u.password_hash}</span>`
+    ).join('<br/>');
+  } catch(e) {
+    el.innerHTML = `<span class="err">❌ Error: ${e.message}</span>`;
+  }
+}
+
+// Auto-run hash on load
+generateHash();
+</script>
+</body>
+</html>
