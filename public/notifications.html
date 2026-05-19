@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Notifications — Fixia</title>
@@ -23,6 +23,16 @@
     .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
     .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+	
+    .bnav-center-btn {
+      width:52px; height:52px; border-radius:16px;
+      background:var(--brand); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem; box-shadow:0 4px 14px rgba(255,90,31,0.4);
+      cursor:pointer; border:none;
+      transform:translateY(-8px);
+    }	
+	
     .notif-item{background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background 0.15s;}
     .notif-item:hover{background:#FAFBFC;}
     .notif-item.unread{background:#FFF8F5;}
@@ -80,65 +90,181 @@
 <script>
 const session = FX.getSession();
 
-/* Sample notifications — replace with real DB notifications in future */
-const SAMPLE = [
-  { icon:'⭐', bg:'#FFFBEB', title:'Rating Reminder', sub:'You recently transacted with Mang Larry Plumbing. Tap to leave a rating and help others!', time:'2 hours ago', unread:true, href:'provider.html?id=mang-larry' },
-  { icon:'🔔', bg:'#EFF6FF', title:'Welcome to Fixia!', sub:'Your account is set up. Start browsing services near you.', time:'Yesterday', unread:false, href:'homepage.html' },
-  { icon:'✨', bg:'var(--brand-light)', title:'Upgrade to Fixia Plus', sub:'Remove pop-up ads and enjoy uninterrupted browsing. Upgrade anytime.', time:'2 days ago', unread:false, href:'signup-regular.html' },
-];
+const STATUS_CONFIG = {
+  active:    { icon:'⚡',  bg:'#ECFDF5', title:'Booking Confirmed!',           msg:'Your booking is now active. The provider will be in touch shortly.' },
+  done:      { icon:'🏁',  bg:'#FFFBEB', title:'Service Marked as Complete',   msg:'The provider marked your job as done. Tap to confirm and leave a rating.' },
+  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by Provider', msg:'The provider has cancelled this booking.' },
+  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'You Disputed This Booking',    msg:'You raised a dispute. Contact the provider to resolve and rebook if needed.' },
+};
+
+const PROV_CONFIG = {
+  pending:   { icon:'📩',  bg:'#FFF8F5', title:'New Booking Request',         msg:'A user has sent you a booking request.' },
+  active:    { icon:'📋',  bg:'#ECFDF5', title:'Booking Now Active',          msg:'A user confirmed their booking. The job is now active.' },
+  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by You',    msg:'You cancelled this booking. The user has been notified.' },
+  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'User Disputed This Booking',  msg:'The user raised a dispute on this job. Please reach out to resolve.' },
+  completed: { icon:'⭐',  bg:'#FFFBEB', title:'Job Completed & Rated',       msg:'A user confirmed completion and left you a rating.' },
+};
+
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function renderHeader(hasUnread, hasRead) {
+  const existing = document.getElementById('notifHeader');
+  if (existing) existing.remove();
+  const header = document.createElement('div');
+  header.id = 'notifHeader';
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;gap:8px;';
+  header.innerHTML = `
+    <span style="font-size:0.75rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;flex:1;">Notifications</span>
+    <button id="clearAllBtn" onclick="clearAllNotifs()" style="font-size:0.7rem;font-weight:700;background:#FFF0EB;border:none;cursor:${hasUnread ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasUnread ? 'var(--brand)' : '#ccc'};" ${!hasUnread ? 'disabled' : ''}>
+      Clear All
+    </button>
+    <button id="deleteReadBtn" onclick="deleteReadNotifs()" style="font-size:0.7rem;font-weight:700;background:#F5F7FA;border:none;cursor:${hasRead ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasRead ? 'var(--text-2)' : '#ccc'};" ${!hasRead ? 'disabled' : ''}>
+      🗑 Delete Read
+    </button>
+  `;
+  document.getElementById('notifList').before(header);
+}
+
+// Mark a single notification as read when tapped
+async function tapNotif(inquiryId, href, role, providerId) {
+  try {
+    if (role === 'regular') {
+      await FX.markOneReadUser(inquiryId);
+    } else {
+      await FX.markOneReadProvider(inquiryId);
+    }
+    // Update dot on this item
+    const dot = document.getElementById('dot-' + inquiryId);
+    const item = document.getElementById('item-' + inquiryId);
+    if (dot) dot.remove();
+    if (item) item.classList.remove('unread');
+  } catch(e) {}
+  window.location.href = href;
+}
+
+async function clearAllNotifs() {
+  try {
+    if (session.role === 'regular') {
+      await FX.markReadUser(session.userId);
+    } else {
+      const pd = await FX.getProviderByUserId(session.userId);
+      if (pd) await FX.markReadProvider(pd.id);
+    }
+    // Remove all dots and unread styles
+    document.querySelectorAll('.unread-dot').forEach(d => d.remove());
+    document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
+    const stillHasRead = document.querySelectorAll('.notif-item:not(.unread)').length > 0;
+    renderHeader(false, stillHasRead);
+    // Hide bell badge
+    const badge = document.getElementById('notifBellBadge');
+    if (badge) badge.style.display = 'none';
+  } catch(e) {}
+}
+
+async function deleteReadNotifs() {
+  try {
+    const sess = FX.getSession();
+    if (!sess) return;
+    if (sess.role === 'regular') {
+      await FX.deleteReadForUser(sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) await FX.deleteReadForProvider(pd.id);
+    }
+    await init();
+  } catch(e) {}
+}
 
 (async function init() {
   if (!session) { window.location.href = 'login.html'; return; }
 
   const list = document.getElementById('notifList');
+  list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--text-3);font-size:0.82rem;">Loading…</div>';
 
-  // Fetch real inquiry updates
-  let liveNotifs = [];
   try {
-    const inquiries = await FX.getUserInquiries(session.userId);
-    const unread = inquiries.filter(i => i.user_has_unread);
-    const STATUS_LABEL = {
-      replied:   { icon:'💬', bg:'#EFF6FF', title:'Provider Replied', msg: i => `Your inquiry has a new reply. Tap to view and decide.` },
-      declined:  { icon:'❌', bg:'#FFF5F5', title:'Inquiry Declined', msg: i => `A provider declined your inquiry.` },
-      active:    { icon:'✅', bg:'#ECFDF5', title:'Booking Confirmed', msg: i => `Your booking is now active!` },
-      done:      { icon:'🏁', bg:'#FFFBEB', title:'Service Completed', msg: i => `The provider marked your service as done. Tap to confirm and rate.` },
-    };
-    liveNotifs = unread.map(i => {
-      const s = STATUS_LABEL[i.status] || { icon:'🔔', bg:'var(--brand-light)', title:'Update', msg: () => 'Your inquiry was updated.' };
-      return { icon: s.icon, bg: s.bg, title: s.title, sub: s.msg(i), time: 'New', unread: true, href: `bookings.html` };
-    });
-    // Mark as read now that user has seen them
-    await FX.markReadUser(session.userId);
-  } catch(e) {}
+    let notifs = [];
+    let role = session.role;
 
-  const SAMPLE = [
-    { icon:'⭐', bg:'#FFFBEB', title:'Rating Reminder', sub:'You recently transacted with Mang Larry Plumbing. Tap to leave a rating and help others!', time:'2 hours ago', unread:false, href:'provider.html?id=mang-larry' },
-    { icon:'🔔', bg:'#EFF6FF', title:'Welcome to Fixia!', sub:'Your account is set up. Start browsing services near you.', time:'Yesterday', unread:false, href:'homepage.html' },
-    { icon:'✨', bg:'var(--brand-light)', title:'Upgrade to Fixia Plus', sub:'Remove pop-up ads and enjoy uninterrupted browsing. Upgrade anytime.', time:'2 days ago', unread:false, href:'signup-regular.html' },
-  ];
+    if (role === 'regular') {
+      const inquiries = await FX.getUserInquiries(session.userId);
+      notifs = inquiries
+        .filter(i => STATUS_CONFIG[i.status])
+        .map(i => {
+          const cfg = STATUS_CONFIG[i.status];
+          return {
+            id: i.id,
+            icon: cfg.icon, bg: cfg.bg,
+            title: cfg.title, sub: cfg.msg,
+            time: timeAgo(i.updated_at),
+            unread: !!i.user_has_unread,
+            href: 'bookings.html',
+            role: 'regular',
+          };
+        });
 
-  const all = [...liveNotifs, ...SAMPLE];
+    } else if (role === 'provider') {
+      const pd = await FX.getProviderByUserId(session.userId);
+      if (!pd) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">No Notifications</div></div>';
+        return;
+      }
+      const inquiries = await FX.getProviderInquiries(pd.id);
+      notifs = inquiries
+        .filter(i => PROV_CONFIG[i.status])
+        .map(i => {
+          const cfg = PROV_CONFIG[i.status];
+          return {
+            id: i.id,
+            icon: cfg.icon, bg: cfg.bg,
+            title: cfg.title, sub: cfg.msg,
+            time: timeAgo(i.updated_at),
+            unread: !!i.provider_has_unread,
+            href: 'bookings.html',
+            role: 'provider',
+          };
+        });
+    }
 
-  if (!all.length) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔔</div>
-        <div class="empty-title">No Notifications Yet</div>
-        <div class="empty-sub">You'll see updates here — inquiry replies, booking confirmations, and Fixia news.</div>
-      </div>`;
-    return;
+	const hasUnread = notifs.some(n => n.unread);
+	const hasRead   = notifs.some(n => !n.unread);
+	renderHeader(hasUnread, hasRead);
+
+    if (!notifs.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔔</div>
+          <div class="empty-title">No Notifications Yet</div>
+          <div class="empty-sub">Booking updates and status changes will appear here.</div>
+        </div>`;
+      return;
+    }
+
+    // Render — NO markRead here, only on individual tap or Clear All
+    list.innerHTML = notifs.map(n => `
+      <div class="notif-item ${n.unread ? 'unread' : ''}" id="item-${n.id}"
+           onclick="tapNotif('${n.id}','${n.href}','${n.role}')">
+        <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-sub">${n.sub}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        ${n.unread ? `<div class="unread-dot" id="dot-${n.id}"></div>` : ''}
+      </div>`).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load notifications</div><div class="empty-sub">${e.message}</div></div>`;
   }
-
-  list.innerHTML = all.map(n => `
-    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="window.location.href='${n.href || '#'}'">
-      <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
-      <div class="notif-body">
-        <div class="notif-title">${n.title}</div>
-        <div class="notif-sub">${n.sub}</div>
-        <div class="notif-time">${n.time}</div>
-      </div>
-      ${n.unread ? '<div class="unread-dot"></div>' : ''}
-    </div>`).join('');
 })();
 </script>
 </body>

@@ -8,6 +8,7 @@
 -->
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Fixia — Find Any Service Near You</title>
@@ -28,14 +29,15 @@
       --border:      #E8ECF0;
       --gold:        #F59E0B;
       --green:       #10B981;
+	  --red:         #DC3545;
       --radius-sm:   8px;
       --radius-md:   14px;
       --radius-lg:   20px;
       --shadow-sm:   0 1px 4px rgba(0,0,0,0.06);
       --shadow-md:   0 4px 16px rgba(0,0,0,0.10);
       --shadow-lg:   0 8px 32px rgba(0,0,0,0.13);
-      --nav-h:       60px;
-      --bottom-h:    64px;
+      --nav-h:       56px;
+      --bottom-h:    62px;
     }
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html { scroll-behavior:smooth; }
@@ -98,53 +100,61 @@
     }
     .section-label .dot { width:6px; height:6px; border-radius:50%; background:var(--brand); }
 
-    /* Featured 2-per-row grid */
-    #featuredList {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
+/* Featured horizontal scroll */
+#featuredList {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
 
-    .featured-card {
-      background:var(--navy);
-      border-radius:var(--radius-lg);
-      overflow:hidden;
-      position:relative; cursor:pointer;
-      display:flex; flex-direction:column;
-    }
-    .featured-card .fc-img-placeholder {
-      width:100%; height:100px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:2.5rem;
-    }
-    .fc-img-placeholder.plumbing { background:linear-gradient(135deg,#1e3c72,#2a5298); }
-    .fc-img-placeholder.aircon   { background:linear-gradient(135deg,#0f4c75,#1b6ca8); }
-    .fc-img-placeholder.auto     { background:linear-gradient(135deg,#1a1a2e,#16213e); }
-    .fc-img-placeholder.elec     { background:linear-gradient(135deg,#2d3561,#c05b2f); }
+.featured-card {
+  background:var(--navy);
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  border:1px solid rgba(255,255,255,0.08);
+  min-width:0;
+}
 
-    .featured-card .fc-badge {
-      position:absolute; top:10px; left:10px;
-      background:var(--gold); color:#7B4F00;
-      font-size:0.65rem; font-weight:700; letter-spacing:0.06em;
-      padding:3px 8px; border-radius:20px; text-transform:uppercase;
-    }
-    .featured-card .fc-body {
-      padding:10px 12px 12px;
-    }
-    .fc-name { font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .fc-service { font-size:0.68rem; color:rgba(255,255,255,0.55); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .fc-row { display:flex; align-items:center; justify-content:space-between; }
-    .fc-stars { display:flex; align-items:center; gap:2px; font-size:0.68rem; }
-    .fc-stars i { color:var(--gold); font-size:11px; }
-    .fc-stars span { color:rgba(255,255,255,0.7); }
-    .fc-loc { font-size:0.72rem; color:rgba(255,255,255,0.45); display:flex; align-items:center; gap:3px; }
-    .fc-loc i { color:var(--brand); font-size:10px; }
-    .fc-cta {
-      background:var(--brand); color:#fff;
-      border:none; border-radius:8px;
-      font-size:0.72rem; font-weight:700;
-      padding:5px 12px; cursor:pointer; font-family:inherit;
-    }
+.featured-card .fc-img-placeholder {
+  width:100%;
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.8rem;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+.featured-card .fc-img-placeholder img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.featured-card .fc-badge {
+  position:absolute; top:8px; left:8px;
+  background:var(--gold); color:#7B4F00;
+  font-size:0.58rem; font-weight:700; letter-spacing:0.06em;
+  padding:2px 7px; border-radius:20px; text-transform:uppercase;
+}
+.featured-card .fc-body {
+  padding:8px 10px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.fc-name { font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fc-service { font-size:0.65rem; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fc-stars { display:flex; align-items:center; gap:2px; font-size:0.65rem; }
+.fc-stars i { color:var(--gold); font-size:10px; }
+.fc-stars span { color:rgba(255,255,255,0.7); }
+.fc-loc { font-size:0.65rem; color:rgba(255,255,255,0.45); display:flex; align-items:center; gap:3px; }
+.fc-loc i { color:var(--brand); font-size:9px; }
 
     /* ── AD BANNER ───────────────────────────────────────────── */
     .ad-banner {
@@ -175,8 +185,6 @@
       flex-shrink:0;
     }
 
-    /* ── CATEGORY GRID ───────────────────────────────────────── */
-    /* ── NEARBY PROVIDERS ────────────────────────────────────── */
     .nearby-section { padding:18px 16px 0; }
 
     .provider-card {
@@ -252,7 +260,6 @@
     .ad-inline .ai-icon { font-size:1.8rem; flex-shrink:0; }
     .ad-inline .ai-btn { margin-left:auto; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.68rem; font-weight:700; padding:5px 10px; border-radius:20px; cursor:pointer; flex-shrink:0; font-family:inherit; }
 
-    /* ── LOCATION MODAL ──────────────────────────────────────── */
     .modal-overlay {
       display:none; position:fixed; inset:0; z-index:200;
       background:rgba(0,0,0,0.5); backdrop-filter:blur(3px);
@@ -311,32 +318,13 @@
     }
 
     /* ── BOTTOM NAV ──────────────────────────────────────────── */
-    .bottom-nav {
-      position:fixed; bottom:0; left:0; right:0; z-index:100;
-      background:var(--card); border-top:1px solid var(--border);
-      height:var(--bottom-h);
-      display:flex; align-items:center;
-      box-shadow:0 -4px 20px rgba(0,0,0,0.07);
-    }
-    .bnav-item {
-      flex:1; display:flex; flex-direction:column; align-items:center;
-      gap:3px; cursor:pointer; padding:6px 0;
-      color:var(--text-3); font-size:0.6rem; font-weight:600;
-      transition:color 0.15s; text-decoration:none;
-    }
-    .bnav-item i { font-size:1.15rem; }
-    .bnav-item.active { color:var(--brand); }
-    .bnav-center {
-      flex:0 0 68px; display:flex; align-items:center; justify-content:center;
-    }
-    .bnav-center-btn {
-      width:52px; height:52px; border-radius:16px;
-      background:var(--brand); color:#fff;
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.3rem; box-shadow:0 4px 14px rgba(255,90,31,0.4);
-      cursor:pointer; border:none;
-      transform:translateY(-8px);
-    }
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:var(--bottom-h);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
     /* ── EMPTY / UTILITY ─────────────────────────────────────── */
     .spacer { height:16px; }
@@ -369,12 +357,32 @@
     .gate-dismiss { text-align:center; margin-top:10px; font-size:0.72rem; color:var(--text-3); cursor:pointer; padding:4px; }
     .gate-dismiss:hover { color:var(--brand); }
 
+    .sub-modal-overlay {
+      display:none; position:fixed; inset:0; z-index:999;
+      background:rgba(0,0,0,0.5); backdrop-filter:blur(3px);
+      align-items:center; justify-content:center; padding:1rem;
+    }
+    .sub-modal-overlay.active { display:flex; animation:fadeIn 0.2s; }
+    .sub-modal-box {
+      background:#fff; border-radius:16px; width:100%;
+      max-width:360px; padding:1.5rem; text-align:center;
+      animation:slideUp 0.25s ease;
+    }	
+	
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
+    .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
+    .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
 	
     @keyframes spin {
       to { transform: rotate(360deg); }
     }	
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
 	
   </style>
 </head>
@@ -387,15 +395,35 @@
     <i class="fa-solid fa-magnifying-glass"></i>
     <input type="text" id="searchInput" placeholder="Search services, providers…" autocomplete="off"/>
   </div>
-  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
+  <button class="nav-icon-btn" onclick="goToNotifications()" title="Notifications" style="position:relative;">
     <i class="fa-regular fa-bell"></i>
     <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
   </button>
-  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
 
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="signOutModal" onclick="handleOverlay(event,'signOutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> Sign Out</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+       Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn" onclick="closeSignOutModal()">Cancel</button>
+      <button class="action-btn" onclick="FX.logout()" style="background:linear-gradient(135deg,#dc3545,#b02030);color:#fff;box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ── GUEST BANNER (hidden for logged-in users) ─────────── -->
 <div class="guest-banner" id="guestBanner" style="display:none;">
@@ -436,8 +464,7 @@
   <!-- Nearby Providers -->
   <section class="nearby-section">
     <div class="section-header">
-      <div class="section-title">Providers Near You</div>
-      <a href="browse.html" class="see-all">See all</a>
+      <div class="section-label"><div class="dot"></div> Providers Near You</div>
     </div>
 
     <div class="providers-grid" id="nearbyGrid">
@@ -454,6 +481,26 @@
   </section>
 
 </main>
+
+<!-- ── SUBSCRIPTION WARNING MODAL ──────────────────────────── -->
+<div id="subWarningModal" class="sub-modal-overlay">
+  <div class="sub-modal-box">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">⏰</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:6px;">Subscription Notice</div>
+    <div style="font-size:0.85rem;color:var(--text-2);line-height:1.7;margin-bottom:1.25rem;" id="subWarningMsg"></div>
+    <div style="font-size:0.75rem;font-weight:700;color:var(--brand);margin-bottom:1rem;" id="subDaysLeft"></div>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button onclick="document.getElementById('subWarningModal').classList.remove('active')"
+        style="padding:0.5rem 1rem;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:0.83rem;font-weight:600;cursor:pointer;">
+        Later
+      </button>
+      <button onclick="window.location.href='topup.html'"
+        style="padding:0.5rem 1.2rem;border:none;border-radius:8px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.83rem;font-weight:700;cursor:pointer;">
+        Top Up Now
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ── LOCATION MODAL ────────────────────────────────────────── -->
 <div class="modal-overlay" id="locationModal" onclick="handleOverlayClick(event)">
@@ -526,7 +573,7 @@
   </div>
 </div>
 <nav class="bottom-nav">
-  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item active" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
   <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
   <div class="bnav-center">
     <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
@@ -557,10 +604,47 @@ function openNotif() {
 /* ── Location Modal ────────────────────────────────────────── */
 const PSGC_BASE = 'https://psgc.gitlab.io/api';
 
-function openLocationModal() {
+async function openLocationModal() {
   document.getElementById('locationModal').classList.add('active');
-  if (!document.getElementById('selRegion').options.length > 1) return;
-  loadRegions();
+  await loadRegions();
+
+  // Restore saved location into dropdowns
+  try {
+    const saved = JSON.parse(localStorage.getItem('fixia_location') || '{}');
+    if (!saved.prov) return;
+
+    // We need the region code — find it by loading all provinces and matching
+    const selRegion = document.getElementById('selRegion');
+    const selProv   = document.getElementById('selProvince');
+    const selCity   = document.getElementById('selCity');
+    const selBrgy   = document.getElementById('selBarangay');
+
+    // Try each region to find which one has our saved province
+    for (const opt of selRegion.options) {
+      if (!opt.value) continue;
+      const r    = await fetch(`${PSGC_BASE}/regions/${opt.value}/provinces/`);
+      const data = await r.json();
+      const match = data.find(p => p.code === saved.prov);
+      if (match) {
+        selRegion.value = opt.value;
+        await loadProvinces();
+        selProv.value = saved.prov;
+      
+        // Always load cities after restoring province so the dropdown is enabled
+        await loadCities();
+      
+        if (saved.city) {
+          selCity.value = saved.city;
+          await loadBarangays();
+      
+          if (saved.brgy) {
+            selBrgy.value = saved.brgy;
+          }
+        }
+        break;
+      }
+    }
+  } catch(e) { /* silent — just open with empty dropdowns */ }
 }
 
 function handleOverlayClick(e) {
@@ -618,6 +702,31 @@ async function loadProvinces() {
       await loadCitiesForRegion(regCode);
     }
   } catch(e) { console.error('PSGC provinces error:', e); }
+}
+
+async function checkSubscriptionOnLogin(user) {
+  if (!user.subscription_end || user.package_id?.includes('free')) return;
+  const session = FX.getSession();
+  if (!session) return;
+  if (session.status === 'pending' || session.status === 'needs_compliance') return;
+
+  const expiry   = new Date(user.subscription_end);
+  const now      = new Date();
+  const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+
+  // Only show modal if 7 days or less remaining
+  if (daysLeft > 7) return;
+
+  const msg = daysLeft <= 0
+    ? `Your subscription has expired. Your account has been downgraded to the free plan.`
+    : `Your <strong>${user.package_id}</strong> subscription expires in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>.`;
+
+  const seenKey = `fixia_subwarn_${session.userId}_${new Date().toDateString()}`;
+  if (localStorage.getItem(seenKey)) return;
+  localStorage.setItem(seenKey, '1');
+  document.getElementById('subWarningMsg').innerHTML = msg;
+  document.getElementById('subDaysLeft').textContent = daysLeft <= 0 ? 'Expired' : `${daysLeft} days left`;
+  document.getElementById('subWarningModal').classList.add('active');
 }
 
 async function loadCitiesForRegion(regCode) {
@@ -687,31 +796,41 @@ function resetSelect(sel, placeholder) {
 }
 
 function applyLocation() {
+  const prov = document.getElementById('selProvince');
   const city = document.getElementById('selCity');
   const brgy = document.getElementById('selBarangay');
-  const prov = document.getElementById('selProvince');
 
+  const provName = prov.options[prov.selectedIndex]?.text;
   const cityName = city.options[city.selectedIndex]?.text;
   const brgyName = brgy.options[brgy.selectedIndex]?.text;
-  const provName = prov.options[prov.selectedIndex]?.text;
 
-  if (!cityName || cityName.startsWith('Select')) {
-    alert('Please select at least a City or Municipality.');
+  const hasProvince = prov.value && !provName.startsWith('Select');
+  const hasCity     = city.value && !cityName.startsWith('Select');
+  const hasBrgy     = brgy.value && !brgyName.startsWith('Select');
+
+  if (!hasProvince) {
+    alert('Please select at least a Province.');
     return;
   }
 
-  const display = brgyName && !brgyName.startsWith('Select')
-    ? `${brgyName}, ${cityName}`
-    : `${cityName}${provName && !provName.startsWith('Select') ? ', ' + provName : ''}`;
+  // Build display string from most specific to least
+  let display = provName;
+  if (hasCity)  display = `${cityName}, ${provName}`;
+  if (hasBrgy)  display = `${brgyName}, ${cityName}`;
+
+  // Build filter object — only include what was selected
+  const loc = {
+    prov:     prov.value,  provName,
+    city:     hasCity ? city.value : '',     cityName: hasCity ? cityName : '',
+    brgy:     hasBrgy ? brgy.value : '',     brgyName: hasBrgy ? brgyName : '',
+    display,
+  };
 
   document.getElementById('locDisplay').textContent = display;
-  localStorage.setItem('fixia_location', JSON.stringify({
-    city: city.value, cityName,
-    brgy: brgy.value || '', brgyName: brgyName || '',
-    display
-  }));
+  localStorage.setItem('fixia_location', JSON.stringify(loc));
 
   closeLocationModal();
+  loadHomepageData();
 }
 
 function useGPS() {
@@ -777,39 +896,40 @@ function renderFeaturedCard(p) {
     ? '<div class="fc-badge" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;">👑 Elite</div>'
     : '<div class="fc-badge">⭐ Featured</div>';
 
-  return `
+return `
     <div class="featured-card" onclick="openProvider('${p.id}')">
       ${eliteBadge}
-      <div class="fc-img-placeholder" style="background:${bg};">${emoji}</div>
+      <div class="fc-img-placeholder" style="background:${bg};">
+        ${p.avatar_url
+          ? `<img src="${p.avatar_url}" alt="${p.biz_name}">`
+          : emoji}
+      </div>
       <div class="fc-body">
         <div class="fc-name">${p.biz_name}</div>
-        <div class="fc-service">${p.cat_sub || '—'}</div>
-        <div class="fc-row">
-          <div>
-            <div class="fc-stars">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
-            <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${p.city_name || '—'}</div>
-          </div>
-          <button class="fc-cta">View</button>
-        </div>
+        ${p.cat_sub ? `<div class="fc-service">${p.cat_sub}</div>` : ''}
+        <div class="fc-stars">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
+        <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${p.city_name || '—'}</div>
       </div>
     </div>`;
 }
 
 /* ── Render a nearby provider card ──────────────────────────── */
 function renderNearbyCard(p) {
-  const emoji = CAT_EMOJI[p.cat_main] || '🔧';
+  const emoji = CAT_EMOJI[p._listing_cats_main?.[0] || p.cat_main] || '🔧';
   const stars = Array.from({length:5}, (_,i) =>
     `<i class="fa-${i < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
   ).join('');
   return `
     <div class="provider-card" onclick="openProvider('${p.id}')">
-      <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
-        <div style="font-size:1.25rem;">${emoji}</div>
+	  <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
+        ${p.avatar_url
+          ? `<img src="${p.avatar_url}" alt="${p.biz_name}" onerror="this.style.display='none';this.parentElement.innerHTML+='<div style=\'font-size:1.25rem\'>${emoji}</div>'">`
+          : `<div style="font-size:1.25rem;">${emoji}</div>`}
         ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>
       <div class="provider-info">
         <div class="provider-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
-        <div class="provider-service">${p.cat_sub || '—'}</div>
+        <div class="provider-service">${p._listing_cats?.[0] || p.cat_sub || '—'}</div>
         <div class="provider-meta">
           <div class="stars-row">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
           <div class="pmeta-item" style="font-size:0.65rem;color:var(--text-3);">
@@ -818,14 +938,15 @@ function renderNearbyCard(p) {
         </div>
       </div>
       <div class="provider-action">
-        <div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>
-        <button class="contact-btn"><i class="fa-solid fa-eye"></i> View</button>
+        ${p.status === 'approved' ? '<div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>' : '<div class="verified-badge" style="background:var(--red);color:#fff;">⚠ Unverified</div>'}
       </div>
     </div>`;
 }
 
 /* ── Load everything dynamically ─────────────────────────────── */
 async function loadHomepageData() {
+
+  FX.checkAndShowMessages(); // non-blocking — shows unread messages in background
   try {
     // Load featured providers (weighted rotation)
     const featuredList = document.getElementById('featuredList');
@@ -846,36 +967,46 @@ async function loadHomepageData() {
        </div>`;
   }
 
-  try {
-    // Load inline ad for banner slot (first inline ad)
-    const inlineAds = await FX.getAds('inline');
-    if (inlineAds.length) {
-      // Banner ad (first slot — full width above nearby)
-      const bannerEl = document.getElementById('homepageAdBanner');
-      if (bannerEl) {
-        const ad = inlineAds[0];
-        bannerEl.innerHTML = `
-          <div class="ad-banner" onclick="window.open('${ad.link_url || '#'}','_blank')"
-               style="background:linear-gradient(135deg,${ad.bg_color || '#667eea'},${ad.bg_color || '#764ba2'});">
-            <div class="ad-icon">${ad.icon || '📢'}</div>
-            <div class="ad-text">
-              <div class="ad-label">Sponsored</div>
-              <div class="ad-title">${ad.title}</div>
-              <div class="ad-sub">${ad.description || ''}</div>
-            </div>
-            <button class="ad-btn">${ad.cta_label || 'Learn More'}</button>
-          </div>`;
-      }
-      // Inline ad between nearby cards (second slot)
-      const inlineEl = document.getElementById('homepageInlineAd');
-      if (inlineEl && inlineAds.length > 1) {
-        inlineEl.innerHTML = FX.renderInlineAd(inlineAds[1]);
-      } else if (inlineEl && inlineAds.length > 0) {
-        inlineEl.innerHTML = FX.renderInlineAd(inlineAds[0]);
-      }
+try {
+  const inlineAds = await FX.getAds('inline');
+  if (inlineAds.length) {
+
+    // Banner ad (first slot)
+    const bannerEl = document.getElementById('homepageAdBanner');
+    if (bannerEl) {
+      const ad = inlineAds[0];
+      bannerEl.innerHTML = FX.renderInlineAd(ad);
+      sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+	  FX.checkAndCompleteAd(ad.id, (ad.impression_count || 0) + 1, ad.impression_quota).catch(() => {});
+      const injected = bannerEl.firstElementChild;
+      const clickHandler = () => {
+        sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+        window.open(ad.link_url || '#', '_blank');
+      };
+      injected.addEventListener('click', clickHandler);
+      injected.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
     }
+
+    // Inline ad (second slot)
+    const inlineEl = document.getElementById('homepageInlineAd');
+    if (inlineEl) {
+      const ad2 = inlineAds.length > 1 ? inlineAds[1] : inlineAds[0];
+      inlineEl.innerHTML = FX.renderInlineAd(ad2);
+      sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad2.id }) }).catch(()=>{});
+	  FX.checkAndCompleteAd(ad2.id, (ad2.impression_count || 0) + 1, ad2.impression_quota).catch(() => {});
+      const injected2 = inlineEl.firstElementChild;
+      const clickHandler2 = () => {
+        sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad2.id }) }).catch(()=>{});
+        window.open(ad2.link_url || '#', '_blank');
+      };
+      injected2.addEventListener('click', clickHandler2);
+      injected2.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler2(); });
+    }
+
+  }
     // Load popup ads into memory for the session
-    await FX.loadPopupAds();
+    const session = FX.getSession();
+	if (session && session.role === 'regular' && !session.adsFree) await FX.initAds();
   } catch(e) {
     console.warn('[Fixia] Ad load failed:', e.message);
   }
@@ -884,21 +1015,40 @@ async function loadHomepageData() {
     // Load nearby providers (approved, sorted by rating)
     const sess = FX.getSession();
     const savedLoc = JSON.parse(localStorage.getItem('fixia_location') || '{}');
-    const filters = { limit: 8 };
-    if (savedLoc.city) filters.city = savedLoc.city;
-
-    const nearby = await FX.getProviders(filters);
+	const filters = { limit: 8 };
+	if (savedLoc.brgy)          filters.barangay = savedLoc.brgyName;
+	else if (savedLoc.city)     filters.city     = savedLoc.cityName;
+	else if (savedLoc.provName) filters.province = savedLoc.provName;
+		
+	if (activeFilter === 'top')      filters.featured = true;
+	if (activeFilter === 'verified') filters.elite    = true;
+	
     const grid = document.getElementById('nearbyGrid');
     if (!grid) return;
+    grid.innerHTML = `
+      ${[1].map(() => `
+        <div style="background:var(--card);border-radius:var(--radius-md);padding:14px;display:flex;gap:12px;align-items:center;animation:pulse 1.2s ease-in-out infinite;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="height:12px;background:var(--border);border-radius:6px;margin-bottom:8px;width:60%;"></div>
+            <div style="height:10px;background:var(--border);border-radius:6px;width:40%;"></div>
+          </div>
+        </div>`).join('')}`;
+    const nearby = await FX.getProviders(filters);
 
     if (!nearby.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:1.5rem;color:var(--text-3);font-size:0.82rem;">No providers in your area yet. <a href="browse.html" style="color:var(--brand);font-weight:700;">Browse all</a></div>';
+      const hasLocation = savedLoc.prov || savedLoc.city || savedLoc.brgy;
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:1.5rem;color:var(--text-3);font-size:0.82rem;">
+        ${hasLocation ? 'No providers in your area yet.' : 'No providers found.'}
+        <a href="browse.html" style="color:var(--brand);font-weight:700;">Browse all</a>
+      </div>`;
       return;
     }
 
     // Render 4 providers (2 rows of 2)
     const show = nearby.slice(0, 4);
     grid.innerHTML = show.map(renderNearbyCard).join('');
+	FX.adTrigger('category_browsed');
   } catch(e) {
     console.error('[Homepage] Nearby load error:', e.message);
     const grid = document.getElementById('nearbyGrid');
@@ -952,12 +1102,20 @@ openProvider = function(id) {
   _openProvider(id);
 };
 
+let activeFilter = 'nearby';
+
 function setFilter(el, key) {
   if (IS_GUEST && ['nearby','top','verified'].includes(key)) {
     gate('📍', 'Filter is for Members', 'Sign in to filter providers by location, rating, and availability.');
     return;
   }
-  // Add your actual filter logic here when ready
+  activeFilter = key;
+
+  // Update active pill UI
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+
+  loadHomepageData();
 }
 
 function browseSubcat(cat, sub) {
@@ -975,23 +1133,64 @@ openNotif = function() {
   if (gate('🔔', 'Sign In for Notifications', 'Log in to see your activity and updates.')) return;
   window.location.href = 'notifications.html';
 };
-</script>
 
-
-<script>
-// Load notification bell badge
-(async function loadNotifBadge() {
+function goToNotifications() {
   const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
+  if (!sess) { window.location.href = 'login.html'; return; }
+  window.location.href = 'notifications.html';
+}
+
+async function refreshNotifBadge() {
   try {
-    const count = await FX.getUnreadCount('regular', sess.userId);
+    const sess = FX.getSession();
+    if (!sess) return;
+
+    let count = 0;
+
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+
     const badge = document.getElementById('notifBellBadge');
-    if (badge && count > 0) {
+    if (!badge) return;
+    if (count > 0) {
       badge.textContent = count > 9 ? '9+' : count;
       badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
     }
   } catch(e) {}
+}
+
+refreshNotifBadge();
+setInterval(refreshNotifBadge, 10000);
+
+// Check subscription status on load + suspension guard
+(async () => {
+  const sess = FX.getSession();
+  if (!sess) return;
+  try {
+    const user = await FX.getUserById(sess.userId);
+    // ── Suspension check ──────────────────────────────────────
+if (!user || user.status === 'suspended') {
+  FX.clearSession();
+  window.location.href = 'login.html';
+  return;
+}
+// force_logout is handled after the user reads their rejection message in checkAndShowMessages
+    // ─────────────────────────────────────────────────────────
+    await checkSubscriptionOnLogin(user);
+  } catch(e) {
+    console.warn('[Fixia] Subscription check failed:', e.message);
+  }
 })();
+
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('active'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('active'); }
+
 </script>
 </body>
 </html>

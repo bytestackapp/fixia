@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Provider — Fixia</title>
@@ -70,6 +70,7 @@
     .contact-btn-inquire:hover{transform:translateY(-1px);}
     .contact-btn-call{background:var(--green-bg);color:var(--green-text);border:1px solid rgba(16,185,129,0.3);}
     .contact-btn-msg{background:var(--blue-bg);color:var(--blue-text);border:1px solid rgba(59,130,246,0.3);}
+	.contact-btn-book{background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 4px 12px rgba(255,90,31,0.3);flex:2;}
 
     /* ── BODY ────────────────────────────────────────────────── */
     .body{padding:14px 16px;animation:fadeIn 0.3s;}
@@ -96,26 +97,17 @@
     .li-sub{font-size:0.7rem;color:var(--text-3);margin-bottom:4px;}
     .li-desc{font-size:0.78rem;color:var(--text-2);line-height:1.55;}
 
-    /* ── PORTFOLIO ───────────────────────────────────────────── */
-    .portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-    .portfolio-img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);cursor:pointer;transition:transform 0.15s;}
-    .portfolio-img:active{transform:scale(0.97);}
-
     /* ── REVIEWS ─────────────────────────────────────────────── */
-    .rating-summary{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
-    .rating-big{font-size:2.5rem;font-weight:800;color:var(--navy);line-height:1;}
-    .rating-right{flex:1;}
-    .stars-row{display:flex;gap:3px;margin-bottom:3px;}
-    .stars-row i{color:var(--gold);font-size:14px;}
-    .stars-row i.empty{color:var(--border);}
+    .rating-summary{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+    .rating-big{font-size:2rem;font-weight:900;color:var(--navy);line-height:1;}
+    .rating-star-icon{font-size:1.5rem;color:var(--gold);line-height:1;}
+    .rating-label{font-size:0.72rem;font-weight:700;color:var(--text-3);}
     .rating-count{font-size:0.72rem;color:var(--text-3);}
 
     .review-item{padding:11px 0;border-bottom:1px solid var(--border);}
     .review-item:last-child{border-bottom:none;}
-    .ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-    .ri-stars{display:flex;gap:2px;}
-    .ri-stars i{color:var(--gold);font-size:11px;}
-    .ri-stars i.empty{color:var(--border);}
+    .ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .ri-stars{display:flex;gap:1px;align-items:center;}
     .ri-date{font-size:0.68rem;color:var(--text-3);}
     .ri-comment{font-size:0.8rem;color:var(--text-2);line-height:1.6;}
 
@@ -170,6 +162,8 @@
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
 	
+	#reviewTooltip.show { display:block !important; }
+	
   </style>
 </head>
 <body>
@@ -183,6 +177,7 @@
   </div>
   <button class="nav-share" id="saveBtn" onclick="toggleSave()" title="Save"><i class="fa-regular fa-bookmark"></i></button>
   <button class="nav-share" onclick="shareProfile()" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
+  <button class="nav-share" id="reportBtn" onclick="openReportModal()" title="Report" style="display:none;"><i class="fa-solid fa-flag"></i></button>
 </nav>
 
 <!-- HERO -->
@@ -207,13 +202,16 @@
 <!-- CONTACT BAR -->
 <div class="contact-bar" id="contactBar" style="display:none;">
   <button class="contact-btn contact-btn-inquire" id="inquireBtn" onclick="openInquire()">
-    <i class="fa-solid fa-paper-plane"></i> Inquire
+    <i class="fa-solid fa-phone-volume"></i> Inquire
   </button>
-  <button class="contact-btn contact-btn-call" id="callBtn" onclick="callProvider()">
+  <button class="contact-btn contact-btn-call" id="callBtn" onclick="callProvider()" style="display:none;">
     <i class="fa-solid fa-phone"></i> Call
   </button>
-  <button class="contact-btn contact-btn-msg" id="smsBtn" onclick="smsProvider()">
+  <button class="contact-btn contact-btn-msg" id="smsBtn" onclick="smsProvider()" style="display:none;">
     <i class="fa-solid fa-comment-sms"></i> SMS
+  </button>
+  <button class="contact-btn contact-btn-book" id="bookBtn" onclick="openBooking()" style="display:none;">
+    <i class="fa-solid fa-calendar-check"></i> Book
   </button>
 </div>
 
@@ -229,12 +227,6 @@
 
   <!-- Inline Ad (free users only) -->
   <div id="adSlot"></div>
-
-  <!-- Portfolio -->
-  <div class="sec" id="portfolioSec" style="display:none;">
-    <div class="sec-title"><i class="fa-solid fa-images"></i> Portfolio</div>
-    <div class="portfolio-grid" id="portfolioGrid"></div>
-  </div>
 
   <!-- Services / Listings -->
   <div class="sec" id="listingsSec" style="display:none;">
@@ -261,7 +253,24 @@
 
   <!-- Reviews -->
   <div class="sec">
-    <div class="sec-title"><i class="fa-solid fa-star"></i> Customer Reviews</div>
+    <div class="sec-title" style="display:flex;align-items:center;gap:6px;">
+      <i class="fa-solid fa-star"></i> Customer Reviews
+      <span style="position:relative;display:inline-flex;align-items:center;" id="reviewInfoWrap">
+        <i class="fa-solid fa-circle-question"
+           style="font-size:0.85rem;color:var(--text-3);cursor:pointer;"
+           onclick="document.getElementById('reviewTooltip').classList.toggle('show')"></i>
+        <span id="reviewTooltip"
+              style="display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);
+                     background:var(--navy);color:#fff;font-size:0.68rem;font-weight:500;line-height:1.5;
+                     padding:6px 10px;border-radius:8px;width:200px;text-align:center;z-index:99;
+                     box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+          Only customers with completed bookings can leave reviews for this provider.
+          <span style="position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);
+                       width:0;height:0;border-left:5px solid transparent;
+                       border-right:5px solid transparent;border-top:5px solid var(--navy);"></span>
+        </span>
+      </span>
+    </div>
     <div id="reviewsBody"><div class="empty">Loading reviews…</div></div>
   </div>
 
@@ -306,6 +315,15 @@
 
 <script src="fixia-data.js"></script>
 <script>
+
+const CAT_LABELS = {
+  home:'Home Services', auto:'Automotive', garden:'Garden & Lawn',
+  elec:'Electrical', beauty:'Beauty & Wellness', health:'Health & Care',
+  tech:'Tech & IT', build:'Construction', clean:'Cleaning',
+  pet:'Pet Services', event:'Events', edu:'Education & Tutoring',
+  other:'Others',
+};
+
 /* ══════════════════════════════════════════════════════════════
    STATE
 ══════════════════════════════════════════════════════════════ */
@@ -321,7 +339,7 @@ const session = FX.getSession();
 ══════════════════════════════════════════════════════════════ */
 (async function init() {
   // Init pop-up ads for free regular users
-  FX.initAds();
+  await FX.initAds();
 
   const params     = new URLSearchParams(window.location.search);
   const providerId = params.get('id');
@@ -353,11 +371,33 @@ async function renderPage() {
   document.getElementById('contactBar').style.display   = 'flex';
   document.getElementById('bodySection').style.display  = 'block';
 
-  const initials = (providerUser?.first_name?.[0] || '') + (providerUser?.last_name?.[0] || '');
-  document.getElementById('heroAvatar').childNodes[0].nodeValue = initials || '?';
+  const avatarEl = document.getElementById('heroAvatar');
+  if (provider.avatar_url) {
+    avatarEl.innerHTML = `
+      <img src="${provider.avatar_url}" alt="Avatar"
+           style="width:100%;height:100%;object-fit:cover;border-radius:18px;display:block;"/>
+      <div class="elite-crown" id="heroEliteCrown" style="display:none;">👑</div>`;
+  } else {
+    const initials = (providerUser?.first_name?.[0] || '') + (providerUser?.last_name?.[0] || '');
+    avatarEl.childNodes[0].nodeValue = initials || '?';
+  }
   document.getElementById('navTitle').textContent   = provider.biz_name;
+  // Show report button for all logged-in users (except viewing own profile)
+  if (session && (session.role === 'regular' || session.role === 'admin') && provider.user_id !== session.userId) {
+    const reportBtn = document.getElementById('reportBtn');
+    reportBtn.style.display = 'flex';
+    // Check if already reported
+    const alreadyReported = await FX.hasReported(provider.id, session.userId);
+    if (alreadyReported) {
+      reportBtn.innerHTML = '<i class="fa-solid fa-flag" style="color:var(--red);"></i>';
+      reportBtn.title = 'Already reported';
+      reportBtn.onclick = null;
+      reportBtn.style.cursor = 'default';
+    }
+  }
   document.getElementById('heroName').textContent   = provider.biz_name;
-  document.getElementById('heroService').textContent = `${provider.cat_sub} · ${provider.city_name}`;
+  const headerLoc = [provider.city_name, provider.province_name].filter(Boolean).join(', '); // keep header short
+  document.getElementById('heroService').textContent = headerLoc || '—';
 
   // Elite
   if (provider.is_elite) {
@@ -369,8 +409,13 @@ async function renderPage() {
     document.getElementById('heroBadges').innerHTML +=
       '<span class="hbadge hbadge-brand">⭐ Featured</span>';
   }
+if (provider.status === 'approved') {
   document.getElementById('heroBadges').innerHTML +=
     '<span class="hbadge hbadge-green">✅ Verified</span>';
+} else {
+  document.getElementById('heroBadges').innerHTML +=
+    '<span class="hbadge" style="background:var(--red);color:#fff;">⚠ Unverified</span>';
+}
 
   // Stats
   document.getElementById('sbRating').textContent   = provider.avg_rating   || '0.0';
@@ -380,54 +425,48 @@ async function renderPage() {
   // About
   document.getElementById('aboutText').textContent = provider.biz_desc || 'No description provided.';
 
-  // Detail rows
-  const loc = [
-    provider.barangay_name,
-    provider.city_name,
-    provider.province_name,
-  ].filter(Boolean).join(', ');
+  const loc = [provider.street_addr, provider.barangay_name, provider.city_name, provider.province_name].filter(Boolean).join(', ');
+  const mainService = listings?.[0]?.cat_sub || null;
+  const memberSince = provider.created_at
+    ? new Date(provider.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'long' })
+    : null;
 
   document.getElementById('detailRows').innerHTML = `
+    ${loc ? `
     <div class="detail-row">
       <div class="detail-icon"><i class="fa-solid fa-location-dot"></i></div>
-      <div><div class="detail-label">Location</div><div class="detail-val">${loc || '—'}</div></div>
-    </div>
+      <div><div class="detail-label">Location</div><div class="detail-val">${loc}</div></div>
+    </div>` : ''}
+    ${mainService ? `
     <div class="detail-row">
       <div class="detail-icon"><i class="fa-solid fa-wrench"></i></div>
-      <div><div class="detail-label">Service Type</div><div class="detail-val">${provider.cat_sub}</div></div>
-    </div>
+      <div><div class="detail-label">Main Service</div><div class="detail-val">${mainService}</div></div>
+    </div>` : ''}
+    ${memberSince ? `
     <div class="detail-row">
-      <div class="detail-icon"><i class="fa-solid fa-user-tie"></i></div>
-      <div><div class="detail-label">Provider Type</div><div class="detail-val">${capitalize(provider.prov_type)}</div></div>
-    </div>
-    ${provider.experience ? `
-    <div class="detail-row">
-      <div class="detail-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-      <div><div class="detail-label">Experience</div><div class="detail-val">${provider.experience} years</div></div>
+      <div class="detail-icon"><i class="fa-solid fa-calendar-days"></i></div>
+      <div><div class="detail-label">Member Since</div><div class="detail-val">${memberSince}</div></div>
     </div>` : ''}`;
 
   // Inline ad for free regular users
-  if (!session || (session.role === 'regular' && !session.adsFree)) {
-    document.getElementById('adSlot').innerHTML = `
-      <div class="ad-inline" onclick="">
-        <div class="ai-icon">🏗️</div>
-        <div style="flex:1;min-width:0;">
-          <div class="ai-label">Sponsored</div>
-          <div class="ai-title">BuildRight Construction</div>
-          <div class="ai-sub">Free renovation estimates</div>
-        </div>
-        <button class="ai-btn">Visit</button>
-      </div>`;
-  }
-
-  // Portfolio
-  if ((provider.portfolio_urls || []).length) {
-    document.getElementById('portfolioSec').style.display = 'block';
-    document.getElementById('portfolioGrid').innerHTML =
-      provider.portfolio_urls.map(url =>
-        `<img class="portfolio-img" src="${url}" alt="Portfolio" onclick="openLightbox('${url}')"/>`
-      ).join('');
-  }
+if (!session || !FX.getSession()?.adsFree) {
+  try {
+    const inlineAds = await FX.getAds('inline');
+    if (inlineAds.length) {
+      const ad = inlineAds[0];
+      document.getElementById('adSlot').innerHTML = FX.renderInlineAd(ad);
+      const injected = document.getElementById('adSlot').firstElementChild;
+      const clickHandler = () => {
+        sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+        window.open(ad.link_url || '#', '_blank');
+      };
+      injected.addEventListener('click', clickHandler);
+      injected.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
+      sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+	  FX.checkAndCompleteAd(ad.id, (ad.impression_count || 0) + 1, ad.impression_quota).catch(() => {});
+    }
+  } catch(e) {}
+}
 
   // Listings
   const activeListing = listings.filter(l => l.is_active);
@@ -439,13 +478,13 @@ async function renderPage() {
           <div class="li-title">${l.title}</div>
           ${l.price_label ? `<div class="li-price">${l.price_label}</div>` : ''}
         </div>
-        <div class="li-sub">${l.cat_sub || ''}</div>
+        <div class="li-sub">${CAT_LABELS[l.cat_main] || l.cat_main || ''} &nbsp; • &nbsp; ${l.cat_sub || ''}</div>
         <div class="li-desc">${l.description || ''}</div>
       </div>`).join('');
   }
 
   // Rating section — only show if user has a completed booking with this provider
-  if (session && session.role === 'regular') {
+  if (session && (session.role === 'regular' || session.role === 'admin')) {
     try {
       const bookings = await FX.getUserInquiries(session.userId);
       const hasCompleted = bookings.some(b =>
@@ -455,17 +494,7 @@ async function renderPage() {
         document.getElementById('rateSection').style.display = 'block';
       } else {
         // Show info message instead
-        const rateEl = document.getElementById('rateSection');
-        rateEl.style.display = 'block';
-        rateEl.innerHTML = `
-          <div style="background:var(--bg);border-radius:var(--radius-md);padding:14px;text-align:center;">
-            <div style="font-size:1.5rem;margin-bottom:6px;">⭐</div>
-            <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:4px;">Want to leave a review?</div>
-            <div style="font-size:0.75rem;color:var(--text-3);line-height:1.6;">
-              Reviews are only available after a completed booking with this provider.
-              Book a service to get started.
-            </div>
-          </div>`;
+        document.getElementById('rateSection').style.display = 'none';
       }
 	} catch(e) {
       console.warn('[Fixia] Could not load booking status for rating section:', e.message);
@@ -489,20 +518,21 @@ function renderReviews() {
 
   const avg = provider.avg_rating || 0;
   const filledStars = Array.from({length:5}, (_,i) =>
-    `<i class="fa-solid fa-star${i >= Math.round(avg) ? ' empty' : ''}"></i>`
+    `<i class="fa-solid fa-star" style="color:${i < Math.round(avg) ? 'var(--gold)' : 'var(--border)'};font-size:16px;"></i>`
   ).join('');
 
   body.innerHTML = `
     <div class="rating-summary">
       <div class="rating-big">${avg}</div>
-      <div class="rating-right">
-        <div class="stars-row">${filledStars}</div>
+      <div class="rating-star-icon"><i class="fa-solid fa-star"></i></div>
+      <div>
+        <div class="rating-label">Service Rating</div>
         <div class="rating-count">${reviews.length} review${reviews.length !== 1 ? 's' : ''}</div>
       </div>
     </div>
     ${reviews.map(r => {
       const stars = Array.from({length:5}, (_,i) =>
-        `<i class="fa-solid fa-star${i >= r.stars ? ' empty' : ''}"></i>`
+        `<i class="fa-solid fa-star" style="color:${i < r.stars ? 'var(--gold)' : 'var(--border)'};font-size:12px;"></i>`
       ).join('');
       return `
       <div class="review-item">
@@ -544,8 +574,7 @@ async function submitRating() {
   const rateAlert = document.getElementById('rateAlert');
   rateAlert.className = 'rate-alert';
 
-  if (!session || session.role !== 'regular') {
-    rateAlert.className = 'rate-alert show err';
+  if (!session || (session.role !== 'regular' && session.role !== 'admin')) {
     rateAlert.textContent = 'Please log in as a regular user to leave a rating.';
     return;
   }
@@ -636,7 +665,7 @@ FX.isSaved     = function(id) { return this.getSaved().some(s => s.id === id); }
 FX.saveProvider = function(p) {
   const saved = this.getSaved();
   if (saved.find(s => s.id === p.id)) return;
-  saved.unshift({ id:p.id, bizName:p.biz_name, catSub:p.cat_sub, catMain:p.cat_main, avgRating:p.avg_rating, totalRatings:p.total_ratings, cityName:p.city_name, isElite:p.is_elite, savedAt:new Date().toISOString() });
+  saved.unshift({ id:p.id, bizName:p.biz_name, catSub:p.cat_sub, catMain:p.cat_main, avgRating:p.avg_rating, totalRatings:p.total_ratings, cityName:p.city_name, isElite:p.is_elite, avatarUrl:p.avatar_url||null, savedAt:new Date().toISOString() });
   localStorage.setItem('fixia_saved', JSON.stringify(saved));
 };
 FX.unsaveProvider = function(id) { localStorage.setItem('fixia_saved', JSON.stringify(this.getSaved().filter(s => s.id !== id))); };
@@ -685,13 +714,11 @@ function fmtDate(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
 }
-</script>
 
-<script>
 // Load notification bell badge
 (async function loadNotifBadge() {
   const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
+  if (!sess || sess.role === 'provider') return;
   try {
     const count = await FX.getUnreadCount('regular', sess.userId);
     const badge = document.getElementById('notifBellBadge');
@@ -702,125 +729,266 @@ function fmtDate(d) {
   } catch(e) {}
 })();
 
-/* ── Inquire flow ────────────────────────────────────────────── */
+/* ── Inquire / Contact / Booking flow ───────────────────────── */
+function showToast(msg, color) {
+  color = color || '#065f46';
+  let toast = document.getElementById('fxToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'fxToast';
+    toast.style.cssText = [
+      'position:fixed','bottom:80px','left:50%',
+      'transform:translateX(-50%) translateY(100px)',
+      'z-index:99999','color:#fff','border-radius:10px',
+      'padding:12px 20px','font-size:0.85rem','font-weight:700',
+      'box-shadow:0 8px 24px rgba(0,0,0,0.25)','white-space:nowrap',
+      'pointer-events:none','opacity:0',
+      'transition:transform 0.3s ease, opacity 0.3s ease',
+    ].join(';');
+    document.body.appendChild(toast);
+  }
+  toast.style.background = color;
+  toast.textContent = msg;
+  toast.getBoundingClientRect();
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  toast.style.opacity = '1';
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(function() {
+    toast.style.transform = 'translateX(-50%) translateY(100px)';
+    toast.style.opacity = '0';
+  }, 3500);
+}
+
 function openInquire() {
   const sess = FX.getSession();
   if (!sess) {
-    if (confirm('Please sign in to send an inquiry. Go to login?')) {
+    if (confirm('Please sign in to contact this provider. Go to login?')) {
       window.location.href = 'login.html';
     }
     return;
   }
   if (sess.role === 'provider') {
-    alert('Providers cannot send inquiries. Please log in as a regular user.');
-    return;
-  }
-  if (sess.role === 'admin') {
-    alert('Admins cannot send inquiries.');
+    alert('Providers cannot contact other providers. Please use a regular account.');
     return;
   }
   if (!provider) { alert('Provider info not loaded yet. Please wait.'); return; }
-  // Prevent inquiring to own profile (if somehow a provider is logged in)
   if (provider.user_id === sess.userId) {
-    alert('You cannot inquire to your own profile.');
+    alert('You cannot contact your own profile.');
     return;
   }
-  document.getElementById('inquireProvName').textContent = provider.biz_name;
-  document.getElementById('inquireMsg').value = '';
-  document.getElementById('inquireAlert').style.display = 'none';
-  document.getElementById('inquireModal').classList.add('active');
+
+  // Reveal Call, SMS, and Book buttons — hide the Inquire button
+  document.getElementById('inquireBtn').style.display = 'none';
+  document.getElementById('callBtn').style.display = 'flex';
+  document.getElementById('smsBtn').style.display = 'flex';
+  document.getElementById('bookBtn').style.display = 'flex';
 }
 
-function closeInquire() {
-  document.getElementById('inquireModal').classList.remove('active');
+/* ── Book flow ───────────────────────────────────────────────── */
+function openBooking() {
+  const sess = FX.getSession();
+  if (!sess) { window.location.href = 'login.html'; return; }
+  document.getElementById('bookProvName').textContent = provider.biz_name;
+  document.getElementById('bookMsg').value = '';
+  document.getElementById('bookAlert').style.display = 'none';
+  document.getElementById('bookModal').classList.add('active');
 }
 
-function handleInquireOverlay(e) {
-  if (e.target === document.getElementById('inquireModal')) closeInquire();
+function closeBooking() {
+  document.getElementById('bookModal').classList.remove('active');
 }
 
-async function submitInquiry() {
-  const msg = document.getElementById('inquireMsg').value.trim();
-  const alertEl = document.getElementById('inquireAlert');
+function handleBookOverlay(e) {
+  if (e.target === document.getElementById('bookModal')) closeBooking();
+}
+
+async function submitBooking() {
+  const msg = document.getElementById('bookMsg').value.trim();
+  const alertEl = document.getElementById('bookAlert');
   alertEl.style.display = 'none';
 
   if (!msg || msg.length < 10) {
-    alertEl.textContent = 'Please describe your need in at least 10 characters.';
+    alertEl.textContent = 'Please describe the job in at least 10 characters.';
     alertEl.style.display = 'block';
     return;
   }
 
-  const btn = document.getElementById('inquireSubmitBtn');
+  const btn = document.getElementById('bookSubmitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Booking…';
 
   try {
     const sess = FX.getSession();
-    await FX.createInquiry(sess.userId, provider.id, msg);
-    closeInquire();
-    FX.adTrigger('inquiry_sent');
-	// Show success toast
-    let toast = document.getElementById('inquireToast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'inquireToast';
-      toast.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:#065f46;color:#fff;border-radius:8px;padding:0.75rem 1.4rem;font-size:0.82rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;';
-      document.body.appendChild(toast);
-    }
-    toast.textContent = "✅ Inquiry sent! We'll notify you when the provider replies.";
-    toast.style.transform = 'translateX(-50%) translateY(0)';
-    toast.style.opacity = '1';
-    setTimeout(() => {
-      toast.style.transform = 'translateX(-50%) translateY(80px)';
-      toast.style.opacity = '0';
-    }, 3500);
+    await FX.createBooking(sess.userId, provider.id, msg, sess.role);
+    closeBooking();
+    setTimeout(function() {
+      showToast('✅ Booking sent!');
+    }, 300);
+    setTimeout(function() { FX.adTrigger('booking_sent'); }, 4000);
   } catch(e) {
-    alertEl.textContent = e.message || 'Failed to send inquiry. Please try again.';
-    alertEl.style.display = 'block';
+    const errMsg = e.message || 'Failed to send booking. Please try again.';
+    if (errMsg.toLowerCase().includes('already have')) {
+      closeBooking();
+      setTimeout(function() {
+        showToast('⚠️ You already have an active booking with this provider.', '#92400e');
+      }, 300);
+    } else {
+      alertEl.textContent = errMsg;
+      alertEl.style.display = 'block';
+    }
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Inquiry';
+    btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Confirm Booking';
   }
 }
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('reviewInfoWrap')?.contains(e.target)) {
+    document.getElementById('reviewTooltip')?.classList.remove('show');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   REPORT
+══════════════════════════════════════════════════════════════ */
+function openReportModal() {
+  if (!session) { window.location.href = 'login.html'; return; }
+  document.getElementById('reportReason').value  = '';
+  document.getElementById('reportDetails').value = '';
+  document.getElementById('reportAlert').style.display = 'none';
+  document.getElementById('reportModal').classList.add('active');
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('active');
+}
+
+async function submitReport() {
+  const reason  = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value.trim();
+  const alertEl = document.getElementById('reportAlert');
+
+  if (!reason) {
+    alertEl.textContent = 'Please select a reason.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('reportSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
+
+  try {
+    await FX.submitReport({
+      providerId:   provider.id,
+      providerName: provider.biz_name,
+      userId:       session.userId,
+      userName:     `${session.firstName} ${session.lastName}`,
+      reason,
+      details,
+    });
+    closeReportModal();
+    showToast('Report submitted. We\'ll review it within 24–48 hours.');
+
+    // Update report button to show already reported
+    const reportBtn = document.getElementById('reportBtn');
+    reportBtn.innerHTML = '<i class="fa-solid fa-flag" style="color:var(--red);"></i>';
+    reportBtn.title     = 'Already reported';
+    reportBtn.onclick   = null;
+    reportBtn.style.cursor = 'default';
+  } catch(e) {
+    if (e.message?.includes('duplicate') || e.message?.includes('unique')) {
+      closeReportModal();
+      showToast('You have already reported this provider.');
+    } else {
+      alertEl.textContent = 'Error: ' + e.message;
+      alertEl.style.display = 'block';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-flag"></i> Submit Report';
+  }
+}
+
 </script>
 
-<!-- INQUIRE MODAL -->
-<div class="modal-overlay" id="inquireModal" onclick="handleInquireOverlay(event)">
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookModal" onclick="handleBookOverlay(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-head" style="padding:14px 18px 10px;border-bottom:1px solid var(--border);">
       <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">
-        <i class="fa-solid fa-paper-plane" style="color:var(--brand);"></i>
-        Send an Inquiry
+        <i class="fa-solid fa-calendar-check" style="color:var(--brand);"></i>
+        Confirm Booking
       </div>
-      <div style="font-size:0.75rem;color:var(--text-3);margin-top:3px;" id="inquireProvName"></div>
+      <div style="font-size:0.75rem;color:var(--text-3);margin-top:3px;" id="bookProvName"></div>
     </div>
     <div style="padding:14px 18px;">
       <div style="font-size:0.78rem;color:var(--text-2);line-height:1.6;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:10px 12px;">
-        💡 Describe the service you need. The provider will reply with details and pricing.
-        You can then choose to <strong>Book</strong> or <strong>Decline</strong>.
+        📋 Describe the job you agreed on. This creates a record so the provider can mark it done and receive your rating.
       </div>
       <div style="display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;">
-        Describe your need <span style="color:var(--red);">*</span>
+        Job Description <span style="color:var(--red);">*</span>
       </div>
-      <textarea id="inquireMsg" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;resize:vertical;min-height:120px;color:var(--text);transition:all 0.2s;outline:none;" placeholder="e.g. I need my aircon cleaned, 1 unit, 1.5HP window type, located in Quezon City…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-      <div style="font-size:0.68rem;color:var(--text-3);margin-top:3px;text-align:right;">
-        Be specific — include unit count, location, preferred schedule if any.
-      </div>
-      <div id="inquireAlert" style="font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-top:8px;display:none;background:var(--red-bg);color:var(--red-text);"></div>
+      <textarea id="bookMsg" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;resize:vertical;min-height:100px;color:var(--text);transition:all 0.2s;outline:none;" placeholder="e.g. Aircon cleaning, 1 unit 1.5HP, agreed price ₱500, Quezon City…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div id="bookAlert" style="font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-top:8px;display:none;background:var(--red-bg);color:var(--red-text);"></div>
     </div>
     <div style="padding:0 18px;display:flex;gap:8px;">
-      <button onclick="closeInquire()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
+      <button onclick="closeBooking()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
         Cancel
       </button>
-      <button onclick="submitInquiry()" id="inquireSubmitBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(255,90,31,0.3);">
-        <i class="fa-solid fa-paper-plane"></i> Send Inquiry
+      <button onclick="submitBooking()" id="bookSubmitBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(255,90,31,0.3);">
+        <i class="fa-solid fa-calendar-check"></i> Confirm Booking
       </button>
     </div>
     <div style="padding:12px 18px 0;text-align:center;font-size:0.7rem;color:var(--text-3);">
-      You'll be notified when the provider replies.
+      The provider will be notified and can mark the job done when complete.
     </div>
   </div>
 </div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this)closeReportModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head" style="padding:14px 18px 10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-flag" style="color:var(--red);"></i> &nbsp; Report Provider
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-top:3px;">Your report is anonymous and will be reviewed by our team.</div>
+    </div>
+    <div style="padding:14px 18px;">
+      <div id="reportAlert" style="display:none;font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-bottom:10px;background:var(--red-bg);color:var(--red-text);"></div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Reason <span style="color:var(--red);">*</span></div>
+        <select id="reportReason" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;color:var(--text);background:#fff;appearance:none;outline:none;">
+          <option value="">— Select a reason —</option>
+          <option value="Fake or misleading profile">Fake or misleading profile</option>
+          <option value="Rude or unprofessional behavior">Rude or unprofessional behavior</option>
+          <option value="Did not show up / no-show">Did not show up / no-show</option>
+          <option value="Overcharging / scam">Overcharging / scam</option>
+          <option value="Inappropriate content">Inappropriate content</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Additional Details <span style="font-size:0.65rem;color:var(--text-3);font-weight:400;text-transform:none;">(optional)</span></div>
+        <textarea id="reportDetails" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-family:inherit;resize:none;min-height:80px;color:var(--text);outline:none;" placeholder="Briefly describe what happened…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="closeReportModal()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
+        Cancel
+      </button>
+      <button onclick="submitReport()" id="reportSubmitBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:var(--red);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i class="fa-solid fa-flag"></i> Submit Report
+      </button>
+    </div>
+    <div style="padding:10px 18px 0;text-align:center;font-size:0.68rem;color:var(--text-3);">
+      We'll review your report within 24–48 hours. Your identity remains anonymous.
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

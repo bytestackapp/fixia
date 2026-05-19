@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Admin — Fixia</title>
@@ -142,12 +142,16 @@
     .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none!important;}
 
     /* ── MODAL ───────────────────────────────────────────────── */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px);}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);}
     .modal.open{display:flex;animation:fadeIn 0.2s;}
-    .modal-box{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:slideUp 0.25s ease;}
+    .modal-sheet{background:#fff;width:100%;border-radius:20px 20px 0 0;padding:0 0 24px;animation:slideUpSheet 0.3s ease;}
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+    @keyframes slideUpSheet{from{transform:translateY(100%);}to{transform:none;}}
+    
+    .modal-box{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:slideUpBox 0.25s ease;}
     .modal-box.sm{max-width:400px;}
     .modal-box.lg{max-width:680px;}
-    @keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+    @keyframes slideUpBox{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
     .modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1;}
     .modal-head h3{font-size:1rem;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;}
     .modal-x{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-3);line-height:1;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
@@ -240,9 +244,7 @@
   <button class="nav-btn" onclick="window.open('homepage.html','_blank')">
     <i class="fa-solid fa-arrow-up-right-from-square"></i> View Site
   </button>
-  <button class="nav-btn danger" onclick="doLogout()">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
-  </button>
+  <button class="nav-btn danger" onclick="openModal('logoutModal')" style="font-size:1rem;padding:6px 10px;"><i class="fa-solid fa-right-from-bracket"></i></button>
 </nav>
 
 <!-- MOBILE TABS -->
@@ -254,6 +256,9 @@
   <button class="mtab" onclick="showSection('packages',this)">📦 Packages</button>
   <button class="mtab" onclick="showSection('elite',this)">👑 Elite</button>
   <button class="mtab" onclick="showSection('ads',this)">📢 Ads</button>
+  <button class="mtab" onclick="showSection('suspicious',this)">⚠️ Suspicious</button>
+  <button class="mtab" onclick="showSection('uncategorized',this)">🏷️ Uncategorized</button>
+  <button class="mtab" onclick="showSection('upgrades',this);loadUpgradeRequests();">⬆️ Upgrades</button>
 </div>
 
 <div class="layout">
@@ -266,18 +271,25 @@
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Approvals</div>
-      <button class="sidebar-item" onclick="showSection('pending',this)"><i class="fa-solid fa-clock"></i> Pending <span class="sidebar-count" id="pendingCount">0</span></button>
+      <button class="sidebar-item" onclick="showSection('pending',this)"><i class="fa-solid fa-clock"></i> Pending <span id="pendingCount" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Users</div>
       <button class="sidebar-item" onclick="showSection('providers',this)"><i class="fa-solid fa-wrench"></i> Providers</button>
       <button class="sidebar-item" onclick="showSection('regulars',this)"><i class="fa-solid fa-users"></i> Regular Users</button>
+	  <button class="sidebar-item" onclick="showSection('suspicious',this)"><i class="fa-solid fa-triangle-exclamation"></i> Suspicious Activity<span id="suspiciousBadge" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Config</div>
       <button class="sidebar-item" onclick="showSection('packages',this)"><i class="fa-solid fa-boxes-stacked"></i> Package Manager</button>
       <button class="sidebar-item" onclick="showSection('elite',this)"><i class="fa-solid fa-crown"></i> Fixia Elite</button>
       <button class="sidebar-item" onclick="showSection('ads',this)"><i class="fa-solid fa-rectangle-ad"></i> Ad Manager</button>
+	  <button class="sidebar-item" onclick="showSection('settings',this)"><i class="fa-solid fa-sliders"></i> App Settings</button>
+	  <button class="sidebar-item" onclick="showSection('messages',this)"><i class="fa-solid fa-bullhorn"></i> Messages</button>
+	  <button class="sidebar-item" onclick="showSection('requests',this)"><i class="fa-solid fa-inbox"></i> Change Requests<span id="requestsBadge" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
+	  <button class="sidebar-item" onclick="showSection('uncategorized',this)"><i class="fa-solid fa-tag"></i> Uncategorized <span id="uncatBadge" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
+	  <button class="sidebar-item" onclick="showSection('upgrades',this);loadUpgradeRequests();"><i class="fa-solid fa-arrow-trend-up"></i> Upgrades<span id="upgradesBadge" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
+	  <button class="sidebar-item" onclick="showSection('reports',this)"><i class="fa-solid fa-flag"></i> Reports<span id="reportsBadge" style="display:none;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></button>
     </div>
   </aside>
 
@@ -307,12 +319,16 @@
 
     <!-- ── PENDING APPROVALS ──────────────────────────────────── -->
     <div id="sec-pending" class="section">
-      <div class="page-title">Pending Approvals</div>
+      <div class="page-title">Pending Applications</div>
       <div class="page-sub">Review and approve provider applications.</div>
-
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="ftab active" id="pendingTabReview" onclick="switchPendingTab('review',this)">⏳ Awaiting Review</button>
+        <button class="ftab" id="pendingTabCompliance" onclick="switchPendingTab('compliance',this)">⚠️ Need Compliance</button>
+      </div>
       <div class="sec-card">
         <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-clock"></i> Provider Applications</div></div>
         <div id="pendingList"><div class="loading">Loading…</div></div>
+        <div id="complianceList" style="display:none;"><div class="loading">Loading…</div></div>
       </div>
     </div>
 
@@ -336,10 +352,9 @@
         <div class="tbl-wrap">
           <table id="provTable">
             <thead><tr>
-              <th>Provider</th><th>Service</th><th>Location</th>
-              <th>Package</th><th>Rating</th><th>Status</th><th>Actions</th>
+              <th>Provider</th><th>Details</th><th>Package</th><th>Status</th><th>Actions</th>
             </tr></thead>
-            <tbody id="provTbody"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody>
+            <tbody id="provTbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -363,13 +378,87 @@
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>User</th><th>Phone</th><th>Package</th><th>Ads Free</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-            <tbody id="regTbody"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody>
+            <thead><tr><th>User</th><th>Details</th><th>Package</th><th>Status</th><th>Actions</th></tr></thead>
+			<tbody id="regTbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
+    <!-- ── SUSPICIOUS ACTIVITY ──────────────────────────────────── -->
+    <div id="sec-suspicious" class="section">
+      <div class="page-title">Suspicious Activity</div>
+      <div class="page-sub">Bookings and ratings where the user and provider share the same IP address — possible self-rating abuse.</div>
+      <div style="margin-top:16px;" id="suspiciousContent">
+        <div class="empty-state"><div class="empty-icon">🔍</div><p>Loading…</p></div>
+      </div>
+    </div>
+
+<!-- ── UNCATEGORIZED LISTINGS ─────────────────────────────── -->
+<div id="sec-uncategorized" class="section">
+  <div class="page-title">Uncategorized Listings</div>
+  <div class="page-sub">Listings where the provider couldn't find a matching category. Reassign each to the correct category.</div>
+  <div class="sec-card">
+    <div class="sec-head">
+      <div class="sec-title"><i class="fa-solid fa-tag"></i> Pending Categorization <span id="uncatCount" style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:6px;display:none;"></span></div>
+    </div>
+    <div id="uncatList"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- Reassign Modal -->
+<div class="modal" id="reassignModal" onclick="if(event.target===this)closeModal('reassignModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-tag" style="color:var(--brand);"></i> Reassign Listing</h3>
+      <button class="modal-x" onclick="closeModal('reassignModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="reassignAlert" class="alert"></div>
+      <div style="font-size:0.82rem;color:var(--text-2);background:var(--bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;line-height:1.7;">
+        <strong>Listing:</strong> <span id="reassignTitle"></span><br>
+        <strong>Provider's description:</strong> <span id="reassignDesc" style="color:var(--brand);font-style:italic;"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign to Category</label>
+        <select class="form-select" id="reassignCat" onchange="loadReassignSubcats()">
+          <option value="">Select category…</option>
+          <option value="home">Home Services</option>
+          <option value="auto">Automotive</option>
+          <option value="garden">Garden & Lawn</option>
+          <option value="elec">Electrical</option>
+          <option value="beauty">Beauty & Wellness</option>
+		  <option value="edu">Education & Tutoring</option>
+          <option value="health">Health & Care</option>
+          <option value="tech">Tech & IT</option>
+          <option value="build">Construction</option>
+          <option value="clean">Cleaning</option>
+          <option value="pet">Pet Services</option>
+          <option value="event">Events</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Specific Service</label>
+        <select class="form-select" id="reassignSub" disabled>
+          <option value="">Select category first…</option>
+        </select>
+      </div>
+      <div class="form-group" id="reassignCustomGroup" style="display:none;">
+        <label class="form-label">Or type a new subcategory <span style="font-weight:400;color:var(--text-3);">(leave blank to use dropdown above)</span></label>
+        <input class="form-input" id="reassignCustomSub" placeholder="e.g. Welding, Boat Repair, 3D Printing…" maxlength="80"/>
+      </div>
+      <input type="hidden" id="reassignListingId"/>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('reassignModal')">Cancel</button>
+      <button class="btn btn-brand" id="reassignBtn" onclick="doReassign()">
+        <span class="spinner" id="reassignSpinner"></span>
+        <span id="reassignBtnText"><i class="fa-solid fa-check"></i> Reassign</span>
+      </button>
+    </div>
+  </div>
+</div>
+	
     <!-- ── PACKAGE MANAGER ────────────────────────────────────── -->
     <div id="sec-packages" class="section">
       <div class="page-title">Package Manager</div>
@@ -404,38 +493,27 @@
       <div class="elite-banner">
         <div style="font-size:2rem;">👑</div>
         <div class="elite-banner-text">
-          <div class="elite-banner-title">Fixia Elite — Admin-Granted Only</div>
-          <div class="elite-banner-sub">This tier cannot be purchased. Grant it to competition winners, top performers, or as a special promotion — with an optional expiry date.</div>
+          <div class="elite-banner-title">Fixia Elite</div>
+          <div class="elite-banner-sub">An exclusive, admin-granted tier for top providers. Elite members enjoy the following perks:</div>
+          <ul style="margin-top:8px;padding-left:16px;font-size:0.75rem;opacity:0.9;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>👑 Crown Badge</strong> — Displayed next to the provider's name across the platform.</li>
+            <li><strong>🏠 Homepage Priority</strong> — Always pinned to the first slots, above all featured providers.</li>
+            <li><strong>🔝 Top Search Ranking</strong> — Listed first in all search and browse results, regardless of subscription.</li>
+            <li><strong>🔍 Elite Filter</strong> — Discoverable exclusively via the Elite filter by clients looking for the best.</li>
+          </ul>
         </div>
       </div>
 
       <div class="sec-card">
-        <div class="sec-head">
+		<div class="sec-head">
           <div class="sec-title"><i class="fa-solid fa-crown"></i> Current Elite Providers</div>
+          <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openModal('grantEliteModal')"><i class="fa-solid fa-plus"></i> Add</button>
         </div>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>Provider</th><th>Service</th><th>Elite Since</th><th>Expires</th><th>Actions</th></tr></thead>
             <tbody id="eliteTbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
           </table>
-        </div>
-      </div>
-
-      <div class="sec-card">
-        <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-gift"></i> Grant Elite to a Provider</div></div>
-        <div style="padding:16px;">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Select Approved Provider</label>
-              <select class="form-select" id="eliteProvSelect"><option value="">Loading…</option></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Expires On <span style="font-weight:400;color:var(--text-3);">(leave blank = permanent)</span></label>
-              <input type="date" class="form-input" id="eliteExpiry"/>
-            </div>
-          </div>
-          <div id="eliteAlert" class="alert"></div>
-          <button class="btn btn-gold" onclick="grantElite()"><i class="fa-solid fa-crown"></i> Grant Fixia Elite</button>
         </div>
       </div>
     </div>
@@ -448,12 +526,17 @@
       <!-- Inline Ads -->
       <div class="sec-card" style="margin-bottom:16px;">
         <div class="sec-head">
-          <div class="sec-title"><i class="fa-solid fa-rectangle-list"></i> Inline Ads
-            <span style="font-size:0.65rem;font-weight:600;color:var(--text-3);margin-left:6px;">(appear between provider cards)</span>
+        <div class="sec-title"><i class="fa-solid fa-rectangle-list"></i> Inline Ads
+          <span style="font-size:0.65rem;font-weight:600;color:var(--text-3);margin-left:6px;">(appear between provider cards)</span>
+        </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdDetails('inline')">
+              <i class="fa-solid fa-chart-bar"></i> Details
+            </button>
+            <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdModal('inline')">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
           </div>
-          <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdModal('inline')">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
         </div>
         <div style="padding:14px;" id="inlineAdGrid"><div class="loading">Loading…</div></div>
       </div>
@@ -461,25 +544,673 @@
       <!-- Popup Ads -->
       <div class="sec-card">
         <div class="sec-head">
-          <div class="sec-title"><i class="fa-solid fa-window-restore"></i> Pop-Up Ads
-            <span style="font-size:0.65rem;font-weight:600;color:var(--text-3);margin-left:6px;">(appear after major user actions)</span>
+         <div class="sec-title"><i class="fa-solid fa-window-restore"></i> Pop-Up Ads
+           <span style="font-size:0.65rem;font-weight:600;color:var(--text-3);margin-left:6px;">(appear after major user actions)</span>
+         </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdDetails('popup')">
+              <i class="fa-solid fa-chart-bar"></i> Details
+            </button>
+            <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdModal('popup')">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
           </div>
-          <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openAdModal('popup')">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
         </div>
         <div style="padding:14px;" id="popupAdGrid"><div class="loading">Loading…</div></div>
       </div>
 
       <!-- Rotation stats -->
       <div class="sec-card" style="margin-top:16px;">
-        <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-rotate"></i> Featured Rotation Stats</div></div>
-        <div id="rotationStats" style="padding:14px;"><div class="loading">Loading…</div></div>
+        <div class="sec-head">
+          <div class="sec-title"><i class="fa-solid fa-rotate"></i> Featured Rotation Stats</div>
+          <button class="btn btn-brand" style="padding:6px 14px;font-size:0.78rem;" onclick="openModal('rotationStatsModal')">
+            <i class="fa-solid fa-list"></i> Show List
+          </button>
+        </div>
+        <div style="padding:14px;font-size:0.82rem;color:var(--text-2);line-height:1.7;">
+          Tracks how many times each featured provider has appeared in the featured strip across all pages. 
+          The system automatically rotates providers fairly — least-shown providers always appear first, 
+          so every paying provider gets balanced exposure over time.
+        </div>
       </div>
     </div>
 
+<!-- ── APP SETTINGS ──────────────────────────────────────── -->
+<div id="sec-settings" class="section">	
+  <div class="page-title">App Settings</div>
+  <div class="page-sub">Global toggles for the Fixia platform. Changes take effect immediately.</div>
+
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
+      <i class="fa-solid fa-shield" style="color:var(--brand);"></i> Email OTP Verification
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:0.85rem;font-weight:600;color:var(--text);">Require OTP on Signup</div>
+        <div style="font-size:0.72rem;color:var(--text-3);margin-top:2px;">When off, users skip email verification entirely.</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="otpEnabledToggle" onchange="saveOtpEnabled(this.checked)"/>
+        <div class="toggle-slider"></div>
+      </label>
+    </div>
+
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:6px;">Test OTP Code</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Set a fixed 6-digit code for testing. Leave empty to use real random OTPs. When set, no email is sent — just use this code.</div>
+      <div style="display:flex;gap:8px;">
+        <input id="testOtpInput" type="text" maxlength="6" placeholder="e.g. 123456"
+               style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;letter-spacing:0.15em;font-family:monospace;"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+        <button onclick="saveTestOtp()" style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+        <button onclick="clearTestOtp()" style="padding:8px 16px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Clear
+        </button>
+      </div>
+      <div id="testOtpStatus" style="font-size:0.72rem;margin-top:6px;color:var(--green);display:none;">
+        ✅ Test code active — all signups will use this code, no email sent.
+      </div>
+    </div>
+  </div>
+  
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
+      <i class="fa-solid fa-rectangle-ad" style="color:var(--brand);"></i> Pop-Up Ad Behaviour
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+      Controls how often pop-up ads appear for free regular users. Changes take effect immediately on next page load.
+    </div>
+
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Actions Before Pop-Up</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many major user actions (search, view provider, send inquiry…) trigger a pop-up. Default: 3.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="adActionsInput" type="number" min="1" max="20" placeholder="3"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('ad_actions_per_popup','adActionsInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+      </div>
+    </div>
+
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Minimum Minutes Between Pop-Ups</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Minimum wait time (in minutes) after a pop-up fires before the next one can appear. Default: 2.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="adMinutesInput" type="number" min="0.5" max="60" step="0.5" placeholder="2"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('ad_min_minutes','adMinutesInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+      </div>
+    </div>
+
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Skip Countdown (seconds)</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many seconds the user must wait before they can skip a pop-up. Default: 5.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="adSkipInput" type="number" min="3" max="30" placeholder="5"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('ad_skip_seconds','adSkipInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+      </div>
+    </div>	
+</div>
+
+<div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
+      <i class="fa-solid fa-ban" style="color:var(--red);"></i> Provider Suspension
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+      How many days a provider remains suspended after acknowledging their suspension notice. After this period their account is automatically restored.
+    </div>
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Suspension Duration (days)</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Default: 7 days.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="suspensionDaysInput" type="number" min="1" max="365" placeholder="7"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('suspension_days','suspensionDaysInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>
+  </div>
+	  
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
+      <i class="fa-solid fa-layer-group" style="color:var(--brand);"></i> Ad Batch Rotation
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+      Controls how many ads run per batch and how long each batch lasts. When a batch expires and the queue is full, the next batch auto-promotes at midnight.
+    </div>
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Ads Per Batch</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many ads (inline or popup) run per batch cycle. Default: 6.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="adBatchSizeInput" type="number" min="1" max="20" placeholder="6"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('ad_batch_size','adBatchSizeInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Ad Batch Duration (days)</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many days each ad batch runs before expiring. Default: 30.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="adBatchDaysInput" type="number" min="1" max="365" placeholder="30"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('ad_batch_days','adBatchDaysInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
+      <i class="fa-solid fa-star" style="color:var(--brand);"></i> Featured Provider Batch Rotation
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+      Controls how many featured providers run per batch and how long each batch lasts.
+    </div>
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Featured Slots Per Batch</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many featured providers are shown per batch cycle. Default: 3.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="featBatchSizeInput" type="number" min="1" max="20" placeholder="3"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('featured_batch_size','featBatchSizeInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Featured Batch Duration (days)</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many days each featured batch runs before expiring. Default: 30.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="featBatchDaysInput" type="number" min="1" max="365" placeholder="30"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('featured_batch_days','featBatchDaysInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MESSAGES ──────────────────────────────────────────────── -->
+<div id="sec-messages" class="section">
+  <div class="page-title">Messages</div>
+  <div class="page-sub">Create reusable message templates and send announcements or warnings to users.</div>
+
+	<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px;">
+
+    <!-- TOP — Send Panel -->
+    <div>
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--navy);">
+            <i class="fa-solid fa-paper-plane" style="color:var(--brand);"></i> Send Message
+          </div>
+          <button onclick="openModal('templatesModal')"
+                  style="padding:5px 12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;">
+            <i class="fa-solid fa-file-lines"></i> Templates
+          </button>
+        </div>
+
+        <div id="sendAlert" class="alert"></div>
+
+        <div class="form-group">
+          <label class="form-label">Select Template</label>
+          <select class="form-select" id="sendTemplate" onchange="onSendTemplateChange()">
+            <option value="">— Choose a template —</option>
+          </select>
+        </div>
+
+        <!-- Template preview in send panel -->
+        <div id="sendPreviewBox" style="display:none;background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span id="sendPreviewIcon" style="font-size:1.5rem;"></span>
+            <div>
+              <div id="sendPreviewType" style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);"></div>
+              <div id="sendPreviewTitle" style="font-size:0.85rem;font-weight:700;color:var(--navy);"></div>
+            </div>
+          </div>
+          <div id="sendPreviewBody" style="font-size:0.75rem;color:var(--text-2);line-height:1.6;white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Recipients</label>
+          <select class="form-select" id="sendRecipients" onchange="onRecipientsChange()">
+            <option value="all">Everyone (all active users)</option>
+            <option value="regulars">All Regular Users</option>
+            <option value="providers">All Providers</option>
+            <option value="specific">Specific User…</option>
+          </select>
+        </div>
+
+        <!-- Specific user search -->
+        <div id="userSearchBox" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Search User</label>
+            <input class="form-input" id="userSearchInput" placeholder="Type name or email…"
+                   oninput="searchUsers()"/>
+          </div>
+          <div id="userSearchResults" style="border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none;"></div>
+          <div id="selectedUserBox" style="display:none;margin-top:8px;background:var(--brand-light);border-radius:8px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div id="selectedUserName" style="font-size:0.82rem;font-weight:700;color:var(--navy);"></div>
+              <div id="selectedUserEmail" style="font-size:0.7rem;color:var(--text-3);"></div>
+            </div>
+            <button onclick="clearSelectedUser()"
+                    style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:1rem;">✕</button>
+          </div>
+        </div>
+
+        <button class="btn btn-brand" onclick="doSendMessage()" style="width:100%;margin-top:4px;text-align:center;justify-content:center;">
+          <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+
+        <!-- Send log -->
+        <div style="margin-top:20px;">
+          <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:10px;">
+            Recent Sends
+          </div>
+          <div id="sendLog">
+            <div style="font-size:0.75rem;color:var(--text-3);text-align:center;padding:12px;">
+              No sends yet this session.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+	
+	
+    <!-- BOT — Template Manager -->
+    <div>
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
+          <i class="fa-solid fa-file-lines" style="color:var(--brand);"></i> Message Templates
+        </div>
+
+        <!-- Create / Edit form -->
+        <input type="hidden" id="tplId"/>
+        <div id="tplAlert" class="alert"></div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="tplType" onchange="updateTplPreview()">
+            <option value="announcement">📢 Announcement</option>
+            <option value="warning">⚠️ Warning</option>
+            <option value="maintenance">🔧 Maintenance</option>
+            <option value="welcome">👋 Welcome</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon (emoji)</label>
+          <input class="form-input" id="tplIcon" placeholder="📢" maxlength="4"
+                 oninput="updateTplPreview()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input class="form-input" id="tplTitle" placeholder="e.g. System Update"
+                 oninput="updateTplPreview()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message Body</label>
+          <textarea class="form-textarea" id="tplBody" rows="4"
+                    placeholder="Write the message content here…"
+                    oninput="updateTplPreview()"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-brand" onclick="saveTemplate()" style="flex:1;text-align:center;justify-content:center;">
+            <i class="fa-solid fa-floppy-disk"></i> <span id="tplSaveLabel">Save Template</span>
+          </button>
+          <button class="btn btn-secondary" onclick="resetTemplateForm()">
+            Cancel
+          </button>
+        </div>
+
+        <!-- Preview -->
+        <div id="tplPreview" style="margin-top:14px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);display:none;">
+          <div id="tplPreviewHeader" style="padding:12px 14px;text-align:center;">
+            <div id="tplPreviewIcon" style="font-size:2rem;margin-bottom:4px;"></div>
+            <div id="tplPreviewLabel" style="font-size:0.58rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;"></div>
+            <div id="tplPreviewTitle" style="font-size:0.88rem;font-weight:800;color:#0F1B2D;"></div>
+          </div>
+          <div id="tplPreviewBody" style="padding:10px 14px;font-size:0.78rem;color:var(--text-2);line-height:1.6;white-space:pre-wrap;border-top:1px solid var(--border);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Templates Modal -->
+    <div id="templatesModal" class="modal">
+      <div class="modal-box" style="max-width:520px;">
+        <div class="modal-head">
+          <h3><i class="fa-solid fa-file-lines"></i> &nbsp; Saved Templates</h3>
+          <button class="modal-x" onclick="closeModal('templatesModal')">×</button>
+        </div>
+        <div class="modal-body" style="max-height:420px;overflow-y:auto;padding:12px 16px;">
+          <div id="templateListModal">
+            <div class="empty-state"><div class="empty-icon">📝</div><p>No templates yet.</p></div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button onclick="closeModal('templatesModal')">Close</button>
+        </div>
+      </div>
+    </div>  
+  </div>
+
+<!-- ── CHANGE REQUESTS ───────────────────────────────────────── -->
+<div id="sec-requests" class="section">
+  <div class="page-title">Change Requests</div>
+  <div class="page-sub">Provider-submitted requests to change their business name, email, or location.</div>
+
+  <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;">
+    <button class="ftab active" onclick="setReqFilter('pending',this)">⏳ Pending</button>
+  </div>
+
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-top:4px;">
+    <table>
+      <thead><tr>
+        <th>Provider</th>
+        <th>Subject</th>
+        <th>Requested Value</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr></thead>
+      <tbody id="requestsTbody">
+        <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📥</div><p>No pending requests.</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" class="modal">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-magnifying-glass"></i> Review Request</h3>
+        <button class="modal-x" onclick="closeModal('reviewModal')">×</button>
+      </div>
+      <div class="modal-body" id="reviewModalBody"></div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal('reviewModal')">Cancel</button>
+        <button class="btn btn-danger"    id="reviewRejectBtn"><i class="fa-solid fa-ban"></i> Reject</button>
+        <button class="btn btn-brand"     id="reviewApproveBtn"><i class="fa-solid fa-check"></i> Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Reason Modal -->
+  <div id="rejectReasonModal" class="modal">
+    <div class="modal-box sm">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-ban" style="color:var(--red);"></i> Rejection Reason</h3>
+        <button class="modal-x" onclick="closeModal('rejectReasonModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.82rem;color:var(--text-2);margin-bottom:10px;line-height:1.6;">
+          Provide a reason for rejection. This will be sent to the provider as a message.
+        </p>
+        <textarea id="rejectReasonInput" class="form-textarea" rows="3"
+                  placeholder="e.g. The document provided is unclear. Please resubmit with a clearer photo."></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal('rejectReasonModal')">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmRejectReason()"><i class="fa-solid fa-paper-plane"></i> Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Info Details Modal -->
+<div id="infoDetailsModal" class="modal">
+  <div class="modal-box" style="max-width:480px;width:92%;max-height:85vh;overflow-y:auto;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-circle-info" style="color:var(--brand);"></i> Provider Info</h3>
+      <button class="modal-x" onclick="closeModal('infoDetailsModal')">×</button>
+    </div>
+    <div id="infoDetailsBody" style="padding:1rem;display:flex;flex-direction:column;gap:12px;font-size:0.83rem;">
+	</div>
+  </div>
+</div>
+
+<!-- Compliance Modal -->
+<div id="complianceModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3>⚠️ Set Compliance Required</h3>
+      <button class="modal-x" onclick="closeModal('complianceModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:12px;">
+        Provider: <strong id="complianceName"></strong><br><br>
+        Reason for application suspension:
+      </p>
+      <textarea id="complianceReason" rows="4" class="form-input" style="width:100%;resize:vertical;" placeholder="Enter the requirement or instruction for this provider…"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('complianceModal')">Cancel</button>
+      <button class="btn btn-brand" style="background:#CA8A04;" onclick="confirmCompliance()"><i class="fa-solid fa-clock"></i> Suspend</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURED ROTATION STATS MODAL ──────────────────────────── -->
+<div id="rotationStatsModal" class="modal" onclick="if(event.target===this)closeModal('rotationStatsModal')">
+  <div class="modal-box lg">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-rotate" style="color:var(--brand);"></i> Featured Rotation Stats</h3>
+      <button class="modal-x" onclick="closeModal('rotationStatsModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+        All featured providers sorted by most shown. Providers with fewer appearances will automatically 
+        be prioritised in the next rotation cycle.
+      </p>
+      <div id="rotationStats"><div class="loading">Loading…</div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('rotationStatsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REPORTS ───────────────────────────────────────────────── -->
+<div id="sec-reports" class="section">
+  <div class="page-title">Provider Reports</div>
+  <div class="page-sub">Reports submitted by users against providers. Review and take action.</div>
+
+  <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;">
+    <button class="ftab active" onclick="setReportFilter('pending',this)">⏳ Pending</button>
+    <button class="ftab" onclick="setReportFilter('warned',this)">⚠️ Warned</button>
+    <button class="ftab" onclick="setReportFilter('suspended',this)">🚫 Suspended</button>
+    <button class="ftab" onclick="setReportFilter('dismissed',this)">✅ Dismissed</button>
+  </div>
+
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+    <table>
+      <thead><tr>
+        <th>Provider</th>
+        <th>Reason</th>
+        <th>Reported By</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr></thead>
+      <tbody id="reportsTbody">
+        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🚩</div><p>No reports.</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Review Report Modal -->
+  <div id="reviewReportModal" class="modal">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-flag" style="color:var(--red);"></i> Review Report</h3>
+        <button class="modal-x" onclick="closeModal('reviewReportModal')">×</button>
+      </div>
+      <div class="modal-body" id="reviewReportBody"></div>
+      <div class="modal-foot" id="reviewReportFoot"></div>
+    </div>
+  </div>
+</div>  
+  
+<!-- ── UPGRADE REQUESTS ──────────────────────────────────────── -->
+<div id="sec-upgrades" class="section">
+  <div class="page-title">Upgrade Requests</div>
+  <div class="page-sub">Review and process pending provider plan upgrade submissions.</div>
+
+  <div class="sec-card">
+    <div class="sec-head">
+      <div class="sec-title"><i class="fa-solid fa-arrow-trend-up"></i> Pending Approvals</div>
+    </div>
+    <div id="upgradesContainer">
+      <div class="loading">Loading…</div>
+    </div>
+  </div>
+</div>
+
   </main>
 </div><!-- /layout -->
+
+<!-- ── APPROVE UPGRADE MODAL ─────────────────────────────────── -->
+<div id="approveUpgradeModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-check-circle" style="color:var(--green);"></i> Approve Upgrade</h3>
+      <button class="modal-x" onclick="closeModal('approveUpgradeModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="approveUpgradeSummary"
+           style="background:var(--bg);border-radius:8px;padding:12px 14px;
+                  font-size:0.82rem;line-height:1.9;margin-bottom:10px;">
+      </div>
+      <p style="font-size:0.82rem;color:var(--text-2);line-height:1.7;">
+        Approving will immediately activate the new plan, apply carryover days, and notify the user.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('approveUpgradeModal')">Cancel</button>
+      <button class="btn btn-brand" id="approveUpgradeOkBtn" onclick="confirmApproveUpgrade()">
+        <i class="fa-solid fa-check"></i> Approve
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REJECT UPGRADE MODAL ──────────────────────────────────── -->
+<div id="rejectUpgradeModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-ban" style="color:var(--red);"></i> Reject Upgrade</h3>
+      <button class="modal-x" onclick="closeModal('rejectUpgradeModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:14px;line-height:1.6;">
+        The user will be notified that their upgrade request was not approved.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Reason <span style="font-weight:400;color:var(--text-3);">(optional)</span></label>
+        <textarea class="form-textarea" id="rejectUpgradeReason"
+                  placeholder="e.g. Payment reference not found, amount mismatch…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('rejectUpgradeModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmRejectUpgrade()">
+        <i class="fa-solid fa-ban"></i> Reject
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── UPGRADE DETAILS MODAL ─────────────────────────────────── -->
+<div id="upgradeDetailsModal" class="modal" onclick="if(event.target===this)closeModal('upgradeDetailsModal')">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-arrow-trend-up" style="color:var(--brand);"></i> Upgrade Details</h3>
+      <button class="modal-x" onclick="closeModal('upgradeDetailsModal')">×</button>
+    </div>
+    <div class="modal-body" id="upgradeDetailsBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('upgradeDetailsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROVIDER DETAILS MODAL ────────────────────────────────── -->
+<div id="providerDetailsModal" class="modal" onclick="if(event.target===this)closeModal('providerDetailsModal')">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-wrench" style="color:var(--brand);"></i> Provider Details</h3>
+      <button class="modal-x" onclick="closeModal('providerDetailsModal')">×</button>
+    </div>
+    <div class="modal-body" id="providerDetailsBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('providerDetailsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REGULAR USER DETAILS MODAL ────────────────────────────── -->
+<div id="regularDetailsModal" class="modal" onclick="if(event.target===this)closeModal('regularDetailsModal')">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-user" style="color:var(--blue);"></i> User Details</h3>
+      <button class="modal-x" onclick="closeModal('regularDetailsModal')">×</button>
+    </div>
+    <div class="modal-body" id="regularDetailsBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('regularDetailsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGOUT MODAL ───────────────────────────────────────────── -->
+<div id="logoutModal" class="modal" onclick="if(event.target===this)closeModal('logoutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 style="font-size:0.95rem;font-weight:800;color:var(--navy);"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</h3>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('logoutModal')">Cancel</button>
+      <button class="btn" style="background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(220,53,69,0.3);" onclick="doLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── AD DETAILS MODAL ────────────────────────────────────────── -->
+<div id="adDetailsModal" class="modal" onclick="if(event.target===this)closeModal('adDetailsModal')">
+  <div class="modal-box lg">
+    <div class="modal-head">
+      <h3 id="adDetailsTitle"><i class="fa-solid fa-chart-bar" style="color:var(--brand);"></i> Ad Details</h3>
+      <button class="modal-x" onclick="closeModal('adDetailsModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+        Summary of all ads for this type. Share with advertisers as a performance report.
+      </p>
+      <div id="adDetailsTable"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('adDetailsModal')">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST -->
 
@@ -525,7 +1256,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Background Color</label>
-          <input class="form-input" id="adBgColor" placeholder="#0f2027" type="color" value="#0f2027" style="height:40px;padding:4px;"/>
+          <input class="form-input" id="adBgColor" type="color" value="#0f2027" style="height:40px;padding:4px;"/>
         </div>
       </div>
       <div class="form-group">
@@ -536,31 +1267,14 @@
         <label class="form-label">Image URL <span style="font-weight:400;color:var(--text-3);">(optional — leave blank to use emoji icon)</span></label>
         <input class="form-input" id="adImageUrl" placeholder="https://..." type="url"/>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Start Date</label>
-          <input class="form-input" id="adStartsAt" type="date"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">End Date <span style="font-weight:400;color:var(--text-3);">(blank = no expiry)</span></label>
-          <input class="form-input" id="adEndsAt" type="date"/>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Sort Order</label>
-          <input class="form-input" id="adSort" type="number" value="99"/>
-        </div>
-        <div class="form-group" style="display:flex;align-items:flex-end;">
-          <div class="toggle-wrap" style="padding-bottom:8px;">
-            <label class="toggle"><input type="checkbox" id="adActive" checked><div class="toggle-slider"></div></label>
-            <span class="toggle-label">Active</span>
-          </div>
-        </div>
+      <div class="form-group">
+        <label class="form-label">Impression Quota</label>
+        <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:6px;">How many impressions this ad runs for before completing. e.g. 5000 ≈ 1 month.</div>
+        <input class="form-input" id="adQuota" type="number" min="100" placeholder="5000"/>
       </div>
       <div class="form-group">
         <label class="form-label">Internal Notes <span style="font-weight:400;color:var(--text-3);">(not shown to users)</span></label>
-        <textarea class="form-textarea" id="adNotes" placeholder="e.g. Paid ₱5,000 for 30 days — contract ends Jan 31"></textarea>
+        <textarea class="form-textarea" id="adNotes" placeholder="e.g. Paid ₱5,000 for 5,000 impressions — ref #INV-001"></textarea>
       </div>
     </div>
     <div class="modal-foot">
@@ -599,7 +1313,20 @@
     </div>
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal('rejectModal')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmReject()"><i class="fa-solid fa-ban"></i> Reject & Notify</button>
+      <button class="btn btn-danger" onclick="confirmReject()"><i class="fa-solid fa-ban"></i> Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Payment Details Modal ─────────────────────────────── -->
+<div id="payDetailsModal" class="modal">
+  <div class="modal-box" style="max-width:480px;width:92%;max-height:85vh;overflow-y:auto;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-receipt" style="color:var(--brand);"></i> Payment & ID Details</h3>
+      <button class="modal-x" onclick="closeModal('payDetailsModal')">×</button>
+    </div>
+    <div id="payDetailsBody" style="padding:1rem;display:flex;flex-direction:column;gap:12px;font-size:0.83rem;">
+      <!-- Populated dynamically -->
     </div>
   </div>
 </div>
@@ -620,11 +1347,85 @@
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal('approveModal')">Cancel</button>
       <button class="btn btn-brand" id="approveOkBtn" onclick="confirmApprove()">
-        <i class="fa-solid fa-check"></i> Approve & Notify
+        <i class="fa-solid fa-check"></i> Approve
       </button>
     </div>
   </div>
 </div>
+
+<!-- ── APPROVE REGULAR USER MODAL ───────────────────────────── -->
+<div id="approveRegularModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-check-circle" style="color:var(--green);"></i> Approve User</h3>
+      <button class="modal-x" onclick="closeModal('approveRegularModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.87rem;color:var(--text-2);line-height:1.7;">
+        Approve <strong id="approveRegularName">—</strong>?
+        Their account will be activated and they can start using Fixia.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('approveRegularModal')">Cancel</button>
+      <button class="btn btn-brand" id="approveRegularOkBtn" onclick="confirmApproveRegular()">
+        <i class="fa-solid fa-check"></i> Approve
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REJECT REGULAR USER MODAL ────────────────────────────── -->
+<div id="rejectRegularModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-ban" style="color:var(--red);"></i> Reject User</h3>
+      <button class="modal-x" onclick="closeModal('rejectRegularModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:14px;line-height:1.6;">
+        Rejecting <strong id="rejectRegularName">—</strong>. Their account will be permanently deleted.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Reason <span style="font-weight:400;color:var(--text-3);">(optional)</span></label>
+        <textarea class="form-textarea" id="rejectRegularReason" placeholder="e.g. Duplicate account, invalid details…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('rejectRegularModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmRejectRegular()"><i class="fa-solid fa-ban"></i> Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── GRANT ELITE MODAL (bottom sheet) ──────────────────────── -->
+<div id="grantEliteModal" class="modal" onclick="if(event.target===this)closeModal('grantEliteModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-gift" style="color:var(--gold);"></i> Grant Fixia Elite</h3>
+      <button class="modal-x" onclick="closeModal('grantEliteModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Approved Provider</label>
+          <select class="form-select" id="eliteProvSelect"><option value="">Loading…</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expires On <span style="font-weight:400;color:var(--text-3);">(leave blank = permanent)</span></label>
+          <input type="date" class="form-input" id="eliteExpiry"/>
+        </div>
+      </div>
+      <div id="eliteAlert" class="alert"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('grantEliteModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="grantElite()"><i class="fa-solid fa-crown"></i> Grant Fixia Elite</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ── REVOKE ELITE MODAL ─────────────────────────────────────── -->
 <div id="revokeEliteModal" class="modal">
@@ -671,7 +1472,7 @@
           </select>
         </div>
         <div class="form-group"><label class="form-label">Package</label>
-          <select class="form-select" id="editPackage"><option value="">Loading…</option></select>
+          <select class="form-select" id="editPackage" onchange="syncAdsFreeFromPackage()"><option value="">Loading…</option></select>
         </div>
       </div>
       <div class="form-group">
@@ -715,13 +1516,17 @@
       <div class="form-row">
         <div class="form-group"><label class="form-label">Period</label>
           <select class="form-select" id="pkgPeriod">
-            <option value="month">Monthly</option>
-            <option value="year">Yearly</option>
-            <option value="lifetime">Lifetime</option>
+            <option value="month">Monthly Plan</option>
+			<option value="6month">6-Month Plan</option>
+            <option value="year">Annual Plan</option>
+            <option value="lifetime">Lifetime Access</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label">Listing Limit <span style="font-weight:400;color:var(--text-3);">(999 = unlimited)</span></label>
-          <input class="form-input" type="number" id="pkgListings" placeholder="5" value="5"/>
+          <input class="form-input" type="number" id="pkgListings" min="0" placeholder="5" value="5"/>
+        </div>
+        <div class="form-group"><label class="form-label">Booking Limit <span style="font-weight:400;color:var(--text-3);">(999 = unlimited)</span></label>
+          <input class="form-input" type="number" id="pkgBookingLimit" min="0" placeholder="5" value="5"/>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Sort Order</label><input class="form-input" type="number" id="pkgSort" placeholder="1" value="1"/>
@@ -734,7 +1539,11 @@
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgAdsFree"><div class="toggle-slider"></div></label><span class="toggle-label">Ads-Free (removes pop-up ads)</span></div>
         <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgFeatured"><div class="toggle-slider"></div></label><span class="toggle-label">Featured Placement (provider strip)</span></div>
-        <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgPopular"><div class="toggle-slider"></div></label><span class="toggle-label">Mark as Popular</span></div>
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="pkgPopular"><div class="toggle-slider"></div></label>
+          <span class="toggle-label">Show Badge</span>
+          <input type="text" id="pkgBadgeLabel" class="form-input" placeholder="Popular" value="Popular" style="width:140px;padding:0.3rem 0.6rem;font-size:0.8rem;margin-left:8px;">
+        </div>
         <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgActive" checked><div class="toggle-slider"></div></label><span class="toggle-label">Active (visible to users)</span></div>
       </div>
     </div>
@@ -759,6 +1568,15 @@
 
 <script src="fixia-data.js"></script>
 <script>
+
+const CAT_LABELS = {
+  home:'Home Services', auto:'Automotive', garden:'Garden & Lawn',
+  elec:'Electrical', beauty:'Beauty & Wellness', health:'Health & Care',
+  tech:'Tech & IT', build:'Construction', clean:'Cleaning',
+  pet:'Pet Services', event:'Events', edu:'Education & Tutoring',
+  other:'Others',
+};
+
 /* ══════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════ */
@@ -772,7 +1590,16 @@ let currentEditUser = null;
   const sess = FX.getSession();
   if (!sess || sess.role !== 'admin') { window.location.href = 'login.html'; return; }
 
-  await Promise.all([loadStats(), loadPending(), loadProviders(), loadRegulars(), loadPackages(), loadElite()]);
+  await Promise.all([loadStats(), loadPending(), loadProviders(), loadRegulars(), loadPackages(), loadElite(), loadSettings(), loadTemplates(), loadChangeRequests(), loadUncatBadge(), loadUpgradesBadge()]);
+  loadReports().catch(() => {});
+  
+  // Auto-refresh badges every 30 seconds without full page reload
+  setInterval(async () => {
+    try {
+	  await Promise.all([loadStats(), loadPending(), loadChangeRequests(), loadSuspicious(), loadReports(), loadUncatBadge(), loadUpgradesBadge()]);
+    } catch(e) { /* silent fail */ }
+  }, 30000);
+  
   // Pre-load ads in background
   loadAds().catch(() => {});
 })();
@@ -786,6 +1613,11 @@ function showSection(id, el) {
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.mtab').forEach(s => s.classList.remove('active'));
   if (el) el.classList.add('active');
+  if (id === 'suspicious') loadSuspicious();
+  if (id === 'settings') loadSettings();
+  if (id === 'messages') loadTemplates();
+  if (id === 'reports') loadReports();
+  if (id === 'uncategorized') loadUncategorized();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -794,14 +1626,30 @@ function showSection(id, el) {
 async function loadStats() {
   try {
     const s = await FX.getStats();
+    const pendingRegulars = await FX.getAllUsers({ role: 'regular', status: 'pending' });
+    const totalPending = s.pendingProviders + (pendingRegulars?.length || 0);
     document.getElementById('st-regulars').textContent  = s.totalRegulars;
     document.getElementById('st-providers').textContent = s.approvedProviders;
-    document.getElementById('st-pending').textContent   = s.pendingProviders;
+    document.getElementById('st-pending').textContent   = totalPending;
     document.getElementById('st-elite').textContent     = s.eliteProviders;
     document.getElementById('st-packages').textContent  = s.totalPackages;
-    document.getElementById('pendingCount').textContent = s.pendingProviders;
-    if (s.pendingProviders === 0) document.getElementById('pendingCount').style.display = 'none';
+    document.getElementById('pendingCount').textContent = totalPending;
+    document.getElementById('pendingCount').style.display = totalPending ? 'inline-block' : 'none';
   } catch(e) { console.error(e); }
+}
+
+async function loadUncatBadge() {
+  try {
+    const listings = await FX.getUncategorizedListings();
+    const badge = document.getElementById('uncatBadge');
+    if (!badge) return;
+    if (listings.length > 0) {
+      badge.textContent = listings.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(e) {}
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -809,24 +1657,380 @@ async function loadStats() {
 ══════════════════════════════════════════════════════════════ */
 async function loadPending() {
   try {
-    const pending = await FX.getAllProviders({ status: 'pending' });
-    console.log('[Admin] Pending providers found:', pending.length);
+    const [pending, compliance, pendingRegularManual] = await Promise.all([
+      FX.getAllProviders({ status: 'pending' }),
+      FX.getAllProviders({ status: 'needs_compliance' }),
+      FX.getAllUsers({ role: 'regular', status: 'pending' }),
+    ]);
+    const pendingRegulars = await FX.getAllUsers({ role: 'regular', status: 'pending' });
 
-    // Update pending count badge
+    // Enrich pending providers with their user payment data
+    const enrichedProviders = await Promise.all(pending.map(async prov => {
+      const user = await FX.getUserById(prov.user_id);
+      return {
+        ...prov,
+        // Pull payment fields from user row without overwriting provider fields
+        payment_method:    user?.payment_method    || null,
+        payment_reference: user?.payment_reference || null,
+        payment_amount:    user?.payment_amount    || null,
+        payment_status:    user?.payment_status    || null,
+        package_name:      user?.package_name      || null,
+        first_name:        user?.first_name        || null,
+        last_name:         user?.last_name         || null,
+        role: 'provider',
+      };
+    }));
+
+    const enrichedCompliance = await Promise.all(compliance.map(async prov => {
+      const user = await FX.getUserById(prov.user_id);
+      return { ...prov, payment_method: user?.payment_method || null, payment_reference: user?.payment_reference || null, payment_amount: user?.payment_amount || null, payment_status: user?.payment_status || null, package_name: user?.package_name || null, first_name: user?.first_name || null, last_name: user?.last_name || null, role: 'provider' };
+    }));
+    const allPending = [...enrichedProviders, ...enrichedCompliance, ...pendingRegularManual];
+
+    console.log('[Admin] Pending found:', allPending.length);
+
     const countEl = document.getElementById('pendingCount');
     if (countEl) {
-      countEl.textContent = pending.length;
-      countEl.style.display = pending.length ? 'inline-block' : 'none';
+      countEl.textContent = allPending.length;
+      countEl.style.display = allPending.length ? 'inline-block' : 'none';
     }
 
-    renderPendingList(pending, 'pendingList');
-    renderPendingList(pending.slice(0, 5), 'dashPendingList');
+    const awaitingReview   = allPending.filter(p => p.status === 'pending');
+	const needsCompliance  = allPending.filter(p => p.status === 'needs_compliance');
+	renderPendingList(awaitingReview,  'pendingList');
+	renderPendingList(needsCompliance, 'complianceList');
+	renderPendingList(awaitingReview.slice(0, 5), 'dashPendingList');
   } catch(e) {
     console.error('[Admin] loadPending error:', e);
     const errMsg = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load: ${e.message}</p></div>`;
     document.getElementById('pendingList').innerHTML = errMsg;
     document.getElementById('dashPendingList').innerHTML = errMsg;
   }
+}
+
+function switchPendingTab(tab, btn) {
+  document.querySelectorAll('#sec-pending .ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pendingList').style.display    = tab === 'review'     ? '' : 'none';
+  document.getElementById('complianceList').style.display = tab === 'compliance' ? '' : 'none';
+}
+
+let currentComplianceTarget = null;
+
+function openCompliance(providerId, userId, bizName) {
+  currentComplianceTarget = { providerId, userId, bizName };
+  document.getElementById('complianceName').textContent = bizName;
+  document.getElementById('complianceReason').value = '';
+  openModal('complianceModal');
+}
+
+async function confirmCompliance() {
+  if (!currentComplianceTarget) return;
+  const { providerId, userId, bizName } = currentComplianceTarget;
+  const reason = document.getElementById('complianceReason').value.trim();
+  if (!reason) { showToast('Please enter the compliance requirement.', 'error'); return; }
+  try {
+    await FX.setProviderNeedsCompliance(providerId, userId, reason);
+    closeModal('complianceModal');
+    showToast('Provider notified and moved to Need Compliance.', '');
+    await Promise.all([loadStats(), loadPending()]);
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function loadUpgradesBadge() {
+  try {
+    const reqs  = await FX.getUpgradeRequests('pending');
+    const badge = document.getElementById('upgradesBadge');
+    if (badge && reqs.length > 0) {
+      badge.textContent  = reqs.length;
+      badge.style.display = 'inline-block';
+    }
+  } catch(e) { /* silent */ }
+}
+
+async function loadSettings() {
+  try {
+    const otpEnabled = await FX.getSetting('otp_enabled');
+    const testCode   = await FX.getSetting('otp_test_code');
+    document.getElementById('otpEnabledToggle').checked = otpEnabled === 'true';
+    document.getElementById('testOtpInput').value = testCode || '';
+    updateTestOtpStatus(testCode);
+
+    const actions  = await FX.getSetting('ad_actions_per_popup');
+    const minutes  = await FX.getSetting('ad_min_minutes');
+    const skipSecs = await FX.getSetting('ad_skip_seconds');
+	const suspensionDays = await FX.getSetting('suspension_days');
+	if (suspensionDays) document.getElementById('suspensionDaysInput').value = suspensionDays;
+    const adBatchSize = await FX.getSetting('ad_batch_size');
+    const adBatchDays = await FX.getSetting('ad_batch_days');
+    const featBatchSize = await FX.getSetting('featured_batch_size');
+    const featBatchDays = await FX.getSetting('featured_batch_days');
+    if (actions)      document.getElementById('adActionsInput').value    = actions;
+    if (minutes)      document.getElementById('adMinutesInput').value    = minutes;
+    if (skipSecs)     document.getElementById('adSkipInput').value       = skipSecs;
+    if (adBatchSize)  document.getElementById('adBatchSizeInput').value  = adBatchSize;
+    if (adBatchDays)  document.getElementById('adBatchDaysInput').value  = adBatchDays;
+    if (featBatchSize) document.getElementById('featBatchSizeInput').value = featBatchSize;
+    if (featBatchDays) document.getElementById('featBatchDaysInput').value = featBatchDays;
+  } catch(e) {
+    showToast('Failed to load settings: ' + e.message, 'error');
+  }
+}
+
+async function saveOtpEnabled(checked) {
+  try {
+    await FX.setSetting('otp_enabled', checked ? 'true' : 'false');
+    showToast(checked ? 'OTP verification enabled.' : 'OTP verification disabled.');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function saveTestOtp() {
+  const code = document.getElementById('testOtpInput').value.trim();
+  if (code && code.length !== 6) {
+    showToast('Test code must be exactly 6 digits.', 'error'); return;
+  }
+  try {
+    await FX.setSetting('otp_test_code', code);
+    updateTestOtpStatus(code);
+    showToast(code ? `Test code set to ${code}.` : 'Test code saved.');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function clearTestOtp() {
+  try {
+    await FX.setSetting('otp_test_code', '');
+    document.getElementById('testOtpInput').value = '';
+    updateTestOtpStatus('');
+    showToast('Test code cleared. Real OTPs will be sent.');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function saveAdSetting(key, inputId) {
+  const val = document.getElementById(inputId).value.trim();
+  if (!val || isNaN(val)) { showToast('Please enter a valid number.', 'error'); return; }
+  try {
+    await FX.setSetting(key, val);
+    showToast('Ad setting saved ✅', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+function updateTestOtpStatus(code) {
+  const el = document.getElementById('testOtpStatus');
+  if (!el) return;
+  el.style.display = code && code.length === 6 ? 'block' : 'none';
+}
+
+async function loadSuspicious() {
+  try {
+    const [ratings, allInquiries, allUsers, allProviders] = await Promise.all([
+      sbFetch(`ratings?select=*&order=created_at.desc`).then(r => r || []),
+      sbFetch(`inquiries?select=provider_id,user_ip&user_ip=not.is.null`).then(r => r || []),
+      sbFetch(`users?select=id,first_name,last_name,username`).then(r => r || []),
+      sbFetch(`providers?select=id,biz_name,user_id`).then(r => r || []),
+    ]);
+
+    // Build lookup maps for quick name resolution
+    const userMap     = {};
+    const providerMap = {};
+    allUsers.forEach(u => userMap[u.id] = u.first_name && u.last_name
+      ? `${u.first_name} ${u.last_name}` : u.username || u.id.substring(0,8));
+    allProviders.forEach(p => providerMap[p.id] = p.biz_name || p.id.substring(0,8));
+
+    // ── Check 1: IP match (self-rating) ──────────────────────────
+    const provIpMap = {};
+    allInquiries.forEach(inq => {
+      if (!provIpMap[inq.provider_id]) provIpMap[inq.provider_id] = new Set();
+      provIpMap[inq.provider_id].add(inq.user_ip);
+    });
+
+    const ipSuspicious = ratings.filter(r => {
+      const providerIps = provIpMap[r.provider_id] || new Set();
+      return r.user_ip && providerIps.has(r.user_ip);
+    });
+
+    // ── Check 2: Repeat rating — same user → same provider within 3 days ──
+    const repeatSuspicious = [];
+    const seen = {}; // key: userId_providerId → array of timestamps
+    ratings.forEach(r => {
+      const key = `${r.regular_user_id}_${r.provider_id}`;
+      if (!seen[key]) seen[key] = [];
+      seen[key].push({ id: r.id, date: new Date(r.created_at), stars: r.stars, rating: r });
+    });
+
+    Object.values(seen).forEach(entries => {
+      if (entries.length < 2) return;
+      // Sort by date ascending
+      entries.sort((a, b) => a.date - b.date);
+      for (let i = 1; i < entries.length; i++) {
+        const diffDays = (entries[i].date - entries[i-1].date) / (1000 * 60 * 60 * 24);
+        if (diffDays < 3) {
+          // Flag the newer rating
+          repeatSuspicious.push({
+            ...entries[i].rating,
+            _suspicionType: 'repeat_rating',
+            _prevDate: entries[i-1].date,
+            _daysDiff: diffDays.toFixed(1),
+          });
+        }
+      }
+    });
+
+// ── Check 3: Burst Rating — same user rates 3+ providers within 24 hours ──
+const burstSuspicious = [];
+const userRatingsByTime = {};
+ratings.forEach(r => {
+  if (!userRatingsByTime[r.regular_user_id]) userRatingsByTime[r.regular_user_id] = [];
+  userRatingsByTime[r.regular_user_id].push({ ...r, _date: new Date(r.created_at) });
+});
+
+Object.values(userRatingsByTime).forEach(entries => {
+  if (entries.length < 3) return;
+  entries.sort((a, b) => a._date - b._date);
+  for (let i = 2; i < entries.length; i++) {
+    const diffHours = (entries[i]._date - entries[i-2]._date) / (1000 * 60 * 60);
+    if (diffHours <= 24) {
+      // Flag all three entries in the burst window
+      [entries[i-2], entries[i-1], entries[i]].forEach(e => {
+        if (!burstSuspicious.find(b => b.id === e.id)) {
+          burstSuspicious.push({
+            ...e,
+            _suspicionType: 'burst_rating',
+            _burstCount:    entries.length,
+            _burstHours:    diffHours.toFixed(1),
+          });
+        }
+      });
+    }
+  }
+});
+
+// ── Check 4: Perfect Score Flood — 5 consecutive 5-star ratings within 48 hours ──
+const floodSuspicious = [];
+const provRatings = {};
+ratings.forEach(r => {
+  if (!provRatings[r.provider_id]) provRatings[r.provider_id] = [];
+  provRatings[r.provider_id].push({ ...r, _date: new Date(r.created_at) });
+});
+
+Object.entries(provRatings).forEach(([provId, entries]) => {
+  if (entries.length < 5) return;
+  entries.sort((a, b) => a._date - b._date);
+  for (let i = 4; i < entries.length; i++) {
+    const window5 = entries.slice(i - 4, i + 1);
+    const allFive = window5.every(e => e.stars === 5);
+    const diffHours = (window5[4]._date - window5[0]._date) / (1000 * 60 * 60);
+    if (allFive && diffHours <= 48) {
+      window5.forEach(e => {
+        if (!floodSuspicious.find(f => f.id === e.id)) {
+          floodSuspicious.push({
+            ...e,
+            _suspicionType: 'perfect_flood',
+            _floodHours:    diffHours.toFixed(1),
+          });
+        }
+      });
+    }
+  }
+});
+
+// ── Combine and deduplicate ───────────────────────────────────
+const allSuspicious = [
+  ...ipSuspicious.map(r => ({ ...r, _suspicionType: r._suspicionType || 'ip_match' })),
+  ...repeatSuspicious.filter(r => !ipSuspicious.find(s => s.id === r.id)),
+  ...burstSuspicious.filter(r => !ipSuspicious.find(s => s.id === r.id) && !repeatSuspicious.find(s => s.id === r.id)),
+  ...floodSuspicious.filter(r => !ipSuspicious.find(s => s.id === r.id) && !repeatSuspicious.find(s => s.id === r.id) && !burstSuspicious.find(s => s.id === r.id)),
+];
+
+    // ── Update badge ──────────────────────────────────────────────
+    const sBadge = document.getElementById('suspiciousBadge');
+    if (allSuspicious.length) {
+      sBadge.style.display = 'inline-block';
+      sBadge.textContent   = allSuspicious.length;
+    } else {
+      sBadge.style.display = 'none';
+    }
+
+    const wrap = document.getElementById('suspiciousContent');
+    if (!allSuspicious.length) {
+      wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No suspicious activity detected.</p></div>';
+      return;
+    }
+
+    wrap.innerHTML = `
+      <table>
+        <thead><tr>
+          <th>Type</th>
+          <th>Provider ID</th>
+          <th>User ID</th>
+          <th>Stars</th>
+          <th>Detail</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr></thead>
+        <tbody>
+          ${allSuspicious.map(r => {
+            const type = r._suspicionType;
+            const styles = {
+              ip_match:     { bg: '#FFF5F5', badgeBg: '#fee2e2', badgeColor: '#991B1B', label: '🌐 IP Match' },
+              repeat_rating:{ bg: '#FFFBEB', badgeBg: '#FEF3C7', badgeColor: '#92400E', label: '🔁 Repeat Rating' },
+              burst_rating: { bg: '#FFF5F5', badgeBg: '#fce7f3', badgeColor: '#9d174d', label: '⚡ Burst Rating' },
+              perfect_flood:{ bg: '#F0FDF4', badgeBg: '#dcfce7', badgeColor: '#166534', label: '🌊 Score Flood' },
+            };
+            const s = styles[type] || styles.ip_match;
+            const detail = {
+              ip_match:      `<code style="font-size:0.72rem;background:#fee2e2;padding:2px 6px;border-radius:4px;">${r.user_ip}</code>`,
+              repeat_rating: `<span style="font-size:0.7rem;color:#92400E;">Rated again after <strong>${r._daysDiff} days</strong><br/><span style="color:var(--text-3);">Prev: ${r._prevDate?.toLocaleDateString('en-PH')}</span></span>`,
+              burst_rating:  `<span style="font-size:0.7rem;color:#9d174d;">Rated <strong>${r._burstCount} providers</strong> in <strong>${r._burstHours}h</strong></span>`,
+              perfect_flood: `<span style="font-size:0.7rem;color:#166534;">5 consecutive ⭐⭐⭐⭐⭐ within <strong>${r._floodHours}h</strong></span>`,
+            }[type] || '—';
+            
+            return `
+            <tr style="background:${s.bg};">
+              <td>
+                <span style="font-size:0.68rem;font-weight:800;padding:2px 7px;border-radius:10px;background:${s.badgeBg};color:${s.badgeColor};">
+                  ${s.label}
+                </span>
+              </td>
+              <td style="font-size:0.7rem;color:var(--text-3);">${providerMap[r.provider_id] || r.provider_id.substring(0,8)+'…'}</td>
+              <td style="font-size:0.7rem;color:var(--text-3);">${userMap[r.regular_user_id] || r.regular_user_id.substring(0,8)+'…'}</td>
+              <td>${'⭐'.repeat(r.stars)}</td>
+              <td>${detail}</td>
+              <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleDateString('en-PH')}</td>
+              <td>
+                <button onclick="deleteRating('${r.id}','${r.provider_id}')" style="padding:4px 10px;background:#fee2e2;color:#991B1B;border:none;border-radius:6px;font-size:0.72rem;font-weight:700;cursor:pointer;">
+                  🗑
+                </button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+
+  } catch(e) {
+    document.getElementById('suspiciousContent').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${e.message}</p></div>`;
+  }
+}
+
+async function deleteRating(id, providerId) {
+  if (!confirm('Remove this rating? This cannot be undone.')) return;
+  try {
+    // Delete the rating
+    await sbFetch(`ratings?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+
+    // Recalculate provider's avg_rating and total_ratings
+    const remaining = await sbFetch(`ratings?provider_id=eq.${providerId}&select=stars`).then(r => r || []);
+    const total     = remaining.length;
+    const avg       = total ? remaining.reduce((sum, r) => sum + r.stars, 0) / total : 0;
+    await sbFetch(`providers?id=eq.${providerId}`, {
+      method:  'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body:    JSON.stringify({ avg_rating: Math.round(avg * 10) / 10, total_ratings: total }),
+    });
+
+    showToast('Rating removed and provider score updated.');
+    await loadSuspicious();
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 function renderPendingList(list, containerId) {
@@ -836,36 +2040,190 @@ function renderPendingList(list, containerId) {
     return;
   }
   el.innerHTML = '';
-  list.forEach(p => {
+  window._pendingList = list;
+  list.forEach((p, idx) => {
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;';
     row.innerHTML = `
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">${p.biz_name}</div>
-        <div style="font-size:0.73rem;color:var(--text-3);">${p.cat_sub} · ${p.city_name}${p.province_name ? ', '+p.province_name : ''}</div>
-        <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px;">${p.prov_type} · ID: ${p.id_type || '—'}</div>
+	  <div style="flex:1;min-width:0;">
+        <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">
+          ${p.role === 'regular' ? (p.first_name + ' ' + p.last_name) : (p.biz_name || '—')}
+        </div>
+        <div style="font-size:0.73rem;color:var(--text-3);">
+          ${p.role === 'regular' ? '👤 Regular User · ' + (p.package_name || p.package_id || 'Free') : p.cat_sub + ' · ' + p.city_name + (p.province_name ? ', '+p.province_name : '')}
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px;">
+          ${p.role === 'regular' ? '💳 ' + (p.payment_method || '—') + ' · Ref: ' + (p.payment_reference || '—') : '📍 ' + [p.street_addr, p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ')}
+        </div>
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button class="btn-xs btn-view" onclick="viewProvider('${p.id}','pending')">
-          <i class="fa-solid fa-eye"></i> View
+	  <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">
+        <button class="btn-xs" style="background:#EFF6FF;color:#1D4ED8;" onclick="openInfoDetails(window._pendingList[${idx}])">
+          <i class="fa-solid fa-circle-info"></i> Info
         </button>
-        <button class="btn-xs btn-approve" onclick="quickApprove('${p.id}','${p.user_id}','${esc(p.biz_name)}')">
-          <i class="fa-solid fa-check"></i> Approve
+        <button class="btn-xs btn-view" onclick="openPayDetails(window._pendingList[${idx}])">
+          <i class="fa-solid fa-receipt"></i> Payment
         </button>
-        <button class="btn-xs btn-reject" onclick="openReject('${p.id}','${p.user_id}','${esc(p.biz_name)}','${esc(p.user_id)}')">
-          <i class="fa-solid fa-ban"></i> Reject
-        </button>
+        ${p.role === 'regular' ? `
+          <button class="btn-xs btn-approve" onclick="approveRegular('${p.id}','${esc(p.first_name + ' ' + p.last_name)}')">
+            <i class="fa-solid fa-check"></i> Approve
+          </button>
+          <button class="btn-xs btn-reject" onclick="rejectRegular('${p.id}','${esc(p.first_name + ' ' + p.last_name)}')">
+            <i class="fa-solid fa-ban"></i> Reject
+          </button>
+        ` : `
+          <button class="btn-xs btn-approve" onclick="quickApprove('${p.id}','${p.user_id}','${esc(p.biz_name)}')">
+            <i class="fa-solid fa-check"></i> Approve
+          </button>
+          <button class="btn-xs" style="background:#FEF9C3;color:#854D0E;" onclick="openCompliance('${p.id}','${p.user_id}','${esc(p.biz_name)}')">
+            <i class="fa-solid fa-clock"></i> Pending
+          </button>
+          <button class="btn-xs btn-reject" onclick="openReject('${p.id}','${p.user_id}','${esc(p.biz_name)}')">
+            <i class="fa-solid fa-ban"></i> Reject
+          </button>
+        `}
       </div>`;
     el.appendChild(row);
   });
 }
 
 let currentApproveTarget = null;
+let currentApproveRegularTarget = null;
+let currentRejectRegularTarget  = null;
 
 function quickApprove(providerId, userId, bizName) {
   currentApproveTarget = { providerId, userId, bizName };
   document.getElementById('approveProvName').textContent = bizName;
   openModal('approveModal');
+}
+
+function approveRegular(userId, fullName) {
+  currentApproveRegularTarget = { userId, fullName };
+  document.getElementById('approveRegularName').textContent = fullName;
+  openModal('approveRegularModal');
+}
+
+async function confirmApproveRegular() {
+  if (!currentApproveRegularTarget) return;
+  const { userId, fullName } = currentApproveRegularTarget;
+  const btn = document.getElementById('approveRegularOkBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span> Approving…';
+  try {
+    await FX.approveRegularUser(userId);
+	closeModal('approveRegularModal');
+	showToast('User approved ✅', 'success');
+    await Promise.all([loadStats(), loadPending(), loadRegulars()]);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Approve';
+  }
+}
+
+function rejectRegular(userId, fullName) {
+  currentRejectRegularTarget = { userId, fullName };
+  document.getElementById('rejectRegularName').textContent = fullName;
+  document.getElementById('rejectRegularReason').value = '';
+  openModal('rejectRegularModal');
+}
+
+async function confirmRejectRegular() {
+  if (!currentRejectRegularTarget) return;
+  const { userId, fullName } = currentRejectRegularTarget;
+  const reason = document.getElementById('rejectRegularReason').value.trim();
+  try {
+    await FX.rejectRegularUser(userId, reason);
+    closeModal('rejectRegularModal');
+    showToast('User rejected and notified.', '');
+    await Promise.all([loadStats(), loadPending(), loadRegulars()]);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+function syncAdsFreeFromPackage() {
+  const packageId = document.getElementById('editPackage').value;
+  const pkg       = (allPackages || []).find(pk => pk.id === packageId);
+  document.getElementById('editAdsFree').checked = pkg?.ads_free ?? false;
+}
+
+function openPayDetails(p) {
+  const isProvider = p.role === 'provider' || p.biz_name;
+  const body = document.getElementById('payDetailsBody');
+
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Name</span>
+        <span style="font-weight:700;color:var(--navy);">
+          ${isProvider ? (p.biz_name || '—') : ((p.first_name || '') + ' ' + (p.last_name || ''))}
+        </span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Package</span>
+        <span style="font-weight:700;color:var(--navy);">${p.package_name || p.package_id || 'Free'}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Payment Method</span>
+        <span style="font-weight:700;color:var(--navy);">${p.payment_method || '—'}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Reference No.</span>
+        <span style="font-weight:700;color:var(--brand);">${p.payment_reference || '—'}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Amount Sent</span>
+        <span style="font-weight:700;color:var(--green);">₱${p.payment_amount || '—'}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Payment Status</span>
+        <span style="font-weight:700;color:var(--navy);">${p.payment_status || '—'}</span>
+      </div>
+    </div>
+  `;
+
+  openModal('payDetailsModal');
+}
+
+function openInfoDetails(p) {
+  const body = document.getElementById('infoDetailsBody');
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Full Name</span>
+        <span style="font-weight:700;color:var(--navy);">${(p.first_name || '') + ' ' + (p.last_name || '')}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Business Name</span>
+        <span style="font-weight:700;color:var(--navy);">${p.biz_name || '—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Location</span>
+        <span style="font-weight:700;color:var(--navy);">${[p.street_addr, p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ') || '—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">ID Type</span>
+        <span style="font-weight:700;color:var(--navy);">${p.id_type || '—'}</span>
+      </div>
+      ${p.id_file_url ? `
+      <div style="padding:8px 0;">
+        <div style="color:var(--text-3);font-weight:600;margin-bottom:8px;">Government-Issued ID</div>
+        <img src="${p.id_file_url}" alt="ID"
+             style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;"
+             onclick="window.open('${p.id_file_url}','_blank')"
+             title="Click to open full size"/>
+        <div style="font-size:0.68rem;color:var(--text-3);margin-top:4px;text-align:center;">Click image to open full size</div>
+      </div>` : `<div style="padding:8px 0;color:var(--text-3);font-size:0.82rem;">No ID uploaded.</div>`}
+    </div>
+  `;
+  openModal('infoDetailsModal');
 }
 
 async function confirmApprove() {
@@ -875,9 +2233,18 @@ async function confirmApprove() {
   btn.disabled = true;
   btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span> Approving…';
   try {
-    await FX.approveProvider(providerId, userId);
-    // Update payment_status to verified on approval
-    await FX.updateUser(userId, { paymentStatus: 'verified' });
+    if (providerId) {
+      await FX.approveProvider(providerId, userId);
+      await FX.updateUser(userId, { paymentStatus: 'verified' });
+    } else {
+      await FX.approveRegularUser(userId);
+    }
+    await FX.sendUserMessage(userId, {
+      title: '🎉 Account Approved!',
+      body:  'Congratulations! Your application has been approved. You can now create listings and start receiving bookings. Welcome to Fixia!',
+      type:  'success',
+      icon:  '✅',
+    });
     const provider = await FX.getProviderById(providerId);
     const user     = await FX.getUserById(userId);
     if (user && provider) {
@@ -913,9 +2280,13 @@ async function confirmReject() {
   const { providerId, userId, bizName } = currentRejectTarget;
   const reason = document.getElementById('rejectReason').value.trim();
   try {
-    await FX.rejectProvider(providerId, userId);
+    // Fetch user data BEFORE deleting
     const user = await FX.getUserById(userId);
-    const provider = await FX.getProviderById(providerId);
+    if (providerId) {
+      await FX.rejectProvider(providerId, userId, reason);
+    } else {
+      await FX.rejectRegularUser(userId, reason);
+    }
     if (user) {
       await FX.sendEmail('provider_rejected', {
         fullName: `${user.first_name} ${user.last_name}`,
@@ -937,7 +2308,10 @@ let provFilter = 'all';
 
 async function loadProviders() {
   try {
-    allProviders = await FX.getAllProviders();
+    [allProviders, allPackages] = await Promise.all([
+      FX.getAllProviders(),
+      FX.getAllPackages(),
+    ]);
     renderProviders();
   } catch(e) {}
 }
@@ -951,11 +2325,13 @@ function setProvFilter(f, el) {
 
 function filterProviderTable(q) { renderProviders(q); }
 
+const _providerDataMap = {};
+
 function renderProviders(search = '') {
   const tbody = document.getElementById('provTbody');
   let list = allProviders.filter(p => {
-    if (provFilter === 'elite')    return p.is_elite;
-    if (provFilter !== 'all')      return p.status === provFilter;
+    if (provFilter === 'elite')  return p.is_elite;
+    if (provFilter !== 'all')    return p.status === provFilter;
     return true;
   });
   if (search) {
@@ -967,70 +2343,84 @@ function renderProviders(search = '') {
     );
   }
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔍</div><p>No providers found.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🔍</div><p>No providers found.</p></div></td></tr>';
     return;
   }
-  tbody.innerHTML = list.map(p => `
-    <tr>
+
+  // Store data in map for safe modal access
+  list.forEach(p => { _providerDataMap[p.id] = p; });
+
+  tbody.innerHTML = list.map(p => {
+    const mainService = CAT_LABELS[p.cat_main] || p.cat_main || '—';
+    // Package: prefer package_name, fallback to package_id lookup in allPackages
+    const pkg = allPackages.find(pk => pk.id === p.package_id);
+    const pkgLabel = p.package_name || pkg?.name || p.package_id || 'Free';
+
+    return `<tr>
       <td>
         <div style="font-weight:700;font-size:0.85rem;">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
-        <div style="font-size:0.7rem;color:var(--text-3);">${p.prov_type}</div>
       </td>
-      <td style="font-size:0.8rem;">${p.cat_sub || '—'}<br/><span style="font-size:0.68rem;color:var(--text-3);">${p.cat_main}</span></td>
-      <td style="font-size:0.78rem;">${p.city_name || '—'}${p.province_name ? '<br/><span style="font-size:0.68rem;color:var(--text-3);">' + p.province_name + '</span>' : ''}</td>
-      <td><span class="badge badge-purple">👑 Fixia Elite</span></td>
-      <td style="font-size:0.8rem;">⭐ ${p.avg_rating || 0} <span style="color:var(--text-3);">(${p.total_ratings || 0})</span></td>
-      <td>${statusBadge(p.status)}</td>
+      <td>
+        <button class="btn-xs btn-view" onclick="openProviderDetails('${p.id}')">🔍 View</button>
+      </td>
+      <td><span class="badge badge-purple">${pkgLabel}</span></td>
+      <td>${statusBadge(p.status, p.is_inactive)}</td>
       <td>
         <div class="btn-row">
-          <button class="btn-xs btn-view" onclick="viewProvider('${p.id}','${p.status}')"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn-xs btn-edit" onclick="openEditProvider('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn-xs btn-delete" onclick="confirmDelete('provider','${p.id}','${esc(p.biz_name)}')"><i class="fa-solid fa-trash"></i></button>
           ${p.status === 'pending' ? `<button class="btn-xs btn-approve" onclick="quickApprove('${p.id}','${p.user_id}','${esc(p.biz_name)}')"><i class="fa-solid fa-check"></i></button>` : ''}
           ${p.status === 'pending' ? `<button class="btn-xs btn-reject" onclick="openReject('${p.id}','${p.user_id}','${esc(p.biz_name)}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-          ${p.is_elite ? `<button class="btn-xs btn-reject" onclick="doRevokeElite('${p.id}','${esc(p.biz_name)}')"><i class="fa-solid fa-crown"></i> Revoke Elite</button>` : ''}
+          ${p.is_elite ? `<button class="btn-xs btn-reject" onclick="doRevokeElite('${p.id}','${esc(p.biz_name)}')"><i class="fa-solid fa-crown"></i></button>` : ''}
         </div>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
-async function viewProvider(providerId, context) {
-  const p = await FX.getProviderById(providerId);
+function openProviderDetails(id) {
+  const p = _providerDataMap[id];
   if (!p) return;
-  const user = await FX.getUserById(p.user_id);
+  const mainService = CAT_LABELS[p.cat_main] || p.cat_main || '—';
 
-  document.getElementById('provModalTitle').textContent = p.biz_name;
-  document.getElementById('provModalBody').innerHTML = `
-    <div class="prov-detail-grid">
-      <div class="prov-detail-item"><div class="prov-detail-label">Full Name</div><div class="prov-detail-val">${user?.first_name || ''} ${user?.last_name || ''}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Email</div><div class="prov-detail-val" style="word-break:break-all;">${user?.email || '—'}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Phone</div><div class="prov-detail-val">${user?.phone || '—'}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Provider Type</div><div class="prov-detail-val">${p.prov_type}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Service</div><div class="prov-detail-val">${p.cat_sub}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Location</div><div class="prov-detail-val">${p.barangay_name ? p.barangay_name + ', ' : ''}${p.city_name}${p.province_name ? ', ' + p.province_name : ''}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Package</div><div class="prov-detail-val">${p.package_id || '—'}</div></div>
-      <div class="prov-detail-item"><div class="prov-detail-label">Payment</div><div class="prov-detail-val">${user?.payment_method || '—'} · ₱${user?.payment_amount || 0}</div></div>
-      <div class="prov-detail-item" style="grid-column:1/-1;"><div class="prov-detail-label">Description</div><div class="prov-detail-val" style="font-weight:400;font-size:0.82rem;line-height:1.6;">${p.biz_desc || '—'}</div></div>
+  document.getElementById('providerDetailsBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--brand-light);
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔧</div>
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
     </div>
-    ${p.id_file_url ? `
-      <div style="margin-bottom:10px;">
-        <div class="prov-detail-label" style="margin-bottom:6px;">Government ID (${p.id_type})</div>
-        <img class="prov-id-img" src="${p.id_file_url}" alt="ID" onclick="window.open(this.src,'_blank')"/>
-      </div>` : ''}
-    ${(p.portfolio_urls || []).length ? `
-      <div>
-        <div class="prov-detail-label" style="margin-bottom:6px;">Portfolio (${p.portfolio_urls.length} photos)</div>
-        <div class="prov-portfolio">${p.portfolio_urls.map(u => `<img src="${u}" onclick="window.open(this.src,'_blank')" alt="Portfolio"/>`).join('')}</div>
-      </div>` : ''}
-    <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;font-size:0.75rem;color:var(--text-3);">
-      <strong>Payment Reference:</strong> ${user?.payment_reference || '—'} &nbsp;|&nbsp; <strong>Payment Status:</strong> ${user?.payment_status || '—'}
-    </div>`;
 
-  document.getElementById('provModalFoot').innerHTML = context === 'pending' ? `
-    <button class="btn btn-secondary" onclick="closeModal('provModal')">Close</button>
-    <button class="btn btn-danger" onclick="closeModal('provModal');openReject('${p.id}','${p.user_id}','${esc(p.biz_name)}')"><i class="fa-solid fa-ban"></i> Reject</button>
-    <button class="btn btn-brand" onclick="closeModal('provModal');quickApprove('${p.id}','${p.user_id}','${esc(p.biz_name)}')"><i class="fa-solid fa-check"></i> Approve</button>` :
-    `<button class="btn btn-secondary" onclick="closeModal('provModal')">Close</button>`;
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:10px;">Service</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Main Service</span><strong>${mainService}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Specialization</span><strong>${p.cat_sub || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
+        <span style="color:var(--text-3);">Rating</span>
+        <strong>⭐ ${p.avg_rating || 0} <span style="font-weight:400;color:var(--text-3);">(${p.total_ratings || 0} reviews)</span></strong>
+      </div>
+    </div>
 
-  openModal('provModal');
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:10px;">Location</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">City</span><strong>${p.city_name || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Province</span><strong>${p.province_name || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
+        <span style="color:var(--text-3);">Region</span><strong>${p.region_name || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-top:1px solid var(--border);margin-top:4px;">
+        <span style="color:var(--text-3);">Joined</span><strong>${fmtDate(p.created_at)}</strong>
+      </div>	  
+    </div>
+  `;
+  openModal('providerDetailsModal');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1054,6 +2444,8 @@ function setRegFilter(f, el) {
 
 function filterRegularTable(q) { renderRegulars(q); }
 
+const _regularDataMap = {};
+
 function renderRegulars(search = '') {
   const tbody = document.getElementById('regTbody');
   let list = allRegulars.filter(u => regFilter === 'all' || u.status === regFilter);
@@ -1066,20 +2458,25 @@ function renderRegulars(search = '') {
     );
   }
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><p>No users found.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><p>No users found.</p></div></td></tr>';
     return;
   }
+
+  list.forEach(u => { _regularDataMap[u.id] = u; });
+
+  const pkg = u => allPackages.find(pk => pk.id === u.package_id);
+  const pkgLabel = u => u.package_name || pkg(u)?.name || u.package_id || 'Free';
+
   tbody.innerHTML = list.map(u => `
     <tr>
       <td>
         <div style="font-weight:700;font-size:0.85rem;">${u.first_name} ${u.last_name}</div>
-        <div style="font-size:0.7rem;color:var(--text-3);">@${u.username} · ${u.email}</div>
       </td>
-      <td style="font-size:0.8rem;">${u.phone || '—'}</td>
-      <td><span class="badge badge-blue">${u.package_id || 'free'}</span></td>
-      <td style="text-align:center;">${u.ads_free ? '✅' : '❌'}</td>
-      <td>${statusBadge(u.status)}</td>
-      <td style="font-size:0.75rem;color:var(--text-3);">${fmtDate(u.created_at)}</td>
+      <td>
+        <button class="btn-xs btn-view" onclick="openRegularDetails('${u.id}')">🔍 View</button>
+      </td>
+      <td><span class="badge badge-blue">${pkgLabel(u)}</span></td>
+      <td>${statusBadge(u.status, u.is_inactive)}</td>
       <td>
         <div class="btn-row">
           <button class="btn-xs btn-edit" onclick="openEditUser('${u.id}')"><i class="fa-solid fa-pen"></i></button>
@@ -1087,6 +2484,36 @@ function renderRegulars(search = '') {
         </div>
       </td>
     </tr>`).join('');
+}
+
+function openRegularDetails(id) {
+  const u = _regularDataMap[id];
+  if (!u) return;
+
+  document.getElementById('regularDetailsBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--blue-bg);
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${u.first_name} ${u.last_name}</div>
+    </div>
+
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:10px;">Info</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Username</span><strong>@${u.username || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Email</span><strong>${u.email || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Phone</span><strong>${u.phone || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
+        <span style="color:var(--text-3);">Joined</span><strong>${fmtDate(u.created_at)}</strong>
+      </div>
+    </div>
+  `;
+  openModal('regularDetailsModal');
 }
 
 async function openEditUser(userId) {
@@ -1115,22 +2542,207 @@ async function openEditUser(userId) {
   openModal('editUserModal');
 }
 
+async function openEditProvider(providerId) {
+  const p = await FX.getProviderById(providerId);
+  if (!p) return;
+  const user = await FX.getUserById(p.user_id);
+  document.getElementById('provModalTitle').textContent = p.biz_name || 'Edit Provider';
+  document.getElementById('provModalBody').innerHTML = `
+    <div id="provEditAlert" class="alert"></div>
+    <input type="hidden" id="provEditId" value="${p.id}"/>
+    <input type="hidden" id="provEditUserId" value="${p.user_id}"/>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input class="form-input" id="provFn" value="${user?.first_name || ''}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input class="form-input" id="provLn" value="${user?.last_name || ''}"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="provEmail" type="email" value="${user?.email || ''}"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="provPhone" type="tel" value="${user?.phone || ''}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="provStatus">
+          <option value="pending"   ${p.status === 'pending'   ? 'selected' : ''}>Pending</option>
+          <option value="approved"  ${p.status === 'approved'  ? 'selected' : ''}>Approved</option>
+          <option value="rejected"  ${p.status === 'rejected'  ? 'selected' : ''}>Rejected</option>
+          <option value="suspended" ${p.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Package</label>
+        <select class="form-select" id="provPackage">
+          ${allPackages.filter(pk => pk.type === 'provider').map(pk => `
+            <option value="${pk.id}" ${pk.id === p.package_id ? 'selected' : ''}>${pk.name}</option>
+          `).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Status</label>
+        <select class="form-select" id="provPayStatus">
+          <option value="pending"  ${user?.payment_status === 'pending'  ? 'selected' : ''}>Pending</option>
+          <option value="verified" ${user?.payment_status === 'verified' ? 'selected' : ''}>Verified</option>
+          <option value="rejected" ${user?.payment_status === 'rejected' ? 'selected' : ''}>Rejected</option>
+          <option value="free"     ${user?.payment_status === 'free'     ? 'selected' : ''}>Free</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Business Name</label>
+      <input class="form-input" id="provBizName" value="${p.biz_name || ''}"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">City / Municipality</label>
+        <input class="form-input" id="provCityName" value="${p.city_name || ''}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Province</label>
+        <input class="form-input" id="provProvinceName" value="${p.province_name || ''}"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Barangay <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <input class="form-input" id="provBarangayName" value="${p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : ''}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Street Address <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <input class="form-input" id="provStreetAddr" value="${p.street_addr || ''}"/>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('provModalFoot').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal('provModal')">Cancel</button>
+    <button class="btn btn-brand" onclick="saveProviderEdit()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+  `;
+
+  openModal('provModal');
+}
+
+async function saveProviderEdit() {
+  const providerId = document.getElementById('provEditId').value;
+  const userId     = document.getElementById('provEditUserId').value;
+  const alertEl    = document.getElementById('provEditAlert');
+  try {
+    const newStatus    = document.getElementById('provStatus').value;
+    const newPackageId = document.getElementById('provPackage').value;
+    const newPkg       = (allPackages || []).find(pk => pk.id === newPackageId);
+
+    await FX.updateProvider(providerId, {
+      status:         newStatus,
+      packageId:      newPackageId,
+      isFeatured:     newPkg?.is_featured ?? false,
+      bizName:        document.getElementById('provBizName').value.trim(),
+      cityName:       document.getElementById('provCityName').value.trim(),
+      provinceName:   document.getElementById('provProvinceName').value.trim(),
+      barangayName:   document.getElementById('provBarangayName').value.trim(),
+      streetAddr:     document.getElementById('provStreetAddr').value.trim(),
+    });
+
+    await FX.updateUser(userId, {
+      firstName:    document.getElementById('provFn').value.trim(),
+      lastName:     document.getElementById('provLn').value.trim(),
+      email:        document.getElementById('provEmail').value.trim(),
+      phone:        document.getElementById('provPhone').value.trim(),
+      paymentStatus: document.getElementById('provPayStatus').value,
+      status:       newStatus === 'approved' ? 'active' : newStatus,
+      packageId:    newPackageId,
+      packageName:  newPkg?.name || newPackageId,
+      adsFree:      newPkg?.ads_free ?? false,
+    });
+
+    if (newStatus === 'suspended' || newStatus === 'suspension_pending') {
+      await FX.updateUser(userId, { forceLogout: true });
+    } else if (newStatus === 'active' || newStatus === 'approved') {
+      await FX.updateUser(userId, { forceLogout: false });
+    }
+
+// ── Delete excess listings on downgrade ───────────────────
+    if (newPkg) {
+      const newLimit = newPkg.listing_limit >= 999 ? Infinity : (newPkg.listing_limit ?? 0);
+      const listings = await sbFetch(
+        `listings?provider_id=eq.${providerId}&order=created_at.asc`
+      ) || [];
+
+      if (listings.length > newLimit) {
+        const toDelete = listings.slice(newLimit);
+        for (const l of toDelete) {
+          await sbFetch(`listings?id=eq.${l.id}`, {
+            method: 'DELETE',
+            prefer: 'return=minimal',
+          });
+        }
+        showToast(`Provider updated ✅ — ${toDelete.length} listing(s) deleted to match new plan limit.`, 'success');
+      } else {
+        showToast('Provider updated ✅', 'success');
+      }
+    } else {
+      showToast('Provider updated ✅', 'success');
+    }
+
+    closeModal('provModal');
+    await Promise.all([loadProviders(), loadStats()]);
+  } catch(e) {
+    alertEl.className = 'alert alert-error show';
+    alertEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function viewRegularUser(userId) {
+  const u = allRegulars.find(x => x.id === userId) || await FX.getUserById(userId);
+  if (!u) return;
+  // Reuse the edit modal in read context
+  openEditUser(userId);
+}
+
 async function saveUser() {
-  const id = document.getElementById('editUserId').value;
+  const id        = document.getElementById('editUserId').value;
+  const packageId = document.getElementById('editPackage').value || null;
+  const newPkg    = (allPackages || []).find(pk => pk.id === packageId);
+  const isFree    = !packageId || packageId.includes('free');
+
   const changes = {
-    firstName: document.getElementById('editFn').value.trim(),
-    lastName:  document.getElementById('editLn').value.trim(),
-    email:     document.getElementById('editEmail').value.trim(),
-    phone:     document.getElementById('editPhone').value.trim(),
-    status:    document.getElementById('editStatus').value,
-    packageId: document.getElementById('editPackage').value || null,
-    adsFree:   document.getElementById('editAdsFree').checked,
+    firstName:     document.getElementById('editFn').value.trim(),
+    lastName:      document.getElementById('editLn').value.trim(),
+    email:         document.getElementById('editEmail').value.trim(),
+    phone:         document.getElementById('editPhone').value.trim(),
+    status:        document.getElementById('editStatus').value,
+    packageId:     packageId,
+    packageName:   newPkg?.name || (isFree ? 'Free' : null),
+    adsFree:       newPkg?.ads_free ?? false,
+    paymentStatus: isFree ? 'free' : undefined,
   };
+
+  // Clear subscription dates on downgrade to free
+  if (isFree) {
+    changes.subscriptionStart = null;
+    changes.subscriptionEnd   = null;
+  }
+
   const pw = document.getElementById('editPassword').value;
   if (pw) changes.password = pw;
 
   try {
     await FX.updateUser(id, changes);
+    // If suspended, flag force logout so any active session is killed on next page load
+    if (changes.status === 'suspended') {
+      await FX.updateUser(id, { forceLogout: true });
+    }
     closeModal('editUserModal');
     showToast('User updated ✅', 'success');
     await loadRegulars();
@@ -1158,27 +2770,32 @@ function renderPackages() {
   regGrid.innerHTML  = regPkgs.length  ? '' : '<div class="empty-state"><p>No regular packages yet. Add one above.</p></div>';
   provGrid.innerHTML = provPkgs.length ? '' : '<div class="empty-state"><p>No provider packages yet. Add one above.</p></div>';
 
-  const renderCard = (pkg, el) => {
+    const renderCard = (pkg, el) => {
     const card = document.createElement('div');
     card.className = `pkg-admin-card${pkg.is_active ? '' : ' inactive'}`;
-    const listLabel = pkg.listing_limit >= 999 ? 'Unlimited listings' : `${pkg.listing_limit} listings`;
+    const listLabel    = pkg.listing_limit >= 999 ? 'Unlimited listings'      : `${pkg.listing_limit} listings`;
+	const bookingLabel = pkg.booking_limit >= 999 ? 'Unlimited active bookings': `${pkg.booking_limit} active bookings`;
     card.innerHTML = `
       <div class="pkg-admin-head">
         <div class="pkg-admin-icon">${pkg.icon || '📦'}</div>
         <div>
-          <div class="pkg-admin-name">${pkg.name} ${pkg.popular ? '⭐' : ''}</div>
+          <div class="pkg-admin-name">${pkg.name} ${pkg.popular ? `<span style="font-size:0.65rem;background:var(--brand);color:#fff;border-radius:4px;padding:1px 6px;vertical-align:middle;">${pkg.badge_label || 'Popular'}</span>` : ''}</div>
           <div class="pkg-admin-type">${pkg.type}</div>
         </div>
       </div>
-      <div class="pkg-admin-price">₱${pkg.price}<span style="font-size:0.7rem;font-weight:500;color:var(--text-3);">/${pkg.period}</span></div>
+	  <div class="pkg-admin-price">${pkg.price === 0 ? 'Free' : '₱' + pkg.price}<span style="font-size:0.7rem;font-weight:500;color:var(--text-3);">${pkg.price === 0 ? '' : '/' + ({ month: 'month', '6month': '6 months', year: 'year', lifetime: 'lifetime', forever: 'forever' }[pkg.period] || pkg.period)}</span></div>
       <div class="pkg-admin-meta">
-        📋 ${listLabel}<br/>
-        ${pkg.ads_free ? '✅ Ads-free' : '❌ Ads shown'} · ${pkg.is_featured ? '✅ Featured' : '❌ Not featured'}<br/>
+		📋 ${listLabel} · 📅 ${bookingLabel}<br/>
+        ${pkg.ads_free ? '✅ Ads-free' : '❌ Ads shown'}<br/>
+        ${pkg.is_featured ? '✅ Featured' : '❌ Not featured'}<br/>
         Sort: ${pkg.sort_order} · ${pkg.is_active ? '<span style="color:var(--green);">Active</span>' : '<span style="color:var(--red);">Inactive</span>'}
       </div>
       <div class="pkg-admin-actions">
         <button class="btn-xs btn-edit" onclick="editPackage('${pkg.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
-        <button class="btn-xs btn-delete" onclick="confirmDelete('package','${pkg.id}','${esc(pkg.name)}')"><i class="fa-solid fa-trash"></i></button>
+        ${['regular-free','regular-plus','regular-pro','regular-starter','provider-free','provider-basic','provider-pro','provider-premium'].includes(pkg.id)
+          ? `<button class="btn-xs btn-delete" disabled title="Permanent package — cannot be deleted" style="opacity:0.35;cursor:not-allowed;"><i class="fa-solid fa-lock"></i></button>`
+          : `<button class="btn-xs btn-delete" onclick="confirmDelete('package','${pkg.id}','${esc(pkg.name)}')"><i class="fa-solid fa-trash"></i></button>`
+        }
       </div>`;
     el.appendChild(card);
   };
@@ -1201,6 +2818,7 @@ function openPackageModal(type) {
   document.getElementById('pkgPrice').value  = '0';
   document.getElementById('pkgPeriod').value = 'month';
   document.getElementById('pkgListings').value = '5';
+  document.getElementById('pkgBookingLimit').value = '5';
   document.getElementById('pkgSort').value   = '99';
   document.getElementById('pkgFeatures').value = '';
   document.getElementById('pkgAdsFree').checked  = false;
@@ -1221,11 +2839,13 @@ function editPackage(id) {
   document.getElementById('pkgPrice').value  = pkg.price;
   document.getElementById('pkgPeriod').value = pkg.period;
   document.getElementById('pkgListings').value = pkg.listing_limit;
+  document.getElementById('pkgBookingLimit').value = pkg.booking_limit ?? 5;
   document.getElementById('pkgSort').value   = pkg.sort_order;
   document.getElementById('pkgFeatures').value = (pkg.features || []).join('\n');
   document.getElementById('pkgAdsFree').checked  = pkg.ads_free;
   document.getElementById('pkgFeatured').checked = pkg.is_featured;
-  document.getElementById('pkgPopular').checked  = pkg.popular;
+  document.getElementById('pkgPopular').checked = pkg.popular;
+  document.getElementById('pkgBadgeLabel').value = pkg.badge_label || 'Popular';
   document.getElementById('pkgActive').checked   = pkg.is_active;
   openModal('pkgModal');
 }
@@ -1238,12 +2858,14 @@ async function savePackage() {
     name:         document.getElementById('pkgName').value.trim(),
     price:        parseFloat(document.getElementById('pkgPrice').value) || 0,
     period:       document.getElementById('pkgPeriod').value,
-    listingLimit: parseInt(document.getElementById('pkgListings').value) || 5,
+    listingLimit: (() => { const v = parseInt(document.getElementById('pkgListings').value); return isNaN(v) ? 5 : v; })(),
+	bookingLimit: (() => { const v = parseInt(document.getElementById('pkgBookingLimit').value); return isNaN(v) ? 5 : v; })(),
     sortOrder:    parseInt(document.getElementById('pkgSort').value) || 99,
     features:     document.getElementById('pkgFeatures').value.split('\n').map(s=>s.trim()).filter(Boolean),
     adsFree:      document.getElementById('pkgAdsFree').checked,
     isFeatured:   document.getElementById('pkgFeatured').checked,
     popular:      document.getElementById('pkgPopular').checked,
+    badgeLabel:   document.getElementById('pkgBadgeLabel').value.trim() || 'Popular',
     isActive:     document.getElementById('pkgActive').checked,
   };
   if (!data.name) { showAlert('pkgAlert','Package name is required.'); return; }
@@ -1315,6 +2937,7 @@ async function grantElite() {
         expiresAt: expiresAt ? new Date(expiresAt).toLocaleDateString('en-PH') : 'No expiry',
       });
     }
+    closeModal('grantEliteModal');
     showToast('👑 Fixia Elite granted!', 'success');
     await Promise.all([loadStats(), loadElite(), loadProviders()]);
   } catch(e) { showAlert('eliteAlert','Error: ' + e.message); }
@@ -1350,6 +2973,7 @@ function confirmDelete(type, id, name) {
     closeModal('confirmModal');
     try {
       if (type === 'user')    { await FX.deleteUser(id);    await loadRegulars(); }
+	  if (type === 'provider') { await FX.deleteProvider(id); await loadProviders(); }
       if (type === 'package') { await FX.deletePackage(id); await loadPackages(); }
       showToast(`${name} deleted`, '');
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
@@ -1360,16 +2984,6 @@ function confirmDelete(type, id, name) {
 /* ══════════════════════════════════════════════════════════════
    UTILS
 ══════════════════════════════════════════════════════════════ */
-function statusBadge(s) {
-  const map = {
-    active:   '<span class="badge badge-green">✅ Active</span>',
-    approved: '<span class="badge badge-green">✅ Approved</span>',
-    pending:  '<span class="badge badge-gold">⏳ Pending</span>',
-    rejected: '<span class="badge badge-red">❌ Rejected</span>',
-    suspended:'<span class="badge badge-red">🚫 Suspended</span>',
-  };
-  return map[s] || `<span class="badge badge-grey">${s}</span>`;
-}
 
 function fmtDate(d) {
   if (!d) return '—';
@@ -1393,8 +3007,13 @@ function showToast(msg, type='') {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'rotationStatsModal') loadRotationStats();
+}
+
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
 window.addEventListener('click', e => {
   document.querySelectorAll('.modal.open').forEach(m => {
     if (e.target === m) m.classList.remove('open');
@@ -1437,17 +3056,36 @@ function renderAdGrid(type, containerId) {
           </div>
         </div>
         <div style="font-size:0.72rem;color:var(--text-2);margin-bottom:8px;line-height:1.5;">${ad.description || '—'}</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.65rem;color:var(--text-3);margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:12px;font-size:0.65rem;color:var(--text-3);margin-bottom:8px;flex-wrap:wrap;">
           <span>${ad.is_active ? '<span style="color:var(--green-text);">✅ Active</span>' : '<span style="color:var(--red-text);">❌ Inactive</span>'}</span>
-          <span>Sort: ${ad.sort_order}</span>
-          <span>${ad.ends_at ? 'Ends: ' + fmtDate(ad.ends_at) : 'No expiry'}</span>
+          <span>${
+            ad.batch_status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>' :
+            ad.batch_status === 'queued'    ? `<span style="color:var(--text-3);">⏳ Queued #${ad.queue_position || '—'}</span>` :
+            ad.batch_status === 'completed' ? '<span style="color:var(--text-3);">✔ Completed</span>' : '—'
+          }</span>
+          ${ad.shown_from  ? `<span>From: ${fmtDate(ad.shown_from)}</span>`  : ''}
+          ${ad.shown_until ? `<span>Until: ${fmtDate(ad.shown_until)}</span>` : ''}
         </div>
-        <div style="display:flex;gap:6px;">
+        <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:6px;">
+          👁 ${ad.impression_count || 0} / ${ad.impression_quota || 5000} impressions
+          <div style="margin-top:4px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;">
+            <div style="height:100%;border-radius:2px;background:var(--brand);width:${Math.min(100, Math.round(((ad.impression_count||0)/(ad.impression_quota||5000))*100))}%;transition:width 0.3s;"></div>
+          </div>
+        </div>
+        <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:8px;">
+          🖱 ${ad.click_count || 0} clicks
+          ${ad.shown_from ? `&nbsp;·&nbsp; From: ${fmtDate(ad.shown_from)}` : ''}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn-xs btn-edit" onclick="editAd('${ad.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
           <button class="btn-xs btn-delete" onclick="confirmDelete('ad','${ad.id}','${esc(ad.title)}')"><i class="fa-solid fa-trash"></i></button>
-          <button class="btn-xs ${ad.is_active ? 'btn-reject' : 'btn-approve'}" onclick="toggleAd('${ad.id}',${!ad.is_active})">
-            ${ad.is_active ? 'Pause' : 'Activate'}
+          <button class="btn-xs ${ad.batch_status === 'active' ? 'btn-reject' : 'btn-approve'}" onclick="toggleAd('${ad.id}',${ad.batch_status !== 'active'})">
+            ${ad.batch_status === 'active' ? 'Pause' : 'Activate'}
           </button>
+          ${ad.batch_status === 'queued' ? `
+          <button class="btn-xs btn-approve" onclick="promoteAdNow('${ad.id}')">
+            <i class="fa-solid fa-forward-step"></i> Promote
+          </button>` : ''}
         </div>
       </div>`
     ).join('') + '</div>';
@@ -1464,14 +3102,20 @@ async function loadRotationStats() {
     el.innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
         <thead><tr>
-          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Provider ID</th>
+          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Provider</th>
+          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Package</th>
+          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Rating</th>
           <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Times Shown</th>
           <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Last Shown</th>
         </tr></thead>
         <tbody>
           ${stats.map(s => `
             <tr>
-              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">${s.provider_id?.slice(0,16)}…</td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);">
+                ${s.is_elite ? '👑 ' : '⭐ '}${s.biz_name}
+              </td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">${s.package_id || '—'}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">⭐ ${s.avg_rating || 0}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--navy);">${s.show_count}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-3);">${fmtDate(s.last_shown)}</td>
             </tr>`).join('')}
@@ -1480,75 +3124,173 @@ async function loadRotationStats() {
   } catch(e) {}
 }
 
-function openAdModal(type) {
-  document.getElementById('adId').value        = '';
+function openAdDetails(type) {
+  const label = type === 'inline' ? 'Inline Ads' : 'Pop-Up Ads';
+  document.getElementById('adDetailsTitle').innerHTML =
+    `<i class="fa-solid fa-chart-bar" style="color:var(--brand);"></i> ${label} — Details`;
+  const list = allAds.filter(a => a.type === type);
+  const el   = document.getElementById('adDetailsTable');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><p>No ads found for this type.</p></div>';
+  } else {
+    const pct = a => Math.min(100, Math.round(((a.impression_count||0)/(a.impression_quota||5000))*100));
+    el.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+        <thead><tr>
+          ${['Ad Name','Advertiser','Status','Impressions','Clicks','Shown From','Completes At'].map(h =>
+            `<th style="padding:8px 10px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);border-bottom:1px solid var(--border);white-space:nowrap;">${h}</th>`
+          ).join('')}
+        </tr></thead>
+        <tbody>
+          ${list.map(a => `
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);white-space:nowrap;">${a.icon || '📢'} ${a.title}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-2);white-space:nowrap;">${a.advertiser || '—'}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;">
+                ${a.batch_status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>'   :
+                  a.batch_status === 'queued'    ? `<span style="color:var(--text-3);">⏳ Queued #${a.queue_position||'—'}</span>` :
+                  a.batch_status === 'completed' ? '<span style="color:var(--text-3);">✔ Completed</span>' : '—'}
+              </td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);">
+                <div style="font-size:0.75rem;font-weight:700;color:var(--navy);">${a.impression_count||0} / ${a.impression_quota||5000}</div>
+                <div style="margin-top:3px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;min-width:80px;">
+                  <div style="height:100%;border-radius:2px;background:var(--brand);width:${pct(a)}%;"></div>
+                </div>
+              </td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);">${a.click_count||0}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-3);white-space:nowrap;">${a.shown_from ? fmtDate(a.shown_from) : '—'}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-3);white-space:nowrap;">${a.shown_until ? fmtDate(a.shown_until) : '—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+  openModal('adDetailsModal');
+}
+
+async function loadBatchStatus() {
+  try {
+    const { adBatches, featBatches, queuedAds, queuedFeat } = await FX.getBatchStatus();
+    const el = document.getElementById('batchStatusBlock');
+    if (!el) return;
+
+    const inlineBatch = adBatches.find(b => b.type === 'inline');
+    const popupBatch  = adBatches.find(b => b.type === 'popup');
+    const featBatch   = featBatches[0];
+
+    const qInline = queuedAds.filter(a => a.type === 'inline').length;
+    const qPopup  = queuedAds.filter(a => a.type === 'popup').length;
+    const qFeat   = queuedFeat.length;
+
+    const row = (label, batch, queued, type) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:0.83rem;font-weight:700;color:var(--navy);">${label}</div>
+          ${batch
+            ? `<div style="font-size:0.72rem;color:var(--green-text);margin-top:2px;">✅ Active batch — expires ${fmtDate(batch.expires_at)}</div>`
+            : `<div style="font-size:0.72rem;color:var(--red-text);margin-top:2px;">⏳ No active batch — ${queued} in queue</div>`
+          }
+        </div>
+        <button class="btn btn-secondary" style="padding:5px 12px;font-size:0.75rem;" onclick="manualPromote('${type}')">
+          <i class="fa-solid fa-forward-step"></i> Promote Now
+        </button>
+      </div>`;
+
+    el.innerHTML =
+      row('Inline Ads',          inlineBatch, qInline, 'inline') +
+      row('Pop-Up Ads',           popupBatch,  qPopup,  'popup') +
+      row('Featured Providers',   featBatch,   qFeat,   'featured');
+  } catch(e) {}
+}
+
+async function manualPromote(type) {
+  try {
+    await FX.promoteNextBatch(type);
+    showToast(`${type} batch promoted successfully ✅`, 'success');
+    loadBatchStatus();
+    if (type !== 'featured') loadAds();
+    else loadRotationStats();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+async function promoteAdNow(adId) {
+  try {
+    const defaultQuota = await FX.getSetting('default_impression_quota') || '5000';
+    await FX.updateAd(adId, {
+      batchStatus:  'active',
+      shownFrom:    new Date().toISOString(),
+      isActive:     true,
+    });
+    showToast('Ad promoted and now running ✅', 'success');
+    await loadAds();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function openAdModal(type) {
+  document.getElementById('adId').value             = '';
   document.getElementById('adModalTitle').innerHTML = '<i class="fa-solid fa-rectangle-ad"></i> Add Ad';
-  document.getElementById('adType').value      = type;
-  document.getElementById('adIcon').value      = '📢';
-  document.getElementById('adAdvertiser').value= '';
-  document.getElementById('adTitle').value     = '';
-  document.getElementById('adDescription').value = '';
-  document.getElementById('adCta').value       = 'Learn More';
-  document.getElementById('adBgColor').value   = '#0f2027';
-  document.getElementById('adLink').value      = '';
-  document.getElementById('adImageUrl').value  = '';
-  document.getElementById('adSort').value      = '99';
-  document.getElementById('adActive').checked  = true;
-  document.getElementById('adNotes').value     = '';
-  document.getElementById('adStartsAt').value  = new Date().toISOString().split('T')[0];
-  document.getElementById('adEndsAt').value    = '';
-  document.getElementById('adAlert').className = 'alert';
+  document.getElementById('adType').value           = type;
+  document.getElementById('adIcon').value           = '📢';
+  document.getElementById('adAdvertiser').value     = '';
+  document.getElementById('adTitle').value          = '';
+  document.getElementById('adDescription').value    = '';
+  document.getElementById('adCta').value            = 'Learn More';
+  document.getElementById('adBgColor').value        = '#0f2027';
+  document.getElementById('adLink').value           = '';
+  document.getElementById('adImageUrl').value       = '';
+  document.getElementById('adNotes').value          = '';
+  document.getElementById('adAlert').className      = 'alert';
+  const defaultQuota = await FX.getSetting('default_impression_quota') || '5000';
+  document.getElementById('adQuota').value          = defaultQuota;
   openModal('adModal');
 }
 
 function editAd(id) {
   const ad = allAds.find(a => a.id === id);
   if (!ad) return;
-  document.getElementById('adId').value          = ad.id;
+  document.getElementById('adId').value             = ad.id;
   document.getElementById('adModalTitle').innerHTML = '<i class="fa-solid fa-pen"></i> Edit Ad';
-  document.getElementById('adType').value        = ad.type;
-  document.getElementById('adIcon').value        = ad.icon || '📢';
-  document.getElementById('adAdvertiser').value  = ad.advertiser || '';
-  document.getElementById('adTitle').value       = ad.title || '';
-  document.getElementById('adDescription').value = ad.description || '';
-  document.getElementById('adCta').value         = ad.cta_label || 'Learn More';
-  document.getElementById('adBgColor').value     = ad.bg_color || '#0f2027';
-  document.getElementById('adLink').value        = ad.link_url || '';
-  document.getElementById('adImageUrl').value    = ad.image_url || '';
-  document.getElementById('adSort').value        = ad.sort_order || 99;
-  document.getElementById('adActive').checked    = ad.is_active;
-  document.getElementById('adNotes').value       = ad.notes || '';
-  document.getElementById('adStartsAt').value    = ad.starts_at?.split('T')[0] || '';
-  document.getElementById('adEndsAt').value      = ad.ends_at?.split('T')[0]   || '';
-  document.getElementById('adAlert').className   = 'alert';
+  document.getElementById('adType').value           = ad.type;
+  document.getElementById('adIcon').value           = ad.icon || '📢';
+  document.getElementById('adAdvertiser').value     = ad.advertiser || '';
+  document.getElementById('adTitle').value          = ad.title || '';
+  document.getElementById('adDescription').value   = ad.description || '';
+  document.getElementById('adCta').value            = ad.cta_label || 'Learn More';
+  document.getElementById('adBgColor').value        = ad.bg_color || '#0f2027';
+  document.getElementById('adLink').value           = ad.link_url || '';
+  document.getElementById('adImageUrl').value       = ad.image_url || '';
+  document.getElementById('adNotes').value          = ad.notes || '';
+  document.getElementById('adQuota').value          = ad.impression_quota || 5000;
+  document.getElementById('adAlert').className      = 'alert';
   openModal('adModal');
 }
 
 async function saveAd() {
-  const id = document.getElementById('adId').value;
+  const id         = document.getElementById('adId').value;
   const advertiser = document.getElementById('adAdvertiser').value.trim();
   const title      = document.getElementById('adTitle').value.trim();
+  const quota      = parseInt(document.getElementById('adQuota').value) || 5000;
   if (!advertiser) { showAlert('adAlert','Advertiser name is required.'); return; }
   if (!title)      { showAlert('adAlert','Ad title is required.'); return; }
+  if (quota < 100) { showAlert('adAlert','Impression quota must be at least 100.'); return; }
 
-  const endsAtVal = document.getElementById('adEndsAt').value;
   const data = {
-    type:        document.getElementById('adType').value,
-    icon:        document.getElementById('adIcon').value.trim() || '📢',
+    type:             document.getElementById('adType').value,
+    icon:             document.getElementById('adIcon').value.trim() || '📢',
     advertiser,
     title,
-    description: document.getElementById('adDescription').value.trim(),
-    ctaLabel:    document.getElementById('adCta').value.trim()        || 'Learn More',
-    bgColor:     document.getElementById('adBgColor').value,
-    linkUrl:     document.getElementById('adLink').value.trim()       || '#',
-    imageUrl:    document.getElementById('adImageUrl').value.trim()   || null,
-    sortOrder:   parseInt(document.getElementById('adSort').value)    || 99,
-    isActive:    document.getElementById('adActive').checked,
-    notes:       document.getElementById('adNotes').value.trim(),
-    startsAt:    document.getElementById('adStartsAt').value
-                   ? new Date(document.getElementById('adStartsAt').value).toISOString()
-                   : new Date().toISOString(),
-    endsAt:      endsAtVal ? new Date(endsAtVal).toISOString() : null,
+    description:      document.getElementById('adDescription').value.trim(),
+    ctaLabel:         document.getElementById('adCta').value.trim() || 'Learn More',
+    bgColor:          document.getElementById('adBgColor').value,
+    linkUrl:          document.getElementById('adLink').value.trim() || '#',
+    imageUrl:         document.getElementById('adImageUrl').value.trim() || null,
+    notes:            document.getElementById('adNotes').value.trim(),
+    impressionQuota:  quota,
+    isActive:         true,
+    startsAt:         new Date().toISOString(),
   };
 
   try {
@@ -1595,7 +3337,933 @@ const _showSection = showSection;
 showSection = function(id, el) {
   _showSection(id, el);
   if (id === 'ads') loadAds();
+  if (id === 'requests') loadChangeRequests();
 };
+
+/* ══════════════════════════════════════════════════════════════
+   MESSAGES
+══════════════════════════════════════════════════════════════ */
+let allTemplates = [];
+let selectedUserId = null;
+let searchTimer = null;
+
+const TPL_STYLES = {
+  announcement: { bg:'#EFF6FF', border:'#3B82F6', color:'#1E40AF', label:'Announcement' },
+  warning:      { bg:'#FFF5F5', border:'#DC3545', color:'#991B1B', label:'Warning' },
+  maintenance:  { bg:'#FFFBEB', border:'#F59E0B', color:'#92400E', label:'Maintenance' },
+  welcome:      { bg:'#ECFDF5', border:'#10B981', color:'#065F46', label:'Welcome' },
+};
+
+async function loadTemplates() {
+  try {
+    allTemplates = await FX.getTemplates();
+    renderTemplateList();
+    populateSendDropdown();
+  } catch(e) {
+    console.error('Failed to load templates:', e);
+  }
+}
+
+function renderTemplateList() {
+  const html = !allTemplates.length
+    ? '<div class="empty-state"><div class="empty-icon">📝</div><p>No templates yet.</p></div>'
+    : allTemplates.map(t => {
+        const s = TPL_STYLES[t.type] || TPL_STYLES.announcement;
+        return `
+          <div style="border:1.5px solid ${s.border};border-radius:10px;padding:10px 12px;margin-bottom:8px;background:${s.bg};">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:1.1rem;">${t.icon}</span>
+                <span style="font-size:0.8rem;font-weight:800;color:${s.color};">${t.title}</span>
+              </div>
+              <span style="font-size:0.62rem;color:var(--text-3);font-weight:600;">${s.label} · Sent ${t.send_count}×</span>
+            </div>
+            <div style="font-size:0.72rem;color:var(--text-2);line-height:1.5;margin-bottom:8px;
+                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.body}</div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-xs btn-edit" onclick="editTemplate('${t.id}');closeModal('templatesModal')">
+                <i class="fa-solid fa-pen"></i> Edit
+              </button>
+              <button class="btn-xs btn-delete" onclick="confirmDeleteTemplate('${t.id}','${esc(t.title)}')">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+
+  // Update both the inline list and the modal list
+  const inlineEl = document.getElementById('templateList');
+  const modalEl  = document.getElementById('templateListModal');
+  if (inlineEl) inlineEl.innerHTML = html;
+  if (modalEl)  modalEl.innerHTML  = html;
+}
+
+function populateSendDropdown() {
+  const sel = document.getElementById('sendTemplate');
+  sel.innerHTML = '<option value="">— Choose a template —</option>' +
+    allTemplates.map(t => `<option value="${t.id}">${t.icon} ${t.title}</option>`).join('');
+}
+
+async function saveTemplate() {
+  const id    = document.getElementById('tplId').value;
+  const type  = document.getElementById('tplType').value;
+  const icon  = document.getElementById('tplIcon').value.trim() || '📢';
+  const title = document.getElementById('tplTitle').value.trim();
+  const body  = document.getElementById('tplBody').value.trim();
+
+  if (!title) { showAlert('tplAlert', 'Please enter a title.', 'error'); return; }
+  if (!body)  { showAlert('tplAlert', 'Please enter a message body.', 'error'); return; }
+
+  try {
+    if (id) {
+      await FX.updateTemplate(id, { type, icon, title, body });
+      showToast('Template updated ✅');
+    } else {
+      await FX.createTemplate({ type, icon, title, body });
+      showToast('Template created ✅');
+    }
+    resetTemplateForm();
+    await loadTemplates();
+  } catch(e) {
+    showAlert('tplAlert', 'Error: ' + e.message, 'error');
+  }
+}
+
+function editTemplate(id) {
+  const t = allTemplates.find(t => t.id === id);
+  if (!t) return;
+  document.getElementById('tplId').value    = t.id;
+  document.getElementById('tplType').value  = t.type;
+  document.getElementById('tplIcon').value  = t.icon;
+  document.getElementById('tplTitle').value = t.title;
+  document.getElementById('tplBody').value  = t.body;
+  document.getElementById('tplSaveLabel').textContent = 'Update Template';
+  updateTplPreview();
+  document.getElementById('tplTitle').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function resetTemplateForm() {
+  document.getElementById('tplId').value    = '';
+  document.getElementById('tplType').value  = 'announcement';
+  document.getElementById('tplIcon').value  = '';
+  document.getElementById('tplTitle').value = '';
+  document.getElementById('tplBody').value  = '';
+  document.getElementById('tplSaveLabel').textContent = 'Save Template';
+  document.getElementById('tplPreview').style.display = 'none';
+  hideAlert('tplAlert');
+}
+
+function confirmDeleteTemplate(id, title) {
+  document.getElementById('confirmMsg').textContent =
+    `Delete template "${title}"? This cannot be undone.`;
+  document.getElementById('confirmOkBtn').onclick = async () => {
+    closeModal('confirmModal');
+    try {
+      await FX.deleteTemplate(id);
+      showToast('Template deleted.');
+      await loadTemplates();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+  openModal('confirmModal');
+}
+
+function updateTplPreview() {
+  const type  = document.getElementById('tplType').value;
+  const icon  = document.getElementById('tplIcon').value || '📢';
+  const title = document.getElementById('tplTitle').value;
+  const body  = document.getElementById('tplBody').value;
+  const s     = TPL_STYLES[type] || TPL_STYLES.announcement;
+  const preview = document.getElementById('tplPreview');
+
+  if (!title && !body) { preview.style.display = 'none'; return; }
+
+  preview.style.display = 'block';
+  document.getElementById('tplPreviewHeader').style.background   = s.bg;
+  document.getElementById('tplPreviewHeader').style.borderBottom = `2px solid ${s.border}`;
+  document.getElementById('tplPreviewIcon').textContent  = icon;
+  document.getElementById('tplPreviewLabel').textContent = s.label;
+  document.getElementById('tplPreviewLabel').style.color = s.color;
+  document.getElementById('tplPreviewTitle').textContent = title;
+  document.getElementById('tplPreviewBody').textContent  = body;
+}
+
+function onSendTemplateChange() {
+  const id = document.getElementById('sendTemplate').value;
+  const t  = allTemplates.find(t => t.id === id);
+  const box = document.getElementById('sendPreviewBox');
+  if (!t) { box.style.display = 'none'; return; }
+  const s = TPL_STYLES[t.type] || TPL_STYLES.announcement;
+  box.style.display = 'block';
+  document.getElementById('sendPreviewIcon').textContent  = t.icon;
+  document.getElementById('sendPreviewType').textContent  = s.label;
+  document.getElementById('sendPreviewType').style.color  = s.color;
+  document.getElementById('sendPreviewTitle').textContent = t.title;
+  document.getElementById('sendPreviewBody').textContent  = t.body;
+}
+
+function onRecipientsChange() {
+  const val = document.getElementById('sendRecipients').value;
+  const box = document.getElementById('userSearchBox');
+  box.style.display = val === 'specific' ? 'block' : 'none';
+  clearSelectedUser();
+}
+
+let searchDebounce = null;
+function searchUsers() {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(async () => {
+    const q = document.getElementById('userSearchInput').value.trim().toLowerCase();
+    const resultsEl = document.getElementById('userSearchResults');
+    if (q.length < 2) { resultsEl.style.display = 'none'; return; }
+    try {
+      // Search across all users by email or name
+      const all = await sbFetch(
+        `users?or=(email.ilike.*${q}*,first_name.ilike.*${q}*,last_name.ilike.*${q}*)&status=eq.active&limit=10&select=id,first_name,last_name,email,role,is_inactive`
+      ) || [];
+      if (!all.length) {
+        resultsEl.style.display = 'block';
+        resultsEl.innerHTML = '<div style="padding:10px 12px;font-size:0.75rem;color:var(--text-3);">No users found.</div>';
+        return;
+      }
+      resultsEl.style.display = 'block';
+      resultsEl.innerHTML = all.map(u => `
+        <div onclick="selectUser('${u.id}','${esc(u.first_name + ' ' + u.last_name)}','${esc(u.email)}')"
+             style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);
+                    font-size:0.78rem;transition:background 0.15s;"
+             onmouseover="this.style.background='var(--bg)'"
+             onmouseout="this.style.background=''">
+          <div style="font-weight:700;color:var(--navy);">${u.first_name} ${u.last_name}
+            <span style="font-size:0.65rem;color:var(--text-3);font-weight:400;margin-left:4px;">${u.role}</span>
+            ${u.is_inactive ? '<span style="font-size:0.6rem;background:#FFF5F5;color:#991B1B;border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:700;">Inactive</span>' : ''}
+          </div>
+          <div style="color:var(--text-3);">${u.email}</div>
+        </div>`).join('');
+    } catch(e) { console.error(e); }
+  }, 350);
+}
+
+function selectUser(id, name, email) {
+  selectedUserId = id;
+  document.getElementById('userSearchResults').style.display = 'none';
+  document.getElementById('userSearchInput').value = '';
+  const box = document.getElementById('selectedUserBox');
+  box.style.display = 'flex';
+  document.getElementById('selectedUserName').textContent  = name;
+  document.getElementById('selectedUserEmail').textContent = email;
+}
+
+function clearSelectedUser() {
+  selectedUserId = null;
+  document.getElementById('userSearchInput').value = '';
+  document.getElementById('userSearchResults').style.display = 'none';
+  const box = document.getElementById('selectedUserBox');
+  if (box) box.style.display = 'none';
+}
+
+async function doSendMessage() {
+  const templateId  = document.getElementById('sendTemplate').value;
+  const recipientType = document.getElementById('sendRecipients').value;
+
+  if (!templateId) {
+    showAlert('sendAlert', 'Please select a template.', 'error'); return;
+  }
+  if (recipientType === 'specific' && !selectedUserId) {
+    showAlert('sendAlert', 'Please search and select a specific user.', 'error'); return;
+  }
+
+  const recipients = recipientType === 'specific'
+    ? { userId: selectedUserId }
+    : recipientType;
+
+  try {
+    hideAlert('sendAlert');
+    const count = await FX.sendMessage(templateId, recipients);
+    const t = allTemplates.find(t => t.id === templateId);
+    showToast(`✅ Message sent to ${count} user${count !== 1 ? 's' : ''}.`);
+
+    // Log the send in the Recent Sends section
+    const log = document.getElementById('sendLog');
+    const entry = document.createElement('div');
+    entry.style.cssText = 'font-size:0.75rem;padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:6px;';
+    entry.innerHTML = `
+      <span style="font-weight:700;color:var(--navy);">${t?.icon} ${t?.title}</span>
+      <span style="color:var(--text-3);"> → ${count} recipient${count !== 1 ? 's' : ''}</span>
+      <span style="color:var(--text-3);float:right;">${new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'})}</span>`;
+    if (log.querySelector('div[style*="No sends"]')) log.innerHTML = '';
+    log.prepend(entry);
+
+    // Reset send panel
+    document.getElementById('sendTemplate').value = '';
+    document.getElementById('sendPreviewBox').style.display = 'none';
+    document.getElementById('sendRecipients').value = 'all';
+    onRecipientsChange();
+    await loadTemplates(); // refresh send_count
+  } catch(e) {
+    showAlert('sendAlert', 'Error: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHANGE REQUESTS
+══════════════════════════════════════════════════════════════ */
+let allRequests      = [];
+let currentReviewReq = null;
+
+async function loadChangeRequests() {
+  try {
+    allRequests = await FX.getChangeRequests({ status: 'pending' });
+    renderRequestsTable();
+    // Update sidebar badge
+    const badge = document.getElementById('requestsBadge');
+    if (allRequests.length) {
+      badge.style.display  = 'inline-block';
+      badge.textContent    = allRequests.length;
+    } else {
+      badge.style.display  = 'none';
+    }
+  } catch(e) { console.error(e); }
+}
+
+function renderRequestsTable() {
+  const tbody = document.getElementById('requestsTbody');
+  if (!allRequests.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📥</div><p>No pending requests.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = allRequests.map(r => `
+    <tr>
+      <td><div style="font-weight:700;font-size:0.85rem;">${r.provider_name}</div></td>
+      <td><span class="badge badge-gold">${r.subject}</span></td>
+      <td style="font-size:0.82rem;color:var(--text-3);font-style:italic;">Refer to application form</td>
+      <td style="font-size:0.75rem;color:var(--text-3);">${fmtDate(r.created_at)}</td>
+      <td>
+        <button class="btn-xs btn-view" onclick="openReviewModal('${r.id}')">
+          <i class="fa-solid fa-magnifying-glass"></i> Review
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function openReviewModal(id) {
+  const r = allRequests.find(x => x.id === id);
+  if (!r) return;
+  currentReviewReq = r;
+
+  document.getElementById('reviewModalBody').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:0.83rem;">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Provider</span>
+        <span style="font-weight:700;color:var(--navy);">${r.provider_name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Subject</span>
+        <span style="font-weight:700;color:var(--navy);">${r.subject}</span>
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="color:var(--text-3);font-weight:600;margin-bottom:4px;">Requested Value</div>
+        ${(() => {
+          if (r.subject === 'Location Change') {
+            try {
+              const loc = JSON.parse(r.requested_value);
+              return `
+                <div style="font-size:0.8rem;color:var(--navy);line-height:1.8;">
+                  ${loc.barangay_name ? `<div><span style="color:var(--text-3);">Barangay:</span> ${loc.barangay_name}</div>` : ''}
+                  <div><span style="color:var(--text-3);">City:</span> ${loc.city_name || '—'}</div>
+                  <div><span style="color:var(--text-3);">Province:</span> ${loc.province_name || '—'}</div>
+                  <div><span style="color:var(--text-3);">Region:</span> ${loc.region_name || '—'}</div>
+                  ${loc.street_addr ? `<div><span style="color:var(--text-3);">Street:</span> ${loc.street_addr}</div>` : ''}
+                </div>`;
+            } catch(e) {
+              return `<span style="font-weight:700;color:var(--brand);">${r.requested_value}</span>`;
+            }
+          }
+          return `<span style="font-weight:700;color:var(--brand);word-break:break-all;">${r.requested_value}</span>`;
+        })()}
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="color:var(--text-3);font-weight:600;margin-bottom:4px;">Explanation</div>
+        <div style="color:var(--navy);line-height:1.6;white-space:pre-wrap;">${r.explanation}</div>
+      </div>
+      ${r.file_url ? `
+      <div style="padding:8px 0;">
+        <div style="color:var(--text-3);font-weight:600;margin-bottom:6px;">Supporting Document</div>
+        <img src="${r.file_url}" alt="Document"
+             style="max-width:100%;max-height:200px;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;"
+             onclick="window.open('${r.file_url}','_blank')"
+             onerror="this.outerHTML='<a href=\'${r.file_url}\' target=\'_blank\' class=\'btn-xs btn-view\'>📄 View Document</a>'"/>
+      </div>` : '<div style="font-size:0.75rem;color:var(--text-3);padding:4px 0;">No document attached.</div>'}
+      <div style="font-size:0.72rem;color:var(--text-3);padding-top:4px;">
+        Submitted: ${fmtDate(r.created_at)}
+      </div>
+    </div>`;
+
+  document.getElementById('reviewRejectBtn').onclick  = () => {
+    closeModal('reviewModal');
+    document.getElementById('rejectReasonInput').value = '';
+    openModal('rejectReasonModal');
+  };
+  document.getElementById('reviewApproveBtn').onclick = () => doApproveRequest();
+
+  openModal('reviewModal');
+}
+
+async function doApproveRequest() {
+  if (!currentReviewReq) return;
+  const btn = document.getElementById('reviewApproveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Approving…';
+  try {
+    await FX.approveChangeRequest(currentReviewReq);
+    closeModal('reviewModal');
+    showToast('Request approved ✅ Provider has been notified.', 'success');
+    await loadChangeRequests();
+    await loadProviders(); // refresh provider table
+    await loadStats();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Approve';
+  }
+}
+
+async function confirmRejectReason() {
+  if (!currentReviewReq) return;
+  const reason = document.getElementById('rejectReasonInput').value.trim();
+  if (!reason) { showToast('Please enter a rejection reason.', 'error'); return; }
+  try {
+    await FX.rejectChangeRequest(currentReviewReq, reason);
+    closeModal('rejectReasonModal');
+    showToast('Request rejected. Provider has been notified.', '');
+    await loadChangeRequests();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REPORTS
+══════════════════════════════════════════════════════════════ */
+let allReports = [];
+let currentReport = null;
+let currentReportFilter = 'pending';
+
+async function loadReports() {
+  try {
+    const [reports, pending] = await Promise.all([
+      FX.getReports({ status: currentReportFilter }),
+      FX.getReports({ status: 'pending' }),
+    ]);
+    allReports = reports;
+    renderReportsTable();
+    const badge = document.getElementById('reportsBadge');
+    badge.textContent   = pending.length;
+    badge.style.display = pending.length ? 'inline-block' : 'none';
+  } catch(e) { console.error(e); }
+}
+
+function setReportFilter(status, el) {
+  currentReportFilter = status;
+  document.querySelectorAll('#sec-reports .ftab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  loadReports();
+}
+
+const REPORT_STATUS_BADGE = {
+  pending:   '<span class="badge badge-gold">⏳ Pending</span>',
+  warned:    '<span class="badge badge-red">⚠️ Warned</span>',
+  suspended: '<span class="badge" style="background:#F3E8FF;color:#6B21A8;">🚫 Suspended</span>',
+  dismissed: '<span class="badge badge-green">✅ Dismissed</span>',
+};
+
+function renderReportsTable() {
+  const tbody = document.getElementById('reportsTbody');
+  if (!allReports.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🚩</div><p>No ${currentReportFilter} reports.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = allReports.map(r => `
+    <tr>
+      <td><div style="font-weight:700;font-size:0.85rem;">${r.provider_name}</div></td>
+      <td><div style="font-size:0.78rem;color:var(--text-2);max-width:150px;">${r.reason}</div></td>
+      <td><div style="font-size:0.78rem;color:var(--text-3);">Anonymous</div></td>
+      <td style="font-size:0.75rem;color:var(--text-3);">${fmtDate(r.created_at)}</td>
+      <td>
+        <button class="btn-xs btn-view" onclick="openReviewReport('${r.id}')">
+          <i class="fa-solid fa-magnifying-glass"></i> Review
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+async function openReviewReport(id) {
+  const r = allReports.find(x => x.id === id);
+  if (!r) return;
+  currentReport = r;
+
+  // Fetch provider user_id for messaging
+  try {
+    const provRows = await sbFetch(`providers?id=eq.${r.provider_id}&limit=1`);
+    currentReport.provider_user_id = provRows?.[0]?.user_id || null;
+  } catch(e) { currentReport.provider_user_id = null; }
+
+  document.getElementById('reviewReportBody').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:0.83rem;">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Provider</span>
+        <span style="font-weight:700;color:var(--navy);">${r.provider_name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Reported By</span>
+        <span style="font-weight:700;color:var(--navy);">${r.user_name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Reason</span>
+        <span style="font-weight:700;color:var(--red);text-align:right;max-width:60%;">${r.reason}</span>
+      </div>
+      ${r.details ? `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="color:var(--text-3);font-weight:600;margin-bottom:4px;">Details</div>
+        <div style="color:var(--navy);line-height:1.6;">${r.details}</div>
+      </div>` : ''}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);font-weight:600;">Status</span>
+        ${REPORT_STATUS_BADGE[r.status] || r.status}
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;">
+        <span style="color:var(--text-3);font-weight:600;">Submitted</span>
+        <span style="color:var(--text-2);">${fmtDate(r.created_at)}</span>
+      </div>
+    </div>`;
+
+  // Footer buttons depend on status
+  const foot = document.getElementById('reviewReportFoot');
+  if (r.status === 'pending') {
+    foot.innerHTML = `
+      <button class="btn btn-secondary" onclick="closeModal('reviewReportModal')">Cancel</button>
+      <button class="btn" style="background:var(--green);color:#fff;" onclick="doDismissReport()">
+        <i class="fa-solid fa-check"></i> Dismiss
+      </button>
+      <button class="btn" style="background:var(--gold);color:#fff;" onclick="doWarnProvider()">
+        <i class="fa-solid fa-triangle-exclamation"></i> Warn
+      </button>
+      <button class="btn btn-danger" onclick="doSuspendProvider()">
+        <i class="fa-solid fa-ban"></i> Suspend
+      </button>`;
+  } else {
+    foot.innerHTML = `<button class="btn btn-secondary" onclick="closeModal('reviewReportModal')">Close</button>`;
+  }
+
+  openModal('reviewReportModal');
+}
+
+async function doDismissReport() {
+  if (!currentReport) return;
+  try {
+    await FX.dismissReport(currentReport.id);
+    closeModal('reviewReportModal');
+    showToast('Report dismissed ✅');
+    await loadReports();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function doWarnProvider() {
+  if (!currentReport) return;
+  if (!currentReport.provider_user_id) {
+    showToast('Cannot find provider user ID.', 'error'); return;
+  }
+  try {
+    await FX.warnProvider(currentReport);
+    closeModal('reviewReportModal');
+    showToast('Warning sent to provider ⚠️');
+    await loadReports();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function doSuspendProvider() {
+  if (!currentReport) return;
+  if (!currentReport.provider_user_id) {
+    showToast('Cannot find provider user ID.', 'error'); return;
+  }
+  try {
+    await FX.suspendProvider(currentReport);
+    closeModal('reviewReportModal');
+    showToast('Provider suspended 🚫');
+    await loadReports();
+    await loadProviders();
+    await loadStats();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UNCATEGORIZED LISTINGS
+══════════════════════════════════════════════════════════════ */
+const ADMIN_SUBCATS = {
+  home:   ['Plumbing','Aircon Service','Electrical','Painting','Carpentry','Waterproofing','Door & Window Repair','Gas & LPG','Deep Cleaning','Pest Control'],
+  auto:   ['General Auto Repair','Car Aircon','Tires & Wheels','PMS / Oil Change','Battery','Car Wash & Detailing','Car Locksmith','Towing','Window Tint'],
+  garden: ['Lawn Mowing','Tree Trimming','Landscaping','Pest Control','Irrigation','Garden Design'],
+  elec:   ['Wiring & Rewiring','Solar Installation','Lighting','CCTV Installation','Network / Internet Setup','Generator Service'],
+  beauty: ['Haircut & Styling','Nails','Facial & Skincare','Massage','Personal Training','Makeup Artist'],
+  edu:    ['Academic Tutoring','Language Lessons','Music Lessons','Dance Lessons','Online Tutoring','Exam Review','Computer Lessons','Arts & Crafts','Homework Assistance','Special Education Support'],
+  health: ['Home Nursing','Home Laboratory','Elder Care','Baby Care','Medicine Delivery','Dental (Home Visit)'],
+  tech:   ['Laptop Repair','Desktop Repair','Network Setup','Printer Repair','Phone Repair','Data Recovery'],
+  build:  ['Renovation','Civil / Structural Engineering','Architecture','Masonry','Drainage Works','Driveway & Flooring'],
+  clean:  ['House Cleaning','Office Cleaning','Upholstery Cleaning','Carpet Cleaning','Laundry','Junk Removal'],
+  pet:    ['Pet Grooming','Pet Sitting','Veterinary (Home Visit)','Dog Walking','Pet Hotel','Vaccination'],
+  event:  ['Photography','DJ / Live Band','Catering','Event Host / MC','Tent & Tables Rental','Decorations'],
+};
+
+async function loadUncategorized() {
+  const container = document.getElementById('uncatList');
+  container.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const listings = await FX.getUncategorizedListings();
+    const badge  = document.getElementById('uncatBadge');
+    const count  = document.getElementById('uncatCount');
+
+    if (!listings.length) {
+      badge.style.display = 'none';
+      count.style.display = 'none';
+      container.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:var(--text-3);font-size:0.85rem;">✅ No uncategorized listings — all clear!</div>';
+      return;
+    }
+
+    // Update badges
+    badge.textContent  = listings.length;
+    badge.style.display = 'inline';
+    count.textContent  = listings.length;
+    count.style.display = 'inline';
+
+    // Fetch provider names for context
+    const providerIds = [...new Set(listings.map(l => l.provider_id))];
+    const providerMap = {};
+    await Promise.all(providerIds.map(async id => {
+      try {
+        const p = await FX.getProviderById(id);
+        if (p) providerMap[id] = p.biz_name || `Provider #${id.slice(0,6)}`;
+      } catch(e) {}
+    }));
+
+    container.innerHTML = `
+      <table>
+        <thead><tr>
+          <th>Listing Title</th>
+          <th>Provider</th>
+          <th>Their Description</th>
+          <th>Submitted</th>
+          <th>Action</th>
+        </tr></thead>
+        <tbody>
+          ${listings.map(l => `
+            <tr>
+              <td><strong>${l.title}</strong></td>
+              <td>${providerMap[l.provider_id] || '—'}</td>
+              <td style="color:var(--brand);font-style:italic;max-width:200px;">${l.other_service_desc || '(no description provided)'}</td>
+              <td style="color:var(--text-3);">${new Date(l.created_at).toLocaleDateString()}</td>
+              <td><button class="btn-xs btn-view" onclick="openReassign('${l.id}','${(l.title||'').replace(/'/g,"\\'")}','${(l.other_service_desc||'').replace(/'/g,"\\'")}')">Assign</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    container.innerHTML = `<div style="padding:1rem;color:var(--red);font-size:0.82rem;">Error loading listings: ${e.message}</div>`;
+  }
+}
+
+function openReassign(id, title, desc) {
+  document.getElementById('reassignListingId').value = id;
+  document.getElementById('reassignTitle').textContent = title;
+  document.getElementById('reassignDesc').textContent = desc || '(none provided)';
+  document.getElementById('reassignCat').value = '';
+  document.getElementById('reassignSub').innerHTML = '<option value="">Select category first…</option>';
+  document.getElementById('reassignSub').disabled = true;
+  document.getElementById('reassignCustomSub').value = '';
+  document.getElementById('reassignCustomGroup').style.display = 'none';
+  document.getElementById('reassignAlert').className = 'alert';	
+  document.getElementById('reassignAlert').textContent = '';
+  openModal('reassignModal');
+}
+
+function loadReassignSubcats() {
+  const cat = document.getElementById('reassignCat').value;
+  const sub = document.getElementById('reassignSub');
+  sub.innerHTML = '<option value="">Select specific…</option>';
+  if (!cat || !ADMIN_SUBCATS[cat]) { sub.disabled = true; return; }
+  sub.disabled = false;
+  ADMIN_SUBCATS[cat].forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s; sub.appendChild(o);
+  });
+  // Always show the custom sub input so admin can add a brand-new subcat
+  document.getElementById('reassignCustomGroup').style.display = 'block';
+}
+
+async function doReassign() {
+  const id      = document.getElementById('reassignListingId').value;
+  const cat     = document.getElementById('reassignCat').value;
+  const subSel  = document.getElementById('reassignSub').value;
+  const subCust = document.getElementById('reassignCustomSub').value.trim();
+  const sub     = subCust || subSel;
+  const alertEl = document.getElementById('reassignAlert');
+
+  if (!cat)  { alertEl.className = 'alert alert-error show'; alertEl.textContent = 'Please select a category.'; return; }
+  if (!sub)  { alertEl.className = 'alert alert-error show'; alertEl.textContent = 'Please select or type a specific service.'; return; }
+
+  document.getElementById('reassignSpinner').style.display = 'inline-block';
+  document.getElementById('reassignBtnText').style.display = 'none';
+
+  try {
+    await FX.reassignListing(id, cat, sub);
+    closeModal('reassignModal');
+    showToast('Listing reassigned ✅', 'success');
+    await loadUncategorized();
+  } catch(e) {
+    alertEl.className = 'alert alert-error show';
+    alertEl.textContent = 'Error: ' + e.message;
+  } finally {
+    document.getElementById('reassignSpinner').style.display = 'none';
+    document.getElementById('reassignBtnText').style.display = 'inline';
+  }
+}
+
+function statusBadge(status, isInactive) {
+  if (isInactive) return '<span class="badge badge-grey">💤 Inactive</span>';
+  const map = {
+    active:              '<span class="badge badge-green">✅ Active</span>',
+    approved:            '<span class="badge badge-green">✅ Active</span>',
+    pending:             '<span class="badge badge-gold">⏳ Pending</span>',
+    rejected:            '<span class="badge badge-red">❌ Rejected</span>',
+    suspended:           '<span class="badge badge-red">🚫 Suspended</span>',
+    suspension_pending:  '<span class="badge" style="background:#FFF5F5;color:#991B1B;">⏳ Suspension Pending</span>',
+  };
+  return map[status] || `<span class="badge badge-grey">${status}</span>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UPGRADE REQUESTS
+══════════════════════════════════════════════════════════════ */
+let _currentUpgradeReq = null;
+
+const _upgradeDataMap = {};
+
+async function loadUpgradeRequests() {
+  const wrap = document.getElementById('upgradesContainer');
+  wrap.innerHTML = '<div class="loading">Loading…</div>';
+
+  try {
+    const requests = await FX.getUpgradeRequests('pending');
+
+    const badge = document.getElementById('upgradesBadge');
+    if (requests.length > 0) {
+      badge.textContent   = requests.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    if (!requests.length) {
+      wrap.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>No pending upgrade requests.</p>
+      </div>`;
+      return;
+    }
+
+    const allPkgs = await FX.getAllPackages();
+    const pkgMap  = Object.fromEntries(allPkgs.map(p => [p.id, p]));
+
+    const userIds  = [...new Set(requests.map(r => r.user_id))];
+	const provRows = await Promise.all(userIds.map(uid => FX.getProviderByUserId(uid)));
+	const provMap  = Object.fromEntries(provRows.filter(Boolean).map(p => [p.user_id, p]));
+	const userRows = await Promise.all(userIds.map(uid => FX.getUserById(uid)));
+	const userMap  = Object.fromEntries(userRows.filter(Boolean).map(u => [u.id, u]));
+
+    // Store data in map keyed by request id — safe alternative to inline JSON
+    requests.forEach(req => {
+      _upgradeDataMap[req.id] = {
+        req,
+        currentPkg: pkgMap[req.current_package_id],
+        newPkg:     pkgMap[req.new_package_id],
+        prov:       provMap[req.user_id],
+        user:       userMap[req.user_id],
+      };
+    });
+
+    wrap.innerHTML = `<div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Business</th>
+        <th>Submitted</th>
+        <th>Details</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>
+        ${requests.map(req => {
+          const { prov, newPkg } = _upgradeDataMap[req.id];
+          const user    = userMap[req.user_id];
+          const bizName = prov?.biz_name
+            || (user?.first_name || user?.last_name ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : null)
+            || user?.username
+            || req.user_id;
+
+          return `<tr>
+            <td>
+              <div style="font-size:0.82rem;font-weight:700;color:var(--navy);">${bizName}</div>
+              ${prov?.cat_sub ? `<div style="font-size:0.7rem;color:var(--text-3);">${prov.cat_sub}</div>` : ''}
+            </td>
+            <td style="font-size:0.78rem;color:var(--text-2);">
+              ${new Date(req.created_at).toLocaleDateString('en-PH',
+                { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}
+            </td>
+            <td>
+              <button class="btn-xs btn-view" onclick="openUpgradeDetails('${req.id}')">🔍 View</button>
+            </td>
+            <td>
+              <div class="btn-row">
+                <button class="btn-xs btn-approve" title="Approve"
+                  onclick="openApproveUpgrade('${req.id}','${(newPkg?.name || req.new_package_id).replace(/'/g,"\\'")}',
+                           ${req.carryover_days},'${(req.payment_reference||'').replace(/'/g,"\\'")}',
+                           ${parseFloat(req.payment_amount || 0).toFixed(2)})">✅</button>
+                <button class="btn-xs btn-reject" title="Reject"
+                  onclick="openRejectUpgrade('${req.id}')">❌</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`;
+
+  } catch(e) {
+    wrap.innerHTML = `<div class="alert alert-error show">Failed to load: ${e.message}</div>`;
+  }
+}
+
+function openUpgradeDetails(reqId) {
+  const data = _upgradeDataMap[reqId];
+  if (!data) return;
+  const { req, currentPkg, newPkg, prov } = data;
+
+  document.getElementById('upgradeDetailsBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--brand-light);
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔧</div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${prov?.biz_name || '—'}</div>
+        <div style="font-size:0.72rem;color:var(--text-3);">${prov?.cat_sub || ''}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:16px;">
+      <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:4px;">FROM</div>
+        <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">${currentPkg?.name || req.current_package_id}</div>
+        <div style="font-size:0.72rem;color:var(--text-3);">₱${currentPkg?.price ?? '—'}</div>
+      </div>
+      <i class="fa-solid fa-arrow-right" style="color:var(--brand);font-size:1.1rem;"></i>
+      <div style="background:var(--brand-light);border-radius:10px;padding:12px;text-align:center;border:1.5px solid rgba(255,90,31,0.2);">
+        <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--brand);margin-bottom:4px;">TO</div>
+        <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">${newPkg?.name || req.new_package_id}</div>
+        <div style="font-size:0.72rem;color:var(--brand);">₱${newPkg?.price ?? '—'}</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:10px;">Subscription</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Remaining Days</span><strong>${req.remaining_days} days</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Remaining Value</span><strong>₱${parseFloat(req.remaining_value).toFixed(2)}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
+        <span style="color:var(--text-3);">Carryover Days</span><strong style="color:var(--green);">+${req.carryover_days} days</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);margin-bottom:10px;">Payment</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Method</span><strong>${req.payment_method || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--text-3);">Reference #</span><strong>${req.payment_reference || '—'}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
+        <span style="color:var(--text-3);">Amount Paid</span>
+        <strong style="color:var(--brand);font-size:0.95rem;">₱${parseFloat(req.payment_amount || 0).toFixed(2)}</strong>
+      </div>
+    </div>
+
+    ${req.notes ? `
+    <div style="background:var(--red-bg);border-radius:8px;padding:10px 12px;font-size:0.78rem;color:var(--red-text);">
+      <i class="fa-solid fa-circle-info"></i> ${req.notes}
+    </div>` : ''}
+
+    <div style="font-size:0.7rem;color:var(--text-3);margin-top:12px;text-align:right;">
+      Submitted: ${new Date(req.created_at).toLocaleDateString('en-PH',
+        { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}
+    </div>
+  `;
+  openModal('upgradeDetailsModal');
+}
+
+function openApproveUpgrade(reqId, newPkgName, carryoverDays, payRef, amtPaid) {
+  _currentUpgradeReq = reqId;
+  document.getElementById('approveUpgradeSummary').innerHTML = `
+    <div style="display:flex;justify-content:space-between;">
+      <span style="color:var(--text-3);">Upgrading to</span>
+      <strong>${newPkgName}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <span style="color:var(--text-3);">Carryover</span>
+      <strong style="color:var(--green);">+${carryoverDays} days</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <span style="color:var(--text-3);">Reference #</span>
+      <strong>${payRef || '—'}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <span style="color:var(--text-3);">Amount Paid</span>
+      <strong style="color:var(--brand);">₱${parseFloat(amtPaid).toFixed(2)}</strong>
+    </div>`;
+  openModal('approveUpgradeModal');
+}
+
+async function confirmApproveUpgrade() {
+  if (!_currentUpgradeReq) return;
+  const btn = document.getElementById('approveUpgradeOkBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span> Approving…';
+  try {
+    await FX.approveUpgrade(_currentUpgradeReq);
+    closeModal('approveUpgradeModal');
+    showToast('Upgrade approved ✅', 'success');
+    await loadUpgradeRequests();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Approve';
+  }
+}
+
+function openRejectUpgrade(reqId) {
+  _currentUpgradeReq = reqId;
+  document.getElementById('rejectUpgradeReason').value = '';
+  openModal('rejectUpgradeModal');
+}
+
+async function confirmRejectUpgrade() {
+  if (!_currentUpgradeReq) return;
+  const reason = document.getElementById('rejectUpgradeReason').value.trim();
+  try {
+    await FX.rejectUpgrade(_currentUpgradeReq, reason);
+    closeModal('rejectUpgradeModal');
+    showToast('Upgrade request rejected.', '');
+    await loadUpgradeRequests();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
 </script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Sign Up — Fixia</title>
@@ -104,7 +104,7 @@
     .pkg-card:hover { border-color:var(--brand); background:var(--brand-light); }
     .pkg-card.selected { border-color:var(--brand); background:var(--brand-light); box-shadow:0 4px 14px rgba(255,90,31,0.15); }
     .pkg-card.selected::after { content:'✓'; position:absolute; top:7px; right:10px; color:var(--brand); font-weight:800; font-size:13px; }
-    .pkg-popular { position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; }
+    .pkg-popular, .pkg-popular-flag { position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; }
     .pkg-icon { font-size:1.6rem; margin-bottom:6px; }
     .pkg-name { font-size:0.85rem; font-weight:800; color:var(--navy); margin-bottom:2px; }
     .pkg-price { font-size:1.3rem; font-weight:800; color:var(--brand); line-height:1; }
@@ -140,10 +140,37 @@
     .login-row button { background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-family:inherit; font-size:0.8rem; }
 
     /* ── Toast ───────────────────────────────────────────────── */
-    .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(80px); z-index:9999; background:var(--navy); color:#fff; border-radius:var(--radius-sm); padding:0.75rem 1.5rem; font-size:0.83rem; font-weight:600; opacity:0; transition:all 0.35s; white-space:nowrap; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.2); }
-    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-    .toast.success { background:#065f46; }
-    .toast.error   { background:#dc3545; }
+	.toast { position:fixed; top:1.25rem; left:50%; transform:translateX(-50%) translateY(-80px); z-index:9999; background:var(--navy); color:#fff; border-radius:var(--radius-sm); padding:0.75rem 1.5rem; font-size:0.83rem; font-weight:600; opacity:0; transition:all 0.35s; white-space:nowrap; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+	.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+	.toast.success { background:#065f46; }
+	.toast.error   { background:#dc3545; }
+	
+    /* ── Payment step ────────────────────────────────────────── */
+    .pay-summary { background:var(--bg); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:1rem; }
+    .pay-summary-row { display:flex; justify-content:space-between; font-size:0.82rem; padding:4px 0; border-bottom:1px solid var(--border); }
+    .pay-summary-row:last-child { border-bottom:none; }
+    .pay-summary-row span { color:var(--text-3); }
+    .pay-category-label { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-2); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+    .pay-tooltip { color:var(--text-3); cursor:help; position:relative; }
+    .pay-tooltip:hover::after { content:attr(title); position:absolute; bottom:120%; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; font-size:0.7rem; font-weight:500; padding:6px 10px; border-radius:6px; white-space:normal; width:200px; text-align:center; z-index:99; line-height:1.5; text-transform:none; letter-spacing:0; }
+    .pay-methods-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .pay-opt { border:2px solid var(--border); border-radius:var(--radius-sm); padding:10px 6px; text-align:center; cursor:pointer; background:#fff; transition:all 0.15s; }
+    .pay-opt:hover, .pay-opt.selected { border-color:var(--brand); background:var(--brand-light); }
+    .pay-opt-icon { font-size:1.3rem; margin-bottom:4px; }
+	.pay-opt-icon img { width:48px; height:48px; object-fit:contain; }
+    .pay-opt-label { font-size:0.72rem; font-weight:700; color:var(--navy); }
+    
+    /* ── Modal (reuse existing but add this if not present) ──── */
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:1rem; }
+    .modal.open { display:flex; animation:fadeIn 0.2s; }
+    .modal-box { background:#fff; border-radius:var(--radius-md); width:100%; max-width:440px; overflow:hidden; animation:slideUp 0.25s ease; }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 1.4rem; border-bottom:1px solid var(--border); }
+    .modal-head h3 { font-size:0.95rem; font-weight:700; color:var(--navy); }
+    .modal-x { background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text-3); line-height:1; }
+    .modal-x:hover { color:var(--brand); }
+    .modal-body { padding:1.25rem 1.4rem; font-size:0.88rem; color:var(--text-2); line-height:1.7; }
+    .modal-foot { padding:0.9rem 1.4rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; }	
+	
   </style>
 </head>
 <body>
@@ -153,49 +180,53 @@
   <div class="card">
 
     <!-- Step indicator -->
-    <div class="steps">
-      <div class="step active" id="s1"><div class="step-circle" id="sc1">1</div><div class="step-label">Your Info</div></div>
+	<div class="steps">
+      <div class="step active" id="s1"><div class="step-circle" id="sc1">1</div><div class="step-label">Info</div></div>
       <div class="step-line" id="sl1"></div>
-      <div class="step" id="s2"><div class="step-circle" id="sc2">2</div><div class="step-label">Package</div></div>
+      <div class="step" id="s2"><div class="step-circle" id="sc2">2</div><div class="step-label">Verify</div></div>
       <div class="step-line" id="sl2"></div>
-      <div class="step" id="s3"><div class="step-circle" id="sc3">3</div><div class="step-label">Done</div></div>
+      <div class="step" id="s3"><div class="step-circle" id="sc3">3</div><div class="step-label">Package</div></div>
+      <div class="step-line" id="sl3"></div>
+      <div class="step" id="s4"><div class="step-circle" id="sc4">4</div><div class="step-label">Payment</div></div>
+      <div class="step-line" id="sl4"></div>
+      <div class="step" id="s5"><div class="step-circle" id="sc5">5</div><div class="step-label">Done</div></div>
     </div>
 
     <!-- ── STEP 1: Personal Info ──────────────────────────────── -->
     <div id="p1" class="panel active">
       <div class="panel-title">Create Your Account</div>
-      <div class="panel-sub">Looking for services? Start here — it's free.</div>
+      <div class="panel-sub">Find trusted services near you. Get started for free.</div>
 
       <div id="alertStep1" class="alert"></div>
 
       <div class="row2">
         <div class="form-group">
           <label class="form-label">First Name <span style="color:#dc3545">*</span></label>
-          <input id="firstName" class="form-input" placeholder="Juan"/>
+          <input id="firstName" class="form-input" value="Juan"/>
           <div class="field-err" id="err_fn"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Last Name <span style="color:#dc3545">*</span></label>
-          <input id="lastName" class="form-input" placeholder="dela Cruz"/>
+          <input id="lastName" class="form-input" value="dela Cruz"/>
           <div class="field-err" id="err_ln"></div>
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Email Address <span style="color:#dc3545">*</span></label>
-        <input id="regEmail" class="form-input" type="email" placeholder="juan@email.com"/>
+        <input id="regEmail" class="form-input" type="email" value="juan@email.com"/>
         <div class="field-err" id="err_email"></div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Phone Number <span style="color:#dc3545">*</span></label>
-        <input id="regPhone" class="form-input" type="tel" placeholder="09XX XXX XXXX"/>
+        <input id="regPhone" class="form-input" type="tel" value="09281234567"/>
         <div class="field-err" id="err_phone"></div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Username <span style="color:#dc3545">*</span></label>
-        <input id="regUsername" class="form-input" placeholder="juandelacruz" autocomplete="off"/>
+        <input id="regUsername" class="form-input" value="juandelacruz" autocomplete="off"/>
         <div class="field-err" id="err_uname"></div>
       </div>
 
@@ -218,73 +249,171 @@
         <div class="field-err" id="err_confirm"></div>
       </div>
 
-      <button class="btn btn-brand" style="margin-top:6px;" onclick="goStep2()">
-        Next — Choose Package <i class="fa-solid fa-arrow-right"></i>
+      <button class="btn btn-brand" style="margin-top:6px;" id="step1NextBtn" onclick="goStep2()">
+        <span class="spinner" id="step1Spinner"></span>
+        <span id="step1BtnText">Next <i class="fa-solid fa-arrow-right"></i></span>
       </button>
 
-      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">Sign In</button></div>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'"> &nbsp; Sign In</button></div>
     </div>
 
-    <!-- ── STEP 2: Package ────────────────────────────────────── -->
+	<!-- ── STEP 2: Email OTP ─────────────────────────────────── -->
     <div id="p2" class="panel">
-      <div class="panel-title">Choose Your Plan</div>
-      <div class="panel-sub">You can upgrade or downgrade anytime.</div>
-
-      <div id="alertStep2" class="alert"></div>
-
-      <div class="pkg-grid" id="pkgGrid">
-        <!-- Rendered by JS from admin-configured packages -->
+      <div class="panel-title">Verify Your Email</div>
+      <div class="panel-sub">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong>. Enter it below to continue.</div>
+      <div class="form-group" style="margin-top:1rem;">
+        <label class="form-label">Verification Code</label>
+        <input id="otpInput" class="form-input" type="text" maxlength="6" placeholder="000000"
+               style="font-size:1.5rem;letter-spacing:0.25em;text-align:center;font-weight:800;"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
       </div>
-
-      <div id="paySection" style="display:none;">
-        <div style="background:var(--brand-light);border:1px solid rgba(255,90,31,0.2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:0.78rem;color:var(--brand-dark);line-height:1.6;">
-          <i class="fa-solid fa-circle-info"></i> You selected <strong id="selectedPkgName">—</strong>. Complete payment to activate your ad-free experience.
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <div onclick="selectPayment('gcash')" class="pay-opt" id="pay_gcash">
-            <div style="font-size:1.3rem;margin-bottom:4px;">📱</div>
-            <div style="font-size:0.75rem;font-weight:700;">GCash</div>
-          </div>
-          <div onclick="selectPayment('maya')" class="pay-opt" id="pay_maya">
-            <div style="font-size:1.3rem;margin-bottom:4px;">💳</div>
-            <div style="font-size:0.75rem;font-weight:700;">Maya</div>
-          </div>
-          <div onclick="selectPayment('bank')" class="pay-opt" id="pay_bank">
-            <div style="font-size:1.3rem;margin-bottom:4px;">🏦</div>
-            <div style="font-size:0.75rem;font-weight:700;">Bank Transfer</div>
-          </div>
-          <div onclick="selectPayment('paypal')" class="pay-opt" id="pay_paypal">
-            <div style="font-size:1.3rem;margin-bottom:4px;">🌐</div>
-            <div style="font-size:0.75rem;font-weight:700;">PayPal</div>
-          </div>
-        </div>
-        <div id="refSection" style="display:none;">
-          <div class="form-group">
-            <label class="form-label">Reference / Transaction No. <span style="color:#dc3545">*</span></label>
-            <input id="payRef" class="form-input" placeholder="Enter your payment reference number"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-back" onclick="goStep1()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-        <button class="btn btn-brand" id="submitBtn" onclick="doSubmit()">
-          <span class="spinner" id="submitSpinner"></span>
-          <span id="submitBtnText">Create Account <i class="fa-solid fa-check"></i></span>
+      <button class="btn btn-brand" style="width:100%;" id="otpVerifyBtn" onclick="verifyOTPStep()">
+        <span class="spinner" id="otpSpinner"></span>
+        <span id="otpBtnText"><i class="fa-solid fa-shield-check"></i> Verify Code</span>
+      </button>
+      <div style="text-align:center;margin-top:14px;">
+        <button onclick="resendOTP()" style="background:none;border:none;color:var(--brand);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          <i class="fa-solid fa-rotate-right"></i> Resend Code
         </button>
       </div>
     </div>
-
-    <!-- ── STEP 3: Done ───────────────────────────────────────── -->
-    <div id="p3" class="panel" style="text-align:center;">
-      <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
-      <div style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-bottom:6px;">You're all set!</div>
-      <div id="doneMsg" style="font-size:0.85rem;color:var(--text-3);line-height:1.7;margin-bottom:1.5rem;"></div>
-      <button class="btn btn-brand" onclick="window.location.href='login.html'">
-        <i class="fa-solid fa-right-to-bracket"></i> Go to Login
-      </button>
+	
+    <!-- ── STEP 3: Package ────────────────────────────────────── -->
+    <div id="p3" class="panel">
+      <div class="panel-title">Choose Your Plan</div>
+      <div class="panel-sub">Flexible plans — change anytime, no hassle.</div>
+      <div id="alertStep2" class="alert"></div>
+      <div class="pkg-grid" id="pkgGrid"></div>
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn btn-back" onclick="setStep(1)"><i class="fa-solid fa-arrow-left"></i> &nbsp; Back</button>
+        <button class="btn btn-brand" onclick="goStep4()">Next &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
     </div>
 
+	<!-- ── STEP 4: Payment ───────────────────────────────────── -->
+	<div id="p4" class="panel">
+
+    <!-- Payment summary -->
+    <div class="pay-summary" id="paySummary">
+      <div class="pay-summary-row">
+        <span>Plan</span>
+        <strong id="sumPkgName">—</strong>
+      </div>
+      <div class="pay-summary-row">
+        <span>Amount</span>
+        <strong id="sumPrice">—</strong>
+      </div>
+      <div class="pay-summary-row">
+        <span>Billing</span>
+        <strong id="sumPeriod">—</strong>
+      </div>
+    </div>
+
+  <!-- Free plan message -->
+  <div id="freeNotice" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-sm);padding:12px 14px;font-size:0.83rem;color:#065f46;margin-bottom:1rem;line-height:1.6;">
+    <i class="fa-solid fa-circle-check"></i> You’re on the <strong>Free</strong> plan. No payment is required.
+  </div>
+
+  <!-- Payment categories (paid only) -->
+  <div id="payCategories" style="display:none;">
+
+    <!-- Category 1: Instant verification -->
+    <div class="pay-category-label">
+      Instant Verification
+      <span class="pay-tooltip" title="Payment is verified automatically. Your account is activated immediately after payment.">
+        <i class="fa-solid fa-circle-info"></i>
+      </span>
+    </div>
+    <div class="pay-methods-grid">
+      <div class="pay-opt" id="pay_paypal" onclick="selectPayMethod('paypal','instant')">
+        <div class="pay-opt-icon"><img src="images/paypal.png" alt="PayPal"></div>
+        <div class="pay-opt-label">PayPal</div>
+      </div>	
+      <div class="pay-opt" id="pay_paymongo" onclick="selectPayMethod('paymongo','instant')">
+        <div class="pay-opt-icon"><img src="images/paymongo.png" alt="PayMongo"></div>
+        <div class="pay-opt-label">PayMongo</div>
+      </div>
+      <div class="pay-opt" id="pay_tbc" onclick="selectPayMethod('tbc','instant')">
+        <div class="pay-opt-icon"><img src="images/tbc.png" alt="tbc"></div>
+        <div class="pay-opt-label">TBC</div>
+      </div>
+    </div>
+
+    <!-- Category 2: Manual verification -->
+    <div class="pay-category-label" style="margin-top:1rem;">
+      Manual Verification
+      <span class="pay-tooltip" title="Send payment manually via GCash, Maya, or bank transfer. Admin will verify your payment before activating your account.">
+        <i class="fa-solid fa-circle-info"></i>
+      </span>
+    </div>
+    <div class="pay-methods-grid">
+      <div class="pay-opt" id="pay_gcash" onclick="selectPayMethod('gcash','manual')">
+        <div class="pay-opt-icon"><img src="images/gcash.png" alt="GCash"></div>
+        <div class="pay-opt-label">GCash</div>
+      </div>
+      <div class="pay-opt" id="pay_maya" onclick="selectPayMethod('maya','manual')">
+        <div class="pay-opt-icon"><img src="images/maya.png" alt="Maya"></div>
+        <div class="pay-opt-label">Maya</div>
+      </div>
+      <div class="pay-opt" id="pay_bank" onclick="selectPayMethod('bank','manual')">
+        <div class="pay-opt-icon"><img src="images/bpi.png" alt="Bank Transfer"></div>
+        <div class="pay-opt-label">Bank Transfer</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btn-row" style="margin-top:1.25rem;">
+    <button class="btn btn-back" onclick="setStep(3)"><i class="fa-solid fa-arrow-left"></i> &nbsp; Back</button>
+    <button class="btn btn-brand" id="payNextBtn" onclick="goStep5()">
+      <span class="spinner" id="paySpinner"></span>
+      <span id="payNextBtnText">Next &nbsp; <i class="fa-solid fa-arrow-right"></i></span>
+    </button>
+  </div>
+</div>
+
+<!-- ── STEP 5: Done ───────────────────────────────────────── -->
+<div id="p5" class="panel" style="text-align:center;padding-top:0.5rem;">
+  <div id="doneIcon" style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+  <div id="doneTitle" style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-bottom:6px;"></div>
+  <div id="doneMsg" style="font-size:0.85rem;color:var(--text-3);line-height:1.7;margin-bottom:1.5rem;"></div>
+  <button class="btn btn-brand" onclick="window.location.href='login.html'">
+    <i class="fa-solid fa-right-to-bracket"></i> Go to Login
+  </button>
+</div>
+
+  </div>
+</div>
+
+<!-- QR Payment Modal -->
+<div id="qrModal" class="modal">
+  <div class="modal-box" style="max-width:360px;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-qrcode"></i> &nbsp;  <span id="qrModalTitle">GCash Payment</span></h3>
+      <button class="modal-x" onclick="closeQrModal()">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:12px;">Scan the QR code and send the exact amount below.</p>
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px;display:inline-block;margin-bottom:12px;">
+        <!-- Replace with your actual QR image -->
+        <img id="qrImage" src="images/gcash-qr.png" alt="QR Code" style="width:160px;height:160px;object-fit:contain;border-radius:8px;" onerror="this.style.display='none';document.getElementById('qrFallback').style.display='block'">
+      </div>
+      <div style="background:var(--brand-light);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:14px;font-size:0.85rem;">
+        Amount to send: <strong id="qrAmount" style="color:var(--brand);">—</strong>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Reference / Transaction No. <span style="color:#dc3545">*</span></label>
+        <input id="qrRef" class="form-input" placeholder="e.g. 1234567890"/>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Amount Sent <span style="color:#dc3545">*</span></label>
+        <input id="qrAmountSent" class="form-input" type="number" placeholder="e.g. 99"/>
+      </div>
+    </div>
+    <div class="modal-foot" style="gap:8px;display:flex;justify-content:flex-end;">
+      <button onclick="closeQrModal()" style="background:#f5f7fa;color:var(--text-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0.5rem 1rem;font-size:0.85rem;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="confirmQrPayment()" style="background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:var(--radius-sm);padding:0.5rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;">Confirm</button>
+    </div>
   </div>
 </div>
 
@@ -305,57 +434,313 @@
 let currentStep = 1;
 let selectedPkg = null;
 let selectedPkgData = null;
-let selectedPayment = null;
+let selectedPayMethod = null;
+let selectedPayCategory = null; // 'instant' or 'manual'
+let manualPayRef = '';
+let manualPayAmount = '';
 
-/* ── Packages (loaded from Supabase via FX) ──────────────────── */
+const TOTAL_STEPS = 5;
+
+/* ── Step engine ─────────────────────────────────────────────── */
+function setStep(n) {
+  currentStep = n;
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const panel = document.getElementById('p' + i);
+    if (panel) panel.classList.toggle('active', i === n);
+    const sc = document.getElementById('sc' + i);
+    const s  = document.getElementById('s' + i);
+    if (!s) continue;
+    if (i < n)  { s.className = 'step done';   sc.innerHTML = '<i class="fa-solid fa-check" style="font-size:10px;"></i>'; }
+    if (i === n){ s.className = 'step active'; sc.textContent = i; }
+    if (i > n)  { s.className = 'step';        sc.textContent = i; }
+    if (i < TOTAL_STEPS) {
+      const sl = document.getElementById('sl' + i);
+      if (sl) sl.classList.toggle('done', i < n);
+    }
+  }
+}
+
+/* ── Step 1 → 2 ──────────────────────────────────────────────── */
+async function goStep2() {
+  if (!validateStep1()) return;
+
+  const btn     = document.getElementById('step1NextBtn');
+  const spinner = document.getElementById('step1Spinner');
+  const btnText = document.getElementById('step1BtnText');
+
+  btn.disabled = true;
+  spinner.classList.add('on');
+  btnText.style.display = 'none';
+
+  try {
+    const email    = document.getElementById('regEmail').value.trim();
+    const username = document.getElementById('regUsername').value.trim();
+
+	const phone = document.getElementById('regPhone').value.trim();
+    const [emailTaken, usernameTaken, phoneTaken] = await Promise.all([
+      FX.checkEmailExists(email),
+      FX.checkUsernameExists(username),
+      FX.checkPhoneExists(phone),
+    ]);
+
+    if (emailTaken) {
+      document.getElementById('regEmail').classList.add('err');
+      showToast('This email is already registered. Please sign in instead.', 'error');
+      return;
+    }
+    if (usernameTaken) {
+      document.getElementById('regUsername').classList.add('err');
+      showToast('That username is already taken. Please choose another.', 'error');
+      return;
+    }
+    if (phoneTaken) {
+      document.getElementById('regPhone').classList.add('err');
+      showToast('This phone number is already registered. Please use a different number.', 'error');
+      return;
+    }
+
+    // Send OTP to email
+    await FX.sendOTP(email);
+    document.getElementById('otpEmailDisplay').textContent = email;
+    setStep(2);
+
+  } catch (e) {
+    showToast('Could not verify your details. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    spinner.classList.remove('on');
+    btnText.style.display = '';
+  }
+}
+
+/* ── OTP Verify ──────────────────────────────────────────────── */
+async function verifyOTPStep() {
+  const email      = document.getElementById('regEmail').value.trim();
+  const code       = document.getElementById('otpInput').value.trim();
+  const otpEnabled = await FX.getSetting('otp_enabled');
+
+  // If OTP is disabled globally, skip verification entirely
+  if (otpEnabled === 'false') {
+    setStep(3);
+    loadPackages();
+    return;
+  }
+
+  if (code.length !== 6) {
+    showToast('Please enter the 6-digit code sent to your email.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('otpVerifyBtn');
+  const sp  = document.getElementById('otpSpinner');
+  const bt  = document.getElementById('otpBtnText');
+  btn.disabled = true; sp.classList.add('on'); bt.style.display = 'none';
+
+  try {
+    FX.verifyOTP(email, code);
+    setStep(3);
+    loadPackages();
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false; sp.classList.remove('on'); bt.style.display = '';
+  }
+}
+
+async function resendOTP() {
+  const email = document.getElementById('regEmail').value.trim();
+  try {
+    await FX.sendOTP(email);
+    showToast('New code sent to ' + email);
+    document.getElementById('otpInput').value = '';
+  } catch(e) {
+    showToast('Failed to resend: ' + e.message, 'error');
+  }
+}
+
+/* ── Step 3 → 4 (was Step 2 → 3) ────────────────────────────── */
+function goStep4() {
+  if (!selectedPkg) { showToast('Please select a plan to continue.', 'error'); return; }
+  const isFree = selectedPkgData?.price === 0;
+  document.getElementById('sumPkgName').textContent = selectedPkgData?.name || '—';
+  document.getElementById('sumPrice').textContent = isFree ? 'Free' : '₱' + selectedPkgData?.price;
+  const periodLabel = { month: '1 Month', '6month': '6 Months', year: '1 Year', lifetime: 'Lifetime' };
+  document.getElementById('sumPeriod').textContent = isFree ? 'Forever' : (periodLabel[selectedPkgData?.period] || selectedPkgData?.period || '—');
+  document.getElementById('freeNotice').style.display = isFree ? 'block' : 'none';
+  document.getElementById('payCategories').style.display = isFree ? 'none' : 'block';
+  selectedPayMethod = null;
+  selectedPayCategory = null;
+  document.querySelectorAll('.pay-opt').forEach(p => p.classList.remove('selected'));
+  setStep(4);
+}
+
+/* ── Step 4 → 5 ──────────────────────────────────────────────── */
+async function goStep5() {
+  const isFree = selectedPkgData?.price === 0;
+
+  if (!isFree && !selectedPayMethod) {
+    showToast('Please select a payment method.', 'error'); return;
+  }
+
+  // Manual payment — open QR modal
+  if (selectedPayCategory === 'manual' && (!manualPayRef || !manualPayAmount)) {
+    openQrModal(); return;
+  }
+
+  // Instant payment (PayMongo / PayPal) — redirect
+  if (selectedPayCategory === 'instant') {
+    const btn = document.getElementById('payNextBtn');
+    const spinner = document.getElementById('paySpinner');
+    const btnText = document.getElementById('payNextBtnText');
+    btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+    try {
+      const endpoint = selectedPayMethod === 'paypal' ? '/api/create-paypal-checkout' : '/api/create-paymongo-checkout';
+      const r = await fetch(endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ package: selectedPkg, type: 'regular' })
+      });
+      const d = await r.json();
+      const url = d.approvalUrl || d.checkoutUrl;
+      if (url) {
+        sessionStorage.setItem('fixia_signup', JSON.stringify(buildFormData()));
+        window.location.href = url; return;
+      }
+      throw new Error(d.error || 'Checkout failed');
+    } catch(e) {
+      showToast('Checkout failed: ' + e.message, 'error');
+      btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+      return;
+    }
+  }
+
+  // Free or manual (already confirmed) — register
+  await doRegister();
+}
+
+/* ── Register user ───────────────────────────────────────────── */
+async function doRegister() {
+  const btn = document.getElementById('payNextBtn');
+  const spinner = document.getElementById('paySpinner');
+  const btnText = document.getElementById('payNextBtnText');
+  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+  try {
+    const formData = buildFormData();
+    await FX.registerRegular(formData);
+
+    await FX.sendEmail('regular_welcome', {
+      fullName: formData.firstName + ' ' + formData.lastName,
+      email: formData.email,
+      username: formData.username,
+      package: formData.packageName,
+    });
+
+    if (formData.paymentMethod !== 'none') {
+      await FX.sendEmail('regular_payment_notify', {
+        fullName: formData.firstName + ' ' + formData.lastName,
+        email: formData.email,
+        package: formData.packageName,
+        paymentMethod: formData.paymentMethod,
+        paymentReference: formData.paymentReference,
+        paymentAmount: '₱' + formData.paymentAmount,
+      });
+    }
+
+    // Done screen
+    const isFree = formData.status === 'active' && formData.paymentMethod === 'none';
+    const isInstant = selectedPayCategory === 'instant';
+    document.getElementById('doneIcon').textContent = isFree || isInstant ? '🎉' : '⏳';
+    document.getElementById('doneTitle').textContent = isFree || isInstant ? 'You\'re all set!' : 'Payment Submitted!';
+    document.getElementById('doneMsg').innerHTML = isFree
+      ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your free account is ready. Log in and start finding services near you.`
+      : isInstant
+      ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your payment was confirmed and your account is now active.`
+      : `Thank you, <strong>${formData.firstName}</strong>! We've received your payment details and your application is now under review.<br/><br/>
+	     You may log in and use the platform with limited access while our team verifies your account. An update will be sent shortly to <strong>${formData.email}</strong>.`;
+
+    setStep(5);
+  } catch(e) {
+    showToast('Registration failed: ' + (e.message || 'Please try again.'), 'error');
+  } finally {
+    btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+  }
+}
+
+function buildFormData() {
+  return {
+    firstName:        document.getElementById('firstName').value.trim(),
+    lastName:         document.getElementById('lastName').value.trim(),
+    email:            document.getElementById('regEmail').value.trim(),
+    phone:            document.getElementById('regPhone').value.trim(),
+    username:         document.getElementById('regUsername').value.trim(),
+    password:         document.getElementById('regPassword').value,
+    role:             'regular',
+	package:          selectedPkg,
+    packageName:      selectedPkgData?.name || selectedPkg,
+    periodDays:       selectedPkgData?.period === 'lifetime' ? null
+                    : selectedPkgData?.period === 'year'     ? 365
+                    : selectedPkgData?.period === '6month'   ? 180
+                    : selectedPkgData?.period === 'month'    ? 30
+                    : parseInt(selectedPkgData?.period) || 30,
+    status:           (selectedPkgData?.price === 0 || selectedPayCategory === 'instant') ? 'active' : 'pending',
+    paymentMethod:    selectedPayMethod || 'none',
+    paymentReference: manualPayRef || '',
+    paymentAmount:    selectedPkgData?.price || 0,
+    paymentStatus:    selectedPkgData?.price === 0 ? 'free' : (selectedPayCategory === 'instant' ? 'paid' : 'pending'),
+    ads_free:         selectedPkgData?.ads_free || false,
+  };
+}
+
+/* ── Package loader ──────────────────────────────────────────── */
 async function loadPackages() {
   const grid = document.getElementById('pkgGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-3);font-size:0.83rem;padding:1rem;">Loading plans…</div>';
-
   try {
-    const pkgs = await FX.getRegularPackages(); // returns [{id,name,price,period,features:[],ads_free:bool}]
+    const pkgs = await FX.getRegularPackages();
     grid.innerHTML = '';
-    pkgs.forEach((pkg, i) => {
+    if (pkgs.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-3);font-size:0.83rem;padding:1rem;">No packages available at the moment.</div>';
+      return;
+    }
+    pkgs.forEach(pkg => {
       const isFree = pkg.price === 0;
       const card = document.createElement('div');
       card.className = 'pkg-card';
       card.id = `pkg_${pkg.id}`;
       card.onclick = () => pickPackage(pkg);
       card.innerHTML = `
-        ${pkg.popular ? '<div class="pkg-popular">⭐ Popular</div>' : ''}
-        <div class="pkg-icon">${isFree ? '🔍' : '✨'}</div>
+        ${pkg.popular ? `<div class="pkg-popular-flag">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
+        <div class="pkg-icon">${pkg.icon || (isFree ? '🔍' : '✨')}</div>
         <div class="pkg-name">${pkg.name}</div>
         <div class="pkg-price">${isFree ? 'Free' : '₱' + pkg.price}</div>
-        <div class="pkg-period">${isFree ? 'forever' : '/ ' + pkg.period}</div>
+        <div class="pkg-period">${isFree ? 'forever' : '/ ' + ({ month: '1 month', '6month': '6 months', year: '1 year', lifetime: 'lifetime' }[pkg.period] || pkg.period)}</div>
         <div class="pkg-features">
-          ${(pkg.features || []).map(f => `<div class="pkg-feat ${f.included ? '' : 'no'}"><i class="fa-solid ${f.included ? 'fa-check' : 'fa-xmark'}"></i>${f.label}</div>`).join('')}
+          ${(pkg.features || []).map(f => {
+            const label = typeof f === 'string' ? f : f.label;
+            return `<div class="pkg-feat">${label}</div>`;
+          }).join('')}
         </div>`;
       grid.appendChild(card);
     });
   } catch(e) {
-    // Fallback static packages if DB not ready
     grid.innerHTML = `
       <div class="pkg-card" id="pkg_free" onclick="pickPackage({id:'free',name:'Free',price:0,ads_free:false})">
-        <div class="pkg-icon">🔍</div>
-        <div class="pkg-name">Free</div>
-        <div class="pkg-price">Free</div>
-        <div class="pkg-period">forever</div>
+        <div class="pkg-icon">🔍</div><div class="pkg-name">Free</div>
+        <div class="pkg-price">Free</div><div class="pkg-period">forever</div>
         <div class="pkg-features">
-          <div class="pkg-feat"><i class="fa-solid fa-check"></i>Browse all providers</div>
-          <div class="pkg-feat"><i class="fa-solid fa-check"></i>Rate & review</div>
-          <div class="pkg-feat no"><i class="fa-solid fa-xmark"></i>Ads shown</div>
+          <div class="pkg-feat">✅ Browse all providers</div>
+          <div class="pkg-feat">✅ Rate & review</div>
+          <div class="pkg-feat">❌ Ads shown</div>
         </div>
       </div>
       <div class="pkg-card" id="pkg_plus" onclick="pickPackage({id:'plus',name:'Fixia Plus',price:99,period:'month',ads_free:true})">
         <div class="pkg-popular">⭐ Popular</div>
-        <div class="pkg-icon">✨</div>
-        <div class="pkg-name">Fixia Plus</div>
-        <div class="pkg-price">₱99</div>
-        <div class="pkg-period">/ month</div>
+        <div class="pkg-icon">✨</div><div class="pkg-name">Fixia Plus</div>
+        <div class="pkg-price">₱99</div><div class="pkg-period">/ month</div>
         <div class="pkg-features">
-          <div class="pkg-feat"><i class="fa-solid fa-check"></i>Browse all providers</div>
-          <div class="pkg-feat"><i class="fa-solid fa-check"></i>Rate & review</div>
-          <div class="pkg-feat"><i class="fa-solid fa-check"></i>No pop-up ads</div>
+          <div class="pkg-feat">✅ Browse all providers</div>
+          <div class="pkg-feat">✅ Rate & review</div>
+          <div class="pkg-feat">✅ No pop-up ads</div>
         </div>
       </div>`;
   }
@@ -367,65 +752,54 @@ function pickPackage(pkg) {
   if (el) el.classList.add('selected');
   selectedPkg = pkg.id;
   selectedPkgData = pkg;
-
-  const paySection = document.getElementById('paySection');
-  if (pkg.price > 0) {
-    document.getElementById('selectedPkgName').textContent = pkg.name + ' (₱' + pkg.price + ')';
-    paySection.style.display = 'block';
-  } else {
-    paySection.style.display = 'none';
-    selectedPayment = 'none';
-  }
 }
 
-function selectPayment(method) {
+/* ── Payment method selection ────────────────────────────────── */
+function selectPayMethod(method, category) {
   document.querySelectorAll('.pay-opt').forEach(p => p.classList.remove('selected'));
   document.getElementById('pay_' + method).classList.add('selected');
-  selectedPayment = method;
-  const refSec = document.getElementById('refSection');
-  refSec.style.display = method !== 'paypal' ? 'block' : 'none';
-  if (method === 'paypal') document.getElementById('payRef').value = '';
+  selectedPayMethod = method;
+  selectedPayCategory = category;
+  // Reset manual refs when switching
+  manualPayRef = '';
+  manualPayAmount = '';
 }
 
-/* ── Step navigation ─────────────────────────────────────────── */
-function goStep1() { setStep(1); }
-
-function goStep2() {
-  if (!validateStep1()) return;
-  setStep(2);
-  loadPackages();
+/* ── QR Modal ────────────────────────────────────────────────── */
+function openQrModal() {
+  const qrImages = { gcash: 'images/gcash-qr.png', maya: 'images/maya-qr.png', bank: 'images/bank-qr.png' };
+  const titles = { gcash: ' GCash Payment', maya: ' Maya Payment', bank: ' Bank Transfer' };
+  document.getElementById('qrModalTitle').textContent = titles[selectedPayMethod] || 'Payment';
+  document.getElementById('qrImage').src = qrImages[selectedPayMethod] || '';
+  document.getElementById('qrAmount').textContent = '₱' + (selectedPkgData?.price || 0);
+  document.getElementById('qrRef').value = '';
+  document.getElementById('qrAmountSent').value = '';
+  document.getElementById('qrModal').classList.add('open');
 }
 
-function setStep(n) {
-  currentStep = n;
-  for (let i=1;i<=3;i++) {
-    document.getElementById('p'+i).classList.toggle('active', i===n);
-    const sc = document.getElementById('sc'+i);
-    const s  = document.getElementById('s'+i);
-    if (i < n)  { s.className='step done';   sc.innerHTML='<i class="fa-solid fa-check" style="font-size:10px;"></i>'; }
-    if (i === n){ s.className='step active'; sc.textContent=i; }
-    if (i > n)  { s.className='step';        sc.textContent=i; }
-    if (i < 3) {
-      const sl = document.getElementById('sl'+i);
-      sl.classList.toggle('done', i < n);
-    }
-  }
+function closeQrModal() {
+  document.getElementById('qrModal').classList.remove('open');
+}
+
+async function confirmQrPayment() {
+  const ref = document.getElementById('qrRef').value.trim();
+  const amt = document.getElementById('qrAmountSent').value.trim();
+  if (!ref) { showToast('Please enter your reference number.', 'error'); return; }
+  if (!amt) { showToast('Please enter the amount you sent.', 'error'); return; }
+  manualPayRef = ref;
+  manualPayAmount = amt;
+  closeQrModal();
+  await doRegister();
 }
 
 /* ── Validation ──────────────────────────────────────────────── */
-function err(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.classList.add('show');
-  document.getElementById(id.replace('err_','') === 'fn' ? 'firstName' : id.replace('err_','')).classList.add('err');
-}
 function clearErrors() {
-  document.querySelectorAll('.field-err').forEach(e => { e.classList.remove('show'); e.textContent=''; });
+  document.querySelectorAll('.field-err').forEach(e => { e.classList.remove('show'); e.textContent = ''; });
   document.querySelectorAll('.form-input').forEach(i => i.classList.remove('err'));
 }
 
 function validateStep1() {
   clearErrors();
-  let ok = true;
   const fn = document.getElementById('firstName').value.trim();
   const ln = document.getElementById('lastName').value.trim();
   const em = document.getElementById('regEmail').value.trim();
@@ -434,17 +808,52 @@ function validateStep1() {
   const pw = document.getElementById('regPassword').value;
   const cf = document.getElementById('regConfirm').value;
 
-  if (!fn) { document.getElementById('err_fn').textContent='Required'; document.getElementById('err_fn').classList.add('show'); document.getElementById('firstName').classList.add('err'); ok=false; }
-  if (!ln) { document.getElementById('err_ln').textContent='Required'; document.getElementById('err_ln').classList.add('show'); document.getElementById('lastName').classList.add('err'); ok=false; }
-  if (!em || !/\S+@\S+\.\S+/.test(em)) { document.getElementById('err_email').textContent='Valid email required'; document.getElementById('err_email').classList.add('show'); document.getElementById('regEmail').classList.add('err'); ok=false; }
-  if (!ph || ph.length < 10) { document.getElementById('err_phone').textContent='Valid PH phone required'; document.getElementById('err_phone').classList.add('show'); document.getElementById('regPhone').classList.add('err'); ok=false; }
-  if (!un || un.length < 3) { document.getElementById('err_uname').textContent='Min. 3 characters'; document.getElementById('err_uname').classList.add('show'); document.getElementById('regUsername').classList.add('err'); ok=false; }
-  if (!pw || pw.length < 8) { document.getElementById('err_pw').textContent='Min. 8 characters'; document.getElementById('err_pw').classList.add('show'); document.getElementById('regPassword').classList.add('err'); ok=false; }
-  if (pw !== cf) { document.getElementById('err_confirm').textContent='Passwords do not match'; document.getElementById('err_confirm').classList.add('show'); document.getElementById('regConfirm').classList.add('err'); ok=false; }
-  return ok;
+  const emptyFields = [];
+  if (!fn) emptyFields.push('firstName');
+  if (!ln) emptyFields.push('lastName');
+  if (!un || un.length < 3) emptyFields.push('regUsername');
+  if (!pw || pw.length < 8) emptyFields.push('regPassword');
+
+  if (pw && (!cf || pw !== cf)) {
+    document.getElementById('regPassword').classList.add('err');
+    document.getElementById('regConfirm').classList.add('err');
+    showToast('Passwords do not match.', 'error'); return false;
+  }
+  if (em && !/\S+@\S+\.\S+/.test(em)) {
+    document.getElementById('regEmail').classList.add('err');
+    showToast('Please enter a valid email address.', 'error'); return false;
+  }
+  if (!em) emptyFields.push('regEmail');
+
+  const phInput = document.getElementById('regPhone');
+  const phRegex = /^(09\d{9}|\+639\d{9})$/;
+  if (ph && !phRegex.test(ph)) {
+    phInput.classList.add('err');
+    showToast('Enter a valid PH mobile number.', 'error'); return false;
+  }
+  if (!ph) emptyFields.push('regPhone');
+
+  if (emptyFields.length > 0) {
+    emptyFields.forEach(id => document.getElementById(id).classList.add('err'));
+    showToast('Please fill in all required fields.', 'error'); return false;
+  }
+  return true;
 }
 
-/* ── Password strength ───────────────────────────────────────── */
+/* ── Utils ───────────────────────────────────────────────────── */
+function togglePwd(iId, icId) {
+  const inp = document.getElementById(iId);
+  const ico = document.getElementById(icId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ico.className = inp.type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+}
+
+function showAlert(id, msg, type='error') {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type} show`;
+  el.textContent = msg;
+}
+
 function checkStrength(pw) {
   const fill = document.getElementById('strengthFill');
   let score = 0;
@@ -458,108 +867,16 @@ function checkStrength(pw) {
   fill.style.background = colors[score] || 'transparent';
 }
 
-/* ── Submit ──────────────────────────────────────────────────── */
-async function doSubmit() {
-  if (!selectedPkg) {
-    showAlert('alertStep2', 'Please select a plan to continue.'); return;
-  }
-  if (selectedPkgData?.price > 0 && !selectedPayment) {
-    showAlert('alertStep2', 'Please choose a payment method.'); return;
-  }
-  if (selectedPkgData?.price > 0 && selectedPayment !== 'paypal' && !document.getElementById('payRef').value.trim()) {
-    showAlert('alertStep2', 'Please enter your payment reference number.'); return;
-  }
-
-  const btn = document.getElementById('submitBtn');
-  const spinner = document.getElementById('submitSpinner');
-  const btnText = document.getElementById('submitBtnText');
-  btn.disabled=true; spinner.classList.add('on'); btnText.style.display='none';
-
-  const formData = {
-    firstName:  document.getElementById('firstName').value.trim(),
-    lastName:   document.getElementById('lastName').value.trim(),
-    email:      document.getElementById('regEmail').value.trim(),
-    phone:      document.getElementById('regPhone').value.trim(),
-    username:   document.getElementById('regUsername').value.trim(),
-    password:   document.getElementById('regPassword').value,
-    role:       'regular',
-    package:    selectedPkg,
-    packageName: selectedPkgData?.name || selectedPkg,
-    status:     selectedPkgData?.price === 0 ? 'active' : 'pending',
-    paymentMethod:    selectedPayment || 'none',
-    paymentReference: document.getElementById('payRef')?.value?.trim() || '',
-    paymentAmount:    selectedPkgData?.price || 0,
-    paymentStatus:    selectedPkgData?.price === 0 ? 'free' : 'pending',
-    ads_free:   selectedPkgData?.ads_free || false,
-  };
-
-  // Handle PayPal redirect
-  if (selectedPayment === 'paypal') {
-    sessionStorage.setItem('fixia_signup', JSON.stringify(formData));
-    try {
-      const r = await fetch('/api/create-paypal-checkout', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ package: selectedPkg, type: 'regular' })
-      });
-      const d = await r.json();
-      if (d.approvalUrl) { window.location.href = d.approvalUrl; return; }
-      throw new Error(d.error || 'PayPal error');
-    } catch(e) {
-      showAlert('alertStep2', 'PayPal checkout failed: ' + e.message);
-      btn.disabled=false; spinner.classList.remove('on'); btnText.style.display='';
-      return;
-    }
-  }
-
-  try {
-    await FX.registerRegular(formData);
-
-    // Send welcome email
-    await FX.sendEmail('regular_welcome', {
-      fullName:  formData.firstName + ' ' + formData.lastName,
-      email:     formData.email,
-      username:  formData.username,
-      package:   formData.packageName,
-    });
-
-    // If paid, notify owner
-    if (formData.paymentMethod !== 'none') {
-      await FX.sendEmail('regular_payment_notify', {
-        fullName:         formData.firstName + ' ' + formData.lastName,
-        email:            formData.email,
-        package:          formData.packageName,
-        paymentMethod:    formData.paymentMethod,
-        paymentReference: formData.paymentReference,
-        paymentAmount:    '₱' + formData.paymentAmount,
-      });
-    }
-
-    document.getElementById('doneMsg').innerHTML = formData.status === 'active'
-      ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your free account is ready. You can now log in and start finding services near you.`
-      : `Thanks, <strong>${formData.firstName}</strong>! Your payment is being verified. We'll send a confirmation to <strong>${formData.email}</strong> once it's approved.`;
-
-    setStep(3);
-  } catch(e) {
-    showAlert('alertStep2', 'Registration failed: ' + (e.message || 'Please try again.'));
-  } finally {
-    btn.disabled=false; spinner.classList.remove('on'); btnText.style.display='';
-  }
-}
-
-/* ── Utils ───────────────────────────────────────────────────── */
-function togglePwd(iId, icId) {
-  const inp = document.getElementById(iId);
-  const ico = document.getElementById(icId);
-  inp.type = inp.type==='password' ? 'text' : 'password';
-  ico.className = inp.type==='password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
-}
-function showAlert(id, msg, type='error') {
-  const el = document.getElementById(id); el.className=`alert alert-${type} show`; el.textContent=msg;
-}
 let toastTimer;
-function showToast(msg,type='') {
-  const el=document.getElementById('toast'); el.textContent=msg; el.className=`toast show ${type}`;
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.classList.remove('show');
+    document.querySelectorAll('.form-input.err, .form-select.err').forEach(f => f.classList.remove('err'));
+  }, 2000);
 }
 </script>
 </body>

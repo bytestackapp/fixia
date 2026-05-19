@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>My Bookings — Fixia</title>
@@ -47,14 +47,13 @@
     .filter-tabs::-webkit-scrollbar{display:none;}
     .ftab{flex-shrink:0;padding:11px 16px;font-size:0.72rem;font-weight:700;color:var(--text-3);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
     .ftab.active{color:var(--brand);border-bottom-color:var(--brand);}
-    .ftab-badge{background:var(--red);color:#fff;font-size:0.55rem;font-weight:800;padding:1px 5px;border-radius:20px;min-width:14px;text-align:center;}
 
     /* ── BODY ────────────────────────────────────────────────── */
     .body{padding:14px 16px;}
 
     /* ── BOOKING CARD ────────────────────────────────────────── */
     .booking-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);animation:slideUp 0.3s ease both;position:relative;}
-    .booking-card.unread{border-left:3px solid var(--brand);}
+    .booking-card.unread{}
     .bc-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
     .bc-avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
     .bc-info{flex:1;min-width:0;}
@@ -90,7 +89,7 @@
 
     /* Action buttons */
     .bc-actions{display:flex;gap:7px;flex-wrap:wrap;}
-    .action-btn{flex:1;min-width:0;padding:9px 8px;border:none;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;}
+    .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
     .action-btn:active{transform:scale(0.97);}
     .btn-book    {background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 3px 10px rgba(255,90,31,0.3);}
     .btn-cancel  {background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
@@ -115,7 +114,9 @@
     /* ── MODAL ───────────────────────────────────────────────── */
     .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
     .modal-overlay.open{display:flex;animation:fadeIn 0.2s;}
-    .modal-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;max-height:85vh;overflow-y:auto;}
+    .modal-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;animation:slideUp 0.3s ease;}
+	@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+	
     .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
     .modal-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);}
     .modal-title{font-size:0.95rem;font-weight:800;color:var(--navy);}
@@ -132,7 +133,7 @@
     /* ── TOAST ───────────────────────────────────────────────── */
     .toast{position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--navy);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1.4rem;font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-    .toast.success{background:#065f46;}
+	.toast.success{background:var(--navy);}
     .toast.error{background:var(--red);}
 
     /* ── BOTTOM NAV ──────────────────────────────────────────── */
@@ -158,11 +159,11 @@
     <i class="fa-solid fa-magnifying-glass"></i>
     <span>Search services…</span>
   </div>
-  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
+  <button class="nav-icon-btn" onclick="goToNotifications()" title="Notifications" style="position:relative;">
     <i class="fa-regular fa-bell"></i>
     <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
   </button>
-  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
@@ -170,29 +171,36 @@
 <!-- FILTER TABS -->
 <div class="filter-tabs">
   <button class="ftab active" onclick="setTab('all',this)">All</button>
-  <button class="ftab" onclick="setTab('inquiring',this)">
-    <i class="fa-solid fa-paper-plane"></i> Inquiries
-    <span class="ftab-badge" id="badge-inquiring" style="display:none;"></span>
-  </button>
-  <button class="ftab" onclick="setTab('replied',this)">
-    <i class="fa-solid fa-reply"></i> Replied
-    <span class="ftab-badge" id="badge-replied" style="display:none;"></span>
-  </button>
-  <button class="ftab" onclick="setTab('active',this)">
-    <i class="fa-solid fa-bolt"></i> Active
-  </button>
-  <button class="ftab" onclick="setTab('done',this)">
-    <i class="fa-solid fa-flag-checkered"></i> For Acceptance
-    <span class="ftab-badge" id="badge-done" style="display:none;"></span>
-  </button>
-  <button class="ftab" onclick="setTab('completed',this)">
-    <i class="fa-solid fa-check-double"></i> Completed
-  </button>
+  <button class="ftab" onclick="setTab('pending',this)">Pending</button>
+  <button class="ftab" onclick="setTab('active',this)">Active</button>
+  <button class="ftab" onclick="setTab('done',this)">Done</button>
+  <button class="ftab" onclick="setTab('completed',this)">Completed</button>
 </div>
 
 <!-- BODY -->
 <div class="body" id="bodyContent">
   <div class="load-spinner"></div>
+</div>
+
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="signOutModal" onclick="handleOverlay(event,'signOutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn" onclick="closeSignOutModal()">Cancel</button>
+      <button class="action-btn" onclick="FX.logout()" style="background:linear-gradient(135deg,#dc3545,#b02030);color:#fff;box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -222,6 +230,19 @@
         <label class="form-label">Comment <span style="color:var(--text-3);font-weight:400;">(optional)</span></label>
         <textarea class="form-textarea" id="ratingComment" placeholder="Share your experience…" style="min-height:75px;"></textarea>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:8px;">
+        <div>
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text);">Post anonymously</div>
+          <div id="anonPreview" style="font-size:0.68rem;color:var(--text-3);margin-top:2px;">Your name will be shown</div>
+        </div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;">
+          <input type="checkbox" id="anonToggle" onchange="updateAnonPreview()" style="opacity:0;width:0;height:0;">
+          <span style="position:absolute;cursor:pointer;inset:0;background:#CBD5E0;border-radius:11px;transition:0.2s;"
+                id="anonTrack"></span>
+          <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"
+                id="anonThumb"></span>
+        </label>
+      </div>
       <div class="modal-alert err" id="acceptAlert"></div>
     </div>
     <div class="modal-foot">
@@ -240,7 +261,7 @@
     <div class="modal-head"><div class="modal-title">Cancel Inquiry?</div></div>
     <div class="modal-body">
       <p style="font-size:0.83rem;color:var(--text-2);line-height:1.6;">
-        Are you sure you want to cancel this inquiry? The provider will be notified.
+        Are you sure you want to cancel this inquiry?
       </p>
     </div>
     <div class="modal-foot">
@@ -270,7 +291,7 @@
 
 <script src="fixia-data.js"></script>
 <script>
-const session = FX.requireAuth(['regular']);
+const session = FX.requireAuth();
 let allInquiries = [];
 let currentTab   = 'all';
 let activeAcceptId = null;
@@ -280,35 +301,48 @@ let selectedStars  = 0;
 /* ── Init ──────────────────────────────────────────────────── */
 (async function init() {
   if (!session) return;
-  if (!session.adsFree) FX.initAds();
+  if (session.role === 'regular' && !session.adsFree) await FX.initAds();
   await load();
+  FX.checkAndShowMessages();
 })();
 
 async function load() {
   try {
-    allInquiries = await FX.getUserInquiries(session.userId);
-
-    // Load provider details for each inquiry
-    const provIds = [...new Set(allInquiries.map(i => i.provider_id))];
-    const provMap = {};
-    await Promise.all(provIds.map(async id => {
-      const p = await FX.getProviderById(id);
-      if (p) provMap[id] = p;
-    }));
-
-    // Attach provider data
-    allInquiries = await Promise.all(allInquiries.map(async inq => {
-      const prov = provMap[inq.provider_id];
-      const user = prov ? await FX.getUserById(prov.user_id) : null;
-      return { ...inq, _provider: prov, _provUser: user };
-    }));
+    console.log('[load] starting, role:', session.role);
+    if (session.role === 'provider') {
+      console.log('[load] fetching providerData for userId:', session.userId);
+	  const providerData = await FX.getProviderByUserId(session.userId);
+      console.log('[load] providerData:', providerData);
+      if (!providerData) { allInquiries = []; render(); return; }
+      allInquiries = await FX.getProviderInquiries(providerData.id);
+      console.log('[load] raw inquiries:', allInquiries.length);
+      allInquiries = await Promise.all(allInquiries.map(async inq => {
+        const user = await FX.getUserById(inq.regular_user_id);
+        return { ...inq, _provider: providerData, _provUser: null, _customer: user };
+      }));
+      console.log('[load] enriched inquiries:', allInquiries.length);
+    } else {
+      console.log('[load] regular user path');
+      allInquiries = await FX.getUserInquiries(session.userId);
+      const provIds = [...new Set(allInquiries.map(i => i.provider_id))];
+      const provMap = {};
+      await Promise.all(provIds.map(async id => {
+        const p = await FX.getProviderById(id);
+        if (p) provMap[id] = p;
+      }));
+      allInquiries = await Promise.all(allInquiries.map(async inq => {
+        const prov = provMap[inq.provider_id];
+        const user = prov ? await FX.getUserById(prov.user_id) : null;
+        return { ...inq, _provider: prov, _provUser: user };
+      }));
+    }
 
     updateBadges();
     render();
 
     // Mark read
-    await FX.markReadUser(session.userId);
   } catch(e) {
+    console.error('[load] CRASHED:', e);
     document.getElementById('bodyContent').innerHTML = `
       <div class="state-box">
         <div class="state-icon">⚠️</div>
@@ -327,14 +361,6 @@ function updateBadges() {
   const navBadge = document.getElementById('navBadge');
   if (unread.length) { navBadge.textContent = unread.length; navBadge.style.display = 'block'; }
   else navBadge.style.display = 'none';
-
-  // Tab badges
-  [['inquiring','badge-inquiring'],['replied','badge-replied'],['done','badge-done']].forEach(([s,id]) => {
-    const el = document.getElementById(id);
-    const n  = byStatus(s);
-    if (n) { el.textContent = n; el.style.display = 'inline-block'; }
-    else el.style.display = 'none';
-  });
 }
 
 /* ── Tab filter ─────────────────────────────────────────────── */
@@ -354,8 +380,7 @@ function render() {
   if (!list.length) {
     const emptyMsgs = {
       all:       { icon:'📋', title:'No bookings yet', sub:'Find a provider and tap "Inquire" to get started.', btn:true },
-      inquiring: { icon:'📤', title:'No pending inquiries', sub:'Your sent inquiries waiting for provider reply will appear here.' },
-      replied:   { icon:'💬', title:'No replies yet', sub:'Providers who have replied to your inquiries will appear here.' },
+      pending:   { icon:'📤', title:'No pending bookings', sub:'Bookings waiting for the provider to start will appear here.' },
       active:    { icon:'⚡', title:'No active bookings', sub:'Once you confirm a booking, it appears here.' },
       done:      { icon:'🎉', title:'Nothing to accept', sub:'When a provider marks a job done, it will appear here for your acceptance.' },
       completed: { icon:'✅', title:'No completed jobs yet', sub:'Your finished and rated jobs will appear here.' },
@@ -375,141 +400,226 @@ function render() {
 }
 
 function renderCard(inq, idx) {
-  const prov = inq._provider;
-  const user = inq._provUser;
-  const provName    = prov?.biz_name || 'Unknown Provider';
-  const provService = prov?.cat_sub  || '—';
-  const provPhone   = user?.phone    || null;
-  const catEmojis   = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
-  const emoji       = catEmojis[prov?.cat_main] || '🔧';
+  const isProvider = session.role === 'provider';
+  const timeAgo    = fmtTimeAgo(inq.updated_at);
 
-  const statusMap = {
-    inquiring: ['sb-inquiring','📤 Inquiry Sent'],
-    replied:   ['sb-replied',  '💬 Provider Replied'],
-    declined:  ['sb-declined', '❌ Declined'],
-    cancelled: ['sb-cancelled','🚫 Cancelled'],
-    active:    ['sb-active',   '⚡ Active'],
-    done:      ['sb-done',     '🎉 Job Done — Awaiting Acceptance'],
-    completed: ['sb-completed','✅ Completed'],
+  /* ── shared status map ───────────────────────────────────── */
+  const statusMap = isProvider ? {
+    pending:   ['sb-inquiring', '📤 Pending'],
+    active:    ['sb-active',    '⚡ Active'],
+    done:      ['sb-done',      '🎉 Marked Done'],
+    completed: ['sb-completed', '✅ Completed'],
+    cancelled: ['sb-cancelled', '🚫 Cancelled by You'],
+    disputed:  ['sb-cancelled', '⚠️ Disputed by User'],
+  } : {
+    pending:   ['sb-inquiring', '📤 Pending'],
+    active:    ['sb-active',    '⚡ Active'],
+    done:      ['sb-done',      '🎉 Job Done'],
+    completed: ['sb-completed', '✅ Completed'],
+    cancelled: ['sb-cancelled', '🚫 Cancelled by Provider'],
+    disputed:  ['sb-cancelled', '⚠️ Disputed by You'],
   };
   const [sbClass, sbLabel] = statusMap[inq.status] || ['sb-inquiring', inq.status];
 
-  const timeAgo = fmtTimeAgo(inq.updated_at);
-  const isUnread = inq.user_has_unread;
+  /* ══ PROVIDER VIEW ═══════════════════════════════════════════ */
+  if (isProvider) {
+    const customer  = inq._customer;
+    const custName  = customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown Customer';
+    const custPhone = customer?.phone || null;
+    const isUnread  = inq.provider_has_unread;
 
-  // Action buttons per status
-  let actions = '';
-  if (inq.status === 'inquiring') {
-    actions = `
-      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
-        <i class="fa-solid fa-xmark"></i> Cancel
-      </button>`;
-  }
-  if (inq.status === 'replied') {
-    actions = `
-      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
-        <i class="fa-solid fa-xmark"></i> Decline
-      </button>
-      <button class="action-btn btn-book" onclick="doBook('${inq.id}')">
-        <i class="fa-solid fa-calendar-check"></i> Book Now
-      </button>`;
-  }
-  if (inq.status === 'done') {
-    actions = `
-      <button class="action-btn btn-accept" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
-        <i class="fa-solid fa-check"></i> Accept Completion
-      </button>`;
-  }
-  if (inq.status === 'completed' && !inq.rating_stars) {
-    actions = `
-      <button class="action-btn btn-rate" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
-        <i class="fa-solid fa-star"></i> Leave a Rating
-      </button>`;
-  }
-  if (inq.status === 'active') {
-    actions = `
-      <button class="action-btn btn-view" onclick="window.location.href='provider.html?id=${prov?.id}'">
-        <i class="fa-solid fa-eye"></i> View Provider
-      </button>`;
-  }
+    const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
+      <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
+        ${'⭐'.repeat(inq.rating_stars)} Customer rated ${inq.rating_stars}/5
+        ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${inq.rating_comment}"</span>` : ''}
+      </div>` : '';
 
-  // Provider contact footer (shown after provider replies)
-  const contactFooter = (inq.status === 'replied' || inq.status === 'active' || inq.status === 'done' || inq.status === 'completed') && provPhone ? `
-    <div class="contact-footer">
-      <div class="cf-text">
-        <strong>Contact ${provName}</strong>
-        For further questions, reach out directly:
-      </div>
-      <div class="cf-btns">
-        <button class="cf-btn cf-btn-call" onclick="window.location.href='tel:${provPhone}'" title="Call">
-          <i class="fa-solid fa-phone"></i>
+    let actionBtns = '';
+    if (inq.status === 'pending' || inq.status === 'active') {
+      actionBtns = `
+        <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+          <i class="fa-solid fa-xmark"></i> Cancel
         </button>
-        <button class="cf-btn cf-btn-sms" onclick="window.location.href='sms:${provPhone}'" title="SMS">
-          <i class="fa-solid fa-comment-sms"></i>
+        ${custPhone ? `
+        <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${custPhone}'">
+          <i class="fa-solid fa-phone"></i> Call
         </button>
-      </div>
-    </div>` : '';
+        <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='sms:${custPhone}'">
+          <i class="fa-solid fa-comment-sms"></i> SMS
+        </button>` : ''}
+        <button class="action-btn btn-accept" onclick="openMarkDone('${inq.id}')">
+          <i class="fa-solid fa-flag-checkered"></i> Mark Done
+        </button>`;
+    }
 
-  // Rating display if completed + rated
+    return `
+      <div class="booking-card ${isUnread ? 'unread' : ''}" style="animation-delay:${idx*0.05}s">
+		<div class="bc-head">
+          <div class="bc-avatar">👤</div>
+          <div class="bc-info">
+            <div class="bc-name">${custName}</div>
+          </div>
+          <div class="bc-status">
+            <span class="status-badge ${sbClass}">${sbLabel}</span>
+            <div class="bc-time" style="text-align:right;margin-top:3px;margin-right:3px;">${timeAgo}</div>
+          </div>
+        </div>
+        ${inq.user_message ? `
+        <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
+          <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${inq.user_message}
+        </div>` : ''}
+        ${ratingDisplay}
+        ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}
+      </div>`;
+  }
+
+  /* ══ REGULAR USER VIEW ═══════════════════════════════════════ */
+  const prov        = inq._provider;
+  const provUser    = inq._provUser;
+  const provName    = prov?.biz_name || 'Unknown Provider';
+  const provService = prov?.cat_sub  || '—';
+  const provPhone   = provUser?.phone || prov?.phone || null;
+  const location    = [prov?.city_name, prov?.province_name].filter(Boolean).join(', ');
+  const catEmojis   = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
+  const emoji       = catEmojis[prov?.cat_main] || '🔧';
+  const isUnread    = inq.user_has_unread;
+
   const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
-    <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-bottom:10px;">
+    <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
       ${'⭐'.repeat(inq.rating_stars)} You rated this ${inq.rating_stars}/5
       ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${inq.rating_comment}"</span>` : ''}
     </div>` : '';
 
+  let actionBtns = '';
+  if (inq.status === 'pending') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>`;
+  }
+  if (inq.status === 'active') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      ${provPhone ? `
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${provPhone}'">
+        <i class="fa-solid fa-phone"></i> Call
+      </button>
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='sms:${provPhone}'">
+        <i class="fa-solid fa-comment-sms"></i> SMS
+      </button>` : ''}
+      <button class="action-btn btn-view" onclick="window.location.href='provider.html?id=${prov?.id}'">
+        <i class="fa-solid fa-eye"></i> View
+      </button>`;
+  }
+  if (inq.status === 'done') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Dispute
+      </button>
+      ${provPhone ? `
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${provPhone}'">
+        <i class="fa-solid fa-phone"></i> Call
+      </button>` : ''}
+      <button class="action-btn btn-accept" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
+        <i class="fa-solid fa-check"></i> Confirm
+      </button>`;
+  }
+  if (inq.status === 'completed' && !inq.rating_stars) {
+    actionBtns = `
+      <button class="action-btn btn-rate" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
+        <i class="fa-solid fa-star"></i> Leave a Rating
+      </button>`;
+  }
+
   return `
     <div class="booking-card ${isUnread ? 'unread' : ''}" style="animation-delay:${idx*0.05}s">
-      <div class="bc-head">
-        <div class="bc-avatar">${emoji}</div>
-        <div class="bc-info">
-          <div class="bc-name">${provName}</div>
-          <div class="bc-service">${provService}</div>
-          <div class="bc-time">${timeAgo}</div>
+		<div class="bc-head">
+          <div class="bc-avatar">${emoji}</div>
+          <div class="bc-info">
+            <div class="bc-name">${provName}</div>
+            <div class="bc-service">${[provService !== '—' ? provService : '', location].filter(Boolean).join(' · ')}</div>
+          </div>
+          <div class="bc-status">
+            <span class="status-badge ${sbClass}">${sbLabel}</span>
+            <div class="bc-time" style="text-align:right;margin-top:3px;margin-right:3px;">${timeAgo}</div>
+          </div>
         </div>
-        <div class="bc-status">
-          <span class="status-badge ${sbClass}">${sbLabel}</span>
-        </div>
-      </div>
-
-      <div class="msg-wrap">
-        <div class="msg-label">Your inquiry</div>
-        <div class="msg-bubble">${inq.user_message}</div>
-      </div>
-
-      ${inq.provider_reply ? `
-        <div class="msg-wrap">
-          <div class="msg-label">Provider's reply</div>
-          <div class="msg-bubble provider">${inq.provider_reply}</div>
-        </div>` : ''}
-
-      ${contactFooter}
+      ${inq.user_message ? `
+      <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
+        <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${inq.user_message}
+      </div>` : ''}
       ${ratingDisplay}
-
-      ${actions ? `<div class="bc-actions">${actions}</div>` : ''}
+      ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}
     </div>`;
 }
 
 /* ── Actions ────────────────────────────────────────────────── */
 async function doBook(id) {
   try {
-    await FX.bookInquiry(id);
-    showToast('Booking confirmed! ⚡', 'success');
+    await FX.activateBooking(id);
     FX.adTrigger('booking_confirmed');
     await load();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
 function openCancel(id) {
+  const inq = allInquiries.find(i => i.id === id);
+  const isDone = inq?.status === 'done';
+  const modalTitle = document.querySelector('#cancelModal .modal-title');
+  const modalSub   = document.querySelector('#cancelModal .modal-sub');
+  if (modalTitle) modalTitle.textContent = isDone ? 'Dispute Completion?' : 'Cancel Booking?';
+  if (modalSub)   modalSub.textContent   = isDone
+    ? 'This will cancel the booking. Contact the provider to resolve the issue and start a new booking if needed.'
+    : 'This will cancel the booking and notify the provider.';
   activeCancelId = id;
   openModal('cancelModal');
+}
+
+let _markDoneId = null;
+function openMarkDone(id) {
+  _markDoneId = id;
+  document.getElementById('markDoneModal').classList.add('open');
+}
+
+function closeMarkDone() {
+  _markDoneId = null;
+  document.getElementById('markDoneModal').classList.remove('open');
+}
+
+async function confirmMarkDone() {
+  if (!_markDoneId) return;
+  const btn = document.getElementById('markDoneConfirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Marking…';
+  try {
+    await FX.markDone(_markDoneId);
+    closeMarkDone();
+    await load();
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Yes, Mark as Done';
+  }
 }
 
 async function confirmCancel() {
   if (!activeCancelId) return;
   closeModal('cancelModal');
   try {
-    await FX.cancelInquiry(activeCancelId);
-    showToast('Inquiry cancelled');
+    if (session.role === 'provider') {
+      await FX.providerCancelBooking(activeCancelId);
+    } else {
+      const inq = allInquiries.find(i => i.id === activeCancelId);
+      if (inq?.status === 'done') {
+        await FX.disputeInquiry(activeCancelId);
+      } else {
+        await FX.cancelInquiry(activeCancelId);
+      }
+    }
+    showToast('Booking cancelled and permanently removed.', 'error');
     await load();
   } catch(e) { showToast(e.message, 'error'); }
 }
@@ -521,7 +631,34 @@ function openAccept(id, provName) {
   document.getElementById('ratingComment').value = '';
   document.getElementById('acceptAlert').className = 'modal-alert err';
   document.querySelectorAll('#starPicker i').forEach(s => s.classList.remove('lit'));
+  // Reset anonymous toggle
+  document.getElementById('anonToggle').checked = false;
+  document.getElementById('anonTrack').style.background = '#CBD5E0';
+  document.getElementById('anonThumb').style.left = '3px';
+  updateAnonPreview();
   openModal('acceptModal');
+}
+
+function updateAnonPreview() {
+  const on     = document.getElementById('anonToggle').checked;
+  const track  = document.getElementById('anonTrack');
+  const thumb  = document.getElementById('anonThumb');
+  const preview = document.getElementById('anonPreview');
+  track.style.background = on ? 'var(--brand)' : '#CBD5E0';
+  thumb.style.left       = on ? '21px' : '3px';
+  const name = session?.firstName || '';
+  const last = session?.lastName  || '';
+  if (on) {
+    const masked = maskName(name) + ' ' + maskName(last);
+    preview.textContent = `Shown as: ${masked.trim()}`;
+  } else {
+    preview.textContent = `Your name will be shown: ${name} ${last}`.trim();
+  }
+}
+
+function maskName(str) {
+  if (!str) return '';
+  return str.slice(0, 3) + '***';
 }
 
 function pickStar(n) {
@@ -533,17 +670,22 @@ function pickStar(n) {
 
 async function confirmAccept() {
   if (!activeAcceptId) return;
+  const btn = document.querySelector('#acceptModal .btn-accept');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…'; }
   try {
-    const comment = document.getElementById('ratingComment').value.trim();
-    await FX.acceptCompletion(activeAcceptId, selectedStars || null, comment);
+    const comment   = document.getElementById('ratingComment').value.trim();
+    const anonymous = document.getElementById('anonToggle').checked;
+    await FX.acceptCompletion(activeAcceptId, selectedStars || null, comment, anonymous);
     closeModal('acceptModal');
-    showToast('Job accepted! Thanks for your rating 🎉', 'success');
+    // Load runs in background — toast shows immediately without waiting
+    load();
     FX.adTrigger('job_accepted');
-    await load();
   } catch(e) {
     const al = document.getElementById('acceptAlert');
     al.textContent = e.message;
     al.className = 'modal-alert err show';
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Accept & Rate'; }
   }
 }
 
@@ -571,6 +713,64 @@ function showToast(msg, type='') {
   el.textContent = msg; el.className = `toast show ${type}`;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
+
+function goToNotifications() {
+  const sess = FX.getSession();
+  if (!sess) { window.location.href = 'login.html'; return; }
+  window.location.href = 'notifications.html';
+}
+
+async function refreshNotifBadge() {
+  try {
+    const sess = FX.getSession();
+    if (!sess) return;
+
+    let count = 0;
+
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+
+    const badge = document.getElementById('notifBellBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(e) {}
+}
+refreshNotifBadge();
+setInterval(refreshNotifBadge, 10000);
+
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('open'); }
+
 </script>
+
+<!-- MARK DONE MODAL -->
+<div class="modal-overlay" id="markDoneModal" onclick="if(event.target===this)closeMarkDone()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+	<div class="modal-head" style="display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-size:0.95rem;font-weight:800;"><i class="fa-solid fa-flag-checkered" style="color:var(--brand);"></i> Job Completed</h3>
+      <button class="modal-x" onclick="closeMarkDone()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-3);">✕</button>
+    </div>
+    <div style="padding:14px 18px;font-size:0.85rem;color:var(--text-2);line-height:1.6;">
+      This marks the job as completed on your side. Final completion is subject to customer approval.
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="closeMarkDone()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+      <button onclick="confirmMarkDone()" id="markDoneConfirmBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i class="fa-solid fa-flag-checkered"></i> Job Completed
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

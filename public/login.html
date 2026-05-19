@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Login — Fixia</title>
@@ -64,15 +64,6 @@
 
     /* ── Logo ────────────────────────────────────────────────── */
     .logo-wrap { text-align:center; margin-bottom:1.75rem; }
-    .logo-icon {
-      width:64px; height:64px; border-radius:18px;
-      background:linear-gradient(135deg, #FF5A1F, #D94200);
-      display:inline-flex; align-items:center; justify-content:center;
-      font-size:1.8rem; margin-bottom:0.75rem;
-      box-shadow:0 8px 24px rgba(255,90,31,0.35);
-    }
-    .logo-name { font-size:1.75rem; font-weight:800; color:var(--navy); letter-spacing:-0.04em; }
-    .logo-name span { color:var(--brand); }
     .logo-sub { font-size:0.82rem; color:var(--text-3); margin-top:2px; }
 
     /* ── Panels ──────────────────────────────────────────────── */
@@ -186,7 +177,29 @@
     .modal-body { padding:1.25rem 1.4rem; font-size:0.88rem; color:var(--text-2); line-height:1.7; }
     .modal-foot { padding:0.9rem 1.4rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; }
     .modal-foot button { background:var(--brand); color:#fff; border:none; border-radius:var(--radius-sm); padding:0.55rem 1.2rem; font-size:0.875rem; font-weight:700; cursor:pointer; font-family:inherit; }
-  </style>
+
+    /* Support Modal Items */
+    .support-item { display:flex; align-items:center; gap:14px; padding:1rem 1.4rem; cursor:pointer; text-decoration:none; color:inherit; border-bottom:1px solid var(--border); transition:background 0.15s; }
+    .support-item:last-child { border-bottom:none; }
+    .support-item:hover { background:var(--bg); }
+    .support-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .support-text { flex:1; }
+    .support-title { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:2px; }
+    .support-desc { font-size:0.78rem; color:var(--text-3); }
+    .support-badge { font-size:0.6rem; font-weight:700; background:var(--border); color:var(--text-3); border-radius:20px; padding:1px 7px; margin-left:5px; vertical-align:middle; text-transform:uppercase; letter-spacing:0.05em; }
+    .support-arrow { color:var(--border); font-size:0.75rem; flex-shrink:0; }
+    
+    /* FAQ */
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:none; }
+    .faq-q { display:flex; justify-content:space-between; align-items:center; padding:0.9rem 1.4rem; font-size:0.88rem; font-weight:700; color:var(--navy); cursor:pointer; gap:8px; }
+    .faq-q:hover { background:var(--bg); }
+    .faq-arrow { transition:transform 0.2s; color:var(--text-3); font-size:0.75rem; flex-shrink:0; }
+    .faq-q.open .faq-arrow { transform:rotate(180deg); }
+    .faq-a { display:none; padding:0 1.4rem 0.9rem; font-size:0.82rem; color:var(--text-2); line-height:1.7; }
+    .faq-a.open { display:block; }
+
+</style>
 </head>
 <body>
 
@@ -200,8 +213,8 @@
 
     <!-- Logo -->
     <div class="logo-wrap">
-      <div class="logo-icon">🔧</div>
-      <div class="logo-name">fix<span>ia</span></div>
+      <img src="images/fixia-icon.png" alt="Fixia Icon" style="width:64px;height:64px;margin-bottom:0.7rem;display:block;margin-left:auto;margin-right:auto;border-radius:18px;box-shadow:0 8px 24px rgba(15,27,45,0.45);">
+      <img src="images/fixia-tag.png" alt="Fixia" style="height:28px;display:block;margin:0 auto 4px;">
       <div class="logo-sub">Find any service near you</div>
     </div>
 
@@ -233,7 +246,7 @@
 
       <button class="btn btn-brand" id="loginBtn" onclick="doLogin()">
         <span class="spinner" id="loginSpinner"></span>
-        <span id="loginBtnText"><i class="fa-solid fa-right-to-bracket"></i> Sign In</span>
+        <span id="loginBtnText"><i class="fa-solid fa-right-to-bracket"></i> &nbsp; Sign In</span>
       </button>
 
       <div class="divider"><span>New to Fixia?</span></div>
@@ -285,10 +298,11 @@
 <!-- About Modal -->
 <div id="aboutModal" class="modal">
   <div class="modal-box">
-    <div class="modal-head"><h3><i class="fa-solid fa-circle-info"></i> About Fixia</h3><button class="modal-x" onclick="closeModal('aboutModal')">×</button></div>
+    <div class="modal-head"><h3><i class="fa-solid fa-circle-info"></i> &nbsp; About Fixia</h3><button class="modal-x" onclick="closeModal('aboutModal')">×</button></div>
     <div class="modal-body">
-      <p><strong>Fixia</strong> is a service marketplace connecting Filipinos with trusted local service providers — from plumbers and electricians to beauty services and IT support.</p>
-      <p style="margin-top:8px;"><strong>Version:</strong> 1.0.0 &nbsp;|&nbsp; <strong>Developer:</strong> ByteStack Labs</p>
+      <p><strong>Fixia</strong> is a modern service marketplace helping Filipinos discover trusted professionals for home, personal, and technical needs.</p>
+      <p style="margin-top:20px;"><strong>Developer:</strong> ByteStack Labs</p>
+	  <p style="margin-top:10px;"><strong>Version:</strong> 1.0.0 &nbsp; &nbsp;|&nbsp;&nbsp; May 2026
     </div>
     <div class="modal-foot"><button onclick="closeModal('aboutModal')">OK</button></div>
   </div>
@@ -297,22 +311,96 @@
 <!-- Support Modal -->
 <div id="supportModal" class="modal">
   <div class="modal-box">
-    <div class="modal-head"><h3><i class="fa-solid fa-headset"></i> Support</h3><button class="modal-x" onclick="closeModal('supportModal')">×</button></div>
-    <div class="modal-body">
-      <p>For questions, concerns, or technical issues, contact us at:</p>
-      <p style="margin-top:8px;"><strong>ByteStack Labs</strong><br/>
-      <a href="mailto:support@fixia.ph" style="color:var(--brand);">support@fixia.ph</a></p>
+    <div class="modal-head"><h3><i class="fa-solid fa-headset"></i> &nbsp; Support</h3><button class="modal-x" onclick="closeModal('supportModal')">×</button></div>
+    <div class="modal-body" style="padding:0;">
+
+      <!-- Live Chat -->
+      <a href="https://www.facebook.com/share/18WYchWMH7/?mibextid=wwXIfr" target="_blank" class="support-item">
+        <div class="support-icon" style="background:#0084FF22;color:#0084FF;"><i class="fa-brands fa-facebook-messenger"></i></div>
+        <div class="support-text">
+          <div class="support-title">Live Chat <span class="support-badge">Coming Soon</span></div>
+          <div class="support-desc">Chat with our support team via Messenger</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </a>
+
+      <!-- FAQ -->
+      <div class="support-item" onclick="closeModal('supportModal'); setTimeout(()=>openModal('faqModal'),150);">
+        <div class="support-icon" style="background:#FF5A1F22;color:var(--brand);"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="support-text">
+          <div class="support-title">FAQ List</div>
+          <div class="support-desc">Browse frequently asked questions</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </div>
+
+      <!-- Email Support -->
+      <a href="mailto:noreply.bytestack@gmail.com" class="support-item">
+        <div class="support-icon" style="background:#16a34a22;color:#16a34a;"><i class="fa-solid fa-envelope"></i></div>
+        <div class="support-text">
+          <div class="support-title">Need Support?</div>
+          <div class="support-desc">noreply.bytestack@gmail.com</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </a>
+
     </div>
-    <div class="modal-foot"><button onclick="closeModal('supportModal')">OK</button></div>
+  </div>
+</div>
+
+<!-- FAQ Modal -->
+<div id="faqModal" class="modal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head"><h3><i class="fa-solid fa-circle-question"></i> FAQ List</h3><button class="modal-x" onclick="closeModal('faqModal')">×</button></div>
+    <div class="modal-body" style="padding:0;max-height:70vh;overflow-y:auto;">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What is Fixia? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Fixia is a service marketplace that connects customers with trusted local service providers. You can browse, compare, and hire professionals for services like plumbing, electrical work, beauty, and IT support—all in one place.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I sign up as a provider? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Tap "Offer Services" on the sign-up page and complete the 5-step registration. A valid government-issued ID is required for verification.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is Fixia free to use? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Yes! Fixia offers a free plan for customers. Service providers can choose from flexible packages based on their needs.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I reset my password? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">On the login page, tap "Forgot password?" and enter your registered email. You'll receive a reset link shortly.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I contact a service provider? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Once logged in, browse providers in your area and tap their profile to view contact options and send a booking request.</div>
+      </div>
+
+    </div>
+    <div class="modal-foot"><button onclick="closeModal('faqModal')">Got it</button></div>
   </div>
 </div>
 
 <!-- Privacy Modal -->
 <div id="privacyModal" class="modal">
   <div class="modal-box">
-    <div class="modal-head"><h3><i class="fa-solid fa-shield-halved"></i> Privacy Policy</h3><button class="modal-x" onclick="closeModal('privacyModal')">×</button></div>
+    <div class="modal-head"><h3><i class="fa-solid fa-shield-halved"></i> &nbsp; Privacy Policy</h3><button class="modal-x" onclick="closeModal('privacyModal')">×</button></div>
     <div class="modal-body">
-      <p>All user data is securely stored and never shared with third parties without consent. Provider documents (IDs, permits) are used solely for verification purposes. ByteStack Labs complies with the Philippine Data Privacy Act of 2012.</p>
+      <p>All user data is securely stored and will not be shared with third parties without explicit consent. Provider-submitted documents (such as government-issued IDs and permits) are collected and used solely for identity verification and platform security.</p>
+	  <p style="margin-top:20px;">ByteStack Labs complies with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines, ensuring that all personal information is processed, protected, and handled in accordance with applicable data privacy regulations.</p>
     </div>
     <div class="modal-foot"><button onclick="closeModal('privacyModal')">OK</button></div>
   </div>
@@ -324,9 +412,22 @@
 (function() {
   const sess = FX.getSession();
   if (!sess) return;
-  if (sess.role === 'admin')    window.location.href = 'admin.html';
-  else if (sess.role === 'provider') window.location.href = 'provider-dashboard.html';
-  else                          window.location.href = 'homepage.html';
+  // Don't redirect blocked accounts — clear any stale session and stay on login
+if (sess.status === 'suspended') {
+  FX.clearSession();
+  return;
+}
+if (sess.status === 'rejected') {
+  window.location.href = 'homepage.html';
+  return;
+}
+if (sess.status === 'pending' && sess.role !== 'provider' && sess.role !== 'regular') {
+  FX.clearSession();
+  return;
+}
+  if (sess.role === 'admin')         window.location.href = 'admin.html';
+  else if (sess.role === 'provider') window.location.href = 'homepage.html';
+  else                               window.location.href = 'homepage.html';
 })();
 
 /* ── Panel switching ─────────────────────────────────────────── */
@@ -394,23 +495,26 @@ async function doLogin() {
       return;
     }
 
-    if (result.user.status === 'pending') {
+    if (result.user.status === 'pending' && result.user.role !== 'provider' && result.user.role !== 'regular') {
+      FX.clearSession();
       showAlert('loginAlert', '⏳ Your account is pending approval. We\'ll notify you by email once approved.', 'info');
       return;
     }
     if (result.user.status === 'rejected') {
+      FX.clearSession();
       showAlert('loginAlert', '❌ Your account application was not approved. Contact support for details.', 'error');
       return;
     }
     if (result.user.status === 'suspended') {
-      showAlert('loginAlert', '🚫 Your account has been suspended. Contact support.', 'error');
+      FX.clearSession();
+      showAlert('loginAlert', '🚫 Your account has been suspended. Please contact support for assistance.', 'error');
       return;
     }
 
     showToast('Welcome back! Redirecting…', 'success');
     setTimeout(() => {
       if (result.user.role === 'admin')         window.location.href = 'admin.html';
-      else if (result.user.role === 'provider') window.location.href = 'provider-dashboard.html';
+      else if (result.user.role === 'provider') window.location.href = 'homepage.html';
       else                                      window.location.href = 'homepage.html';
     }, 900);
 
@@ -449,6 +553,14 @@ async function doForgot() {
 /* ── Modals ──────────────────────────────────────────────────── */
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleFaq(el) {
+  const answer = el.nextElementSibling;
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-q.open').forEach(q => { q.classList.remove('open'); q.nextElementSibling.classList.remove('open'); });
+  if (!isOpen) { el.classList.add('open'); answer.classList.add('open'); }
+}
+
 window.addEventListener('click', e => {
   document.querySelectorAll('.modal.open').forEach(m => {
     if (e.target === m) m.classList.remove('open');

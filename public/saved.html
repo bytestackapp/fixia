@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Saved — Fixia</title>
@@ -97,6 +97,7 @@
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
     .toast.success{background:#065f46;}
 
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:var(--bottom-h);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
     .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
     .bnav-item i{font-size:1.05rem;}
@@ -108,6 +109,19 @@
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
 
+	.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
+    .modal-overlay.open{display:flex;animation:fadeIn 0.2s;}
+    .modal-sheet{background:#FFFFFF;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;animation:slideUp 0.3s ease;}
+	@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+	
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:#E8ECF0;margin:12px auto 0;}
+    .modal-head{padding:14px 18px 10px;border-bottom:1px solid #E8ECF0;}
+    .modal-title{font-size:0.95rem;font-weight:800;color:#0F1B2D;}
+    .modal-body{padding:14px 18px;}
+    .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
+    .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+	
+	
   </style>
 </head>
 <body>
@@ -119,11 +133,12 @@
     <i class="fa-solid fa-magnifying-glass"></i>
     <span style="color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;">Search services…</span>
   </div>
-  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
+  <button id="clearAllBtn" class="nav-clear-all" onclick="clearAll()" style="display:none;">Clear All</button>
+  <button class="nav-icon-btn" onclick="goToNotifications()" title="Notifications" style="position:relative;">
     <i class="fa-regular fa-bell"></i>
     <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
   </button>
-  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
@@ -133,13 +148,34 @@
   <!-- Rendered by JS -->
 </div>
 
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="signOutModal" onclick="handleOverlay(event,'signOutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn" onclick="closeSignOutModal()">Cancel</button>
+      <button class="action-btn" onclick="FX.logout()" style="background:linear-gradient(135deg,#dc3545,#b02030);color:#fff;box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
-  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <a class="bnav-item active" href="saved.html"><i class="fa-solid fa-bookmark"></i>Saved</a>
   <div class="bnav-center">
     <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
       <i class="fa-solid fa-border-all"></i>
@@ -154,19 +190,6 @@
 
 <script src="fixia-data.js"></script>
 <script>
-/*
- * Saved providers are stored in localStorage as an array of provider objects.
- * Key: 'fixia_saved'
- * Value: [{id, bizName, catSub, avgRating, totalRatings, cityName, isElite, isOnline}]
- *
- * To save a provider from provider.html, call:
- *   FX.saveProvider(providerObj)
- * To unsave:
- *   FX.unsaveProvider(providerId)
- * Both are defined below and should also be added to fixia-data.js.
- */
-
-const session = FX.getSession();
 
 /* ── Save/unsave helpers (localStorage-based) ───────────────── */
 FX.getSaved = function() {
@@ -198,15 +221,15 @@ FX.isSaved = function(id) {
 };
 
 /* ── Init ───────────────────────────────────────────────────── */
-(function init() {
-  if (session && session.role === 'regular' && !session.adsFree) FX.initAds();
+(async function init() {
+  const currentSession = FX.getSession();
+  if (currentSession && currentSession.role === 'regular' && !currentSession.adsFree) await FX.initAds();
   render();
 })();
 
 function render() {
+  const session = FX.getSession();
   const body = document.getElementById('bodyContent');
-
-  // Guest wall
   if (!session) {
     body.innerHTML = `
       <div class="guest-wall">
@@ -264,9 +287,11 @@ function renderCards(saved) {
     return `
       <div class="provider-card" style="animation-delay:${i*0.05}s">
         <div class="card-top">
-          <div class="provider-avatar">
-            ${catEmoji(p.catMain)}
-          </div>
+        <div class="provider-avatar">
+          ${p.avatarUrl
+            ? `<img src="${p.avatarUrl}" alt="${p.bizName}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+            : catEmoji(p.catMain)}
+        </div>
           <div class="provider-info">
             <div class="provider-name">${p.isElite ? '👑 ' : ''}${p.bizName}</div>
             <div class="provider-service">${p.catSub || '—'}</div>
@@ -321,22 +346,44 @@ function showToast(msg, type='') {
   el.textContent = msg; el.className = `toast show ${type}`;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
-</script>
 
-<script>
-// Load booking badge count
-(async function loadBookingBadge() {
+function goToNotifications() {
   const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
+  if (!sess) { window.location.href = 'login.html'; return; }
+  window.location.href = 'notifications.html';
+}
+
+async function refreshNotifBadge() {
   try {
-    const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
-    if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+    const sess = FX.getSession();
+    if (!sess) return;
+
+    let count = 0;
+
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+
+    const badge = document.getElementById('notifBellBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
     }
   } catch(e) {}
-})();
+}
+refreshNotifBadge();
+setInterval(refreshNotifBadge, 10000);
+
+function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeSignOutModal(); }
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('open'); }
+
 </script>
 </body>
 </html>

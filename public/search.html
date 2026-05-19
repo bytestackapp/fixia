@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Search — Fixia</title>
@@ -208,7 +208,7 @@ const session = FX.getSession();
 
 /* ── Init ──────────────────────────────────────────────────── */
 (async function init() {
-  if (session && session.role === 'regular' && !session.adsFree) FX.initAds();
+  await FX.initAds();
 
   // Get query from URL
   const params = new URLSearchParams(window.location.search);
@@ -284,6 +284,7 @@ function applyFilters() {
 
 function renderResults() {
   const list = document.getElementById('resultsList');
+  list.innerHTML = '';
   const q    = currentQuery ? `"${currentQuery}"` : 'All providers';
 
   document.getElementById('resultsCount').innerHTML =
@@ -297,22 +298,7 @@ function renderResults() {
     return;
   }
 
-  list.innerHTML = '';
   filtered.forEach((p, i) => {
-    // Insert ad after every 5 results for free users
-    if (i > 0 && i % 5 === 0 && session && session.role === 'regular' && !session.adsFree) {
-      list.insertAdjacentHTML('beforeend', `
-        <div class="ad-inline">
-          <div class="ai-icon">💡</div>
-          <div class="ai-body">
-            <div class="ai-label">Sponsored</div>
-            <div class="ai-title">PowerSave Solar Panels</div>
-            <div class="ai-sub">Cut your electricity bill by 70%</div>
-          </div>
-          <button class="ai-btn">Learn More</button>
-        </div>`);
-    }
-
     const initials = (p.biz_name || '?').charAt(0).toUpperCase();
     const stars = Array.from({length:5}, (_,idx) =>
       `<i class="fa-${idx < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
@@ -324,14 +310,16 @@ function renderResults() {
     card.onclick = () => window.location.href = `provider.html?id=${p.id}`;
     card.innerHTML = `
       <div class="provider-avatar">
-        ${initials}
+        ${p.avatar_url
+          ? `<img src="${p.avatar_url}" alt="${p.biz_name}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">`
+          : initials}
         ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>
       <div class="provider-info">
         <div class="provider-name">
           ${p.is_elite ? '<span class="elite">👑 </span>' : ''}${p.biz_name}
         </div>
-		<div class="provider-service">${p._listing_cats?.length ? p._listing_cats.join(' · ') : (p.cat_sub || 'General Services')}</div>
+		<div class="provider-service">${[p.city_name, p.province_name].filter(Boolean).join(', ') || '—'}</div>
         <div class="provider-meta">
           <div class="stars-mini">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
           <div class="pmeta"><i class="fa-solid fa-location-dot"></i>${p.city_name || '—'}</div>
@@ -345,6 +333,7 @@ function renderResults() {
       </div>`;
     list.appendChild(card);
   });
+  FX.injectInlineAds('resultsList', 5);
 }
 
 function showEmpty(icon, title, sub) {

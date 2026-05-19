@@ -8,7 +8,7 @@
 -->
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Browse — Fixia</title>
@@ -20,7 +20,7 @@
       --navy:#0F1B2D; --navy-mid:#1E3048;
       --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
       --bg:#F0F2F5; --card:#FFFFFF; --border:#E8ECF0;
-      --green:#10B981; --gold:#F59E0B;
+      --green:#10B981; --gold:#F59E0B; --red:#DC3545;
       --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
       --shadow-sm:0 1px 4px rgba(0,0,0,0.07);
       --nav-h:56px; --bottom-h:62px;
@@ -63,26 +63,30 @@
     .bg-beauty{background:#FDF2F8;} .bg-health{background:#F0FDF4;}
     .bg-tech  {background:#EFF6FF;} .bg-build {background:#FFF5F5;}
     .bg-clean {background:#F0F9FF;} .bg-pet   {background:#FFFBEB;}
-    .bg-event {background:#F5F3FF;}
+    .bg-event {background:#F5F3FF;} .bg-edu   {background:#F0FDF4;}
 
     /* ── SUBCATEGORY PANEL ───────────────────────────────────── */
-    .subcat-panel{display:none;background:var(--card);border-radius:var(--radius-md);border:1.5px solid var(--brand);margin:10px 16px 0;overflow:hidden;animation:fadeIn 0.2s;}
-    .subcat-panel.open{display:block;}
-    .subcat-head{background:var(--brand-light);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;}
-    .subcat-head-title{font-size:0.85rem;font-weight:800;color:var(--brand-dark);display:flex;align-items:center;gap:6px;}
-    .subcat-close{background:none;border:none;color:var(--brand);font-size:1rem;cursor:pointer;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
-    .subcat-close:hover{background:rgba(255,90,31,0.1);}
-    .subcat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
-    .subcat-item{background:var(--card);padding:13px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;text-align:center;transition:background 0.15s;}
-    .subcat-item:active{background:var(--brand-light);}
-    .subcat-item i{font-size:1.2rem;color:var(--brand);}
-    .subcat-item span{font-size:0.65rem;font-weight:600;color:var(--text-2);line-height:1.3;}
+	/* Subcat bottom sheet overlay */
+	.subcat-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
+	.subcat-overlay.open{opacity:1;pointer-events:all;}
+	
+	/* Subcat bottom sheet */
+	.subcat-panel{position:fixed;bottom:0;left:0;right:0;z-index:201;background:var(--card);border-radius:20px 20px 0 0;padding-bottom:calc(var(--bottom-h) + 8px);transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);max-height:80vh;overflow-y:auto;}
+	.subcat-panel.open{transform:translateY(0);}
+	.subcat-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:12px auto 4px;}
+	.subcat-head{background:var(--card);padding:10px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1;}
+	.subcat-head-title{font-size:0.88rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;}
+	.subcat-close{background:none;border:none;color:var(--text-3);font-size:1rem;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg);}
+	.subcat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+	.subcat-item{background:var(--card);padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;text-align:center;transition:background 0.15s;}
+	.subcat-item:active{background:var(--brand-light);}
+	.subcat-item i{font-size:1.2rem;color:var(--brand);}
+	.subcat-item span{font-size:0.65rem;font-weight:600;color:var(--text-2);line-height:1.3;}
 
     /* ── FEATURED PROVIDERS STRIP ────────────────────────────── */
-    .featured-strip{display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-    .featured-strip::-webkit-scrollbar{display:none;}
-    .feat-card{flex-shrink:0;width:180px;background:var(--navy);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;}
-    .feat-card-img{width:100%;height:90px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;}
+    .featured-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 4px;}
+	.feat-card{background:var(--navy);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;min-width:0;}
+    .feat-card-img{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
     .feat-card-body{padding:9px 11px 11px;}
     .feat-card-name{font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .feat-card-sub{font-size:0.65rem;color:rgba(255,255,255,0.5);}
@@ -100,7 +104,18 @@
 
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+
+	.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
+    .modal-overlay.open{display:flex;animation:fadeIn 0.2s;}
+    .modal-sheet{background:#FFFFFF;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;animation:slideUp 0.3s ease;}
+	@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
 	
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:#E8ECF0;margin:12px auto 0;}
+    .modal-head{padding:14px 18px 10px;border-bottom:1px solid #E8ECF0;}
+    .modal-title{font-size:0.95rem;font-weight:800;color:#0F1B2D;}
+    .modal-body{padding:14px 18px;}
+    .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
+    .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}	
   </style>
 </head>
 <body>
@@ -112,11 +127,11 @@
     <i class="fa-solid fa-magnifying-glass"></i>
     <span>Search services…</span>
   </div>
-  <button class="nav-icon-btn" onclick="window.location.href='notifications.html'" title="Notifications" style="position:relative;">
+  <button class="nav-icon-btn" onclick="goToNotifications()" title="Notifications" style="position:relative;">
     <i class="fa-regular fa-bell"></i>
     <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
   </button>
-  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
@@ -125,6 +140,27 @@
 <div class="page-header">
   <div class="ph-title">Browse Services</div>
   <div class="ph-sub">Tap a category to explore all service types</div>
+</div>
+
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="signOutModal" onclick="handleOverlay(event,'signOutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn" onclick="closeSignOutModal()">Cancel</button>
+      <button class="action-btn" onclick="FX.logout()" style="background:linear-gradient(135deg,#dc3545,#b02030);color:#fff;box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- MAIN CATEGORIES -->
@@ -152,6 +188,10 @@
       <div class="cat-icon-wrap bg-beauty">💇</div>
       <div class="cat-name">Beauty & Wellness</div>
     </div>
+    <div class="cat-card" id="cat-edu" onclick="openCat('edu',this)">
+      <div class="cat-icon-wrap bg-edu">📚</div>
+      <div class="cat-name">Education & Tutoring</div>
+    </div>	
     <div class="cat-card" id="cat-health" onclick="openCat('health',this)">
       <div class="cat-icon-wrap bg-health">🩺</div>
       <div class="cat-name">Health & Care</div>
@@ -176,18 +216,13 @@
       <div class="cat-icon-wrap bg-event">🎉</div>
       <div class="cat-name">Events</div>
     </div>
-    <div class="cat-card" onclick="window.location.href='search.html'">
-      <div class="cat-icon-wrap" style="background:var(--bg);border:1.5px dashed var(--border);">
-        <i class="fa-solid fa-magnifying-glass" style="font-size:1.1rem;color:var(--text-3);"></i>
-      </div>
-      <div class="cat-name">Search All</div>
-    </div>
-
   </div>
 </div>
 
 <!-- SUBCATEGORY PANEL -->
+<div class="subcat-overlay" id="subcatOverlay" onclick="closeSub()"></div>
 <div class="subcat-panel" id="subcatPanel">
+  <div class="subcat-handle"></div>
   <div class="subcat-head">
     <div class="subcat-head-title">
       <span id="subcatEmoji">🏠</span>
@@ -226,13 +261,14 @@
 <script>
 const SUBCATS = {
   home:   [{icon:'fa-wrench',name:'Plumbing'},{icon:'fa-snowflake',name:'Aircon Service'},{icon:'fa-bolt',name:'Electrical'},{icon:'fa-paint-roller',name:'Painting'},{icon:'fa-hammer',name:'Carpentry'},{icon:'fa-shield',name:'Waterproofing'},{icon:'fa-door-closed',name:'Door & Window'},{icon:'fa-fire',name:'Gas & LPG'},{icon:'fa-broom',name:'Deep Cleaning'}],
-  auto:   [{icon:'fa-car-wrench',name:'General Repair'},{icon:'fa-snowflake',name:'Car Aircon'},{icon:'fa-circle',name:'Tires & Wheels'},{icon:'fa-gauge',name:'PMS / Oil Change'},{icon:'fa-car-battery',name:'Battery'},{icon:'fa-soap',name:'Car Wash'},{icon:'fa-key',name:'Car Locksmith'},{icon:'fa-truck',name:'Towing'},{icon:'fa-window-restore',name:'Window Tint'}],
+  auto:   [{icon:'fa-solid fa-screwdriver-wrench',name:'General Repair'},{icon:'fa-snowflake',name:'Car Aircon'},{icon:'fa-circle',name:'Tires & Wheels'},{icon:'fa-gauge',name:'PMS / Oil Change'},{icon:'fa-car-battery',name:'Battery'},{icon:'fa-soap',name:'Car Wash'},{icon:'fa-key',name:'Car Locksmith'},{icon:'fa-truck',name:'Towing'},{icon:'fa-window-restore',name:'Window Tint'}],
   garden: [{icon:'fa-scissors',name:'Lawn Mowing'},{icon:'fa-tree',name:'Tree Trimming'},{icon:'fa-seedling',name:'Landscaping'},{icon:'fa-bug',name:'Pest Control'},{icon:'fa-water',name:'Irrigation'},{icon:'fa-leaf',name:'Garden Design'}],
   elec:   [{icon:'fa-plug',name:'Wiring & Rewiring'},{icon:'fa-solar-panel',name:'Solar Install'},{icon:'fa-lightbulb',name:'Lighting'},{icon:'fa-video',name:'CCTV Install'},{icon:'fa-wifi',name:'Network Setup'},{icon:'fa-bolt',name:'Generator'}],
   beauty: [{icon:'fa-scissors',name:'Haircut & Style'},{icon:'fa-hand-sparkles',name:'Nails'},{icon:'fa-spa',name:'Facial'},{icon:'fa-person-walking',name:'Massage'},{icon:'fa-dumbbell',name:'Personal Trainer'},{icon:'fa-brush',name:'Makeup'}],
+  edu:    [{icon:'fa-book',name:'Academic Tutoring'},{icon:'fa-language',name:'Language Lessons'},{icon:'fa-music',name:'Music Lessons'},{icon:'fa-person-dancing',name:'Dance Lessons'},{icon:'fa-laptop',name:'Online Tutoring'},{icon:'fa-file-pen',name:'Exam Review'},{icon:'fa-computer',name:'Computer Lessons'},{icon:'fa-palette',name:'Arts & Crafts'},{icon:'fa-pencil',name:'Homework Assistance'},{icon:'fa-hands-helping',name:'Special Education Support'}],
   health: [{icon:'fa-user-nurse',name:'Home Nursing'},{icon:'fa-syringe',name:'Home Labs'},{icon:'fa-wheelchair',name:'Elder Care'},{icon:'fa-baby',name:'Baby Care'},{icon:'fa-pills',name:'Med Delivery'},{icon:'fa-tooth',name:'Dental Visit'}],
   tech:   [{icon:'fa-laptop',name:'Laptop Repair'},{icon:'fa-desktop',name:'Desktop Repair'},{icon:'fa-wifi',name:'Network Setup'},{icon:'fa-print',name:'Printer Repair'},{icon:'fa-mobile',name:'Phone Repair'},{icon:'fa-database',name:'Data Recovery'}],
-  build:  [{icon:'fa-house',name:'Renovation'},{icon:'fa-ruler',name:'Engineering'},{icon:'fa-drafting-compass',name:'Architecture'},{icon:'fa-bricks',name:'Masonry'},{icon:'fa-pipe',name:'Drainage'},{icon:'fa-road',name:'Flooring'}],
+  build:  [{icon:'fa-house',name:'Renovation'},{icon:'fa-ruler',name:'Engineering'},{icon:'fa-drafting-compass',name:'Architecture'},{icon:'fa-hammer',name:'Masonry'},{icon:'fa-droplet',name:'Drainage'},{icon:'fa-road',name:'Flooring'}],
   clean:  [{icon:'fa-house',name:'House Cleaning'},{icon:'fa-building',name:'Office Cleaning'},{icon:'fa-couch',name:'Upholstery'},{icon:'fa-soap',name:'Carpet Cleaning'},{icon:'fa-shirt',name:'Laundry'},{icon:'fa-trash',name:'Junk Removal'}],
   pet:    [{icon:'fa-scissors',name:'Pet Grooming'},{icon:'fa-paw',name:'Pet Sitting'},{icon:'fa-stethoscope',name:'Vet Visit'},{icon:'fa-dog',name:'Dog Walking'},{icon:'fa-house',name:'Pet Hotel'},{icon:'fa-syringe',name:'Vaccination'}],
   event:  [{icon:'fa-camera',name:'Photography'},{icon:'fa-music',name:'DJ / Band'},{icon:'fa-utensils',name:'Catering'},{icon:'fa-star',name:'Event Host'},{icon:'fa-tent',name:'Tent & Tables'},{icon:'fa-cake-candles',name:'Decorations'}],
@@ -240,12 +276,13 @@ const SUBCATS = {
 
 const CAT_LABELS = {
   home:'Home Services', auto:'Automotive', garden:'Garden & Lawn',
-  elec:'Electrical', beauty:'Beauty & Wellness', health:'Health & Care',
+  elec:'Electrical', beauty:'Beauty & Wellness', edu:'Education & Tutoring', health:'Health & Care',
   tech:'Tech & IT', build:'Construction', clean:'Cleaning',
   pet:'Pet Services', event:'Events',
 };
+
 const CAT_EMOJIS = {
-  home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',
+  home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',edu:'📚',health:'🩺',
   tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉',
 };
 
@@ -268,12 +305,12 @@ function openCat(key, el) {
       <span>${s.name}</span>
     </div>`).join('');
 
-  const panel = document.getElementById('subcatPanel');
-  panel.classList.add('open');
-  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  document.getElementById('subcatOverlay').classList.add('open');
+  document.getElementById('subcatPanel').classList.add('open');
 }
 
 function closeSub() {
+  document.getElementById('subcatOverlay').classList.remove('open');
   document.getElementById('subcatPanel').classList.remove('open');
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   openCatKey = null;
@@ -284,11 +321,13 @@ function goSearch(cat, sub) {
   window.location.href = `search.html?q=${encodeURIComponent(sub)}&cat=${cat}`;
 }
 
+const session = FX.getSession();
+
 /* ── Load featured providers ────────────────────────────────── */
 (async function loadFeatured() {
-  if (session && session.role === 'regular' && !session.adsFree) FX.initAds();
+  if (session && session.role === 'regular' && !session.adsFree) await FX.initAds();
   try {
-    const featured = await FX.getProviders({ featured: true, limit: 10 });
+    const featured = await FX.getFeaturedProviders();
     const strip = document.getElementById('featuredStrip');
     if (!featured.length) {
       strip.innerHTML = '<div style="padding:1rem 0;font-size:0.8rem;color:var(--text-3);">No featured providers yet.</div>';
@@ -311,23 +350,43 @@ function goSearch(cat, sub) {
   } catch(e) {}
 })();
 
-const session = FX.getSession();
-</script>
-
-<script>
-// Load booking badge count
-(async function loadBookingBadge() {
+function goToNotifications() {
   const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
+  if (!sess) { window.location.href = 'login.html'; return; }
+  window.location.href = 'notifications.html';
+}
+
+async function refreshNotifBadge() {
   try {
-    const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
-    if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+    const sess = FX.getSession();
+    if (!sess) return;
+
+    let count = 0;
+
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+
+    const badge = document.getElementById('notifBellBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
     }
   } catch(e) {}
-})();
+}
+refreshNotifBadge();
+setInterval(refreshNotifBadge, 10000);
+
+function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeSignOutModal(); }
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('open'); }
+
 </script>
 </body>
 </html>

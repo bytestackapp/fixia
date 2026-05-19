@@ -2,7 +2,7 @@
 <!--
 ═══════════════════════════════════════════════════════════════════════════════
     FIXIA — Service Marketplace
-    Regular User Profile Page
+    Unified Profile Page (Regular User + Provider)
     © ByteStack Labs 2025. All Rights Reserved.
 ═══════════════════════════════════════════════════════════════════════════════
 -->
@@ -25,39 +25,53 @@
       --red:#DC3545; --red-bg:#FFF5F5; --red-text:#991B1B;
       --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
       --shadow-sm:0 1px 4px rgba(0,0,0,0.07);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.10);
       --nav-h:56px; --bottom-h:62px;
     }
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
     @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
     @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+    @keyframes spin{to{transform:rotate(360deg);}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
     .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
     .nav-logo span{color:var(--brand);}
     .nav-spacer{flex:1;}
-    .nav-search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;flex-shrink:0;}
+    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
     .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+    .nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+    .nav-badge{background:rgba(255,90,31,0.2);border:1px solid rgba(255,90,31,0.3);color:var(--brand);font-size:0.58rem;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.06em;text-transform:uppercase;}
 
-    /* ── PROFILE HERO ────────────────────────────────────────── */
-    .hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:22px 16px 20px;text-align:center;}
-    .hero-avatar{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#FF5A1F,#D94200);display:inline-flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:10px;box-shadow:0 8px 24px rgba(255,90,31,0.35);}
-    .hero-name{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:3px;}
-    .hero-username{font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:10px;}
-    .hero-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
-    .hbadge{font-size:0.6rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
-    .hbadge-green{background:rgba(16,185,129,0.2);color:#34D399;}
-    .hbadge-gold{background:rgba(245,158,11,0.2);color:#FBBF24;}
-    .hbadge-brand{background:rgba(255,90,31,0.2);color:#FF8C5A;}
+    /* ── HERO (shared) ───────────────────────────────────────── */
+    .hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:20px 16px 16px;}
+
+    /* Provider hero row */
+    .ph-row{display:flex;align-items:center;gap:12px;}
+    .ph-avatar{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#FF5A1F,#D94200);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#fff;flex-shrink:0;position:relative;}
+	.hero-avatar img{width:100%;height:100%;object-fit:cover;border-radius:20px;}
+	.ph-avatar img{width:100%;height:100%;object-fit:cover;border-radius:16px;}
+	.ph-avatar-initials{background:linear-gradient(135deg,#FF5A1F,#D94200);}
+    .ph-elite-crown{position:absolute;top:-8px;right:-8px;font-size:1rem;}
+    .ph-info{flex:1;min-width:0;}
+    .ph-name{font-size:1rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .ph-service{font-size:0.75rem;color:rgba(255,255,255,0.55);margin-top:2px;}
+    .ph-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+    .ph-badge{font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+    .ph-badge-green{background:rgba(16,185,129,0.2);color:#34D399;}
+    .ph-badge-gold{background:rgba(245,158,11,0.2);color:#FBBF24;}
+    .ph-badge-brand{background:rgba(255,90,31,0.2);color:#FF8C5A;}
 
     /* ── TAB NAV ─────────────────────────────────────────────── */
-    .tab-nav{display:flex;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:var(--nav-h);z-index:50;}
-    .tab-btn{flex:1;padding:11px 8px;font-size:0.72rem;font-weight:700;color:var(--text-3);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .tab-nav{display:flex;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:50;}
+    .tab-nav::-webkit-scrollbar{display:none;}
+    .tab-btn{flex-shrink:0;padding:11px 14px;font-size:0.72rem;font-weight:700;color:var(--text-3);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
     .tab-btn.active{color:var(--brand);border-bottom-color:var(--brand);}
 
-    /* ── PANEL ───────────────────────────────────────────────── */
+    /* ── PANELS ──────────────────────────────────────────────── */
     .panel{display:none;padding:14px 16px;animation:fadeIn 0.2s;}
     .panel.active{display:block;}
 
@@ -65,6 +79,13 @@
     .sec{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
     .sec-title{font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
     .sec-title i{color:var(--brand);}
+    .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .sec-head .sec-title{margin-bottom:0;}
+
+    /* ── PROFILE SECTION (provider style) ───────────────────── */
+    .profile-section{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;}
+    .ps-title{font-size:0.8rem;font-weight:800;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    .ps-title i{color:var(--brand);}
 
     /* ── FORM ────────────────────────────────────────────────── */
     .form-group{margin-bottom:10px;}
@@ -72,12 +93,76 @@
     .form-input{width:100%;padding:0.68rem 0.9rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.87rem;font-family:inherit;color:var(--text);background:#fff;transition:all 0.2s;}
     .form-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,90,31,0.1);}
     .form-input:disabled{background:var(--bg);color:var(--text-3);cursor:not-allowed;}
+    .form-select{width:100%;padding:0.65rem 0.9rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.87rem;font-family:inherit;color:var(--text);background:#fff;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238896A5' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:all 0.2s;}
+    .form-select:focus{outline:none;border-color:var(--brand);}
+    .form-select:disabled{opacity:0.5;}
+    .form-textarea{width:100%;padding:0.65rem 0.9rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.87rem;font-family:inherit;resize:vertical;min-height:75px;color:var(--text);transition:all 0.2s;}
+    .form-textarea:focus{outline:none;border-color:var(--brand);}
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     .pw-wrap{position:relative;}
     .pw-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);font-size:0.9rem;}
     .pw-toggle:hover{color:var(--brand);}
     .strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:5px;overflow:hidden;}
     .strength-fill{height:100%;border-radius:2px;width:0;transition:all 0.3s;}
+
+    /* ── LISTING CARD ────────────────────────────────────────── */
+    .listing-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
+    .lc-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+    .lc-icon{width:40px;height:40px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+    .lc-info{flex:1;min-width:0;}
+    .lc-title{font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:2px;}
+    .lc-sub{font-size:0.72rem;color:var(--text-3);}
+    .lc-price{font-size:0.8rem;font-weight:700;color:var(--brand);margin-bottom:8px;}
+    .lc-desc{font-size:0.78rem;color:var(--text-2);line-height:1.55;margin-bottom:10px;}
+    .lc-actions{display:flex;gap:6px;}
+    .lc-toggle{display:flex;align-items:center;gap:6px;margin-left:auto;}
+
+    /* ── Add Listing Bottom Sheet ─────────────────────────────── */
+    .add-form-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;
+      opacity:0;pointer-events:none;transition:opacity 0.3s;}
+    .add-form-overlay.open{opacity:1;pointer-events:all;}
+    .add-form{position:fixed;bottom:0;left:0;right:0;z-index:201;
+      background:var(--card);border-radius:20px 20px 0 0;
+      padding:0 16px 32px;max-height:92vh;overflow-y:auto;
+      transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);
+      box-shadow:0 -4px 32px rgba(0,0,0,0.15);}
+    .add-form.open{transform:translateY(0);}
+    .add-form-handle{width:36px;height:4px;background:var(--border);border-radius:4px;
+      margin:12px auto 16px;cursor:grab;}
+    .add-form-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .add-form-close{background:none;border:none;font-size:1.3rem;color:var(--text-3);
+      cursor:pointer;padding:4px;line-height:1;}
+
+    /* ── LIMIT BAR ───────────────────────────────────────────── */
+    .limit-bar-wrap{background:var(--brand-light);border:1px solid rgba(255,90,31,0.2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px;}
+    .limit-bar-label{font-size:0.72rem;font-weight:700;color:var(--brand-dark);margin-bottom:5px;}
+    .limit-bar-track{height:6px;background:rgba(255,90,31,0.15);border-radius:3px;overflow:hidden;}
+    .limit-bar-fill{height:100%;background:var(--brand);border-radius:3px;transition:width 0.5s;}
+    .limit-bar-count{font-size:0.7rem;color:var(--text-3);margin-top:4px;}
+
+    /* ── REVIEW CARD ─────────────────────────────────────────── */
+    .review-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
+    .rc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:8px;}
+    .rc-left{flex:1;min-width:0;}
+    .rc-right{text-align:right;flex-shrink:0;}
+    .rc-name{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+    .rc-stars{display:flex;gap:2px;justify-content:flex-end;align-items:center;flex-wrap:nowrap;}
+    .rc-stars i{color:var(--gold);font-size:12px;}
+    .rc-stars i.empty{color:var(--border);}
+    .rc-comment{font-size:0.82rem;color:var(--text-2);line-height:1.6;}
+
+    /* ── BADGE ───────────────────────────────────────────────── */
+    .badge{display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;}
+    .badge-green{background:var(--green-bg);color:var(--green-text);}
+    .badge-grey{background:#F5F7FA;color:var(--text-3);}
+
+    /* ── TOGGLE ──────────────────────────────────────────────── */
+    .toggle{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:0.3s;}
+    .toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.3s;}
+    .toggle input:checked + .toggle-slider{background:var(--green);}
+    .toggle input:checked + .toggle-slider:before{transform:translateX(16px);}
 
     /* ── ALERT ───────────────────────────────────────────────── */
     .alert{border-radius:var(--radius-sm);padding:0.65rem 0.9rem;font-size:0.82rem;margin-bottom:10px;display:none;line-height:1.5;}
@@ -92,8 +177,12 @@
     .btn-brand:disabled{opacity:0.6;cursor:not-allowed;transform:none!important;}
     .btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
     .btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+    .btn-ghost{background:var(--bg);color:var(--text-2);border:1px solid var(--border);}
     .btn-red{background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
     .btn-sm{padding:7px 14px;font-size:0.78rem;}
+    .btn-xs{padding:4px 10px;font-size:0.68rem;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+    .btn-red-xs{background:var(--red-bg);color:var(--red-text);}
+    .btn-edit-xs{background:var(--brand-light);color:var(--brand-dark);}
 
     /* ── PLAN CARD ───────────────────────────────────────────── */
     .plan-card{border-radius:var(--radius-md);padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
@@ -107,8 +196,6 @@
     .plan-desc-plus{color:rgba(255,255,255,0.75);}
     .plan-upgrade-btn{margin-top:10px;padding:9px 18px;border:none;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:800;cursor:pointer;font-family:inherit;background:#fff;color:var(--brand);display:inline-flex;align-items:center;gap:6px;}
     .plan-active-badge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.2);color:#fff;font-size:0.6rem;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.06em;}
-
-    /* ── ADS INFO ────────────────────────────────────────────── */
     .ads-info{background:var(--gold-bg);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-sm);padding:10px 12px;font-size:0.78rem;color:var(--gold-text);line-height:1.6;margin-bottom:10px;}
 
     /* ── MENU ITEMS ──────────────────────────────────────────── */
@@ -120,26 +207,82 @@
     .menu-arrow{color:var(--text-3);font-size:12px;}
     .menu-badge{background:var(--brand);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:20px;}
 
+    /* ── SPINNER ─────────────────────────────────────────────── */
+    .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+    .spinner.on{display:inline-block;}
+    .load-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:2rem auto;}
+
     /* ── TOAST ───────────────────────────────────────────────── */
     .toast{position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--navy);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1.4rem;font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
     .toast.success{background:#065f46;}
     .toast.error{background:var(--red);}
 
+    /* ── EMPTY STATE ─────────────────────────────────────────── */
+    .empty{text-align:center;padding:2rem 1rem;color:var(--text-3);}
+    .empty .ei{font-size:2.5rem;margin-bottom:8px;}
+    .empty p{font-size:0.83rem;}
+
+    /* ── MODAL ───────────────────────────────────────────────── */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;}
+    .modal.open{display:flex;animation:fadeIn 0.2s;}
+    .modal-sheet{background:#FFFFFF;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;animation:slideUp 0.3s ease;}
+	@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+	
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+    .modal-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .modal-head h3{font-size:0.95rem;font-weight:800;color:var(--navy);}
+    .modal-x{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-3);}
+    .modal-body{padding:14px 18px;}
+    .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
+    .modal-foot .btn{flex:1;justify-content:center;}
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:var(--bottom-h);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
     .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
     .bnav-item i{font-size:1.05rem;}
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
-	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}	
-	
-    /* ── LOADING ─────────────────────────────────────────────── */
-    .load-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:2rem auto;}
-    @keyframes spin{to{transform:rotate(360deg);}}
+    /* ── Upgrade package cards ───────────────────────────────── */
+    .upg-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .upg-card { border:2px solid var(--border); border-radius:var(--radius-md); padding:14px 12px;
+                cursor:pointer; transition:all 0.2s; text-align:center; background:#fff;
+                position:relative; }
+    .upg-card:hover { border-color:var(--brand); background:var(--brand-light); }
+    .upg-card.selected { border-color:var(--brand); background:var(--brand-light);
+                         box-shadow:0 4px 14px rgba(255,90,31,0.15); }
+    .upg-card.selected::after { content:'✓'; position:absolute; top:7px; right:10px;
+                                 color:var(--brand); font-weight:800; font-size:13px; }
+    .upg-popular { position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+                   background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800;
+                   padding:2px 10px; border-radius:20px; text-transform:uppercase;
+                   letter-spacing:0.06em; white-space:nowrap; }
+    .upg-icon { font-size:1.5rem; margin-bottom:5px; }
+    .upg-name { font-size:0.85rem; font-weight:800; color:var(--navy); margin-bottom:2px; }
+    .upg-price { font-size:1.2rem; font-weight:800; color:var(--brand); line-height:1; }
+    .upg-period { font-size:0.62rem; color:var(--text-3); margin-bottom:6px; }
+    .upg-feat { font-size:0.68rem; color:var(--text-2); display:flex; align-items:flex-start;
+                gap:5px; margin-bottom:3px; line-height:1.4; text-align:left; }
+    .upg-feat i { color:var(--green); font-size:9px; margin-top:2px; flex-shrink:0; }
+
+    /* ── Upgrade modal payment ───────────────────────────────── */
+    .pay-category-label { font-size:0.72rem; font-weight:800; text-transform:uppercase;
+      letter-spacing:0.06em; color:var(--text-2); margin-bottom:8px;
+      display:flex; align-items:center; gap:6px; }
+    .pay-tooltip { color:var(--text-3); cursor:help; position:relative; }
+    .pay-tooltip:hover::after { content:attr(title); position:absolute; bottom:120%; left:50%;
+      transform:translateX(-50%); background:var(--navy); color:#fff; font-size:0.7rem;
+      font-weight:500; padding:6px 10px; border-radius:6px; white-space:normal; width:200px;
+      text-align:center; z-index:99; line-height:1.5; text-transform:none; letter-spacing:0; }
+    .pay-methods-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .pay-opt { border:2px solid var(--border); border-radius:var(--radius-sm); padding:10px 6px;
+      text-align:center; cursor:pointer; background:#fff; transition:all 0.15s; }
+    .pay-opt:hover, .pay-opt.selected { border-color:var(--brand); background:var(--brand-light); }
+    .pay-opt-icon img { width:40px; height:40px; object-fit:contain; margin-bottom:4px; }
+    .pay-opt-label { font-size:0.7rem; font-weight:700; color:var(--navy); }
+
   </style>
 </head>
 <body>
@@ -155,42 +298,30 @@
     <i class="fa-regular fa-bell"></i>
     <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
   </button>
-  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
 
-<!-- HERO -->
-<div class="hero" id="heroSection">
-  <div class="load-spinner"></div>
+<div id="pageContent">
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(this)"/>
+
+<!-- HERO — filled by JS based on role -->
+<div id="heroSection">
+  <div class="hero hero-centered">
+    <div class="load-spinner"></div>
+  </div>
 </div>
 
-<!-- TAB NAV -->
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="showTab('overview',this)">
-    <i class="fa-solid fa-user"></i> Overview
-  </button>
-  <button class="tab-btn" onclick="showTab('edit',this)">
-    <i class="fa-solid fa-pen"></i> Edit Profile
-  </button>
-  <button class="tab-btn" onclick="showTab('security',this)">
-    <i class="fa-solid fa-lock"></i> Security
-  </button>
-  <button class="tab-btn" onclick="showTab('plan',this)">
-    <i class="fa-solid fa-crown"></i> Plan
-  </button>
-</div>
+<!-- TAB NAV — filled by JS based on role -->
+<div class="tab-nav" id="tabNav"></div>
 
-<!-- ── OVERVIEW TAB ───────────────────────────────────────────── -->
-<div id="tab-overview" class="panel active">
-
+<!-- ── OVERVIEW TAB (regular user) ───────────────────────────── -->
+<div id="tab-overview" class="panel">
   <div class="sec">
     <div class="sec-title"><i class="fa-solid fa-circle-info"></i> Account Info</div>
-    <div id="overviewInfo">
-      <div class="load-spinner"></div>
-    </div>
+    <div id="overviewInfo"><div class="load-spinner"></div></div>
   </div>
-
   <div class="sec">
     <div class="sec-title"><i class="fa-solid fa-grid-2"></i> Quick Actions</div>
     <div class="menu-item" onclick="window.location.href='homepage.html'">
@@ -208,26 +339,103 @@
       <div class="menu-label">Browse Categories</div>
       <i class="fa-solid fa-chevron-right menu-arrow"></i>
     </div>
-    <div class="menu-item" onclick="showTab('plan',document.querySelectorAll('.tab-btn')[3])">
+    <div class="menu-item" onclick="showTab('plan',document.querySelector('[data-tab=plan]'))">
       <div class="menu-icon" style="background:var(--gold-bg);"><i class="fa-solid fa-crown" style="color:var(--gold);"></i></div>
       <div class="menu-label">My Plan</div>
       <div class="menu-badge" id="planBadgeMenu">Free</div>
       <i class="fa-solid fa-chevron-right menu-arrow"></i>
     </div>
   </div>
+</div>
 
-  <div class="sec" style="border-color:var(--red-bg);">
-    <div class="sec-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> Session</div>
-    <button class="btn btn-red btn-sm" onclick="FX.logout()">
-      <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+<!-- ── LISTINGS TAB (provider) ───────────────────────────────── -->
+<div id="tab-listings" class="panel">
+  <div class="sec-head">
+    <div class="sec-title" id="listingsTabTitle">My Service Listings</div>
+    <button class="btn btn-brand btn-sm" id="addListingBtn" onclick="toggleAddForm()">
+      <i class="fa-solid fa-plus"></i> Add
     </button>
   </div>
+  <div class="add-form-overlay" id="addFormOverlay" onclick="toggleAddForm()"></div>
+  <div class="add-form" id="addForm">
+    <div class="add-form-handle"></div>
+    <div class="add-form-head">
+      <div style="font-size:0.88rem;font-weight:800;color:var(--navy);" id="addFormTitle">
+        <i class="fa-solid fa-plus" style="color:var(--brand);"></i> New Listing
+      </div>
+      <button class="add-form-close" onclick="toggleAddForm()">×</button>
+    </div>
+    <div id="addFormAlert" class="alert"></div>
+    <div class="form-group">
+      <label class="form-label">Listing Title <span style="color:var(--red);">*</span></label>
+      <input class="form-input" id="lTitle" placeholder="e.g. Aircon Cleaning & Maintenance"/>
+    </div>
+	<div class="row2">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="lCat" onchange="loadListingSubcats()">
+          <option value="">Select…</option>
+          <option value="home">Home Services</option>
+          <option value="auto">Automotive</option>
+          <option value="garden">Garden & Lawn</option>
+          <option value="elec">Electrical</option>
+          <option value="beauty">Beauty & Wellness</option>
+		  <option value="edu">Education & Tutoring</option>
+          <option value="health">Health & Care</option>
+          <option value="tech">Tech & IT</option>
+          <option value="build">Construction</option>
+          <option value="clean">Cleaning</option>
+          <option value="pet">Pet Services</option>
+          <option value="event">Events</option>
+          <option value="other">Others</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Specific Service</label>
+        <select class="form-select" id="lSub" disabled><option>Select category first…</option></select>
+      </div>
+    </div>
+    <!-- Shown only when "Others" is selected -->
+    <div class="form-group" id="otherDescGroup" style="display:none;">
+      <label class="form-label">Describe your service <span style="color:var(--red);">*</span> <span style="color:var(--text-3);font-weight:400;text-transform:none;">(Admin will assign the right category for you)</span></label>
+      <input class="form-input" id="lOtherDesc" placeholder="e.g. Welding, Signage Printing, Boat Repair…" maxlength="120"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Price / Rate Label <span style="color:var(--text-3);font-weight:400;text-transform:none;">(e.g. ₱500/visit)</span></label>
+      <input class="form-input" id="lPrice" placeholder="e.g. ₱350 per unit"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description <span style="color:var(--red);">*</span></label>
+      <textarea class="form-textarea" id="lDesc" placeholder="Describe what's included, your process, and what sets you apart…" maxlength="400"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-outline btn-sm" onclick="toggleAddForm()">Cancel</button>
+      <button class="btn btn-brand btn-sm" id="saveLBtn" onclick="saveListing()">
+        <span class="spinner" id="lSpinner"></span>
+        <span id="lBtnText"><i class="fa-solid fa-floppy-disk"></i> Save Listing</span>
+      </button>
+    </div>
+    <input type="hidden" id="editListingId"/>
+  </div>
+  <div id="listingsContainer"><div class="empty"><div class="ei">📋</div><p>Loading your listings…</p></div></div>
+</div>
 
+<!-- ── REVIEWS TAB (provider) ────────────────────────────────── -->
+<div id="tab-reviews" class="panel">
+  <div class="sec-head">
+    <div class="sec-title">Customer Reviews</div>
+    <div style="text-align:right;line-height:1.4;">
+      <div id="avgRatingBig" style="font-size:0.95rem;font-weight:800;color:var(--gold);">⭐ —</div>
+      <div id="reviewCountLabel" style="font-size:0.68rem;color:var(--text-3);font-weight:600;">— reviews</div>
+    </div>
+  </div>
+  <div id="reviewsContainer"><div class="empty"><div class="ei">⭐</div><p>Loading reviews…</p></div></div>
 </div>
 
 <!-- ── EDIT PROFILE TAB ───────────────────────────────────────── -->
 <div id="tab-edit" class="panel">
-  <div class="sec">
+  <!-- Regular user fields -->
+  <div class="sec" id="editRegularSection">
     <div class="sec-title"><i class="fa-solid fa-user"></i> Personal Information</div>
     <div id="editAlert" class="alert"></div>
     <div class="row2">
@@ -253,10 +461,52 @@
       <input class="form-input" id="editUsername" disabled/>
       <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">Username cannot be changed.</div>
     </div>
-    <button class="btn btn-brand btn-sm" onclick="saveProfile()">
+    <button class="btn btn-brand btn-sm" onclick="saveRegularProfile()">
       <i class="fa-solid fa-floppy-disk"></i> Save Changes
     </button>
   </div>
+  <!-- Provider business fields (shown only for providers) -->
+<div class="profile-section" id="editProviderSection" style="display:none;">
+  <div class="ps-title"><i class="fa-solid fa-store"></i> Business Info</div>
+  <div id="profileAlert" class="alert"></div>
+
+  <div class="form-group">
+    <label class="form-label">Business / Shop Name</label>
+    <input class="form-input" id="pBizName" disabled
+           style="background:var(--bg);color:var(--text-3);"/>
+    <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">
+      Business name cannot be changed here. Submit a change request below.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Service Location</label>
+    <div id="pLocation" style="font-size:0.85rem;color:var(--text-3);padding:10px 12px;background:var(--bg);border-radius:8px;border:1.5px solid var(--border);line-height:1.6;"></div>
+    <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">
+      To change your location, submit a change request below.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Contact Phone (shown to customers)</label>
+    <input class="form-input" id="pPhone" type="tel"/>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Short Description</label>
+    <textarea class="form-textarea" id="pBizDesc" maxlength="300"></textarea>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:4px;">
+    <button class="btn btn-brand btn-sm" onclick="saveProviderProfile()" style="flex:1;text-align:center;justify-content:center;">
+      <i class="fa-solid fa-floppy-disk"></i> Save Profile
+    </button>
+    <button class="btn btn-sm" onclick="openChangeRequestModal()"
+            style="flex:1;background:var(--bg);border:1.5px solid var(--border);color:var(--navy);font-weight:700;text-align:center;justify-content:center;">
+      <i class="fa-solid fa-envelope"></i> Change Request
+    </button>
+  </div>
+</div>
 </div>
 
 <!-- ── SECURITY TAB ───────────────────────────────────────────── -->
@@ -294,25 +544,31 @@
 
 <!-- ── PLAN TAB ───────────────────────────────────────────────── -->
 <div id="tab-plan" class="panel">
+  <div id="planCard"><div class="load-spinner"></div></div>
+</div>
 
-  <div id="planCard">
-    <div class="load-spinner"></div>
-  </div>
 
-  <div class="sec">
-    <div class="sec-title"><i class="fa-solid fa-circle-info"></i> About Plans</div>
-    <div style="font-size:0.82rem;color:var(--text-2);line-height:1.75;">
-      <p style="margin-bottom:8px;">
-        <strong>Free Plan</strong> — Browse all providers, filter by area, and rate after your transactions.
-        Inline ads and random pop-up ads are shown.
-      </p>
-      <p>
-        <strong>Fixia Plus</strong> — Everything in Free, plus <strong>no pop-up ads</strong>.
-        Inline ads between provider listings remain, but the disruptive pop-ups are completely removed.
+</div><!-- /pageContent -->
+
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal" id="signOutModal" onclick="if(event.target===this)closeSignOutModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 style="font-size:0.95rem;font-weight:800;color:var(--navy);"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</h3>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
       </p>
     </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeSignOutModal()">Cancel</button>
+      <button class="btn" onclick="FX.logout()" style="background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
   </div>
-
 </div>
 
 <!-- TOAST -->
@@ -327,60 +583,273 @@
       <i class="fa-solid fa-border-all"></i>
     </button>
   </div>
-  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
-    <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
-  </a>
-  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+  <a class="bnav-item" href="bookings.html"><i class="fa-solid fa-clipboard-list"></i>Bookings</a>
+  <a class="bnav-item active" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
+
+<!-- PROVIDER CANCEL BOOKING MODAL -->
+<div class="modal" id="provCancelModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-xmark" style="color:#EF4444;"></i> Cancel Booking?</h3>
+      <button class="modal-x" onclick="closeProvCancel()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.6;">
+        This will cancel the booking and notify the user.<br><br>
+        Only cancel if both parties have agreed to stop the job.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeProvCancel()">Go Back</button>
+      <button class="btn" id="provCancelConfirmBtn" onclick="confirmProvCancel()" style="background:#EF4444;color:#fff;box-shadow:0 4px 12px rgba(239,68,68,0.3);">
+        <i class="fa-solid fa-xmark"></i> Yes, Cancel Booking
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MARK DONE CONFIRMATION MODAL -->
+<div class="modal" id="markDoneModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-flag-checkered" style="color:var(--brand);"></i> Mark Job as Done?</h3>
+      <button class="modal-x" onclick="closeMarkDone()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.6;">
+        This will notify the customer to confirm completion and leave a rating.<br><br>
+        Only mark as done when the job has been fully completed.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeMarkDone()">Cancel</button>
+      <button class="btn btn-brand" id="markDoneConfirmBtn" onclick="confirmMarkDone()">
+        <i class="fa-solid fa-flag-checkered"></i> Yes, Mark as Done
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="fixia-data.js"></script>
 <script>
-let userData = null;
-let packageData = null;
-const session = FX.requireAuth(['regular']);
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+let session, userData, providerData, packageData;
+let myListings = [], myReviews = [];
+let addFormOpen = false;
+let editingListingId = null;
+let provBookings = [];
+let pbFilter = 'all';
+let _markDoneId = null;
+let _cancelBookingId = null;
 
-/* ── Init ──────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   SUBCATEGORIES
+══════════════════════════════════════════════════════════════ */
+const CAT_LABELS = {
+  home:'Home Services', auto:'Automotive', garden:'Garden & Lawn',
+  elec:'Electrical', beauty:'Beauty & Wellness', health:'Health & Care',
+  tech:'Tech & IT', build:'Construction', clean:'Cleaning',
+  pet:'Pet Services', event:'Events', edu:'Education & Tutoring',
+  other:'Others',
+};
+
+const SUBCATS = {
+  home:   ['Plumbing','Aircon Service','Electrical','Painting','Carpentry','Waterproofing','Door & Window Repair','Gas & LPG','Deep Cleaning','Pest Control'],
+  auto:   ['General Auto Repair','Car Aircon','Tires & Wheels','PMS / Oil Change','Battery','Car Wash & Detailing','Car Locksmith','Towing','Window Tint'],
+  garden: ['Lawn Mowing','Tree Trimming','Landscaping','Pest Control','Irrigation','Garden Design'],
+  elec:   ['Wiring & Rewiring','Solar Installation','Lighting','CCTV Installation','Network / Internet Setup','Generator Service'],
+  beauty: ['Haircut & Styling','Nails','Facial & Skincare','Massage','Personal Training','Makeup Artist'],
+  edu:    ['Academic Tutoring','Language Lessons','Music Lessons','Dance Lessons','Online Tutoring','Exam Review','Computer Lessons','Arts & Crafts','Homework Assistance','Special Education Support'],
+  health: ['Home Nursing','Home Laboratory','Elder Care','Baby Care','Medicine Delivery','Dental (Home Visit)'],
+  tech:   ['Laptop Repair','Desktop Repair','Network Setup','Printer Repair','Phone Repair','Data Recovery'],
+  build:  ['Renovation','Civil / Structural Engineering','Architecture','Masonry','Drainage Works','Driveway & Flooring'],
+  clean:  ['House Cleaning','Office Cleaning','Upholstery Cleaning','Carpet Cleaning','Laundry','Junk Removal'],
+  pet:    ['Pet Grooming','Pet Sitting','Veterinary (Home Visit)','Dog Walking','Pet Hotel','Vaccination'],
+  event:  ['Photography','DJ / Live Band','Catering','Event Host / MC','Tent & Tables Rental','Decorations'],
+};
+
+function loadListingSubcats() {
+  const cat = document.getElementById('lCat').value;
+  const sub = document.getElementById('lSub');
+  const otherGroup = document.getElementById('otherDescGroup');
+
+  // Show/hide the "Others" description input
+  if (cat === 'other') {
+    otherGroup.style.display = 'block';
+    sub.innerHTML = '<option value="Other">Other</option>';
+    sub.disabled = true;
+    return;
+  }
+  otherGroup.style.display = 'none';
+  document.getElementById('lOtherDesc').value = '';
+
+  sub.innerHTML = '<option value="">Select specific…</option>';
+  if (!cat || !SUBCATS[cat]) { sub.disabled = true; return; }
+  sub.disabled = false;
+  SUBCATS[cat].forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s; sub.appendChild(o);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
 (async function init() {
+  session = FX.requireAuth(['regular', 'provider']);
   if (!session) return;
-  if (session.role === 'regular' && !session.adsFree) FX.initAds();
+
+  // ── Suspension check: re-fetch live status from DB ──────────
+  try {
+    const liveUser = await FX.getUserById(session.userId);
+    if (!liveUser || liveUser.status === 'suspended') {
+      FX.clearSession();
+      window.location.href = 'login.html';
+      return;
+    }
+  } catch(e) { /* network error — allow through, will fail gracefully below */ }
+  // ────────────────────────────────────────────────────────────
+
+  await FX.initAds();
 
   try {
     userData = await FX.getUserById(session.userId);
-    if (userData?.package_id) {
-      packageData = await FX.getPackageById(userData.package_id);
+	await FX.checkAndDowngrade(session.userId).catch(() => {});
+	userData = await FX.getUserById(session.userId); // re-fetch after possible downgrade
+
+    if (session.role === 'provider') {
+
+      try { await FX.checkEliteExpiry(); } catch(e) {}
+
+      providerData = await FX.getProviderByUserId(session.userId);
+      if (!providerData) {
+        showToast('Provider profile not found. Please contact support.', 'error');
+        return;
+      }
+      if (providerData.status === 'pending' || providerData.status === 'needs_compliance') {
+        const isPending = providerData.status === 'pending';
+        const icon      = isPending ? '⏳' : '⚠️';
+        const title     = isPending ? 'Account Pending Approval' : 'Action Required';
+        const message   = isPending
+          ? "Your provider application is being reviewed. You'll receive an email once approved. This usually takes 24-48 hours."
+          : "Your application is on hold. Please check your messages for the requirements and comply to proceed with approval.";
+        document.getElementById('pageContent').innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;text-align:center;">
+            <div style="font-size:3rem;margin-bottom:1rem;">${icon}</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#0F1B2D;margin-bottom:8px;">${title}</div>
+	        <div style="font-size:0.85rem;color:#8896A5;line-height:1.7;max-width:320px;">${message}</div>
+            <div style="font-size:0.78rem;color:#8896A5;line-height:1.7;max-width:320px;margin-top:2rem;padding-top:1.5rem;border-top:1px solid #E2E8F0;">
+              Have inquiries or need further assistance?<br>
+			  You may contact our Support Team at:<br><br>
+              E-mail: <a href="mailto:noreply.bytestack@gmail.com" style="color:#FF5A1F;font-weight:700;text-align:left;">noreply.bytestack@gmail.com</a><br>
+              Facebook: <a href="https://www.facebook.com/share/18WYchWMH7/?mibextid=wwXIfr" target="_blank" style="color:#FF5A1F;font-weight:700;text-align:left;">Fixia PH</a>
+            </div>
+          </div>`;
+        return;
+      }
+      if (providerData?.package_id) {
+        packageData = await FX.getPackageById(providerData.package_id);
+      }
+      buildProviderTabs();
+      renderProviderHero();
+      renderProviderOverview();
+      await Promise.all([loadListings(), loadReviews()]);
+      renderProviderEditTab();
+    } else {
+      // Regular user
+      if (userData?.package_id) {
+        packageData = await FX.getPackageById(userData.package_id);
+      }
+      buildRegularTabs();
+      renderRegularHero();
+      renderOverview();
+      renderRegularEditForm();
+      renderPlanTab();
     }
-    renderHero();
-    renderOverview();
-    renderEditForm();
-    renderPlanTab();
   } catch(e) {
-    showToast('Failed to load profile', 'error');
+    showToast('Failed to load profile: ' + e.message, 'error');
+  }
+    // Auto-switch to tab from URL param e.g. profile.html?tab=plan
+  const tabParam = new URLSearchParams(window.location.search).get('tab');
+  if (tabParam) {
+    const btn = document.querySelector(`[data-tab="${tabParam}"]`);
+    if (btn) btn.click();
   }
 })();
 
-/* ── Hero ───────────────────────────────────────────────────── */
-function renderHero() {
+/* ══════════════════════════════════════════════════════════════
+   TAB BUILDING
+══════════════════════════════════════════════════════════════ */
+function buildRegularTabs() {
+  document.getElementById('tabNav').innerHTML = `
+    <button class="tab-btn active" data-tab="overview" onclick="showTab('overview',this)"><i class="fa-solid fa-user"></i> Overview</button>
+    <button class="tab-btn" data-tab="edit" onclick="showTab('edit',this)"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+    <button class="tab-btn" data-tab="security" onclick="showTab('security',this)"><i class="fa-solid fa-lock"></i> Security</button>
+    <button class="tab-btn" data-tab="plan" onclick="showTab('plan',this)"><i class="fa-solid fa-crown"></i> Plan</button>
+  `;
+  document.getElementById('tab-overview').classList.add('active');
+}
+
+function buildProviderTabs() {
+  document.getElementById('tabNav').innerHTML = `
+    <button class="tab-btn active" data-tab="overview" onclick="showTab('overview',this)"><i class="fa-solid fa-user"></i> Overview</button>
+    <button class="tab-btn" data-tab="listings" onclick="showTab('listings',this)"><i class="fa-solid fa-list"></i> My Listings</button>
+    <button class="tab-btn" data-tab="reviews" onclick="showTab('reviews',this);loadReviews();"><i class="fa-solid fa-star"></i> Reviews</button>
+    <button class="tab-btn" data-tab="edit" onclick="showTab('edit',this)"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+    <button class="tab-btn" data-tab="security" onclick="showTab('security',this)"><i class="fa-solid fa-lock"></i> Security</button>
+    <button class="tab-btn" data-tab="plan" onclick="showTab('plan',this)"><i class="fa-solid fa-crown"></i> Plan</button>
+  `;
+  document.getElementById('tab-overview').classList.add('active');
+  // Show provider-specific edit fields
+  document.getElementById('editRegularSection').style.display = 'none';
+  document.getElementById('editProviderSection').style.display = 'block';
+  // Render plan tab for provider
+  renderPlanTab();
+}
+
+function showTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REGULAR USER HERO + OVERVIEW
+══════════════════════════════════════════════════════════════ */
+function renderRegularHero() {
   if (!userData) return;
   const initials = (userData.first_name?.[0] || '') + (userData.last_name?.[0] || '');
-  const planName = packageData?.name || 'Free';
   const isPlus   = userData.ads_free;
-
   document.getElementById('heroSection').innerHTML = `
-    <div class="hero-avatar">${initials || '?'}</div>
-    <div class="hero-name">${userData.first_name} ${userData.last_name}</div>
-    <div class="hero-username">@${userData.username}</div>
-    <div class="hero-badges">
-      <span class="hbadge hbadge-green">✅ Active</span>
-      <span class="hbadge ${isPlus ? 'hbadge-gold' : 'hbadge-brand'}">${isPlus ? '✨ Fixia Plus' : '🔍 Free'}</span>
+    <div class="hero">
+      <div class="ph-row">
+        <div class="ph-avatar ph-avatar-initials">
+          ${initials || '?'}
+        </div>
+        <div class="ph-info">
+          <div class="ph-name">${userData.first_name} ${userData.last_name}</div>
+          <div class="ph-service">@${userData.username}</div>
+          <div class="ph-badges">
+            <span class="ph-badge ph-badge-brand">👤 User</span>
+            <span class="ph-badge ph-badge-green">✅ Active</span>
+            ${isPlus
+              ? `<span class="ph-badge ph-badge-gold">✨ ${packageData?.name || 'Fixia Plus'}</span>`
+              : `<span class="ph-badge" style="background:rgba(255,90,31,0.15);color:#FF8C5A;">🔍 Free</span>`}
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 
-/* ── Overview ───────────────────────────────────────────────── */
 function renderOverview() {
   if (!userData) return;
   document.getElementById('planBadgeMenu').textContent = packageData?.name || 'Free';
-
   document.getElementById('overviewInfo').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:0;">
       ${row('Full Name',    `${userData.first_name} ${userData.last_name}`)}
@@ -392,6 +861,22 @@ function renderOverview() {
     </div>`;
 }
 
+function renderProviderOverview() {
+  if (!userData || !providerData) return;
+  document.getElementById('planBadgeMenu').textContent = packageData?.name || '—';
+  document.getElementById('overviewInfo').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:0;">
+      ${row('Full Name',    `${userData.first_name} ${userData.last_name}`)}
+      ${row('Business',     providerData.biz_name || '—')}
+      ${row('Email',        userData.email)}
+      ${row('Phone',        userData.phone || '—')}
+      ${row('Username',     '@' + userData.username)}
+      ${row('Location',     [providerData.city_name, providerData.province_name].filter(Boolean).join(', ') || '—')}
+      ${row('Member Since', fmtDate(userData.created_at))}
+      ${row('Plan',         packageData?.name || '—')}
+    </div>`;
+}
+
 function row(label, value) {
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
@@ -400,8 +885,47 @@ function row(label, value) {
     </div>`;
 }
 
-/* ── Edit Form ──────────────────────────────────────────────── */
-function renderEditForm() {
+/* ══════════════════════════════════════════════════════════════
+   PROVIDER HERO
+══════════════════════════════════════════════════════════════ */
+function renderProviderHero() {
+  if (!providerData) return;
+  const initials = (userData?.first_name?.[0] || '') + (userData?.last_name?.[0] || '');
+  const avatarHtml = userData?.avatar_url
+    ? `<img src="${userData.avatar_url}" alt="Avatar" onerror="this.style.display='none';this.parentElement.dataset.initials='${initials}';this.parentElement.classList.add('ph-avatar-initials');"/>`
+    : initials || '?';
+  document.getElementById('heroSection').innerHTML = `
+    <div class="hero">
+      <div class="ph-row">
+        <div class="ph-avatar ${userData?.avatar_url ? '' : 'ph-avatar-initials'}" 
+             style="cursor:pointer;position:relative;" onclick="triggerAvatarUpload()" title="Change avatar">
+          ${avatarHtml}
+          ${providerData.is_elite ? '<div class="ph-elite-crown">👑</div>' : ''}
+          <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;
+                      background:var(--brand);border-radius:50%;border:2px solid #fff;
+                      display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-camera" style="color:#fff;font-size:0.45rem;"></i>
+          </div>
+        </div>
+        <div class="ph-info">
+          <div class="ph-name">${providerData.biz_name}</div>
+          <div class="ph-service">${[providerData.city_name, providerData.province_name].filter(Boolean).join(', ') || '—'}</div>
+          <div class="ph-badges">
+            <span class="ph-badge ph-badge-brand">🔧 Provider</span>
+            ${providerData.status === 'approved' ? '<span class="ph-badge ph-badge-green">✅ Verified</span>' : '<span class="ph-badge" style="background:rgba(220,53,69,0.2);color:#FC8181;">⚠ Unverified</span>'}
+            ${packageData ? `<span class="ph-badge ph-badge-gold">✨ ${packageData.name}</span>` : ''}
+            ${providerData.is_elite ? '<span class="ph-badge ph-badge-gold">👑 Elite</span>' : ''}
+            ${providerData.is_featured ? '<span class="ph-badge ph-badge-brand">⭐ Featured</span>' : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REGULAR USER — EDIT + SAVE
+══════════════════════════════════════════════════════════════ */
+function renderRegularEditForm() {
   if (!userData) return;
   document.getElementById('editFn').value       = userData.first_name || '';
   document.getElementById('editLn').value       = userData.last_name  || '';
@@ -410,23 +934,19 @@ function renderEditForm() {
   document.getElementById('editUsername').value = userData.username   || '';
 }
 
-async function saveProfile() {
+async function saveRegularProfile() {
   hideAlert('editAlert');
   const fn    = document.getElementById('editFn').value.trim();
   const ln    = document.getElementById('editLn').value.trim();
   const email = document.getElementById('editEmail').value.trim();
   const phone = document.getElementById('editPhone').value.trim();
-
-  if (!fn || !ln)                           { showAlert('editAlert','First and last name are required.'); return; }
-  if (!email || !/\S+@\S+\.\S+/.test(email)){ showAlert('editAlert','A valid email is required.'); return; }
-
+  if (!fn || !ln)                            { showAlert('editAlert','First and last name are required.'); return; }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showAlert('editAlert','A valid email is required.'); return; }
   try {
     await FX.updateUser(session.userId, { firstName:fn, lastName:ln, email, phone });
-    userData.first_name = fn;
-    userData.last_name  = ln;
-    userData.email      = email;
-    userData.phone      = phone;
-    renderHero();
+    userData.first_name = fn; userData.last_name = ln;
+    userData.email = email; userData.phone = phone;
+    renderRegularHero();
     renderOverview();
     showToast('Profile updated ✅', 'success');
   } catch(e) {
@@ -434,52 +954,174 @@ async function saveProfile() {
   }
 }
 
-/* ── Plan Tab ───────────────────────────────────────────────── */
-function renderPlanTab() {
-  const isPlus = userData?.ads_free;
-  const plan   = packageData?.name || 'Free';
-
-  document.getElementById('planCard').innerHTML = isPlus ? `
-    <div class="plan-card plan-card-plus">
-      <div class="plan-active-badge">✅ Active</div>
-      <div style="font-size:1.5rem;margin-bottom:6px;">✨</div>
-      <div class="plan-name plan-name-plus">Fixia Plus</div>
-      <div class="plan-desc plan-desc-plus">
-        You have an ad-free browsing experience. Pop-up ads are completely disabled on your account.
-        Inline ads between listings remain but are clearly labeled.
-      </div>
-    </div>` : `
-    <div class="plan-card plan-card-free">
-      <div style="font-size:1.4rem;margin-bottom:6px;">🔍</div>
-      <div class="plan-name plan-name-free">Free Plan</div>
-      <div class="plan-desc plan-desc-free">
-        You're on the free plan. Inline ads and random pop-up ads are shown while browsing.
-        Upgrade to Fixia Plus to remove pop-up ads.
-      </div>
-      <button class="plan-upgrade-btn" onclick="window.location.href='upgrade.html'">
-        <i class="fa-solid fa-arrow-up"></i> Upgrade to Fixia Plus
-      </button>
-    </div>
-    <div class="ads-info">
-      💡 On the free plan, you'll see occasional pop-up ads that appear randomly while browsing.
-      Each ad lasts 3–5 seconds before you can skip. Upgrade to Plus to remove them entirely.
-    </div>`;
+/* ══════════════════════════════════════════════════════════════
+   PROVIDER — EDIT + SAVE
+══════════════════════════════════════════════════════════════ */
+function renderProviderEditTab() {
+  if (!providerData) return;
+  document.getElementById('pBizName').value = providerData.biz_name || '';
+  document.getElementById('pBizDesc').value = providerData.biz_desc || '';
+  document.getElementById('pPhone').value   = userData?.phone || '';
+  const loc = [
+    providerData.street_addr,
+    providerData.barangay_name !== 'Select Barangay…' ? providerData.barangay_name : null,
+    providerData.city_name,
+    providerData.province_name,
+  ].filter(Boolean).join(', ');
+  document.getElementById('pLocation').textContent = loc || '—';
 }
 
-/* ── Security ───────────────────────────────────────────────── */
+async function saveProviderProfile() {
+  const bizName = document.getElementById('pBizName').value.trim();
+  const bizDesc = document.getElementById('pBizDesc').value.trim();
+  const phone   = document.getElementById('pPhone').value.trim();
+  hideAlert('profileAlert');
+  if (!bizName) { showAlert('profileAlert','Business name is required.'); return; }
+  try {
+    await FX.updateProvider(providerData.id, { bizName, bizDesc });
+    await FX.updateUser(userData.id, { phone });
+    providerData.biz_name = bizName;
+    providerData.biz_desc = bizDesc;
+    renderProviderHero();
+    showToast('Profile updated ✅', 'success');
+  } catch(e) { showAlert('profileAlert', 'Error: ' + e.message); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PLAN TAB
+══════════════════════════════════════════════════════════════ */
+async function renderPlanTab() {
+  const role      = session.role;
+  const isFree    = !userData?.package_id ||
+                    userData.package_id === 'regular-free' ||
+                    userData.package_id === 'provider-free';
+  const planName  = packageData?.name || 'Free';
+  const icon      = packageData?.icon || (isFree ? '🔍' : '✨');
+  const subEnd    = userData?.subscription_end ? new Date(userData.subscription_end) : null;
+  const subStart  = userData?.subscription_start ? new Date(userData.subscription_start) : null;
+  const now       = new Date();
+  const daysLeft  = subEnd ? Math.max(0, Math.ceil((subEnd - now) / 86400000)) : null;
+
+  const fmtD = d => d ? d.toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
+
+  // Check for pending upgrade request
+  const pendingReq = await FX.getUserUpgradeRequest(session.userId);
+
+  // Get all packages of same type for upgrade options
+  const allPkgs = role === 'provider'
+    ? await FX.getProviderPackages()
+    : await FX.getRegularPackages();
+
+  // Filter only higher-priced packages (upgrades)
+  const currentPrice = packageData?.price ?? 0;
+  const upgradePkgs  = allPkgs.filter(p => p.price > currentPrice);
+
+  const periodLabel  = { month:'1 Month', '6month':'6 Months', year:'1 Year', lifetime:'Lifetime' };
+
+  // ── Current plan card ──────────────────────────────────────
+  let html = `<div class="sec">
+    <div class="sec-title"><i class="fa-solid fa-crown"></i> Current Plan</div>
+    <div style="background:${isFree ? 'var(--bg)' : 'linear-gradient(135deg,#FF5A1F,#D94200)'};
+                border-radius:var(--radius-md);padding:16px;margin-bottom:10px;
+                border:${isFree ? '1.5px solid var(--border)' : 'none'};">
+      <div style="font-size:1.05rem;font-weight:800;color:${isFree ? 'var(--navy)' : '#fff'};margin-bottom:4px;">${icon} &nbsp; ${planName}</div>
+      ${isFree ? `
+        <div style="font-size:0.78rem;color:var(--text-3);line-height:1.6;">
+          You are on the Free plan. Upgrade to enjoy premium benefits.
+        </div>` : `
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.7);">
+            <i class="fa-solid fa-calendar-check"></i> Started: ${fmtD(subStart)}
+          </div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.7);">
+            <i class="fa-solid fa-calendar-xmark"></i> Expires: ${subEnd ? fmtD(subEnd) : 'Never (Lifetime)'}
+          </div>
+          ${daysLeft !== null ? `
+          <div style="margin-top:6px;background:rgba(255,255,255,0.15);border-radius:8px;padding:6px 10px;
+                      font-size:0.75rem;font-weight:700;color:#fff;">
+            ⏳ ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining
+          </div>` : ''}
+        </div>`}
+    </div>
+  </div>`;
+
+  // ── Pending upgrade notice ─────────────────────────────────
+  if (pendingReq) {
+    const newPkgName = upgradePkgs.find(p => p.id === pendingReq.new_package_id)?.name || pendingReq.new_package_id;
+    html += `<div class="sec">
+      <div class="sec-title"><i class="fa-solid fa-clock"></i> Upgrade Pending</div>
+      <div style="background:var(--gold-bg);border:1px solid rgba(245,158,11,0.3);
+                  border-radius:var(--radius-sm);padding:12px 14px;font-size:0.82rem;
+                  color:var(--gold-text);line-height:1.7;">
+        <i class="fa-solid fa-hourglass-half"></i>
+        Your upgrade request to <strong>${newPkgName}</strong> is currently under review.
+        You'll be notified once it's approved. Payment reference: <strong>${pendingReq.payment_reference || '—'}</strong>
+      </div>
+    </div>`;
+  }
+
+  // ── Upgrade options ────────────────────────────────────────
+  else if (upgradePkgs.length > 0) {
+    html += `<div class="sec">
+      <div class="sec-title"><i class="fa-solid fa-arrow-trend-up"></i> Upgrade Your Plan</div>`;
+
+// Card grid
+    html += `<div class="upg-grid">`;
+    for (const pkg of upgradePkgs) {
+      const features = (pkg.features || []).map(f => {
+        const label = typeof f === 'string' ? f : f.label;
+        return `<div class="upg-feat"><i class="fa-solid fa-check"></i>${label}</div>`;
+      }).join('');
+
+      html += `
+        <div class="upg-card" id="upgCard_${pkg.id}" onclick="selectUpgradePkg('${pkg.id}')">
+          ${pkg.popular ? `<div class="upg-popular">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
+          <div class="upg-icon">${pkg.icon || '✨'}</div>
+          <div class="upg-name">${pkg.name}</div>
+          <div class="upg-price">₱${pkg.price}</div>
+          <div class="upg-period">${periodLabel[pkg.period] || pkg.period}</div>
+          ${features ? `<div style="margin-top:6px;">${features}</div>` : ''}
+        </div>`;
+    }
+    html += `</div>`;
+
+    // Next button
+    html += `
+      <button class="btn btn-brand" id="upgNextBtn" disabled
+              style="width:100%;justify-content:center;opacity:0.5;"
+              onclick="openUpgradeModal(_selectedUpgradePkg)">
+        <i class="fa-solid fa-arrow-right"></i> Next
+      </button>`;
+
+    html += `</div>`; // close upgrade section
+  }
+
+  // ── No upgrades available ──────────────────────────────────
+  else if (!isFree) {
+    html += `<div class="sec">
+      <div style="text-align:center;padding:1rem;color:var(--text-3);font-size:0.82rem;">
+        <div style="font-size:2rem;margin-bottom:8px;">🏆</div>
+        You're on the highest available plan!
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('planCard').innerHTML = html;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECURITY — CHANGE PASSWORD
+══════════════════════════════════════════════════════════════ */
 async function changePassword() {
   hideAlert('pwAlert');
   const current = document.getElementById('pwCurrent').value;
   const newPw   = document.getElementById('pwNew').value;
   const confirm = document.getElementById('pwConfirm').value;
-
   if (!current || !newPw || !confirm) { showAlert('pwAlert','All fields are required.'); return; }
   if (newPw.length < 8)               { showAlert('pwAlert','New password must be at least 8 characters.'); return; }
   if (newPw !== confirm)              { showAlert('pwAlert','New passwords do not match.'); return; }
-
   const check = await FX.login(userData.email, current);
   if (!check.success) { showAlert('pwAlert','Current password is incorrect.'); return; }
-
   try {
     await FX.updateUser(session.userId, { password: newPw });
     document.getElementById('pwCurrent').value = '';
@@ -492,15 +1134,248 @@ async function changePassword() {
   }
 }
 
-/* ── Tab nav ────────────────────────────────────────────────── */
-function showTab(id, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  if (el) el.classList.add('active');
+/* ══════════════════════════════════════════════════════════════
+   LISTINGS (provider)
+══════════════════════════════════════════════════════════════ */
+async function loadListings() {
+  if (!providerData) return;
+  myListings = await FX.getListingsByProvider(providerData.id);
+  const limit = packageData?.listing_limit ?? 5;
+  const used  = myListings.length;
+
+  const limitLabel = limit >= 999 ? '∞' : limit;
+  document.getElementById('listingsTabTitle').textContent =
+    `My Service Listings (${used} of ${limitLabel} Used)`;
+
+  document.getElementById('addListingBtn').disabled = limit < 999 && used >= limit;
+
+  renderListings();
 }
 
-/* ── Utils ──────────────────────────────────────────────────── */
+function renderListings() {
+  const wrap = document.getElementById('listingsContainer');
+  if (!myListings.length) {
+    wrap.innerHTML = '<div class="empty"><div class="ei">📋</div><p>No listings yet. Tap <strong>+ Add</strong> to create your first one.</p></div>';
+    return;
+  }
+  wrap.innerHTML = myListings.map(l => `
+    <div class="listing-card">
+      <div class="lc-head">
+        <div class="lc-icon">🔧</div>
+        <div class="lc-info">
+          <div class="lc-title">${l.title}</div>
+          <div class="lc-sub">${CAT_LABELS[l.cat_main] || l.cat_main || '—'} &nbsp; • &nbsp; ${l.cat_sub || '—'}</div>
+        </div>
+        <span class="badge ${l.is_active ? 'badge-green' : 'badge-grey'}">${l.is_active ? '✅ Active' : 'Inactive'}</span>
+      </div>
+      ${l.price_label ? `<div class="lc-price">💰 ${l.price_label}</div>` : ''}
+      <div class="lc-desc">${l.description || ''}</div>
+      <div class="lc-actions">
+        <button class="btn-xs btn-edit-xs" onclick="editListing('${l.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+        <button class="btn-xs btn-red-xs" onclick="deleteListing('${l.id}')"><i class="fa-solid fa-trash"></i></button>
+        <div class="lc-toggle">
+          <label class="toggle" title="${l.is_active ? 'Deactivate' : 'Activate'}">
+            <input type="checkbox" ${l.is_active ? 'checked' : ''} onchange="toggleListing('${l.id}',this.checked)"/>
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleAddForm() {
+  const form    = document.getElementById('addForm');
+  const overlay = document.getElementById('addFormOverlay');
+  addFormOpen   = !addFormOpen;
+  if (addFormOpen) {
+    form.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden'; // prevent background scroll
+    document.getElementById('addFormTitle').innerHTML =
+      '<i class="fa-solid fa-plus" style="color:var(--brand);"></i> New Listing';
+  } else {
+    form.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+function editListing(id) {
+  const l = myListings.find(x => x.id === id);
+  if (!l) return;
+  editingListingId = id;
+  document.getElementById('addForm').classList.add('open');
+  document.getElementById('addFormOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  addFormOpen = true;
+  document.getElementById('addFormTitle').innerHTML = '<i class="fa-solid fa-pen" style="color:var(--brand);"></i> Edit Listing';
+  document.getElementById('lBtnText').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Update Listing';
+  document.getElementById('editListingId').value = id;
+  document.getElementById('lTitle').value = l.title || '';
+  document.getElementById('lPrice').value = l.price_label || '';
+  document.getElementById('lDesc').value  = l.description || '';
+  document.getElementById('lCat').value   = l.cat_main || '';
+  loadListingSubcats();
+  document.getElementById('lSub').value   = l.cat_sub || '';
+  if (l.cat_main === 'other') {
+    document.getElementById('lOtherDesc').value = l.other_service_desc || '';
+  }
+  document.getElementById('addForm').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+async function saveListing() {
+  const title  = document.getElementById('lTitle').value.trim();
+  const desc   = document.getElementById('lDesc').value.trim();
+  const cat    = document.getElementById('lCat').value;
+  const sub    = document.getElementById('lSub').value;
+  const otherDesc = document.getElementById('lOtherDesc').value.trim();
+
+  // Validate: if Others selected, require the description
+  if (cat === 'other' && !otherDesc) {
+    showAlert('addFormAlert', 'Please describe your service so admin can assign the right category.', 'error');
+    return;
+  }
+  const price  = document.getElementById('lPrice').value.trim();
+  const editId = document.getElementById('editListingId').value;
+  hideAlert('addFormAlert');
+  if (!title) { showAlert('addFormAlert','Listing title is required.'); return; }
+  if (!desc)  { showAlert('addFormAlert','Description is required.'); return; }
+  const btn = document.getElementById('saveLBtn');
+  const sp  = document.getElementById('lSpinner');
+  const bt  = document.getElementById('lBtnText');
+  btn.disabled = true; sp.classList.add('on'); bt.style.display = 'none';
+  try {
+    if (editId) {
+	  await FX.updateListing(editId, { title, description:desc, catMain:cat, catSub:sub, priceLabel:price, otherServiceDesc: cat === 'other' ? otherDesc : null });
+    } else {
+      if (!providerData?.id) throw new Error('Provider profile not loaded. Please refresh.');
+      await FX.addListing({ providerId:providerData.id, title, description:desc, catMain:cat, catSub:sub, priceLabel:price, otherServiceDesc: cat === 'other' ? otherDesc : null });
+    }
+    toggleAddForm();
+    showToast(editId ? 'Listing updated ✅' : 'Listing added ✅', 'success');
+    await loadListings();
+  } catch(e) {
+    showAlert('addFormAlert', e.message || 'Failed to save listing.');
+  } finally {
+    btn.disabled = false; sp.classList.remove('on'); bt.style.display = '';
+  }
+}
+
+async function deleteListing(id) {
+  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  try {
+    await FX.deleteListing(id);
+    showToast('Listing deleted', '');
+    await loadListings();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function toggleListing(id, active) {
+  try {
+    await FX.updateListing(id, { isActive: active });
+    const l = myListings.find(x => x.id === id);
+    if (l) l.is_active = active;
+    showToast(active ? 'Listing activated' : 'Listing deactivated', '');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REVIEWS (provider)
+══════════════════════════════════════════════════════════════ */
+async function loadReviews() {
+  if (!providerData) return;
+  myReviews = await FX.getRatingsByProvider(providerData.id);
+  renderReviews();
+}
+
+function renderReviews() {
+  const wrap = document.getElementById('reviewsContainer');
+  const avg  = providerData?.avg_rating || 0;
+  document.getElementById('avgRatingBig').textContent = `⭐ ${avg} (${myReviews.length} reviews)`;
+  document.getElementById('reviewCountLabel').textContent = myReviews.length + (myReviews.length === 1 ? ' review' : ' reviews');
+  if (!myReviews.length) {
+    wrap.innerHTML = '<div class="empty"><div class="ei">⭐</div><p>No reviews yet. Complete jobs and ask your customers to leave a rating!</p></div>';
+    return;
+  }
+  wrap.innerHTML = myReviews.map(r => {
+    const stars = Array.from({length:5}, (_,i) =>
+      `<i class="fa-${i < r.stars ? 'solid' : 'regular'} fa-star" style="color:${i < r.stars ? 'var(--gold)' : 'var(--border)'};font-size:12px;"></i>`
+    ).join('');
+    const displayName = r.display_name || 'Anonymous';
+    return `
+    <div class="review-card">
+      <div class="rc-head">
+        <div class="rc-left">
+          <div class="rc-name">${displayName}</div>
+          <div class="rc-comment">${r.comment || '<em style="color:var(--text-3);">No comment left.</em>'}</div>
+        </div>
+        <div class="rc-right">
+          <div class="rc-stars">${stars}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MARK DONE MODAL
+══════════════════════════════════════════════════════════════ */
+function markJobDone(id) {
+  _markDoneId = id;
+  document.getElementById('markDoneModal').classList.add('open');
+}
+function closeMarkDone() {
+  _markDoneId = null;
+  document.getElementById('markDoneModal').classList.remove('open');
+}
+async function confirmMarkDone() {
+  if (!_markDoneId) return;
+  const btn = document.getElementById('markDoneConfirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Marking…';
+  try {
+    await FX.markDone(_markDoneId);
+    closeMarkDone();
+    showToast('Job marked as done! ✅ Waiting for customer confirmation.', 'success');
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Yes, Mark as Done';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PROVIDER CANCEL BOOKING MODAL
+══════════════════════════════════════════════════════════════ */
+function providerCancelBooking(id) {
+  _cancelBookingId = id;
+  document.getElementById('provCancelModal').classList.add('open');
+}
+function closeProvCancel() {
+  _cancelBookingId = null;
+  document.getElementById('provCancelModal').classList.remove('open');
+}
+async function confirmProvCancel() {
+  if (!_cancelBookingId) return;
+  const btn = document.getElementById('provCancelConfirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cancelling…';
+  try {
+    await FX.providerCancelBooking(_cancelBookingId);
+    closeProvCancel();
+    showToast('Booking cancelled. The user has been notified.', 'success');
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Yes, Cancel Booking';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════════ */
 function togglePwd(iId, icId) {
   const inp = document.getElementById(iId);
   const ico = document.getElementById(icId);
@@ -526,28 +1401,875 @@ function fmtDate(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
 }
+function fmtTimeAgo(d) {
+  if (!d) return '—';
+  const diff = Date.now() - new Date(d).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
 let toastTimer;
 function showToast(msg, type='') {
   const el = document.getElementById('toast');
   el.textContent = msg; el.className = `toast show ${type}`;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
-</script>
 
-<script>
-// Load booking badge count
-(async function loadBookingBadge() {
-  const sess = FX.getSession();
-  if (!sess || sess.role !== 'regular') return;
+/* ══════════════════════════════════════════════════════════════
+   CHANGE REQUEST
+══════════════════════════════════════════════════════════════ */
+async function openChangeRequestModal() {
+  // Check cooldown
+  const daysLeft = await FX.getCooldownDaysLeft(providerData.id);
+  const notice   = document.getElementById('crCooldownNotice');
+  const form     = document.getElementById('crForm');
+  const submitBtn = document.getElementById('crSubmitBtn');
+
+  if (daysLeft > 0) {
+    notice.style.display = 'block';
+    document.getElementById('crCooldownMsg').textContent =
+      `You have already submitted a request recently. You can submit a new request in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}.`;
+    form.style.opacity   = '0.5';
+    form.style.pointerEvents = 'none';
+    submitBtn.disabled   = true;
+  } else {
+    notice.style.display = 'none';
+    form.style.opacity   = '1';
+    form.style.pointerEvents = '';
+    submitBtn.disabled   = false;
+  }
+
+  // Reset form
+  document.getElementById('crSubject').value      = '';
+  document.getElementById('crRequestedValue').value = '';
+  document.getElementById('crExplanation').value  = '';
+  document.getElementById('crFile').value          = '';
+  document.getElementById('crDynamicField').style.display = 'none';
+  hideAlert('crAlert');
+
+  document.getElementById('changeRequestModal').classList.add('open');
+}
+
+function closeChangeRequestModal() {
+  document.getElementById('changeRequestModal').classList.remove('open');
+}
+
+function onCrSubjectChange() {
+  const subject  = document.getElementById('crSubject').value;
+  const dynField = document.getElementById('crDynamicField');
+  const dynLabel = document.getElementById('crDynamicLabel');
+  const dynInput = document.getElementById('crRequestedValue');
+  const locBtn   = document.getElementById('crLocationBtn');
+
+  const map = {
+    'Business Name Change': { label:'New Business Name', placeholder:'Enter your new business name', type:'text' },
+    'Email Change':         { label:'New Email Address',  placeholder:'Enter your new email address', type:'email' },
+    'Location Change':      { label:'New Location',       placeholder:'Tap "Select Location" to choose', type:'text' },
+  };
+
+  if (map[subject]) {
+    dynField.style.display  = 'block';
+    dynLabel.textContent    = map[subject].label;
+    dynInput.placeholder    = map[subject].placeholder;
+    dynInput.type           = map[subject].type;
+    dynInput.readOnly       = subject === 'Location Change';
+    dynInput.style.background = subject === 'Location Change' ? 'var(--bg)' : '';
+    if (locBtn) locBtn.style.display = subject === 'Location Change' ? 'block' : 'none';
+  } else {
+    dynField.style.display  = 'none';
+    dynInput.value          = '';
+    if (locBtn) locBtn.style.display = 'none';
+  }
+}
+
+async function submitChangeRequest() {
+  const subject        = document.getElementById('crSubject').value;
+  const requestedValue = document.getElementById('crRequestedValue').value.trim();
+  const explanation    = document.getElementById('crExplanation').value.trim();
+  const file           = document.getElementById('crFile').files[0] || null;
+
+  hideAlert('crAlert');
+
+  if (!subject)     { showAlert('crAlert', 'Please select a subject.'); return; }
+  if (subject !== 'Other' && !requestedValue) {
+    showAlert('crAlert', 'Please fill in the requested change value.'); return;
+  }
+  if (!explanation) { showAlert('crAlert', 'Please provide a brief explanation.'); return; }
+
+  const btn = document.getElementById('crSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
+
   try {
-    const count = await FX.getUnreadCount('regular', sess.userId);
-    const badge = document.getElementById('navBadge');
-    if (badge && count > 0) {
-      badge.textContent = count;
-      badge.style.display = 'block';
+    await FX.submitChangeRequest({
+      userId:         session.userId,
+      providerId:     providerData.id,
+      providerName:   providerData.biz_name,
+      subject,
+      requestedValue: requestedValue || '—',
+      explanation,
+      file,
+    });
+    closeChangeRequestModal();
+    showToast('Request submitted ✅ Admin will review it shortly.', 'success');
+  } catch(e) {
+    showAlert('crAlert', 'Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Request';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOCATION PICKER
+══════════════════════════════════════════════════════════════ */
+const PSGC = 'https://psgc.gitlab.io/api';
+let lpRegionsLoaded = false;
+
+function lpResetSel(sel, ph) {
+  sel.innerHTML = `<option value="">${ph}</option>`;
+  sel.disabled  = true;
+}
+
+async function openLocationPickerModal() {
+  // Load regions on first open
+  if (!lpRegionsLoaded) {
+    const sel = document.getElementById('lpRegion');
+    try {
+      const r = await fetch(`${PSGC}/regions/`);
+      const d = await r.json();
+      d.sort((a,b) => a.name.localeCompare(b.name));
+      d.forEach(reg => {
+        const o = document.createElement('option');
+        o.value = reg.code; o.textContent = reg.name; sel.appendChild(o);
+      });
+      lpRegionsLoaded = true;
+    } catch(e) { showToast('Failed to load regions.', 'error'); return; }
+  }
+
+  // Reset selections
+  lpResetSel(document.getElementById('lpProvince'), 'Select Province…');
+  lpResetSel(document.getElementById('lpCity'),     'Select City / Municipality…');
+  lpResetSel(document.getElementById('lpBarangay'), 'Select Barangay…');
+  document.getElementById('lpRegion').value  = '';
+  document.getElementById('lpStreet').value  = '';
+
+  document.getElementById('locationPickerModal').classList.add('open');
+}
+
+function closeLocationPicker() {
+  document.getElementById('locationPickerModal').classList.remove('open');
+}
+
+async function lpLoadProvinces() {
+  const regCode = document.getElementById('lpRegion').value;
+  const sp = document.getElementById('lpProvince');
+  const sc = document.getElementById('lpCity');
+  const sb = document.getElementById('lpBarangay');
+  lpResetSel(sp,'Select Province…');
+  lpResetSel(sc,'Select City / Municipality…');
+  lpResetSel(sb,'Select Barangay…');
+  if (!regCode) return;
+  try {
+    const r = await fetch(`${PSGC}/regions/${regCode}/provinces/`);
+    const d = await r.json();
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    if (!d.length) {
+      // NCR and similar — load cities directly from region
+      await lpLoadCitiesForRegion(regCode);
+      return;
+    }
+    sp.disabled = false;
+    d.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.code; o.textContent = p.name; sp.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+async function lpLoadCitiesForRegion(regCode) {
+  const sc = document.getElementById('lpCity');
+  sc.disabled = false;
+  try {
+    const r = await fetch(`${PSGC}/regions/${regCode}/cities-municipalities/`);
+    const d = await r.json();
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.code; o.textContent = c.name; sc.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+async function lpLoadCities() {
+  const pc = document.getElementById('lpProvince').value;
+  const sc = document.getElementById('lpCity');
+  const sb = document.getElementById('lpBarangay');
+  lpResetSel(sc,'Select City / Municipality…');
+  lpResetSel(sb,'Select Barangay…');
+  if (!pc) return;
+  sc.disabled = false;
+  try {
+    const r = await fetch(`${PSGC}/provinces/${pc}/cities-municipalities/`);
+    const d = await r.json();
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.code; o.textContent = c.name; sc.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+async function lpLoadBarangays() {
+  const cc = document.getElementById('lpCity').value;
+  const sb = document.getElementById('lpBarangay');
+  lpResetSel(sb,'Select Barangay…');
+  if (!cc) return;
+  sb.disabled = false;
+  try {
+    const r = await fetch(`${PSGC}/cities-municipalities/${cc}/barangays/`);
+    const d = await r.json();
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(b => {
+      const o = document.createElement('option');
+      o.value = b.code; o.textContent = b.name; sb.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+function confirmLocationPicker() {
+  const city     = document.getElementById('lpCity');
+  const province = document.getElementById('lpProvince');
+  const barangay = document.getElementById('lpBarangay');
+  const street   = document.getElementById('lpStreet').value.trim();
+
+  if (!city.value) {
+    showToast('Please select at least a City / Municipality.', 'error');
+    return;
+  }
+
+  // Build structured location string
+  // Format: barangay|city|province|street  (pipe-separated for easy parsing in admin)
+  const cityText     = city.options[city.selectedIndex].text;
+  const provinceText = province.value ? province.options[province.selectedIndex].text : '';
+  const barangayText = barangay.value ? barangay.options[barangay.selectedIndex].text : '';
+
+  // Store structured data as JSON string in crRequestedValue
+  const locationData = JSON.stringify({
+    region_name:   document.getElementById('lpRegion').options[document.getElementById('lpRegion').selectedIndex].text,
+    province_name: provinceText,
+    city_name:     cityText,
+    barangay_name: barangayText,
+    street_addr:   street,
+  });
+
+  // Show human-readable in input
+  const display = [barangayText, cityText, provinceText].filter(Boolean).join(', ');
+  document.getElementById('crRequestedValue').value = locationData;
+  document.getElementById('crRequestedValue').setAttribute('data-display', display);
+
+  // Update placeholder to show the selected location
+  document.getElementById('crRequestedValue').style.display = 'none';
+
+  // Show confirmed location text instead
+  let confirmEl = document.getElementById('crLocationConfirmed');
+  if (!confirmEl) {
+    confirmEl = document.createElement('div');
+    confirmEl.id = 'crLocationConfirmed';
+    confirmEl.style.cssText = 'font-size:0.82rem;color:var(--navy);font-weight:600;padding:10px 12px;background:var(--green-bg);border:1.5px solid var(--green);border-radius:8px;margin-bottom:4px;';
+    document.getElementById('crRequestedValue').after(confirmEl);
+  }
+  confirmEl.innerHTML = `<i class="fa-solid fa-location-dot" style="color:var(--green);"></i> ${display} <button onclick="clearLocationSelection()" style="float:right;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:0.9rem;">✕</button>`;
+  confirmEl.style.display = 'block';
+
+  closeLocationPicker();
+}
+
+function clearLocationSelection() {
+  document.getElementById('crRequestedValue').value = '';
+  document.getElementById('crRequestedValue').style.display = 'block';
+  const confirmEl = document.getElementById('crLocationConfirmed');
+  if (confirmEl) confirmEl.style.display = 'none';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NOTIFICATION BADGE
+══════════════════════════════════════════════════════════════ */
+async function refreshNotifBadge() {
+  try {
+    const sess = FX.getSession();
+    if (!sess) return;
+    let count = 0;
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+    const badge = document.getElementById('notifBellBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
     }
   } catch(e) {}
-})();
+}
+refreshNotifBadge();
+setInterval(refreshNotifBadge, 10000);
+
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('open'); }
+
+/* ══════════════════════════════════════════════════════════════
+   AVATAR CHANGE
+══════════════════════════════════════════════════════════════ */
+function triggerAvatarUpload() {
+  document.getElementById('avatarFileInput').click();
+}
+
+async function handleAvatarChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('Please upload an image file.', 'error');
+    input.value = ''; return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('File too large. Max 10MB.', 'error');
+    input.value = ''; return;
+  }
+
+  // Compress to 200×200 JPEG (same as signup)
+  const compressed = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 200; canvas.height = 200;
+        const ctx = canvas.getContext('2d');
+        const size = Math.min(img.width, img.height);
+        const sx = (img.width  - size) / 2;
+        const sy = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  showToast('Uploading avatar…');
+  try {
+    // Upload compressed base64 directly via sbUpload
+    const ext  = 'jpg';
+    const path = `${session.userId}_avatar_${Date.now()}.${ext}`;
+    const newUrl = await sbUpload('fixia-avatars', path, compressed, 'image/jpeg');
+
+    // Get old URL before updating
+    const oldUrl = userData.avatar_url || null;
+
+    // Update both tables
+    await Promise.all([
+      sbFetch(`users?id=eq.${session.userId}`, {
+        method: 'PATCH', prefer: 'return=minimal',
+        body: JSON.stringify({ avatar_url: newUrl }),
+      }),
+      sbFetch(`providers?user_id=eq.${session.userId}`, {
+        method: 'PATCH', prefer: 'return=minimal',
+        body: JSON.stringify({ avatar_url: newUrl }),
+      }),
+    ]);
+
+    // Delete old avatar
+    if (oldUrl) await sbDelete(oldUrl);
+
+    // Update local state
+    userData.avatar_url = newUrl;
+    const sess = FX.getSession();
+    sess.avatarUrl = newUrl;
+    FX.setSession(sess);
+
+    renderProviderHero();
+    showToast('Avatar updated ✅', 'success');
+  } catch(e) {
+    showToast('Failed to update avatar: ' + e.message, 'error');
+  } finally {
+    input.value = '';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UPGRADE MODAL
+══════════════════════════════════════════════════════════════ */
+let _upgradeTarget      = null; // { packageId, calc, newPkg }
+let _upgPayMethod       = null; // 'paypal' | 'paymongo' | 'gcash' | 'maya' | 'bank'
+let _upgPayCategory     = null; // 'instant' | 'manual'
+let _upgManualRef       = '';
+let _upgManualAmount    = '';
+let _selectedUpgradePkg = null;
+
+function selectUpgradePkg(pkgId) {
+  _selectedUpgradePkg = pkgId;
+
+  // Update card selection styles
+  document.querySelectorAll('.upg-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('upgCard_' + pkgId)?.classList.add('selected');
+
+  // Enable Next button
+  const btn = document.getElementById('upgNextBtn');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+async function openUpgradeModal(newPackageId) {
+  _upgradeTarget   = null;
+  _upgPayMethod    = null;
+  _upgPayCategory  = null;
+  _upgManualRef    = '';
+  _upgManualAmount = '';
+
+  // Reset to step 1
+  document.getElementById('upgradeStep1').style.display = 'block';
+  document.getElementById('upgradeStep2').style.display = 'none';
+  document.getElementById('upgradeModalTitle').textContent = 'Upgrade Plan';
+  document.getElementById('upgradeNextBtn').innerHTML = '<i class="fa-solid fa-arrow-right"></i> Next';
+  document.getElementById('upgradeNextBtn').onclick = goToUpgradePayment;
+  document.querySelectorAll('.pay-opt').forEach(p => p.classList.remove('selected'));
+
+  document.getElementById('upgradeModal').classList.add('open');
+  document.getElementById('upgradeModalBody').innerHTML = '<div class="load-spinner"></div>';
+
+  try {
+    const calc   = await FX.calculateUpgrade(session.userId, newPackageId);
+    const allPkgs = session.role === 'provider'
+      ? await FX.getProviderPackages()
+      : await FX.getRegularPackages();
+    const newPkg = allPkgs.find(p => p.id === newPackageId);
+
+    _upgradeTarget = { packageId: newPackageId, calc, newPkg };
+
+    const periodLabel = { month:'1 Month', '6month':'6 Months', year:'1 Year', lifetime:'Lifetime' };
+    const isFree = !userData?.package_id ||
+                   userData.package_id === 'regular-free' ||
+                   userData.package_id === 'provider-free';
+
+    document.getElementById('upgradeModalBody').innerHTML = `
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;
+                  font-size:0.82rem;line-height:1.9;">
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-3);">New Plan</span>
+          <strong>${newPkg?.icon || '✨'} ${newPkg?.name}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-3);">Duration</span>
+          <strong>${periodLabel[newPkg?.period] || newPkg?.period}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-3);">Plan Price</span>
+          <strong>₱${calc.newPlanPrice}</strong>
+        </div>
+        ${!isFree ? `
+        <div style="display:flex;justify-content:space-between;color:var(--green-text);">
+          <span>Credit (${calc.remainingDays} days remaining)</span>
+          <strong>+${calc.carryoverDays} bonus days</strong>
+        </div>` : ''}
+        <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);
+                    padding-top:6px;margin-top:4px;">
+          <span style="color:var(--text-3);">Total Subscription</span>
+          <strong>${calc.totalDays === null ? '♾️ Lifetime' : calc.totalDays + ' days'}</strong>
+        </div>
+      </div>
+      ${!isFree ? `
+      <div style="background:var(--green-bg);border:1px solid rgba(16,185,129,0.3);
+                  border-radius:var(--radius-sm);padding:10px 12px;font-size:0.75rem;
+                  color:var(--green-text);line-height:1.6;margin-top:10px;">
+        <i class="fa-solid fa-circle-check"></i>
+        Your unused balance from your current plan has been automatically credited toward your new subscription.
+      </div>` : ''}`;
+
+  } catch(e) {
+    document.getElementById('upgradeModalBody').innerHTML =
+      `<div class="alert alert-error show">Failed to load upgrade details: ${e.message}</div>`;
+  }
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModal').classList.remove('open');
+  _upgradeTarget = null;
+}
+
+function goToUpgradePayment() {
+  if (!_upgradeTarget) return;
+  // Switch to step 2
+  document.getElementById('upgradeStep1').style.display = 'none';
+  document.getElementById('upgradeStep2').style.display = 'block';
+  document.getElementById('upgradeModalTitle').textContent = 'Select Payment';
+  document.getElementById('upgradeNextBtn').innerHTML =
+    '<i class="fa-solid fa-paper-plane"></i> Proceed';
+  document.getElementById('upgradeNextBtn').onclick = proceedUpgradePayment;
+}
+
+function selectUpgPayMethod(method, category) {
+  document.querySelectorAll('#upgradeStep2 .pay-opt').forEach(p => p.classList.remove('selected'));
+  document.getElementById('upgPay_' + method).classList.add('selected');
+  _upgPayMethod   = method;
+  _upgPayCategory = category;
+}
+
+async function proceedUpgradePayment() {
+  if (!_upgPayMethod) {
+    showUpgradePayAlert('Please select a payment method.'); return;
+  }
+
+  if (_upgPayCategory === 'instant') {
+    const btn = document.getElementById('upgradeNextBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span> Redirecting…';
+    try {
+      const endpoint = _upgPayMethod === 'paypal'
+        ? '/api/create-paypal-checkout'
+        : '/api/create-paymongo-checkout';
+      const r = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount:    _upgradeTarget.calc.newPlanPrice,
+          packageId: _upgradeTarget.packageId,
+          userId:    session.userId,
+          type:      'upgrade',
+        }),
+      });
+      const d = await r.json();
+      if (d.url) window.location.href = d.url;
+      else throw new Error(d.error || 'Checkout failed.');
+    } catch(e) {
+      showUpgradePayAlert('Error: ' + e.message);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Proceed';
+    }
+    return;
+  }
+
+  // Manual — open QR modal
+  openUpgQrModal();
+}
+
+function openUpgQrModal() {
+  const qrImages = {
+    gcash: 'images/gcash-qr.png',
+    maya:  'images/maya-qr.png',
+    bank:  'images/bank-qr.png',
+  };
+  const titles = {
+    gcash: 'GCash Payment',
+    maya:  'Maya Payment',
+    bank:  'Bank Transfer',
+  };
+  document.getElementById('upgQrTitle').textContent  = titles[_upgPayMethod] || 'Payment';
+  document.getElementById('upgQrImage').src          = qrImages[_upgPayMethod] || '';
+  document.getElementById('upgQrAmount').textContent = '₱' + (_upgradeTarget?.calc.newPlanPrice || 0);
+  document.getElementById('upgQrRef').value          = '';
+  document.getElementById('upgQrAmountSent').value   = '';
+  document.getElementById('upgQrModal').classList.add('open');
+}
+
+function closeUpgQrModal() {
+  document.getElementById('upgQrModal').classList.remove('open');
+}
+
+async function confirmUpgQrPayment() {
+  const ref = document.getElementById('upgQrRef').value.trim();
+  const amt = parseFloat(document.getElementById('upgQrAmountSent').value);
+  if (!ref) { showToast('Please enter your reference number.', 'error'); return; }
+  if (!amt || amt <= 0) { showToast('Please enter the amount sent.', 'error'); return; }
+
+  _upgManualRef    = ref;
+  _upgManualAmount = amt;
+
+  const btn     = document.querySelector('#upgQrModal .btn-brand');
+  const spinner = document.getElementById('upgQrSpinner');
+  const btnText = document.getElementById('upgQrBtnText');
+  btn.disabled = true;
+  spinner.classList.add('on');
+  btnText.style.display = 'none';
+
+  try {
+    await FX.requestUpgrade({
+      userId:           session.userId,
+      providerId:       providerData?.id || null,
+      currentPackageId: userData.package_id,
+      newPackageId:     _upgradeTarget.packageId,
+      currentSubEnd:    userData.subscription_end,
+      remainingDays:    _upgradeTarget.calc.remainingDays,
+      remainingValue:   _upgradeTarget.calc.remainingValue,
+      newPlanPrice:     _upgradeTarget.calc.newPlanPrice,
+      carryoverDays:    _upgradeTarget.calc.carryoverDays,
+      paymentMethod:    _upgPayMethod,
+      paymentReference: _upgManualRef,
+      paymentAmount:    _upgManualAmount,
+    });
+    closeUpgQrModal();
+    closeUpgradeModal();
+    showToast('Upgrade request submitted! ✅', 'success');
+    await renderPlanTab();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    spinner.classList.remove('on');
+    btnText.style.display = 'inline';
+  }
+}
+
+function showUpgradePayAlert(msg) {
+  const el = document.getElementById('upgradePayAlert');
+  el.className = 'alert alert-error show';
+  el.textContent = msg;
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModal').classList.remove('open');
+  _upgradeTarget = null;
+}
+
 </script>
+
+<!-- ── CHANGE REQUEST MODAL ───────────────────────────────────── -->
+<div class="modal" id="changeRequestModal" onclick="if(event.target===this)closeChangeRequestModal()">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-envelope" style="color:var(--brand);"></i> &nbsp; Request Profile Change
+      </h3>
+    </div>
+    <div class="modal-body">
+      <div id="crAlert" class="alert"></div>
+
+      <!-- Cooldown notice -->
+      <div id="crCooldownNotice" style="display:none;background:var(--gold-bg);border:1px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:0.78rem;color:var(--gold-text);margin-bottom:12px;line-height:1.6;">
+        <i class="fa-solid fa-clock"></i> <span id="crCooldownMsg"></span>
+      </div>
+
+      <div id="crForm">
+        <div style="font-size:0.75rem;color:var(--text-3);line-height:1.6;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:10px 12px;">
+          <i class="fa-solid fa-circle-info"></i>
+          Changes to your business name, email, or location require admin approval.
+          You may only submit one request every <strong>30 days</strong>. Please ensure all information is correct before submitting.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">What would you like to change?</label>
+          <select class="form-input" id="crSubject" onchange="onCrSubjectChange()"
+                  style="padding:10px 12px;">
+            <option value="">— Select a subject —</option>
+            <option value="Business Name Change">Business Name Change</option>
+            <option value="Email Change">Email Change</option>
+            <option value="Location Change">Location Change</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Dynamic field based on subject -->
+        <div id="crDynamicField" style="display:none;">
+          <div class="form-group">
+            <label class="form-label" id="crDynamicLabel"></label>
+            <input class="form-input" id="crRequestedValue" placeholder=""/>
+            <button type="button" id="crLocationBtn" onclick="openLocationPickerModal()"
+                    style="display:none;margin-top:6px;width:100%;padding:10px;background:var(--brand);color:#fff;
+                           border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+              <i class="fa-solid fa-location-dot"></i> Select Location
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Brief Explanation</label>
+          <textarea class="form-input" id="crExplanation" rows="3"
+                    placeholder="Briefly explain why you need this change…"
+                    style="resize:none;padding:10px 12px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Supporting Document <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional — image or PDF, max 5MB)</span></label>
+          <input type="file" id="crFile" accept="image/*,application/pdf"
+                 style="font-size:0.8rem;padding:8px 0;"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeChangeRequestModal()">Cancel</button>
+      <button class="btn btn-brand" id="crSubmitBtn" onclick="submitChangeRequest()">
+        <i class="fa-solid fa-paper-plane"></i> Submit Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOCATION PICKER MODAL ─────────────────────────────────── -->
+<div class="modal" id="locationPickerModal" onclick="if(event.target===this)closeLocationPicker()">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-location-dot" style="color:var(--brand);"></i> &nbsp; Select New Location
+      </h3>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Region <span style="color:#dc3545">*</span></label>
+        <select id="lpRegion" class="form-input" onchange="lpLoadProvinces()"
+                style="padding:10px 12px;">
+          <option value="">Select Region…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Province</label>
+        <select id="lpProvince" class="form-input" onchange="lpLoadCities()" disabled
+                style="padding:10px 12px;">
+          <option value="">Select Province…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / Municipality <span style="color:#dc3545">*</span></label>
+        <select id="lpCity" class="form-input" onchange="lpLoadBarangays()" disabled
+                style="padding:10px 12px;">
+          <option value="">Select City / Municipality…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Barangay <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <select id="lpBarangay" class="form-input" disabled
+                style="padding:10px 12px;">
+          <option value="">Select Barangay…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Street Address <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <input class="form-input" id="lpStreet" placeholder="House/Unit No., Street Name"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeLocationPicker()">Cancel</button>
+      <button class="btn btn-brand" onclick="confirmLocationPicker()">
+        <i class="fa-solid fa-check"></i> Confirm Location
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── UPGRADE REQUEST MODAL ─────────────────────────────────── -->
+<div class="modal" id="upgradeModal" onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-arrow-trend-up" style="color:var(--brand);"></i>
+        &nbsp; <span id="upgradeModalTitle">Upgrade Plan</span>
+      </h3>
+      <button class="modal-x" onclick="closeUpgradeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Step 1: Plan summary -->
+      <div id="upgradeStep1">
+        <div id="upgradeModalBody"><div class="load-spinner"></div></div>
+      </div>
+      <!-- Step 2: Payment -->
+      <div id="upgradeStep2" style="display:none;">
+        <div id="upgradePayAlert" class="alert"></div>
+        <div class="pay-category-label">
+          Instant Verification
+          <span class="pay-tooltip" title="Payment is verified automatically. Your upgrade is activated immediately after payment.">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+        </div>
+        <div class="pay-methods-grid" style="margin-bottom:14px;">
+          <div class="pay-opt" id="upgPay_paypal" onclick="selectUpgPayMethod('paypal','instant')">
+            <div class="pay-opt-icon"><img src="images/paypal.png" alt="PayPal"></div>
+            <div class="pay-opt-label">PayPal</div>
+          </div>
+          <div class="pay-opt" id="upgPay_paymongo" onclick="selectUpgPayMethod('paymongo','instant')">
+            <div class="pay-opt-icon"><img src="images/paymongo.png" alt="PayMongo"></div>
+            <div class="pay-opt-label">PayMongo</div>
+          </div>
+          <div class="pay-opt" id="upgPay_tbc" onclick="selectUpgPayMethod('tbc','instant')">
+            <div class="pay-opt-icon"><img src="images/tbc.png" alt="TBC"></div>
+            <div class="pay-opt-label">TBC</div>
+          </div>
+        </div>
+        <div class="pay-category-label">
+          Manual Verification
+          <span class="pay-tooltip" title="Send payment manually. Admin will verify before activating your upgrade.">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+        </div>
+        <div class="pay-methods-grid">
+          <div class="pay-opt" id="upgPay_gcash" onclick="selectUpgPayMethod('gcash','manual')">
+            <div class="pay-opt-icon"><img src="images/gcash.png" alt="GCash"></div>
+            <div class="pay-opt-label">GCash</div>
+          </div>
+          <div class="pay-opt" id="upgPay_maya" onclick="selectUpgPayMethod('maya','manual')">
+            <div class="pay-opt-icon"><img src="images/maya.png" alt="Maya"></div>
+            <div class="pay-opt-label">Maya</div>
+          </div>
+          <div class="pay-opt" id="upgPay_bank" onclick="selectUpgPayMethod('bank','manual')">
+            <div class="pay-opt-icon"><img src="images/bpi.png" alt="Bank Transfer"></div>
+            <div class="pay-opt-label">Bank Transfer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" id="upgradeModalFoot">
+      <button class="btn btn-ghost" onclick="closeUpgradeModal()">Cancel</button>
+      <button class="btn btn-brand" id="upgradeNextBtn" onclick="goToUpgradePayment()">
+        <i class="fa-solid fa-arrow-right"></i> Next
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── UPGRADE QR MODAL ───────────────────────────────────────── -->
+<div id="upgQrModal" class="modal">
+  <div class="modal-sheet" style="max-width:380px;margin:0 auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-qrcode"></i> &nbsp; <span id="upgQrTitle">Payment</span></h3>
+      <button class="modal-x" onclick="closeUpgQrModal()">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:12px;">
+        Scan the QR code and send the exact amount below.
+      </p>
+      <img id="upgQrImage" src="" alt="QR Code"
+           style="width:180px;height:180px;object-fit:contain;border-radius:12px;
+                  border:1px solid var(--border);margin-bottom:10px;"/>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--brand);margin-bottom:14px;">
+        Amount: <span id="upgQrAmount">₱0</span>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Reference Number <span style="color:var(--red);">*</span></label>
+        <input class="form-input" id="upgQrRef" placeholder="e.g. GCash ref number"/>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Amount Sent <span style="color:var(--red);">*</span></label>
+        <input class="form-input" id="upgQrAmountSent" type="number" placeholder="₱0"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeUpgQrModal()">Cancel</button>
+      <button class="btn btn-brand" onclick="confirmUpgQrPayment()">
+        <span class="spinner" id="upgQrSpinner"></span>
+        <span id="upgQrBtnText"><i class="fa-solid fa-paper-plane"></i> Submit Upgrade</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
