@@ -1,0 +1,16 @@
+{
+  "name": "Fixia",
+  "short_name": "Fixia",
+  "start_url": "/public/homepage.html",
+  "display": "standalone",
+  "background_color": "#0f2027",
+  "theme_color": "#0f2027",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/public/images/favicon.png",
+      "sizes": "647x647",
+      "type": "image/png"
+    }
+  ]
+}
