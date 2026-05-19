@@ -188,6 +188,22 @@ const templates = {
     `)
   }),
 
+/* ── Email OTP verification ──────────────────────────────────── */
+  email_otp: (d) => ({
+    to:      d.email,
+    subject: `${d.otp} is your Fixia verification code`,
+    html: wrap(`
+      ${heading('Verify Your Email Address', 'Use the code below to complete your Fixia registration.')}
+      <div style="text-align:center;margin:24px 0;">
+        <div style="display:inline-block;background:#FFF0EB;border:2px dashed #FF5A1F;border-radius:12px;padding:18px 36px;">
+          <div style="font-size:2.2rem;font-weight:900;letter-spacing:0.18em;color:#FF5A1F;font-family:monospace;">${d.otp}</div>
+          <div style="font-size:0.75rem;color:#8896A5;margin-top:6px;">Expires in 10 minutes</div>
+        </div>
+      </div>
+      ${alertBox('If you did not request this code, please ignore this email. Do not share this code with anyone.', 'info')}
+    `),
+  }), 
+  
   /* ── Regular user: payment received (Plus upgrade) ──────────── */
   regular_payment_notify: (d) => ({
     to:      OWNER_EMAIL,

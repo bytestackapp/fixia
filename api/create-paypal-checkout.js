@@ -104,7 +104,7 @@ module.exports = async (req, res) => {
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
-            currency_code: 'USD',
+            currency_code: 'PHP',
             value: pkg.price.toFixed(2),
           },
           description,
