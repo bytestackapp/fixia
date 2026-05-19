@@ -583,7 +583,6 @@ window.addEventListener('click', e => {
 <script>
 (function() {
   if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) return;
-  if (localStorage.getItem('pwa_prompt_dismissed')) return;
 
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   let deferredPrompt = null;
@@ -591,7 +590,7 @@ window.addEventListener('click', e => {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    showToast(false);
+    setTimeout(() => showToast(false), 2000);
   });
 
   function showToast(ios) {
@@ -613,7 +612,6 @@ window.addEventListener('click', e => {
       toast.style.transform = 'translateY(20px)';
       setTimeout(() => {
         toast.remove();
-        localStorage.setItem('pwa_prompt_dismissed', '1');
       }, 400);
     }, 3000);
   }
@@ -625,7 +623,7 @@ window.addEventListener('click', e => {
     deferredPrompt = null;
   };
 
-  if (isIOS) setTimeout(() => showToast(true), 1500);
+  if (isIOS) setTimeout(() => showToast(true), 2000);
 })();
 </script>
 
