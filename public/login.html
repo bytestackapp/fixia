@@ -591,40 +591,41 @@ window.addEventListener('click', e => {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    showBanner(false);
+    showToast(false);
   });
 
-  function showBanner(ios) {
-    const banner = document.createElement('div');
-    banner.id = 'pwaBanner';
-    banner.innerHTML = `
-      <div style="position:fixed;bottom:24px;left:12px;right:12px;background:#0f2027;color:#fff;border-radius:16px;padding:14px 16px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;animation:slideUpSheet 0.3s ease;">
-        <img src="/public/images/favicon.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0;">
-        <div style="flex:1;">
-          <div style="font-size:0.85rem;font-weight:800;margin-bottom:2px;">Add Fixia to Home Screen</div>
-          <div style="font-size:0.72rem;opacity:0.75;">${ios ? 'Tap Share → Add to Home Screen for the best experience.' : 'Install for faster access and a better experience.'}</div>
-        </div>
-        ${ios ? '' : `<button onclick="installPWA()" style="background:#e86c2c;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;">Install</button>`}
-        <button onclick="dismissPWA()" style="background:none;border:none;color:#fff;opacity:0.6;font-size:1.2rem;cursor:pointer;padding:0 4px;">×</button>
+  function showToast(ios) {
+    const toast = document.createElement('div');
+    toast.id = 'pwaToast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:12px;right:12px;background:#0f2027;color:#fff;border-radius:16px;padding:14px 16px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;animation:slideUpSheet 0.3s ease;';
+    toast.innerHTML = `
+      <img src="/public/images/favicon.png" style="width:36px;height:36px;border-radius:10px;flex-shrink:0;">
+      <div style="flex:1;">
+        <div style="font-size:0.85rem;font-weight:800;margin-bottom:2px;">Add Fixia to Home Screen</div>
+        <div style="font-size:0.72rem;opacity:0.75;">${ios ? 'Tap Share → Add to Home Screen for the best experience.' : 'Install for faster access and a better experience.'}</div>
       </div>`;
-    document.body.appendChild(banner);
+    document.body.appendChild(toast);
+
+    // Auto dismiss after 3 seconds
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        toast.remove();
+        localStorage.setItem('pwa_prompt_dismissed', '1');
+      }, 400);
+    }, 3000);
   }
 
   window.installPWA = async function() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') dismissPWA();
     deferredPrompt = null;
   };
 
-  window.dismissPWA = function() {
-    const b = document.getElementById('pwaBanner');
-    if (b) b.remove();
-    localStorage.setItem('pwa_prompt_dismissed', '1');
-  };
-
-  if (isIOS) setTimeout(() => showBanner(true), 3000);
+  if (isIOS) setTimeout(() => showToast(true), 1500);
 })();
 </script>
 
