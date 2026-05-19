@@ -11,6 +11,11 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f2027">
+  
   <title>Saved — Fixia</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -285,7 +290,7 @@ function renderCards(saved) {
       `<i class="fa-${idx < Math.round(p.avgRating) ? 'solid' : 'regular'} fa-star"></i>`
     ).join('');
     return `
-      <div class="provider-card" style="animation-delay:${i*0.05}s">
+      <div class="provider-card" style="animation-delay:${i*0.05}s;cursor:pointer;" onclick="window.location.href='provider.html?id=${p.id}'">
         <div class="card-top">
         <div class="provider-avatar">
           ${p.avatarUrl
@@ -303,9 +308,6 @@ function renderCards(saved) {
         </div>
         <div style="font-size:0.65rem;color:var(--text-3);"><i class="fa-solid fa-location-dot" style="color:var(--brand);font-size:9px;"></i> ${p.cityName || '—'}</div>
         <div class="card-actions">
-          <button class="view-btn" onclick="event.stopPropagation();window.location.href='provider.html?id=${p.id}'">
-            <i class="fa-solid fa-eye"></i> View
-          </button>
           <button class="unsave-btn" title="Remove" onclick="event.stopPropagation();unsave('${p.id}')">
             <i class="fa-solid fa-bookmark-slash"></i>
           </button>
