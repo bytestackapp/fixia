@@ -8,8 +8,8 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/public/images/favicon.png",
-      "sizes": "647x647",
+      "src": "/public/images/fixia-icon.png",
+      "sizes": "633x633",
       "type": "image/png"
     }
   ]
