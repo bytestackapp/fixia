@@ -761,6 +761,8 @@ async rejectProvider(providerId, userId, reason) {
   if (prov?.id_file_url) await sbDelete(prov.id_file_url);
   if (prov?.avatar_url)  await sbDelete(prov.avatar_url);
   await sbFetch(`providers?id=eq.${providerId}`, { method: 'DELETE', prefer: 'return=minimal' });
+  // Permanently delete the user account
+  await sbFetch(`users?id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' });
 },
 
 async approveRegularUser(userId) {
@@ -808,12 +810,8 @@ async rejectRegularUser(userId, reason) {
     type:  'warning',
     icon:  '🚫',
   });
-  // Mark for deletion after they read the message
-  await sbFetch(`users?id=eq.${userId}`, {
-    method: 'PATCH',
-    prefer: 'return=minimal',
-    body: JSON.stringify({ force_logout: true, status: 'rejected' }),
-  });
+  // Permanently delete the user account
+  await sbFetch(`users?id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' });
 },
 
 async setProviderNeedsCompliance(providerId, userId, reason) {
