@@ -1,56 +1,15 @@
 {
   "version": 2,
   "name": "fixia",
-  "public": false,
-  "builds": [
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "sw.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "manifest.json",
-      "use": "@vercel/static"
-    },
-      {
-        "src": "api/**/*.js",
-        "use": "@vercel/node"
-      }
-    ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/sw.js",
-      "dest": "/sw.js"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf))",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/(.+\\.html)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/public/homepage.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1.html"
-    }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/sw.js", "destination": "/sw.js" },
+    { "source": "/manifest.json", "destination": "/manifest.json" },
+    { "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf))", "destination": "/public/$1" },
+    { "source": "/(.+\\.html)", "destination": "/public/$1" },
+    { "source": "/", "destination": "/public/homepage.html" },
+    { "source": "/(.*)", "destination": "/public/$1.html" }
   ],
-
   "crons": [
     {
       "path": "/api/subscription-cron",
