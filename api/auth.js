@@ -1,7 +1,14 @@
-// api/auth.js
-import bcrypt from 'bcryptjs'; // add to package.json: "bcryptjs": "^2.4.3"
+/*
+ * ═══════════════════════════════════════════════════════════════
+ *  FIXIA — Service Marketplace
+ *  /api/auth.js  —  Vercel Serverless Function
+ *  © ByteStack Labs 2025. All Rights Reserved.
+ * ═══════════════════════════════════════════════════════════════
+ */
 
-export default async function handler(req, res) {
+const bcrypt = require('bcryptjs');
+
+module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { action, password, hash } = req.body;
@@ -19,4 +26,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(400).json({ error: 'Unknown action' });
-}
+};

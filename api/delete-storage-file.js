@@ -1,5 +1,12 @@
-// api/delete-storage-file.js
-export default async function handler(req, res) {
+/*
+ * ═══════════════════════════════════════════════════════════════
+ *  FIXIA — Service Marketplace
+ *  /api/delete-storage-file.js  —  Vercel Serverless Function
+ *  © ByteStack Labs 2025. All Rights Reserved.
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { publicUrl } = req.body;
@@ -12,6 +19,10 @@ export default async function handler(req, res) {
   const SUPA_URL = process.env.SUPA_URL;
   const SUPA_SERVICE_KEY = process.env.SUPA_SERVICE_KEY;
 
+  if (!SUPA_URL || !SUPA_SERVICE_KEY) {
+    return res.status(500).json({ error: 'Server not configured.' });
+  }
+
   const r = await fetch(`${SUPA_URL}/storage/v1/object/${bucket}/${path}`, {
     method: 'DELETE',
     headers: {
@@ -21,4 +32,4 @@ export default async function handler(req, res) {
   });
 
   return res.status(r.ok ? 200 : r.status).json({ ok: r.ok });
-}
+};
