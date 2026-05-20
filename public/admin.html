@@ -42,8 +42,8 @@
     /* ── TOP NAV ─────────────────────────────────────────────── */
     .topnav{
       position:sticky;top:0;z-index:100;
-      background:var(--navy);height:var(--nav-h);
-      display:flex;align-items:center;padding:0 16px;gap:12px;
+      background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));
+      display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;
       box-shadow:0 2px 12px rgba(0,0,0,0.2);
     }
     .nav-logo{font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
@@ -258,13 +258,17 @@
   <button class="mtab active" onclick="showSection('dashboard',this)">📊 Dashboard</button>
   <button class="mtab" onclick="showSection('pending',this)">⏳ Pending</button>
   <button class="mtab" onclick="showSection('providers',this)">🔧 Providers</button>
-  <button class="mtab" onclick="showSection('regulars',this)">👥 Users</button>
+  <button class="mtab" onclick="showSection('regulars',this)">👥 Regulars</button>
+  <button class="mtab" onclick="showSection('suspicious',this)">⚠️ Suspicious</button> 
   <button class="mtab" onclick="showSection('packages',this)">📦 Packages</button>
   <button class="mtab" onclick="showSection('elite',this)">👑 Elite</button>
   <button class="mtab" onclick="showSection('ads',this)">📢 Ads</button>
-  <button class="mtab" onclick="showSection('suspicious',this)">⚠️ Suspicious</button>
+  <button class="mtab" onclick="showSection('settings',this)">⚙️ Settings</button>
+  <button class="mtab" onclick="showSection('messages',this)">📣 Messages</button>
+  <button class="mtab" onclick="showSection('requests',this)">📥 Requests</button>
   <button class="mtab" onclick="showSection('uncategorized',this)">🏷️ Uncategorized</button>
   <button class="mtab" onclick="showSection('upgrades',this);loadUpgradeRequests();">⬆️ Upgrades</button>
+  <button class="mtab" onclick="showSection('reports',this)">🚩 Reports</button>
 </div>
 
 <div class="layout">
@@ -1692,9 +1696,6 @@ async function loadPending() {
       return { ...prov, payment_method: user?.payment_method || null, payment_reference: user?.payment_reference || null, payment_amount: user?.payment_amount || null, payment_status: user?.payment_status || null, package_name: user?.package_name || null, first_name: user?.first_name || null, last_name: user?.last_name || null, role: 'provider' };
     }));
     const allPending = [...enrichedProviders, ...enrichedCompliance, ...pendingRegularManual];
-
-    console.log('[Admin] Pending found:', allPending.length);
-
     const countEl = document.getElementById('pendingCount');
     if (countEl) {
       countEl.textContent = allPending.length;

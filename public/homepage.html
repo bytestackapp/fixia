@@ -56,31 +56,14 @@
       -webkit-font-smoothing:antialiased;
     }
 
-    /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav {
-      position:sticky; top:0; z-index:100;
-      background:var(--navy);
-      height:var(--nav-h);
-      display:flex; align-items:center;
-      padding:0 16px; gap:10px;
-    }
-    .nav-logo {
-      font-size:1.45rem; font-weight:800;
-      color:#fff; letter-spacing:-0.04em; flex-shrink:0;
-    }
-    .nav-logo span { color:var(--brand); }
-    .nav-search {
-      flex:1; display:flex; align-items:center;
-      background:rgba(255,255,255,0.10);
-      border:1.5px solid rgba(255,255,255,0.15);
-      border-radius:10px; padding:0 12px; height:38px; gap:8px;
-    }
-    .nav-search input {
-      flex:1; background:none; border:none; outline:none;
-      color:#fff; font-size:0.875rem; font-family:inherit;
-    }
+   /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}	
+	.nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}	
+	.nav-logo span{color:var(--brand);}
+    .nav-search {flex:1; display:flex; align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px; padding:0 12px; height:36px; gap:8px;}
+    .nav-search input {flex:1; background:none; border:none; outline:none;color:#fff; font-size:0.82rem; font-family:inherit;}
     .nav-search input::placeholder { color:rgba(255,255,255,0.45); }
-    .nav-search i { color:rgba(255,255,255,0.45); font-size:13px; }
+    .nav-search i { color:rgba(255,255,255,0.45); font-size:12px; }
 
     /* ── LOCATION BAR ────────────────────────────────────────── */
     .loc-bar {
@@ -127,7 +110,7 @@
 
 .featured-card .fc-img-placeholder {
   width:100%;
-  height:72px;
+  height:64px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -142,23 +125,26 @@
   object-fit:cover;
   display:block;
 }
-.featured-card .fc-badge {
-  position:absolute; top:8px; left:8px;
-  background:var(--gold); color:#7B4F00;
-  font-size:0.58rem; font-weight:700; letter-spacing:0.06em;
-  padding:2px 7px; border-radius:20px; text-transform:uppercase;
-}
+
 .featured-card .fc-body {
   padding:8px 10px 10px;
   display:flex;
   flex-direction:column;
   gap:3px;
 }
-.fc-name { font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fc-service { font-size:0.65rem; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fc-stars { display:flex; align-items:center; gap:2px; font-size:0.65rem; }
-.fc-stars i { color:var(--gold); font-size:10px; }
-.fc-stars span { color:rgba(255,255,255,0.7); }
+
+.featured-card .fc-badge {
+  position:absolute; top:8px; left:8px;
+  background:rgba(0,0,0,0.55); color:#fff;
+  font-size:0.72rem; font-weight:700;
+  padding:2px 8px; border-radius:20px;
+  display:flex; align-items:center; gap:3px;
+}
+
+.fc-rating { font-size:0.72rem; font-weight:700; color:var(--gold); display:flex; align-items:center; gap:3px; margin-bottom:2px; }
+.fc-rating i { font-size:10px; }
+.fc-name { font-size:0.82rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:0; }
+.fc-service { font-size:0.65rem; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:0; }
 .fc-loc { font-size:0.65rem; color:rgba(255,255,255,0.45); display:flex; align-items:center; gap:3px; }
 .fc-loc i { color:var(--brand); font-size:9px; }
 
@@ -253,19 +239,6 @@
       display:flex; align-items:center; gap:3px;
     }
 
-    .ad-inline {
-      background:linear-gradient(90deg, #0f2027, #203a43, #2c5364);
-      border-radius:var(--radius-md);
-      padding:12px 14px;
-      display:flex; align-items:center; gap:10px;
-      margin-bottom:10px; cursor:pointer;
-    }
-    .ad-inline .ai-label { font-size:0.55rem; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.35); text-transform:uppercase; }
-    .ad-inline .ai-title { font-size:0.82rem; font-weight:700; color:#fff; }
-    .ad-inline .ai-sub { font-size:0.68rem; color:rgba(255,255,255,0.55); }
-    .ad-inline .ai-icon { font-size:1.8rem; flex-shrink:0; }
-    .ad-inline .ai-btn { margin-left:auto; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.68rem; font-weight:700; padding:5px 10px; border-radius:20px; cursor:pointer; flex-shrink:0; font-family:inherit; }
-
     .modal-overlay {
       display:none; position:fixed; inset:0; z-index:200;
       background:rgba(0,0,0,0.5); backdrop-filter:blur(3px);
@@ -330,7 +303,6 @@
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
     /* ── EMPTY / UTILITY ─────────────────────────────────────── */
     .spacer { height:16px; }
@@ -479,9 +451,6 @@
         Loading providers…
       </div>
     </div>
-
-    <!-- Inline Ad — loaded dynamically -->
-    <div id="homepageInlineAd" style="margin-top:10px;"></div>
 
     <div class="spacer"></div>
   </section>
@@ -898,23 +867,19 @@ function renderFeaturedCard(p) {
   const stars = Array.from({length:5}, (_,i) =>
     `<i class="fa-${i < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
   ).join('');
-  const eliteBadge = p.is_elite
-    ? '<div class="fc-badge" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;">👑 Elite</div>'
-    : '<div class="fc-badge">⭐ Featured</div>';
-
-return `
+  
+	return `
     <div class="featured-card" onclick="openProvider('${p.id}')">
-      ${eliteBadge}
-      <div class="fc-img-placeholder" style="background:${bg};">
+      <div class="fc-img-placeholder" style="background:${bg};position:relative;">
         ${p.avatar_url
           ? `<img src="${p.avatar_url}" alt="${p.biz_name}">`
           : emoji}
+        <div class="fc-badge"><i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}</div>
       </div>
       <div class="fc-body">
-        <div class="fc-name">${p.biz_name}</div>
-        ${p.cat_sub ? `<div class="fc-service">${p.cat_sub}</div>` : ''}
-        <div class="fc-stars">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
-        <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${p.city_name || '—'}</div>
+        <div class="fc-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
+        <div class="fc-service">${p._listing_cats?.[0] || p.cat_sub || '—'}</div>
+        <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${p.province_name || p.city_name || '—'}</div>
       </div>
     </div>`;
 }
@@ -974,7 +939,7 @@ async function loadHomepageData() {
   }
 
 try {
-  const inlineAds = await FX.getAds('inline');
+  const inlineAds = (FX.getSession()?.role === 'admin') ? [] : await FX.getAds('inline');
   if (inlineAds.length) {
 
     // Banner ad (first slot)
@@ -992,23 +957,6 @@ try {
       injected.addEventListener('click', clickHandler);
       injected.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
     }
-
-    // Inline ad (second slot)
-    const inlineEl = document.getElementById('homepageInlineAd');
-    if (inlineEl) {
-      const ad2 = inlineAds.length > 1 ? inlineAds[1] : inlineAds[0];
-      inlineEl.innerHTML = FX.renderInlineAd(ad2);
-      sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad2.id }) }).catch(()=>{});
-	  FX.checkAndCompleteAd(ad2.id, (ad2.impression_count || 0) + 1, ad2.impression_quota).catch(() => {});
-      const injected2 = inlineEl.firstElementChild;
-      const clickHandler2 = () => {
-        sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad2.id }) }).catch(()=>{});
-        window.open(ad2.link_url || '#', '_blank');
-      };
-      injected2.addEventListener('click', clickHandler2);
-      injected2.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler2(); });
-    }
-
   }
     // Load popup ads into memory for the session
     const session = FX.getSession();
@@ -1054,6 +1002,7 @@ try {
     // Render 4 providers (2 rows of 2)
     const show = nearby.slice(0, 4);
     grid.innerHTML = show.map(renderNearbyCard).join('');
+    FX.injectInlineAds('nearbyGrid', 5);
 	FX.adTrigger('category_browsed');
   } catch(e) {
     console.error('[Homepage] Nearby load error:', e.message);

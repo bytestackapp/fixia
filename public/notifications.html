@@ -24,20 +24,15 @@
     :root{--brand:#FF5A1F;--navy:#0F1B2D;--navy-mid:#1E3048;--text:#1A2332;--text-2:#4A5568;--text-3:#8896A5;--bg:#F0F2F5;--card:#fff;--border:#E8ECF0;--green:#10B981;--gold:#F59E0B;--radius-md:12px;--nav-h:56px;--bottom-h:62px;}
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
     .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
     .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
-	
-    .bnav-center-btn {
-      width:52px; height:52px; border-radius:16px;
-      background:var(--brand); color:#fff;
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.3rem; box-shadow:0 4px 14px rgba(255,90,31,0.4);
-      cursor:pointer; border:none;
-      transform:translateY(-8px);
-    }	
+
+    /* ── PAGE HEADER ─────────────────────────────────────────── */
+	.page-header{background:var(--navy-mid);padding:8px 16px;}
+	.ph-sub{font-size:0.78rem; color:rgba(255,255,255,0.75);}	
 	
     .notif-item{background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background 0.15s;}
     .notif-item:hover{background:#FAFBFC;}
@@ -52,11 +47,15 @@
     .empty-icon{font-size:3rem;margin-bottom:10px;}
     .empty-title{font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:4px;}
     .empty-sub{font-size:0.8rem;color:var(--text-3);line-height:1.6;}
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
-    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;border:none;background:none;font-family:inherit;text-decoration:none;}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
     .bnav-item i{font-size:1.05rem;}
     .bnav-item.active{color:var(--brand);}
-	
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
 	
@@ -75,6 +74,10 @@
   </button>
 </nav>
 
+<div class="page-header">
+  <div class="ph-sub">View booking updates and activity alerts</div>
+</div>
+
 <div id="notifList"></div>
 
 <nav class="bottom-nav">
@@ -87,7 +90,6 @@
   </div>
   <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -101,6 +103,7 @@ const STATUS_CONFIG = {
   done:      { icon:'🏁',  bg:'#FFFBEB', title:'Service Marked as Complete',   msg:'The provider marked your job as done. Tap to confirm and leave a rating.' },
   cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by Provider', msg:'The provider has cancelled this booking.' },
   disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'You Disputed This Booking',    msg:'You raised a dispute. Contact the provider to resolve and rebook if needed.' },
+  completed: { icon:'✅',  bg:'#ECFDF5', title:'Booking Completed',            msg:'Your booking has been completed. Thank you for using Fixia!' },
 };
 
 const PROV_CONFIG = {
@@ -134,7 +137,7 @@ function renderHeader(hasUnread, hasRead) {
     <button id="clearAllBtn" onclick="clearAllNotifs()" style="font-size:0.7rem;font-weight:700;background:#FFF0EB;border:none;cursor:${hasUnread ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasUnread ? 'var(--brand)' : '#ccc'};" ${!hasUnread ? 'disabled' : ''}>
       Clear All
     </button>
-    <button id="deleteReadBtn" onclick="deleteReadNotifs()" style="font-size:0.7rem;font-weight:700;background:#F5F7FA;border:none;cursor:${hasRead ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasRead ? 'var(--text-2)' : '#ccc'};" ${!hasRead ? 'disabled' : ''}>
+	<button id="deleteReadBtn" onclick="deleteReadNotifs()" style="font-size:0.7rem;font-weight:700;background:#F5F7FA;border:none;cursor:${hasRead ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasRead ? 'var(--text-2)' : '#ccc'};" ${!hasRead ? 'disabled' : ''}>
       🗑 Delete Read
     </button>
   `;
@@ -191,7 +194,7 @@ async function deleteReadNotifs() {
   } catch(e) {}
 }
 
-(async function init() {
+async function init() {
   if (!session) { window.location.href = 'login.html'; return; }
 
   const list = document.getElementById('notifList');
@@ -204,7 +207,7 @@ async function deleteReadNotifs() {
     if (role === 'regular') {
       const inquiries = await FX.getUserInquiries(session.userId);
       notifs = inquiries
-        .filter(i => STATUS_CONFIG[i.status])
+        .filter(i => STATUS_CONFIG[i.status] && !i.user_notif_dismissed)
         .map(i => {
           const cfg = STATUS_CONFIG[i.status];
           return {
@@ -226,7 +229,7 @@ async function deleteReadNotifs() {
       }
       const inquiries = await FX.getProviderInquiries(pd.id);
       notifs = inquiries
-        .filter(i => PROV_CONFIG[i.status])
+        .filter(i => PROV_CONFIG[i.status] && !i.provider_notif_dismissed)
         .map(i => {
           const cfg = PROV_CONFIG[i.status];
           return {
@@ -271,7 +274,10 @@ async function deleteReadNotifs() {
   } catch(e) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load notifications</div><div class="empty-sub">${e.message}</div></div>`;
   }
-})();
+}
+
+init();
+
 </script>
 
 <script>

@@ -41,7 +41,7 @@
     @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 14px;gap:10px;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
     .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
     .nav-search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 10px;height:36px;gap:7px;cursor:pointer;overflow:hidden;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
@@ -145,7 +145,6 @@
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
     /* ── MODAL (image lightbox) ──────────────────────────────── */
     .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
@@ -666,16 +665,6 @@ function capitalize(s) {
 }
 
 /* ── Save / Unsave ──────────────────────────────────────────── */
-FX.getSaved    = function() { try { return JSON.parse(localStorage.getItem('fixia_saved')||'[]'); } catch { return []; } };
-FX.isSaved     = function(id) { return this.getSaved().some(s => s.id === id); };
-FX.saveProvider = function(p) {
-  const saved = this.getSaved();
-  if (saved.find(s => s.id === p.id)) return;
-  saved.unshift({ id:p.id, bizName:p.biz_name, catSub:p.cat_sub, catMain:p.cat_main, avgRating:p.avg_rating, totalRatings:p.total_ratings, cityName:p.city_name, isElite:p.is_elite, avatarUrl:p.avatar_url||null, savedAt:new Date().toISOString() });
-  localStorage.setItem('fixia_saved', JSON.stringify(saved));
-};
-FX.unsaveProvider = function(id) { localStorage.setItem('fixia_saved', JSON.stringify(this.getSaved().filter(s => s.id !== id))); };
-
 function toggleSave() {
   if (!session) { window.location.href = 'login.html'; return; }
   if (!provider) return;
@@ -724,7 +713,8 @@ function fmtDate(d) {
 // Load notification bell badge
 (async function loadNotifBadge() {
   const sess = FX.getSession();
-  if (!sess || sess.role === 'provider') return;
+  if (!sess) return;
+  if (sess.role === 'provider' && provider.user_id === sess.userId) return;
   try {
     const count = await FX.getUnreadCount('regular', sess.userId);
     const badge = document.getElementById('notifBellBadge');

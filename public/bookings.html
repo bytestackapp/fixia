@@ -40,14 +40,18 @@
     @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
     .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
     .nav-logo span{color:var(--brand);}
     .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
-    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
+    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);}
     .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
     .nav-search-wrap span{color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;}
 
+    /* ── PAGE HEADER ─────────────────────────────────────────── */
+	.page-header{background:var(--navy-mid);padding:8px 16px;}
+	.ph-sub{font-size:0.78rem; color:rgba(255,255,255,0.75);}	
+	
     /* ── FILTER TABS ─────────────────────────────────────────── */
     .filter-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:50;}
     .filter-tabs::-webkit-scrollbar{display:none;}
@@ -149,7 +153,6 @@
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}	
@@ -173,6 +176,11 @@
     <i class="fa-solid fa-right-from-bracket"></i>
   </button>
 </nav>
+
+<!-- SUN HEADER -->
+<div class="page-header">
+  <div class="ph-sub">Manage and track your service bookings</div>
+</div>
 
 <!-- FILTER TABS -->
 <div class="filter-tabs">
@@ -290,7 +298,6 @@
   </div>
   <a class="bnav-item active" href="bookings.html">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -314,21 +321,15 @@ let selectedStars  = 0;
 
 async function load() {
   try {
-    console.log('[load] starting, role:', session.role);
     if (session.role === 'provider') {
-      console.log('[load] fetching providerData for userId:', session.userId);
 	  const providerData = await FX.getProviderByUserId(session.userId);
-      console.log('[load] providerData:', providerData);
       if (!providerData) { allInquiries = []; render(); return; }
       allInquiries = await FX.getProviderInquiries(providerData.id);
-      console.log('[load] raw inquiries:', allInquiries.length);
       allInquiries = await Promise.all(allInquiries.map(async inq => {
         const user = await FX.getUserById(inq.regular_user_id);
         return { ...inq, _provider: providerData, _provUser: null, _customer: user };
       }));
-      console.log('[load] enriched inquiries:', allInquiries.length);
     } else {
-      console.log('[load] regular user path');
       allInquiries = await FX.getUserInquiries(session.userId);
       const provIds = [...new Set(allInquiries.map(i => i.provider_id))];
       const provMap = {};
@@ -343,7 +344,6 @@ async function load() {
       }));
     }
 
-    updateBadges();
     render();
 
     // Mark read
@@ -356,17 +356,6 @@ async function load() {
         <div class="state-sub">${e.message}</div>
       </div>`;
   }
-}
-
-/* ── Badge counts ───────────────────────────────────────────── */
-function updateBadges() {
-  const unread = allInquiries.filter(i => i.user_has_unread);
-  const byStatus = (s) => allInquiries.filter(i => i.status === s && i.user_has_unread).length;
-
-  // Nav badge
-  const navBadge = document.getElementById('navBadge');
-  if (unread.length) { navBadge.textContent = unread.length; navBadge.style.display = 'block'; }
-  else navBadge.style.display = 'none';
 }
 
 /* ── Tab filter ─────────────────────────────────────────────── */
@@ -625,7 +614,7 @@ async function confirmCancel() {
         await FX.cancelInquiry(activeCancelId);
       }
     }
-    showToast('Booking cancelled and permanently removed.', 'error');
+    showToast('Booking cancelled.', 'error');
     await load();
   } catch(e) { showToast(e.message, 'error'); }
 }

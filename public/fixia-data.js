@@ -63,7 +63,6 @@
 /* ── Config — replace with your Supabase project values ─────── */
 const SUPA_URL = 'https://jqycouhbatdmssfqcyio.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeWNvdWhiYXRkbXNzZnFjeWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjMwOTYsImV4cCI6MjA5MjgzOTA5Nn0.SaPsXj_b1LlxLQPv1YrWm2A2KaU8fDx4PbbQV-etUKk';
-const SUPA_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeWNvdWhiYXRkbXNzZnFjeWlvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzI2MzA5NiwiZXhwIjoyMDkyODM5MDk2fQ.ASa4nxpyfYApoNAeqzlAjZmipgj5CcfDnALJAi7Ncq0';
 const APP_URL  = window.location.origin;
 
 /* ── API endpoints ───────────────────────────────────────────── */
@@ -113,12 +112,11 @@ async function sbFetch(path, options = {}) {
 
 async function sbDelete(publicUrl) {
   try {
-    const match = publicUrl?.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)/);
-    if (!match) return;
-    const [, bucket, path] = match;
-    await fetch(`${SUPA_URL}/storage/v1/object/${bucket}/${path}`, {
-      method: 'DELETE',
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
+    if (!publicUrl) return;
+    await fetch('/api/delete-storage-file', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ publicUrl }),
     });
   } catch(e) { console.warn('Storage delete failed:', e); }
 }
@@ -166,8 +164,30 @@ function calcExpiry(periodDays, existingExpiry = null) {
   return expiry.toISOString();
 }
 
-/* ── Simple password hash (non-cryptographic, front-end only) ── */
-function fxHash(str) {
+async function hashPassword(password) {
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'hash', password }),
+  });
+  const data = await res.json();
+  if (!data.hash) throw new Error('Password hashing failed.');
+  return data.hash;
+}
+
+async function verifyPassword(password, hash) {
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'verify', password, hash }),
+  });
+  const data = await res.json();
+  return data.match === true;
+}
+
+/* ── Legacy FNV-1a hash — for migrating old accounts only.
+   Remove after ~30 days once all active users have logged in. ── */
+function legacyHash(str) {
   let h = 0x811c9dc5;
   for (let i = 0; i < str.length; i++) {
     h ^= str.charCodeAt(i);
@@ -221,7 +241,26 @@ const FX = {
       user = await this.getUserByUsername(identifier);
     }
 	if (!user) return { success: false, error: 'No account found with those details.' };
-	if (user.password_hash !== fxHash(password)) return { success: false, error: 'Incorrect password.' };
+	// Try bcrypt first (new accounts), then fall back to legacy FNV-1a (old accounts)
+    let passwordMatch = await verifyPassword(password, user.password_hash);
+    
+    if (!passwordMatch) {
+      // Legacy check: FNV-1a hashes are always exactly 8 hex characters
+      const isLegacyHash = /^[0-9a-f]{8}$/.test(user.password_hash);
+      if (isLegacyHash && legacyHash(password) === user.password_hash) {
+        // Password is correct — silently upgrade the hash to bcrypt in the background
+        hashPassword(password).then(newHash => {
+          sbFetch(`users?id=eq.${user.id}`, {
+            method: 'PATCH',
+            prefer: 'return=minimal',
+            body: JSON.stringify({ password_hash: newHash }),
+          }).catch(() => {});
+        }).catch(() => {});
+        passwordMatch = true;
+      }
+    }
+    
+    if (!passwordMatch) return { success: false, error: 'Incorrect password.' };
     if (user.status === 'suspended') return { success: false, error: 'Your account has been suspended. Contact support if you believe this is a mistake.' };
     if (user.status === 'rejected') return { success: false, error: 'Your account application was not approved.' };
     
@@ -321,7 +360,7 @@ const FX = {
     if (changes.adsFree            != null) p.ads_free          = changes.adsFree;
     if ('subscriptionStart' in changes)     p.subscription_start = changes.subscriptionStart;
     if ('subscriptionEnd'   in changes)     p.subscription_end   = changes.subscriptionEnd;
-    if (changes.password)              p.password_hash     = fxHash(changes.password);
+	if (changes.password) 			   p.password_hash     = await hashPassword(changes.password);
     if (changes.email)                 p.email             = changes.email.toLowerCase();
     if (changes.firstName)             p.first_name        = changes.firstName;
     if (changes.lastName)              p.last_name         = changes.lastName;
@@ -439,7 +478,7 @@ async deleteProvider(id) {
     const user = {
       email:              data.email.trim().toLowerCase(),
       username:           data.username.trim().toLowerCase(),
-      password_hash:      fxHash(data.password),
+	  password_hash:      await hashPassword(data.password),
       first_name:         data.firstName,
       last_name:          data.lastName,
       phone:              data.phone,
@@ -506,7 +545,7 @@ async deleteProvider(id) {
 	const userRow = {
       email:             data.email.trim().toLowerCase(),
       username:          data.username.trim().toLowerCase(),
-      password_hash:     fxHash(data.password),
+	  password_hash:     await hashPassword(data.password),
       first_name:        data.firstName,
       last_name:         data.lastName,
       phone:             data.phone || null,
@@ -761,8 +800,6 @@ async rejectProvider(providerId, userId, reason) {
   if (prov?.id_file_url) await sbDelete(prov.id_file_url);
   if (prov?.avatar_url)  await sbDelete(prov.avatar_url);
   await sbFetch(`providers?id=eq.${providerId}`, { method: 'DELETE', prefer: 'return=minimal' });
-  // Permanently delete the user account
-  await sbFetch(`users?id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' });
 },
 
 async approveRegularUser(userId) {
@@ -810,8 +847,12 @@ async rejectRegularUser(userId, reason) {
     type:  'warning',
     icon:  '🚫',
   });
-  // Permanently delete the user account
-  await sbFetch(`users?id=eq.${userId}`, { method: 'DELETE', prefer: 'return=minimal' });
+  // Mark for deletion — actual delete happens after they read the message
+  await sbFetch(`users?id=eq.${userId}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: JSON.stringify({ force_logout: true, status: 'rejected' }),
+  });
 },
 
 async setProviderNeedsCompliance(providerId, userId, reason) {
@@ -857,6 +898,120 @@ async setProviderNeedsCompliance(providerId, userId, reason) {
       await this.updateProvider(p.id, { isElite: false, eliteExpiresAt: null });
     }
   },
+
+
+/* ════════════════════════════════════════════════════════════
+   SAVED PROVIDERS — Hybrid: localStorage (fast) + Supabase (sync)
+════════════════════════════════════════════════════════════ */
+_savedKey() {
+  const s = this.getSession();
+  return s ? `fixia_saved_${s.userId}` : 'fixia_saved_guest';
+},
+
+getSaved() {
+  try { return JSON.parse(localStorage.getItem(this._savedKey()) || '[]'); }
+  catch { return []; }
+},
+
+isSaved(id) {
+  return this.getSaved().some(s => s.id === id);
+},
+
+saveProvider(p) {
+  const saved = this.getSaved();
+  if (saved.find(s => s.id === p.id)) return;
+  saved.push({
+    id: p.id, bizName: p.biz_name, catSub: p.cat_sub,
+    catMain: p.cat_main, avgRating: p.avg_rating,
+    totalRatings: p.total_ratings, cityName: p.city_name,
+    isElite: p.is_elite, avatarUrl: p.avatar_url || null,
+    savedAt: new Date().toISOString()
+  });
+  localStorage.setItem(this._savedKey(), JSON.stringify(saved));
+  // Sync to DB (non-blocking — won't slow down the UI)
+  const s = this.getSession();
+  if (s) sbFetch('saved_providers', {
+    method: 'POST', prefer: 'return=minimal',
+    body: JSON.stringify({ user_id: s.userId, provider_id: p.id })
+  }).catch((e) => { console.error('[Fixia] saveProvider DB write failed:', e.message, JSON.stringify({ user_id: s.userId, provider_id: p.id })); });
+},
+
+unsaveProvider(id) {
+  localStorage.setItem(this._savedKey(),
+    JSON.stringify(this.getSaved().filter(s => s.id !== id))
+  );
+  // Sync to DB (non-blocking)
+  const s = this.getSession();
+  if (s) sbFetch(
+    `saved_providers?user_id=eq.${s.userId}&provider_id=eq.${id}`,
+    { method: 'DELETE', prefer: 'return=minimal' }
+  ).catch(() => {});
+},
+
+clearSaved() {
+  localStorage.removeItem(this._savedKey());
+  // Sync to DB (non-blocking)
+  const s = this.getSession();
+  if (s) sbFetch(
+    `saved_providers?user_id=eq.${s.userId}`,
+    { method: 'DELETE', prefer: 'return=minimal' }
+  ).catch(() => {});
+},
+
+// Compares DB vs localStorage, merges any differences
+async syncSaved() {
+  const s = this.getSession();
+  if (!s) return;
+  try {
+    // 1. Get DB rows (just IDs + saved_at, very lightweight)
+    const rows = await sbFetch(
+      `saved_providers?user_id=eq.${s.userId}&order=saved_at.desc`
+    ) || [];
+
+    const local = this.getSaved();
+    const localIds = new Set(local.map(p => p.id));
+    const dbIds    = new Set(rows.map(r => r.provider_id));
+
+    // 2. Find what's in DB but missing from localStorage
+    const missingIds = rows
+      .map(r => r.provider_id)
+      .filter(id => !localIds.has(id));
+
+    // 3. Find what's in localStorage but removed from DB (unsaved on another device)
+    const removedIds = local
+      .map(p => p.id)
+      .filter(id => !dbIds.has(id));
+
+    // 4. Nothing to do — already in sync
+    if (!missingIds.length && !removedIds.length) return;
+
+    // 5. Fetch full details for missing providers in one query
+    let merged = [...local];
+    if (missingIds.length) {
+      const providers = await sbFetch(
+        `providers?id=in.(${missingIds.join(',')})&status=eq.approved`
+      ) || [];
+      const newEntries = providers.map(p => ({
+        id: p.id, bizName: p.biz_name, catSub: p.cat_sub,
+        catMain: p.cat_main, avgRating: p.avg_rating,
+        totalRatings: p.total_ratings, cityName: p.city_name,
+        isElite: p.is_elite, avatarUrl: p.avatar_url || null,
+        savedAt: new Date().toISOString()
+      }));
+      merged = [...merged, ...newEntries];
+    }
+
+    // 6. Remove anything deleted on another device
+    if (removedIds.length) {
+      const removedSet = new Set(removedIds);
+      merged = merged.filter(p => !removedSet.has(p.id));
+    }
+
+    // 7. Write merged result back to localStorage
+    localStorage.setItem(this._savedKey(), JSON.stringify(merged));
+  } catch(e) { /* silent — localStorage still works */ }
+},
+ 
 
   /* ════════════════════════════════════════════════════════════
      LISTINGS
@@ -1167,7 +1322,6 @@ async loadAdConfig() {
   const session = this.getSession();
   if (!session) return;
   if (session.role === 'admin') return;
-  if (session.adsFree) return; // will be overridden by _adsAllowed if stale
 
     // Increment action count
     const countKey = 'fx_ad_action_count';
@@ -1639,11 +1793,10 @@ async approveUpgrade(requestId) {
   });
 
   // Delete the request record — no audit trail needed
-  await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
-    method: 'DELETE',
-    prefer: 'return=minimal',
-    headers: { 'Authorization': `Bearer ${SUPA_SERVICE_KEY}`, 'apikey': SUPA_SERVICE_KEY },
-  });
+await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
+  method: 'DELETE',
+  prefer: 'return=minimal',
+});
 
   return { subStart, subEnd, totalDays };
 },
@@ -1680,11 +1833,10 @@ async rejectUpgrade(requestId, reason) {
     }),
   });
   
-  await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
-    method: 'DELETE',
-    prefer: 'return=minimal',
-    headers: { 'Authorization': `Bearer ${SUPA_SERVICE_KEY}`, 'apikey': SUPA_SERVICE_KEY },
-  });
+await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
+  method: 'DELETE',
+  prefer: 'return=minimal',
+});
 }, 
 
 };
@@ -1784,7 +1936,10 @@ async cancelInquiry(inquiryId) {
     }),
   });
 
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, { method: 'DELETE', prefer: 'return=minimal' });
+  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
+  method: 'PATCH', prefer: 'return=minimal',
+  body: JSON.stringify({ status: 'cancelled', user_has_unread: false, provider_has_unread: true })
+});
 },
 
 /* ── User disputes after provider marks job done ─────────────── */
@@ -1813,7 +1968,10 @@ async disputeInquiry(inquiryId) {
     }),
   });
 
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, { method: 'DELETE', prefer: 'return=minimal' });
+  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
+  method: 'PATCH', prefer: 'return=minimal',
+  body: JSON.stringify({ status: 'disputed', user_has_unread: false, provider_has_unread: true })
+});
 },
 
   // Provider cancels — notifies user
@@ -1840,7 +1998,10 @@ async providerCancelBooking(inquiryId) {
     }),
   });
 
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, { method: 'DELETE', prefer: 'return=minimal' });
+  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
+  method: 'PATCH', prefer: 'return=minimal',
+  body: JSON.stringify({ status: 'cancelled', user_has_unread: true, provider_has_unread: false })
+});
 },
   
   /* ── Provider marks job done ─────────────────────────────────── */
@@ -1935,6 +2096,20 @@ async providerCancelBooking(inquiryId) {
       prefer: 'return=minimal'
     });
   },
+
+async deleteReadForUser(userId) {
+  await sbFetch(
+    `inquiries?regular_user_id=eq.${userId}&user_has_unread=eq.false&status=in.(completed,cancelled,disputed)`,
+    { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ user_notif_dismissed: true }) }
+  );
+},
+
+async deleteReadForProvider(providerId) {
+  await sbFetch(
+    `inquiries?provider_id=eq.${providerId}&provider_has_unread=eq.false&status=in.(completed,cancelled,disputed)`,
+    { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ provider_notif_dismissed: true }) }
+  );
+},
   
   async markOneReadProvider(inquiryId) {
     await sbFetch(`inquiries?id=eq.${inquiryId}`, {
@@ -1943,20 +2118,6 @@ async providerCancelBooking(inquiryId) {
       prefer: 'return=minimal'
     });
   }, 
-  
-async deleteReadForUser(userId) {
-    await sbFetch(
-      `inquiries?regular_user_id=eq.${userId}&user_has_unread=eq.false&status=in.(completed,cancelled,disputed)`,
-    { method: 'DELETE', prefer: 'return=minimal' }
-  );
-},
-
-async deleteReadForProvider(providerId) {
-    await sbFetch(
-      `inquiries?provider_id=eq.${providerId}&provider_has_unread=eq.false&status=in.(completed,cancelled,disputed)`,
-    { method: 'DELETE', prefer: 'return=minimal' }
-  );
-},
   
   async markReadProvider(providerId) {
     await sbFetch(
@@ -2058,14 +2219,16 @@ async getAds(type) {
 renderInlineAd(ad) {
   return `
     <div class="ad-inline" data-ad-id="${ad.id}" data-ad-link="${ad.link_url || '#'}"
-         style="background:linear-gradient(90deg,${ad.bg_color || '#0f2027'},${ad.bg_color || '#203a43'});">
-      <div class="ai-icon">${ad.icon || '📢'}</div>
-      <div class="ai-body">
-        <div class="ai-label">Sponsored</div>
-        <div class="ai-title">${ad.title}</div>
-        ${ad.description ? `<div class="ai-sub">${ad.description}</div>` : ''}
+         style="background:linear-gradient(135deg,${ad.bg_color || '#0f2027'},${ad.bg_color || '#1E3048'});border-radius:12px;border:1px solid rgba(255,255,255,0.08);padding:14px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div class="ai-icon" style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${ad.icon || '📢'}</div>
+      <div class="ai-body" style="flex:1;min-width:0;">
+        <div class="ai-label" style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:1px;">Sponsored</div>
+        <div class="ai-title" style="font-size:0.88rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.title}</div>
+        ${ad.description ? `<div class="ai-sub" style="font-size:0.72rem;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.description}</div>` : ''}
       </div>
-      <button class="ai-btn">${ad.cta_label || 'Learn More'}</button>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;">
+        <button class="ai-btn" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:inherit;">${ad.cta_label || 'Learn More'}</button>
+      </div>
     </div>`;
 },
 
@@ -2091,8 +2254,7 @@ renderInlineAd(ad) {
   /* ── Load inline ads into a container element ────────────────── */
   async injectInlineAds(containerId, afterEveryN = 4) {
     const session = FX.getSession();
-    if (!session || session.adsFree) return;
-	if (session.role === 'admin') return;
+    if (session?.role === 'admin') return;
     try {
       const ads = await this.getAds('inline');
       if (!ads.length) return;
@@ -2114,7 +2276,7 @@ renderInlineAd(ad) {
             window.open(adLink || '#', '_blank');
           };
           injectedAd.addEventListener('click', clickHandler);
-          injectedAd.querySelector('.ai-btn').addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
+          injectedAd.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
 		  sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ads[adIdx % ads.length].id }) }).catch(()=>{});
           adIdx++;
         }
@@ -2781,9 +2943,9 @@ async getFeaturedProviders() {
   }
 
   // 5. Record appearances (async, non-blocking)
-  this._recordAppearances(result.map(p => p.id)).catch(() => {});
-
-  return result;
+    this._recordAppearances(result.map(p => p.id)).catch(() => {});
+  
+    return this._enrichWithListingCategories(result);
 },
 
   /* ── Record that these providers were shown ──────────────────── */

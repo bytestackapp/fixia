@@ -41,7 +41,7 @@
     @keyframes spin{to{transform:rotate(360deg);}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
     .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
     .nav-logo span{color:var(--brand);}
     .nav-spacer{flex:1;}
@@ -53,7 +53,7 @@
     .nav-badge{background:rgba(255,90,31,0.2);border:1px solid rgba(255,90,31,0.3);color:var(--brand);font-size:0.58rem;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.06em;text-transform:uppercase;}
 
     /* ── HERO (shared) ───────────────────────────────────────── */
-    .hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:20px 16px 16px;}
+    .hero{background:var(--navy-mid);padding:20px 16px 16px;}
 
     /* Provider hero row */
     .ph-row{display:flex;align-items:center;gap:12px;}
@@ -447,12 +447,16 @@
     <div class="row2">
       <div class="form-group">
         <label class="form-label">First Name</label>
-        <input class="form-input" id="editFn" placeholder="Juan"/>
+		<input class="form-input" id="editFn" disabled/>
       </div>
       <div class="form-group">
         <label class="form-label">Last Name</label>
-        <input class="form-input" id="editLn" placeholder="dela Cruz"/>
+		<input class="form-input" id="editLn" disabled/>
       </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-input" id="editUsername" disabled/>
     </div>
     <div class="form-group">
       <label class="form-label">Email Address</label>
@@ -462,11 +466,7 @@
       <label class="form-label">Phone Number</label>
       <input class="form-input" id="editPhone" type="tel" placeholder="09XX XXX XXXX"/>
     </div>
-    <div class="form-group">
-      <label class="form-label">Username</label>
-      <input class="form-input" id="editUsername" disabled/>
-      <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">Username cannot be changed.</div>
-    </div>
+
     <button class="btn btn-brand btn-sm" onclick="saveRegularProfile()">
       <i class="fa-solid fa-floppy-disk"></i> Save Changes
     </button>
@@ -478,19 +478,12 @@
 
   <div class="form-group">
     <label class="form-label">Business / Shop Name</label>
-    <input class="form-input" id="pBizName" disabled
-           style="background:var(--bg);color:var(--text-3);"/>
-    <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">
-      Business name cannot be changed here. Submit a change request below.
-    </div>
+    <input class="form-input" id="pBizName" disabled style="background:var(--bg);color:var(--text-3);"/>
   </div>
 
   <div class="form-group">
     <label class="form-label">Service Location</label>
     <div id="pLocation" style="font-size:0.85rem;color:var(--text-3);padding:10px 12px;background:var(--bg);border-radius:8px;border:1.5px solid var(--border);line-height:1.6;"></div>
-    <div style="font-size:0.7rem;color:var(--text-3);margin-top:3px;">
-      To change your location, submit a change request below.
-    </div>
   </div>
 
   <div class="form-group">
@@ -921,7 +914,6 @@ function renderProviderHero() {
             ${providerData.status === 'approved' ? '<span class="ph-badge ph-badge-green">✅ Verified</span>' : '<span class="ph-badge" style="background:rgba(220,53,69,0.2);color:#FC8181;">⚠ Unverified</span>'}
             ${packageData ? `<span class="ph-badge ph-badge-gold">✨ ${packageData.name}</span>` : ''}
             ${providerData.is_elite ? '<span class="ph-badge ph-badge-gold">👑 Elite</span>' : ''}
-            ${providerData.is_featured ? '<span class="ph-badge ph-badge-brand">⭐ Featured</span>' : ''}
           </div>
         </div>
       </div>
@@ -1800,6 +1792,7 @@ async function handleAvatarChange(input) {
     const sess = FX.getSession();
     sess.avatarUrl = newUrl;
     FX.setSession(sess);
+	FX.syncSaved();
 
     renderProviderHero();
     showToast('Avatar updated ✅', 'success');
@@ -2065,8 +2058,7 @@ function closeUpgradeModal() {
       <div id="crForm">
         <div style="font-size:0.75rem;color:var(--text-3);line-height:1.6;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:10px 12px;">
           <i class="fa-solid fa-circle-info"></i>
-          Changes to your business name, email, or location require admin approval.
-          You may only submit one request every <strong>30 days</strong>. Please ensure all information is correct before submitting.
+          Updates to your business information are subject to admin approval. You may submit one request every <strong>30 days</strong>. Please review all information carefully before submission.”
         </div>
 
         <div class="form-group">
@@ -2102,7 +2094,7 @@ function closeUpgradeModal() {
         </div>
 
         <div class="form-group">
-          <label class="form-label">Supporting Document <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional — image or PDF, max 5MB)</span></label>
+          <label class="form-label">Supporting Document <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional — image or PDF)</span></label>
           <input type="file" id="crFile" accept="image/*,application/pdf"
                  style="font-size:0.8rem;padding:8px 0;"/>
         </div>

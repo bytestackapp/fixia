@@ -38,14 +38,14 @@
     @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);padding:0 14px;height:var(--nav-h);display:flex;align-items:center;gap:10px;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);padding:env(safe-area-inset-top) 16px 0;height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;gap:10px;}
     .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:38px;gap:8px;}
+    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;}
     .nav-search-wrap:focus-within{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.35);}
-    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:13px;}
-    .nav-search-wrap input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:0.875rem;font-family:inherit;}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+    .nav-search-wrap input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:0.82rem;font-family:inherit;}
     .nav-search-wrap input::placeholder{color:rgba(255,255,255,0.45);}
-    .nav-clear{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:13px;padding:2px;}
+    .nav-clear{background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:12px;padding:2px;}
     .nav-clear:hover{color:#fff;}
 
     /* ── FILTER BAR ──────────────────────────────────────────── */
@@ -117,7 +117,6 @@
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
   </style>
 </head>
 <body>
@@ -339,7 +338,7 @@ function renderResults() {
       </div>`;
     list.appendChild(card);
   });
-  FX.injectInlineAds('resultsList', 5);
+  FX.injectInlineAds('resultsList', 8);
 }
 
 function showEmpty(icon, title, sub) {

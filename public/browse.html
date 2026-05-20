@@ -36,24 +36,23 @@
     @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
     /* ── TOP NAV ─────────────────────────────────────────────── */
-    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:var(--nav-h);display:flex;align-items:center;padding:0 16px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
     .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
     .nav-logo span{color:var(--brand);}
-    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:38px;gap:8px;cursor:pointer;}
+    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
     .nav-search-wrap:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);}
-    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:13px;}
-    .nav-search-wrap span{color:rgba(255,255,255,0.45);font-size:0.875rem;font-family:inherit;}
-    .nav-search-btn i{font-size:12px;}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+    .nav-search-wrap span{color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;}
 
     /* ── PAGE HEADER ─────────────────────────────────────────── */
-    .page-header{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:16px 16px 18px;}
-    .ph-title{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:3px;}
-    .ph-sub{font-size:0.78rem;color:rgba(255,255,255,0.5);}
+	.page-header{background:var(--navy-mid);padding:8px 16px;}
+	.ph-sub{font-size:0.78rem; color:rgba(255,255,255,0.75);}	
 
     /* ── MAIN CATEGORIES ─────────────────────────────────────── */
     .section{padding:14px 16px 0;}
-    .section-label{font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+	.section-label{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+	.section-label .dot{width:6px;height:6px;border-radius:50%;background:var(--brand);}
+	.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
     .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:calc(var(--bottom-h) + 16px);}
     .cat-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow-sm);text-align:center;}
@@ -92,13 +91,12 @@
     /* ── FEATURED PROVIDERS STRIP ────────────────────────────── */
     .featured-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 4px;}
 	.feat-card{background:var(--navy);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;min-width:0;}
-    .feat-card-img{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
-    .feat-card-body{padding:9px 11px 11px;}
-    .feat-card-name{font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .feat-card-sub{font-size:0.65rem;color:rgba(255,255,255,0.5);}
-    .feat-card-row{display:flex;align-items:center;justify-content:space-between;margin-top:7px;}
-    .feat-stars{font-size:0.65rem;color:var(--gold);}
-    .feat-view{background:var(--brand);color:#fff;border:none;border-radius:6px;font-size:0.62rem;font-weight:700;padding:3px 9px;cursor:pointer;font-family:inherit;}
+	.feat-card-img{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+	.feat-card-body{padding:6px 11px 8px;display:flex;flex-direction:column;gap:1px;}
+	.feat-card-name{font-size:0.82rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+	.feat-card-sub{font-size:0.65rem;color:rgba(255,255,255,0.5);}
+	.feat-card-loc{font-size:0.65rem;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:3px;}
+	.feat-card-loc i{color:var(--brand);font-size:9px;}
 
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
     .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
@@ -106,7 +104,6 @@
     .bnav-item.active{color:var(--brand);}
     .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
     .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
-    .bnav-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:0.5rem;font-weight:800;padding:1px 4px;border-radius:20px;min-width:14px;text-align:center;border:1.5px solid var(--card);}
 
 	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
@@ -144,8 +141,7 @@
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <div class="ph-title">Browse Services</div>
-  <div class="ph-sub">Tap a category to explore all service types</div>
+  <div class="ph-sub">Tap a category to explore available services</div>
 </div>
 
 <!-- SIGN OUT CONFIRMATION MODAL -->
@@ -170,16 +166,16 @@
 </div>
 
 <!-- FEATURED PROVIDERS -->
-<div class="section" style="margin-top:16px;">
-  <div class="section-label">Featured Providers</div>
+<div class="section">
+  <div class="section-label"><div class="dot"></div> Featured Providers</div>
 </div>
 <div class="featured-strip" id="featuredStrip">
   <!-- Loaded dynamically -->
 </div>
 
 <!-- MAIN CATEGORIES -->
-<div class="section">
-  <div class="section-label">All Categories</div>
+<div class="section"style="margin-top:12px;">
+  <div class="section-label"><div class="dot"></div> All Categories</div>
   <div class="cat-grid" id="catGrid">
 
     <div class="cat-card" id="cat-home" onclick="openCat('home',this)">
@@ -258,7 +254,6 @@
   </div>
   <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
     <i class="fa-solid fa-clipboard-list"></i>Bookings
-    <span class="bnav-badge" id="navBadge" style="display:none;"></span>
   </a>
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
@@ -341,18 +336,18 @@ const session = FX.getSession();
     }
     strip.innerHTML = featured.map(p => `
       <div class="feat-card" onclick="window.location.href='provider.html?id=${p.id}'">
-        <div class="feat-card-img" style="background:linear-gradient(135deg,#0F1B2D,#1E3048);position:relative;overflow:hidden;">
+       <div class="feat-card-img" style="background:linear-gradient(135deg,#0F1B2D,#1E3048);position:relative;overflow:hidden;">
           ${p.avatar_url
             ? `<img src="${p.avatar_url}" alt="${p.biz_name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
             : CAT_EMOJIS[p._listing_cats_main?.[0] || p.cat_main] || '🔧'}
+          <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:0.82rem;font-weight:700;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:3px;">
+            <i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}
+          </div>
         </div>
         <div class="feat-card-body">
           <div class="feat-card-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
-          <div class="feat-card-sub">${p._listing_cats?.length ? p._listing_cats.join(' · ') : (p.cat_sub || 'General Services')}</div>
-          <div class="feat-card-row">
-            <span class="feat-stars">⭐ ${p.avg_rating || 0}</span>
-            <button class="feat-view">View</button>
-          </div>
+          <div class="feat-card-sub">${p._listing_cats?.length ? p._listing_cats[0] : (p.cat_sub || 'General Services')}</div>
+          <div class="feat-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.province_name || p.city_name || '—'}</div>
         </div>
       </div>`).join('');
   } catch(e) {}
