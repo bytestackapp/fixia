@@ -2,13 +2,12 @@
   "version": 2,
   "name": "fixia",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/manifest.json", "destination": "/manifest.json" },
-    { "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf))", "destination": "/public/$1" },
-    { "source": "/(.+\\.html)", "destination": "/public/$1" },
+    { "source": "/:file.:ext", "destination": "/public/:file.:ext" },
     { "source": "/", "destination": "/public/homepage.html" },
-    { "source": "/(.*)", "destination": "/public/$1.html" }
+    { "source": "/:page", "destination": "/public/:page.html" }
   ],
   "crons": [
     {
