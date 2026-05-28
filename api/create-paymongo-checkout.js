@@ -115,8 +115,8 @@ module.exports = async (req, res) => {
             ],
             success_url: `${APP_URL}/payment-success.html?method=paymongo&type=${type || 'regular'}`,
             cancel_url:  type === 'provider'
-              ? `${APP_URL}/signup-provider.html?cancelled=1`
-              : `${APP_URL}/signup-regular.html?cancelled=1`,
+              ? `${APP_URL}/signup-provider.html?cancelled=1&step=6`
+              : `${APP_URL}/signup-regular.html?cancelled=1&step=4`,
             description,
             metadata: {
               packageId,

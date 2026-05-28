@@ -130,8 +130,8 @@ module.exports = async (req, res) => {
           user_action: 'PAY_NOW',
           return_url:  `${APP_URL}/payment-success.html?method=paypal&type=${type || 'regular'}`,
           cancel_url:  type === 'provider'
-            ? `${APP_URL}/signup-provider.html?cancelled=1`
-            : `${APP_URL}/signup-regular.html?cancelled=1`,
+            ? `${APP_URL}/signup-provider.html?cancelled=1&step=6`
+            : `${APP_URL}/signup-regular.html?cancelled=1&step=4`,
         },
       }),
     });
