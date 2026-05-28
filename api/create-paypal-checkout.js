@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const { package: packageId, type } = req.body || {};
+  const { package: packageId, type, processingFee = 0 } = req.body || {};
 
   if (!packageId) {
     return res.status(400).json({ error: 'No package ID provided' });
@@ -93,6 +93,10 @@ module.exports = async (req, res) => {
     const userTypeLabel = type === 'provider' ? 'Provider' : 'Regular User';
     const description   = `Fixia ${pkg.name} — ${userTypeLabel} (${pkg.period})`;
 
+    // Apply processing fee
+    const fee        = Math.max(0, parseFloat(processingFee) || 0);
+    const totalPrice = (pkg.price + fee).toFixed(2);
+
     // Create PayPal order
     const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
       method: 'POST',
@@ -105,8 +109,19 @@ module.exports = async (req, res) => {
         purchase_units: [{
           amount: {
             currency_code: 'PHP',
-            value: pkg.price.toFixed(2),
+            value: totalPrice,
+            breakdown: {
+              item_total:     { currency_code: 'PHP', value: pkg.price.toFixed(2) },
+              handling:       { currency_code: 'PHP', value: fee.toFixed(2) },
+            },
           },
+          items: [{
+            name:        `Fixia ${pkg.name}`,
+            description: description,
+            unit_amount: { currency_code: 'PHP', value: pkg.price.toFixed(2) },
+            quantity:    '1',
+            category:    'DIGITAL_GOODS',
+          }],
           description,
         }],
         application_context: {
@@ -133,13 +148,13 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'No approval URL in PayPal response' });
     }
 
-    console.log(`[Fixia PayPal] Order created: ${order.id} | Package: ${packageId} | Type: ${type}`);
+    console.log(`[Fixia PayPal] Order created: ${order.id} | Package: ${packageId} | Type: ${type} | Total: ${totalPrice}`);
 
     return res.status(200).json({
       orderId:     order.id,
       approvalUrl,
       packageName: pkg.name,
-      amount:      pkg.price.toFixed(2),
+      amount:      totalPrice,
     });
 
   } catch(err) {

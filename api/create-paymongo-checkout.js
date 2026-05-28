@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const { package: packageId, type } = req.body || {};
+  const { package: packageId, type, processingFee = 0 } = req.body || {};
 
   if (!packageId) {
     return res.status(400).json({ error: 'No package ID provided' });
@@ -73,7 +73,9 @@ module.exports = async (req, res) => {
     }
 
     // PayMongo amounts are in centavos (PHP x 100)
-    const amountInCentavos = Math.round(pkg.price * 100);
+    const fee              = Math.max(0, parseFloat(processingFee) || 0);
+    const totalPrice       = pkg.price + fee;
+    const amountInCentavos = Math.round(totalPrice * 100);
     const userTypeLabel    = type === 'provider' ? 'Provider' : 'Regular User';
     const description      = `Fixia ${pkg.name} — ${userTypeLabel} (${pkg.period})`;
 
@@ -146,7 +148,7 @@ module.exports = async (req, res) => {
       sessionId,
       checkoutUrl,
       packageName: pkg.name,
-      amount:      pkg.price.toFixed(2),
+      amount:      totalPrice.toFixed(2),
     });
 
   } catch(err) {
