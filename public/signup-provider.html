@@ -181,7 +181,7 @@
     .pkg-card:hover { border-color:var(--brand); background:var(--brand-light); }
     .pkg-card.selected { border-color:var(--brand); background:var(--brand-light); box-shadow:0 4px 14px rgba(255,90,31,0.15); }
     .pkg-card.selected::after { content:'✓'; position:absolute; top:10px; right:12px; color:var(--brand); font-weight:800; font-size:14px; }
-    .pkg-popular-flag { position:absolute; top:-10px; left:14px; background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; }
+    .pkg-popular-flag { position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--gold); color:#7B4F00; font-size:0.6rem; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; }
 	.pkg-icon { font-size:1.6rem; margin-bottom:6px; }
     .pkg-name { font-size:0.85rem; font-weight:800; color:var(--navy); margin-bottom:2px; }
     .pkg-price { font-size:1.3rem; font-weight:800; color:var(--brand); line-height:1; }
@@ -252,7 +252,7 @@
   <div class="step-line" id="sl2"></div>
   <div class="step" id="s3"><div class="step-circle" id="sc3">3</div><div class="step-label">Business</div></div>
   <div class="step-line" id="sl3"></div>
-  <div class="step" id="s4"><div class="step-circle" id="sc4">4</div><div class="step-label">ID & Avatar</div></div>
+  <div class="step" id="s4"><div class="step-circle" id="sc4">4</div><div class="step-label">Avatar</div></div>
   <div class="step-line" id="sl4"></div>
   <div class="step" id="s5"><div class="step-circle" id="sc5">5</div><div class="step-label">Package</div></div>
   <div class="step-line" id="sl5"></div>
@@ -309,28 +309,33 @@
         <span class="spinner" id="step1Spinner"></span>
         <span id="step1BtnText">Next <i class="fa-solid fa-arrow-right"></i></span>
       </button>
+
       <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'"> &nbsp; Sign In</button></div>
+
     </div>
 
 <!-- ── STEP 2: Email OTP ──────────────────────────────────── -->
 <div id="p2" class="panel">
   <div class="panel-title">Verify Your Email</div>
   <div class="panel-sub">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong>. Enter it below to continue.</div>
-  <div class="form-group" style="margin-top:1rem;">
+  <div class="form-group" style="margin-top:1rem;margin-bottom:4px;">
     <label class="form-label">Verification Code</label>
-    <input id="otpInput" class="form-input" type="text" maxlength="6" placeholder="000000"
+    <input id="otpInput" class="form-input" type="text" maxlength="6" placeholder="000000" autocomplete="off"
            style="font-size:1.5rem;letter-spacing:0.25em;text-align:center;font-weight:800;"
            oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
   </div>
-  <button class="btn btn-brand" style="width:100%;" id="otpVerifyBtn" onclick="verifyOTPStep()">
-    <span class="spinner" id="otpSpinner"></span>
-    <span id="otpBtnText"><i class="fa-solid fa-shield-check"></i> Verify Code</span>
-  </button>
-  <div style="text-align:center;margin-top:14px;">
-    <button onclick="resendOTP()" style="background:none;border:none;color:var(--brand);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;">
-      <i class="fa-solid fa-rotate-right"></i> Resend Code
+  <div class="login-row" style="text-align:left;margin-top:1px;margin-bottom:20px;">
+    Didn't receive the OTP?
+    <button onclick="resendOTP()" style="background:none;border:none;color:var(--brand);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;"> &nbsp; Resend Code</button>
+  </div>
+  <div class="btn-row" style="margin-top:2px;">
+    <button class="btn btn-back" onclick="go(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+    <button class="btn btn-brand" id="otpVerifyBtn" onclick="verifyOTPStep()">
+      <span class="spinner" id="otpSpinner"></span>
+      <span id="otpBtnText"><i class="fa-solid fa-shield-check"></i> Verify Code</span>
     </button>
   </div>
+  <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">&nbsp;Sign In</button></div>
 </div>	
 	
     <!-- ── STEP 3: Business Info + Location ──────────────────── -->
@@ -378,6 +383,7 @@
         <button class="btn btn-back" onclick="go(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
         <button class="btn btn-brand" onclick="go(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
       </div>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">&nbsp;Sign In</button></div>
     </div>
 
     <!-- ── STEP 4: ID & Avatar ────────────────────────────────── -->
@@ -466,12 +472,13 @@
         <button class="btn btn-back" onclick="go(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
         <button class="btn btn-brand" onclick="go(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
       </div>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">&nbsp;Sign In</button></div>
     </div>
 
     <!-- ── STEP 5: Package ────────────────────────────────────── -->
     <div id="p5" class="panel">
-      <div class="panel-title">Choose Your Provider Plan</div>
-      <div class="panel-sub">Start free or choose a paid plan to unlock listings and get discovered. Upgrade anytime.</div>
+      <div class="panel-title">Choose Your Plan</div>
+      <div class="panel-sub">Flexible plans — change anytime, no hassle.</div>
       <div id="a4" class="alert"></div>
 
       <div class="pkg-grid" id="provPkgList">
@@ -480,8 +487,9 @@
 
       <div class="btn-row" style="margin-top:1rem;">
         <button class="btn btn-back" onclick="go(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
-        <button class="btn btn-brand" onclick="go(6)">Next <i class="fa-solid fa-arrow-right"></i></button>
+        <button class="btn btn-brand" onclick="goStep6()">Next <i class="fa-solid fa-arrow-right"></i></button>
       </div>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">&nbsp;Sign In</button></div>
     </div>
 
     <!-- ── STEP 6: Payment ────────────────────────────────────── -->
@@ -493,8 +501,16 @@
       <!-- Summary -->
       <div class="pay-summary">
         <div class="pay-summary-row"><span>Plan</span><strong id="sumPkgName">—</strong></div>
-        <div class="pay-summary-row"><span>Amount</span><strong id="sumPrice">—</strong></div>
         <div class="pay-summary-row"><span>Billing</span><strong id="sumPeriod">—</strong></div>
+        <div class="pay-summary-row"><span>Amount</span><strong id="sumPrice">—</strong></div>
+        <div class="pay-summary-row" id="sumFeeRow" style="display:none;">
+          <span>Processing Fee <i class="fa-solid fa-circle-info" style="color:var(--text-3);cursor:pointer;font-size:0.7rem;" onclick="openFeeModal()"></i></span>
+          <strong id="sumFee">—</strong>
+        </div>
+        <div class="pay-summary-row" id="sumTotalRow" style="display:none;border-top:2px solid var(--border);margin-top:4px;padding-top:6px;">
+          <span style="font-weight:700;color:var(--text);">Total</span>
+          <strong id="sumTotal" style="color:var(--brand);font-size:1rem;">—</strong>
+        </div>
       </div>
 
 	  <!-- Free plan message -->
@@ -506,8 +522,8 @@
       <div id="payCategories">
 
         <div class="pay-category-label">
-          Instant Verification
-          <span class="pay-tooltip" title="Payment is verified automatically. Your account is activated immediately after payment.">
+          Instant Payment Verification
+          <span class="pay-tooltip" title="Payment is verified automatically, but the account remains under admin review for business legitimacy. Service charges may apply.”">
             <i class="fa-solid fa-circle-info"></i>
           </span>
         </div>
@@ -527,8 +543,8 @@
         </div>
 
         <div class="pay-category-label" style="margin-top:1rem;">
-          Manual Verification
-          <span class="pay-tooltip" title="Send payment manually via GCash, Maya, or bank transfer. Admin will verify your payment before activating your account.">
+          Manual Payment Verification
+          <span class="pay-tooltip" title="Send payment manually via GCash, Maya, or bank transfer. Admin will verify your payment, and your account will undergo review for business legitimacy before activation. No service charges apply.">
             <i class="fa-solid fa-circle-info"></i>
           </span>
         </div>
@@ -553,26 +569,132 @@
         <button class="btn btn-back" onclick="go(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
         <button class="btn btn-brand" id="payNextBtn" onclick="doSubmit()">
           <span class="spinner" id="paySpinner"></span>
-          <span id="payNextBtnText">Submit Application <i class="fa-solid fa-paper-plane"></i></span>
+          <span id="payNextBtnText">Next &nbsp; <i class="fa-solid fa-arrow-right"></i></span>
         </button>
       </div>
 
       <div class="login-row" style="margin-top:0.75rem;">
-        <span style="font-size:0.72rem;color:var(--text-3);">By submitting, you agree to Fixia's <a href="#" style="color:var(--brand);">Terms of Service</a> and <a href="#" style="color:var(--brand);">Privacy Policy</a>.</span>
+        <span style="font-size:0.72rem;color:var(--text-3);">By submitting, you agree to Fixia's <a href="#" onclick="event.preventDefault();document.getElementById('termsModal').classList.add('open')" style="color:var(--brand);">Terms of Service</a> and <a href="#" onclick="event.preventDefault();document.getElementById('privacyModal').classList.add('open')" style="color:var(--brand);">Privacy Policy</a>.</span>
       </div>
+      <div class="login-row">Already have an account? <button onclick="window.location.href='login.html'">&nbsp;Sign In</button></div>
     </div>
 
     <!-- ── STEP 7: Done ───────────────────────────────────────── -->
     <div id="p7" class="panel" style="text-align:center;padding-top:0.5rem;">
-      <div id="doneIcon" style="font-size:3.5rem;margin-bottom:1rem;">⏳</div>
+      <div id="doneIcon" style="font-size:3.5rem;margin-bottom:1rem;"></div>
 	  <div id="doneTitle" style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-bottom:6px;">Application Submitted!</div>
       <div id="doneMsg" style="font-size:0.85rem;color:var(--text-3);line-height:1.7;margin-bottom:1.5rem;"></div>
-      <button class="btn btn-brand" onclick="window.location.href='login.html'">
-        <i class="fa-solid fa-right-to-bracket"></i> Go to Login
+      <button class="btn btn-brand" id="doneBtn" onclick="window.location.href='login.html'">
+        <i class="fa-solid fa-right-to-bracket" id="doneBtnIcon"></i> <span id="doneBtnText">Go to Login</span>
       </button>
+      <div class="login-row" style="margin-top:1rem;"><button onclick="window.location.href='login.html'">← Back to Sign In</button></div>
     </div>
 
   </div><!-- /card -->
+</div>
+
+<!-- Terms of Service Modal -->
+<div id="termsModal" class="modal">
+  <div class="modal-box" style="max-width:480px;max-height:80vh;display:flex;flex-direction:column;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-file-lines"></i> &nbsp; Terms of Service</h3>
+      <button class="modal-x" onclick="document.getElementById('termsModal').classList.remove('open')">×</button>
+    </div>
+  <div class="modal-body" style="overflow-y:auto;flex:1;">
+  <p><strong>Effective Date:</strong> June 01, 2026</p>  
+  <p>By accessing or using this platform (“Fixia PH”), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service.</p>
+
+  <p style="margin-top:10px;"><strong>1. Description of Service</strong></p>
+  <p>The Service provides a platform that connects users with service providers, allowing users to browse listings, book services, and manage appointments. Providers may create listings and manage bookings through the platform.</p>
+
+  <p style="margin-top:10px;"><strong>2. User Accounts</strong></p>
+  <p>You are responsible for maintaining the confidentiality of your account and ensuring that all information provided is accurate and up to date. We may suspend or terminate accounts that violate these Terms.</p>
+
+  <p style="margin-top:10px;"><strong>3. Bookings and Payments</strong></p>
+  <p>All bookings are subject to provider availability and confirmation. Payments are made outside the app. Please transact carefully. We are not responsible for disputes but may assist in resolving them.</p>
+
+  <p style="margin-top:10px;"><strong>4. User Conduct</strong></p>
+  <p>You agree not to misuse the Service, including but not limited to providing false information, engaging in abusive behavior, or attempting to disrupt platform operations.</p>
+
+  <p style="margin-top:10px;"><strong>5. Subscription and Features</strong></p>
+  <p>Certain features may be available under subscription plans. Feature limits such as booking capacity or visibility may vary depending on the selected plan.</p>
+
+  <p style="margin-top:10px;"><strong>6. Termination</strong></p>
+  <p>We reserve the right to suspend or terminate access to the Service at any time for violations of these Terms or for operational reasons.</p>
+
+  <p style="margin-top:10px;"><strong>7. Changes to Terms</strong></p>
+  <p>We may update these Terms at any time. Continued use of the Service constitutes acceptance of the updated Terms.</p>
+
+  <p style="margin-top:10px;"><strong>8. Contact</strong></p>
+  <p>If you have any questions about this Terms of Service, contact us at support.fixia@gmail.com.</p>
+</div>
+    <div class="modal-foot">
+      <button onclick="document.getElementById('termsModal').classList.remove('open')" style="background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:var(--radius-sm);padding:0.5rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div id="privacyModal" class="modal">
+  <div class="modal-box" style="max-width:480px;max-height:80vh;display:flex;flex-direction:column;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-shield-halved"></i> &nbsp; Privacy Policy</h3>
+      <button class="modal-x" onclick="document.getElementById('privacyModal').classList.remove('open')">×</button>
+    </div>
+  <div class="modal-body" style="overflow-y:auto;flex:1;">
+  <p><strong>Effective Date:</strong> June 01, 2026</p>
+  <p>This Privacy Policy explains how we collect, use, and protect your information when you use our Service.</p>
+
+  <p style="margin-top:10px;"><strong>1. Information We Collect</strong></p>
+  <p>We may collect personal information such as account details (name, email, phone number), profile information, booking data, and usage data.</p>
+
+  <p style="margin-top:10px;"><strong>2. How We Use Information</strong></p>
+  <p>We use your information to provide and improve the Service, process bookings, send notifications, and maintain platform security.</p>
+
+  <p style="margin-top:10px;"><strong>3. Data Sharing</strong></p>
+  <p>We do not sell personal data. We may share information only with service providers involved in bookings, payment processors, or when required by law.</p>
+
+  <p style="margin-top:10px;"><strong>4. Data Security</strong></p>
+  <p>We implement reasonable security measures to protect your information, but no system can guarantee absolute security.</p>
+
+  <p style="margin-top:10px;"><strong>5. Cookies and Tracking</strong></p>
+  <p>We may use cookies and similar technologies to improve user experience and analyze platform usage.</p>
+
+  <p style="margin-top:10px;"><strong>6. User Rights</strong></p>
+  <p>You may request access, correction, or deletion of your personal data, subject to legal and operational requirements.</p>
+
+  <p style="margin-top:10px;"><strong>7. Changes to This Policy</strong></p>
+  <p>We may update this Privacy Policy from time to time. Continued use of the Service means acceptance of the updated version.</p>
+
+  <p style="margin-top:10px;"><strong>8. Contact</strong></p>
+  <p>If you have questions about this Privacy Policy, contact us at support.fixia@gmail.com.</p>
+</div>
+    <div class="modal-foot">
+      <button onclick="document.getElementById('privacyModal').classList.remove('open')" style="background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:var(--radius-sm);padding:0.5rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Processing Fee Modal -->
+<div id="feeModal" class="modal">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-circle-info"></i> &nbsp; Processing Fee</h3>
+      <button class="modal-x" onclick="document.getElementById('feeModal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px;">Certain payment methods may incur a small processing fee imposed by the payment provider. Fixia does not set or collect this fee.</p>
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;font-size:0.82rem;">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);">PayPal</span><strong>4.4% + ₱15.00</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);">PayMongo</span><strong>2.9%</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--text-3);">TBC</span><strong>2.5%</strong></div>
+      </div>
+      <p style="margin-top:12px;font-size:0.78rem;color:var(--text-3);">Manual payments (GCash, Maya, Bank Transfer) have no processing fee.</p>
+    </div>
+    <div class="modal-foot">
+      <button onclick="document.getElementById('feeModal').classList.remove('open')" style="background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:var(--radius-sm);padding:0.5rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;">Got it</button>
+    </div>
+  </div>
 </div>
 
 <!-- QR Payment Modal -->
@@ -615,6 +737,18 @@
 ══════════════════════════════════════════════════════════════ */
 const TOTAL = 7;
 let currentStep = 1;
+let isPresignupMode = false;
+let presignupPkg    = null;
+let isRegistering    = false;
+const _refCode = new URLSearchParams(window.location.search).get('ref') || null;
+
+(async function initPresignup() {
+  try {
+    const ps = await FX.getPreSignupSettings();
+    isPresignupMode  = ps.active;
+    presignupPkg     = ps.providerPackage;
+  } catch(e) {}
+})();
 
 let idFileData      = null;   // { name, type, data } — raw, up to 10MB
 let avatarFileData  = null;   // { name, type, data } — compressed 200×200px base64
@@ -625,6 +759,13 @@ let selectedPayMethod   = null;
 let selectedPayCategory = null;  // 'instant' | 'manual'
 let manualPayRef    = '';
 let manualPayAmount = '';
+let calculatedFee   = 0;
+
+const PAYMENT_CHARGES = {
+  paypal:   { rate: 0.044, fixed: 15,  label: '4.4% + ₱15.00' },
+  paymongo: { rate: 0.029, fixed: 0,   label: '2.9%' },
+  tbc:      { rate: 0.025, fixed: 0,   label: '2.5%' },
+};
 
 let regionsLoaded = false;
 
@@ -703,7 +844,13 @@ async function go(step) {
   // Side effects per step
   if (step === 3) loadRegions();
   if (step === 5) loadProviderPackages();
-  if (step === 6) populatePaymentSummary();
+   if (step === 6) {
+    if (isPresignupMode) {
+      doRegister();
+      return;
+    }
+    populatePaymentSummary();
+  }
 
   currentStep = step;
 }
@@ -848,6 +995,21 @@ function validateStep4() {
   return true;
 }
 
+function goStep6() {
+  if (!selPkg) { showToast('Please select a plan to continue.', 'error'); return; }
+  if (isPresignupMode) {
+    // Disable the Next button immediately to prevent double-tap
+    const nextBtn = document.querySelector('#p5 .btn-brand');
+    if (nextBtn) nextBtn.disabled = true;
+    showToast('Processing your registration…', '');
+    doRegister().finally(() => {
+      if (nextBtn) nextBtn.disabled = false;
+    });
+    return;
+  }
+  go(6);
+}
+
 /* ══════════════════════════════════════════════════════════════
    PSGC LOCATION
 ══════════════════════════════════════════════════════════════ */
@@ -881,7 +1043,13 @@ async function loadProvinces() {
     const r = await fetch(`${PSGC}/regions/${regCode}/provinces/`);
     const d = await r.json();
     d.sort((a,b) => a.name.localeCompare(b.name));
-    if (!d.length) { sp.disabled = true; await loadCitiesForRegion(regCode); return; }
+    if (!d.length) {
+      const o = document.createElement('option');
+      o.value = 'metro-manila'; o.textContent = 'Metro Manila'; o.selected = true;
+      sp.appendChild(o); sp.disabled = true;
+      await loadCitiesForRegion(regCode);
+      return;
+    }
     d.forEach(p => { const o = document.createElement('option'); o.value = p.code; o.textContent = p.name; sp.appendChild(o); });
   } catch(e) {}
 }
@@ -893,7 +1061,7 @@ async function loadCitiesForRegion(regCode) {
     const r = await fetch(`${PSGC}/regions/${regCode}/cities-municipalities/`);
     const d = await r.json();
     d.sort((a,b) => a.name.localeCompare(b.name));
-    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name; sc.appendChild(o); });
+    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name.replace(/^City of (.+)/, '$1 City'); sc.appendChild(o); });
   } catch(e) {}
 }
 
@@ -908,7 +1076,7 @@ async function loadCities() {
     const r = await fetch(`${PSGC}/provinces/${pc}/cities-municipalities/`);
     const d = await r.json();
     d.sort((a,b) => a.name.localeCompare(b.name));
-    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name; sc.appendChild(o); });
+    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name.replace(/^City of (.+)/, '$1 City'); sc.appendChild(o); });
   } catch(e) {}
 }
 
@@ -1016,6 +1184,21 @@ function handleIdUpload(input) {
 async function loadProviderPackages() {
   const list = document.getElementById('provPkgList');
   list.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:0.83rem;padding:1rem;">Loading plans…</div>';
+
+  if (isPresignupMode && presignupPkg) {
+    const pkg = await FX.getPackageById(presignupPkg);
+    if (pkg) {
+      pickPkg(pkg);
+      list.innerHTML = `
+        <div style="background:var(--brand-light);border:2px solid var(--brand);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:6px;">${pkg.icon || '🎁'}</div>
+          <div style="font-size:0.9rem;font-weight:800;color:var(--brand);">Pre-Launch Special</div>
+          <div style="font-size:0.85rem;font-weight:700;color:var(--text);margin-top:2px;">${pkg.name}</div>
+          <div style="font-size:0.75rem;color:var(--text-3);margin-top:4px;">Complimentary package — no payment required.</div>
+        </div>`;
+      return;
+    }
+  }
   try {
     const pkgs = await FX.getProviderPackages();
     if (!pkgs.length) {
@@ -1037,22 +1220,23 @@ function renderProviderPackages(pkgs) {
   const list = document.getElementById('provPkgList');
   list.innerHTML = '';
   pkgs.forEach(pkg => {
+    const isFree = pkg.price === 0;
     const card = document.createElement('div');
     card.className = 'pkg-card';
     card.id = `pp_${pkg.id}`;
     card.onclick = () => pickPkg(pkg);
     card.innerHTML = `
       ${pkg.popular ? `<div class="pkg-popular-flag">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
-      <div class="pkg-icon">${pkg.icon || '📦'}</div>
+      <div class="pkg-icon">${pkg.icon || (isFree ? '🔍' : '✨')}</div>
       <div class="pkg-name">${pkg.name}</div>
-      <div class="pkg-price">${pkg.price === 0 ? 'Free' : '₱' + pkg.price}</div>
-	  <div class="pkg-period">${pkg.price === 0 ? 'forever' : '/ ' + ({ month: 'month', year: 'year', lifetime: 'lifetime' }[pkg.period] || pkg.period)}</div>
-      <div class="pkg-features">
-        ${(pkg.features || pkg.perks || []).map(f => {
-          const label = typeof f === 'string' ? f : (f.label || '');
-          return label ? `<div class="pkg-feat">${label}</div>` : '';
-        }).join('')}
-      </div>`;
+      <div class="pkg-price">${isFree
+        ? '<span style="font-size:1.1rem;">Free</span>'
+        : '₱' + pkg.price + '<span style="font-size:0.65rem;font-weight:500;color:var(--text-3);"> / ' + (pkg.period === 'month' ? 'mo' : pkg.period === 'year' ? 'yr' : pkg.period) + '</span>'
+      }</div>
+      <ul class="pkg-features">${(pkg.features || pkg.perks || []).map(f => {
+        const label = typeof f === 'string' ? f : (f.label || '');
+        return label ? `<li class="pkg-feat">${label}</li>` : '';
+      }).join('')}</ul>`;
     list.appendChild(card);
   });
 }
@@ -1084,7 +1268,53 @@ function selectPayMethod(method, category) {
   document.getElementById('pay_' + method).classList.add('selected');
   selectedPayMethod   = method;
   selectedPayCategory = category;
-  manualPayRef = ''; manualPayAmount = '';
+  manualPayRef        = '';
+  manualPayAmount     = '';
+
+  const basePrice  = selPkgData?.price || 0;
+  const charge     = PAYMENT_CHARGES[method];
+  const feeRow     = document.getElementById('sumFeeRow');
+  const totalRow   = document.getElementById('sumTotalRow');
+  const priceEl    = document.getElementById('sumPrice');
+  const feeEl      = document.getElementById('sumFee');
+  const totalEl    = document.getElementById('sumTotal');
+
+  if (charge && basePrice > 0) {
+    calculatedFee = Math.ceil(basePrice * charge.rate + charge.fixed);
+    const total   = basePrice + calculatedFee;
+    if (feeRow)   feeRow.style.display   = '';
+    if (totalRow) totalRow.style.display = '';
+    if (feeEl)    feeEl.textContent      = '₱' + calculatedFee;
+    if (totalEl)  totalEl.textContent    = '₱' + total;
+    if (priceEl)  priceEl.textContent    = '₱' + basePrice;
+  } else {
+    calculatedFee = 0;
+    if (feeRow)   feeRow.style.display   = 'none';
+    if (totalRow) totalRow.style.display = 'none';
+    if (priceEl)  priceEl.textContent    = basePrice === 0 ? 'Free' : '₱' + basePrice;
+  }
+}
+
+function updatePaymentTotal() {
+  const basePrice = (typeof selPkgData !== 'undefined' ? selPkgData : selectedPkgData)?.price || 0;
+  const charge = PAYMENT_CHARGES[selectedPayMethod];
+  const feeRow = document.getElementById('sumFeeRow');
+  const totalRow = document.getElementById('sumTotalRow');
+  const priceEl = document.getElementById('sumPrice');
+
+  if (charge && basePrice > 0) {
+    const fee   = Math.ceil(basePrice * charge.rate + charge.fixed);
+    const total = basePrice + fee;
+    if (feeRow)   feeRow.style.display   = '';
+    if (totalRow) totalRow.style.display = '';
+    document.getElementById('sumFee').textContent = '₱' + fee;
+    document.getElementById('sumTotal').textContent = '₱' + total;
+    priceEl.textContent = '₱' + basePrice;
+  } else {
+    if (feeRow)   feeRow.style.display   = 'none';
+    if (totalRow) totalRow.style.display = 'none';
+    priceEl.textContent = basePrice === 0 ? 'Free' : '₱' + basePrice;
+  }
 }
 
 function openQrModal() {
@@ -1100,6 +1330,10 @@ function openQrModal() {
 
 function closeQrModal() {
   document.getElementById('qrModal').classList.remove('open');
+}
+
+function openFeeModal() {
+  document.getElementById('feeModal').classList.add('open');
 }
 
 async function confirmQrPayment() {
@@ -1133,25 +1367,35 @@ async function doSubmit() {
     const spinner = document.getElementById('paySpinner');
     const btnText = document.getElementById('payNextBtnText');
     btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+    // Safety net — re-enable button if redirect never happens within 15s
+    const safetyTimer = setTimeout(() => {
+      btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+      showToast('Checkout is taking too long. Please try again.', 'error');
+    }, 15000);
+
     try {
       const endpoint = selectedPayMethod === 'paypal'
         ? '/api/create-paypal-checkout'
         : '/api/create-paymongo-checkout';
       const r = await fetch(endpoint, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ package: selPkg, type:'provider' })
+        body: JSON.stringify({ package: selPkg, type:'provider', processingFee: calculatedFee })
       });
       const d = await r.json();
       const url = d.approvalUrl || d.checkoutUrl;
       if (url) {
-        // Save form state (without large binary files) for post-redirect completion
         sessionStorage.setItem('fixia_provider_signup', JSON.stringify({
           ...buildFormData(), idFile:null, avatarFile:null
         }));
+        if (d.orderId)    sessionStorage.setItem('paypal_order_id',    d.orderId);
+        if (d.sessionId)  sessionStorage.setItem('paymongo_session_id', d.sessionId);
+        clearTimeout(safetyTimer);
         window.location.href = url; return;
       }
       throw new Error(d.error || 'Checkout failed');
     } catch(e) {
+      clearTimeout(safetyTimer);
       showToast('Checkout failed: ' + e.message, 'error');
       btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
       return;
@@ -1163,20 +1407,33 @@ async function doSubmit() {
 }
 
 async function doRegister() {
+  if (isRegistering) return;
+  isRegistering = true;
   const btn     = document.getElementById('payNextBtn');
   const spinner = document.getElementById('paySpinner');
   const btnText = document.getElementById('payNextBtnText');
-  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+  if (btn) { btn.disabled = true; }
+  if (spinner) { spinner.classList.add('on'); }
+  if (btnText) { btnText.style.display = 'none'; }
 
   try {
-	const formData  = buildFormData();
+    const formData  = buildFormData();
     const isInstant = selectedPayCategory === 'instant';
     const isFree    = selPkgData?.price === 0;
 
     await FX.registerProvider(formData);
 
+    // Fire emails in background — don't block the done screen
+    const emailPromises = [
+      FX.sendEmail('provider_signup_confirm', {
+        fullName: `${formData.firstName} ${formData.lastName}`,
+        email:    formData.email,
+        bizName:  formData.bizName,
+        package:  formData.packageName,
+      }),
+    ];
     if (!isFree) {
-      await FX.sendEmail('provider_signup_notify', {
+      emailPromises.push(FX.sendEmail('provider_signup_notify', {
         fullName:         `${formData.firstName} ${formData.lastName}`,
         email:            formData.email,
         bizName:          formData.bizName,
@@ -1185,36 +1442,33 @@ async function doRegister() {
         paymentMethod:    formData.paymentMethod,
         paymentReference: formData.paymentReference,
         paymentAmount:    '₱' + formData.paymentAmount,
-      });
+      }));
     }
-
-    await FX.sendEmail('provider_signup_confirm', {
-      fullName: `${formData.firstName} ${formData.lastName}`,
-      email:    formData.email,
-      bizName:  formData.bizName,
-      package:  formData.packageName,
-    });
-
-    await FX.sendEmail('provider_signup_confirm', {
-      fullName: `${formData.firstName} ${formData.lastName}`,
-      email:    formData.email,
-      bizName:  formData.bizName,
-      package:  formData.packageName,
-    });
+    Promise.all(emailPromises).catch(() => {});
 
     document.getElementById('doneIcon').textContent  = (isInstant || isFree) ? '🎉' : '⏳';
-    document.getElementById('doneTitle').textContent = (isInstant || isFree) ? 'You\'re all set!' : 'Application Submitted!';
+    document.getElementById('doneTitle').textContent = (isInstant || isFree) ? 'You\'re all set!' : (isPresignupMode ? 'Pre-Signup Successful!' : 'Application Submitted!');
     document.getElementById('doneMsg').innerHTML = (isInstant || isFree)
       ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your account is now active. Our team will finalize your profile within 24 hours.`
-      : `Thank you, <strong>${formData.firstName}</strong>! Your application is now under review.<br/><br/>
-         You may log in and use the platform with limited access while our team verifies your account. You’ll receive an email update at <strong>${formData.email}</strong> within 24–48 hours.`;
+      : isPresignupMode
+        ? `You're on the list, <strong>${formData.firstName}</strong>! 🎉 You'll be among the first providers to go live on Fixia when we launch. An update will be sent to <strong>${formData.email}</strong> on launch day.`
+        : `Thank you, <strong>${formData.firstName}</strong>! Your application is now under review.<br/><br/>You may log in and use the platform with limited access while our team verifies your account. You'll receive an email update at <strong>${formData.email}</strong> within 24–48 hours.`;
 
+  if (isPresignupMode) {
+    document.getElementById('doneBtn').onclick = () => window.location.href = 'presignup.html';
+    document.getElementById('doneBtnIcon').className = 'fa-solid fa-check';
+    document.getElementById('doneBtnText').textContent = 'Done';
+  } 
     go(7);
 
   } catch(e) {
     showToast('Submission failed: ' + (e.message || 'Please try again.'), 'error');
+	
   } finally {
-    btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+    isRegistering = false;
+    if (btn) { btn.disabled = false; }
+    if (spinner) { spinner.classList.remove('on'); }
+    if (btnText) { btnText.style.display = ''; }
   }
 }
 
@@ -1246,16 +1500,21 @@ function buildFormData() {
     idType:           document.getElementById('idType').value,
     idFile:           idFileData,
     avatarFile:       avatarFileData,
+	is_presignup:     isPresignupMode,
+	referredBy:		  _refCode,
     package:          selPkg,
     packageName:      selPkgData?.name || selPkg,
     periodDays:       selPkgData?.period === 'lifetime' ? null
                     : selPkgData?.period === 'year'     ? 365
+					: selPkgData?.period === '6month'   ? 180
+					: selPkgData?.period === '3month'   ? 90
                     : selPkgData?.period === 'month'    ? 30
                     : parseInt(selPkgData?.period) || 30,
     paymentMethod:    selectedPayMethod || 'none',
     paymentReference: manualPayRef || '',
     paymentAmount:    selPkgData?.price || 0,
-    paymentStatus:    selPkgData?.price === 0 ? 'free'
+    paymentStatus:    isPresignupMode ? 'free'
+                    : selPkgData?.price === 0 ? 'free'
                     : selectedPayCategory === 'instant' ? 'paid' : 'pending',
   };
 }
@@ -1286,6 +1545,30 @@ function hideAlert(id) {
   const el = document.getElementById(id); if (el) el.className = 'alert';
 }
 
+// ── Restore state if returning from cancelled payment ─────────
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('cancelled') !== '1') return;
+  const saved = sessionStorage.getItem('fixia_provider_signup');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+      if (d.firstName)    document.getElementById('firstName').value    = d.firstName    || '';
+      if (d.lastName)     document.getElementById('lastName').value     = d.lastName     || '';
+      if (d.email)        document.getElementById('provEmail').value    = d.email        || '';
+      if (d.phone)        document.getElementById('provPhone').value    = d.phone        || '';
+      if (d.username)     document.getElementById('provUsername').value = d.username     || '';
+      if (d.businessName) document.getElementById('businessName').value = d.businessName || '';
+      if (d.bio)          document.getElementById('provBio').value      = d.bio          || '';
+      if (d.city)         document.getElementById('provCity').value     = d.city         || '';
+      if (d.barangay)     document.getElementById('provBarangay').value = d.barangay     || '';
+    } catch(e) {}
+  }
+  const step = parseInt(p.get('step')) || 6;
+  go(step);
+  setTimeout(() => showToast('Payment was cancelled. You can try again.', 'error'), 300);
+})();
+
 let toastTimer;
 function showToast(msg, type='') {
   const el = document.getElementById('toast');
@@ -1296,6 +1579,29 @@ function showToast(msg, type='') {
     document.querySelectorAll('.form-input.err,.form-select.err,.form-textarea.err').forEach(f => f.classList.remove('err'));
   }, 2500);
 }
+
+// ── Restore state if returning from cancelled payment ──────────
+window.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('cancelled') !== '1') return;
+  const saved = sessionStorage.getItem('fixia_provider_signup');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+      if (d.firstName)    document.getElementById('firstName').value    = d.firstName    || '';
+      if (d.lastName)     document.getElementById('lastName').value     = d.lastName     || '';
+      if (d.email)        document.getElementById('provEmail').value    = d.email        || '';
+      if (d.phone)        document.getElementById('provPhone').value    = d.phone        || '';
+      if (d.username)     document.getElementById('provUsername').value = d.username     || '';
+      if (d.businessName) document.getElementById('businessName').value = d.businessName || '';
+      if (d.bio)          document.getElementById('provBio').value      = d.bio          || '';
+      if (d.city)         document.getElementById('provCity').value     = d.city         || '';
+      if (d.barangay)     document.getElementById('provBarangay').value = d.barangay     || '';
+    } catch(e) {}
+  }
+  go(parseInt(p.get('step')) || 6);
+  setTimeout(() => showToast('Payment was cancelled. You can try again.', 'error'), 300);
+});
 </script>
 
 <script>
