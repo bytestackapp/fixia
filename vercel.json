@@ -15,11 +15,11 @@
       "src": "manifest.json",
       "use": "@vercel/static"
     },
-      {
-        "src": "api/**/*.js",
-        "use": "@vercel/node"
-      }
-    ],
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
@@ -43,7 +43,7 @@
     },
     {
       "src": "/",
-      "dest": "/public/homepage.html"
+      "dest": "/public/presignup.html"
     },
     {
       "src": "/(.*)",
@@ -61,9 +61,9 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin",  "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        { "key": "Access-Control-Allow-Origin",  "value": "https://gofixia.vercel.app" },
+        { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, x-session-token, x-user-id" }
       ]
     },
     {
