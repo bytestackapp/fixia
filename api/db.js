@@ -50,13 +50,23 @@ async function requireAuth(req, requiredRole = null) {
   const sessionToken = req.headers['x-session-token'];
   const userId       = req.headers['x-user-id'];
 
+  console.log('[DB Auth] userId:', userId);
+  console.log('[DB Auth] token prefix:', sessionToken?.substring(0, 8));
+  console.log('[DB Auth] SUPA_URL set:', !!SUPA_URL);
+  console.log('[DB Auth] SUPA_SERVICE_KEY set:', !!SUPA_SERVICE_KEY);
+  console.log('[DB Auth] SUPA_SERVICE_KEY prefix:', SUPA_SERVICE_KEY?.substring(0, 20));
+
   if (!sessionToken || !userId) {
+    console.log('[DB Auth] Missing token or userId');
     throw { status: 401, message: 'Unauthorized' };
   }
 
   const rows = await sb(
     `users?id=eq.${encodeURIComponent(userId)}&session_token=eq.${encodeURIComponent(sessionToken)}&select=id,role,status&limit=1`
   );
+
+  console.log('[DB Auth] rows returned:', JSON.stringify(rows));
+
   const user = rows?.[0];
 
   if (!user) throw { status: 401, message: 'Unauthorized' };
