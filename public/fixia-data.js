@@ -162,7 +162,7 @@ async function registerPushSubscription() {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
-      applicationServerKey: 'BBuzC2DxPe2G7GIdcj-GUiLnTKfXoU3y1Uxu2apeX7kjQjB-nKWVYQbGLhPvb6NAZICPLijndo4zvE4i8padM5w'
+      applicationServerKey: 'BNtCfMYnylxamVQafnkb_wc6QfggZBcHd9bFGyXBdlgcXHUXv9s-Tva5gyd5jOhXU5Dx3n1tVo6V8VIyWZgUKrE'
     });
     const sess = FX.getSession?.();
     if (!sess?.userId) return;
