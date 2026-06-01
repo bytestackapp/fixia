@@ -1070,7 +1070,10 @@ try {
   loadHomepageData();
   
   // Register push notification subscription
-  if (!IS_GUEST) registerPushSubscription().catch(() => {});
+  if (!IS_GUEST) {
+    alert('Permission: ' + Notification.permission);
+    registerPushSubscription().catch(() => {});
+  }
 })();
 
 /* ── Gate wrappers — override functions defined above ────────── */
