@@ -685,7 +685,7 @@ const actions = {
 
     if (!users.length) throw { status: 400, message: 'No recipients found.' };
 
-    // 3. Batch insert into user_messages (chunks of 100)
+	// 3. Batch insert into user_messages (chunks of 100)
     const msgRows = users.map(u => ({
       user_id: u.id,
       title:   tpl.title,
@@ -694,7 +694,6 @@ const actions = {
       icon:    tpl.icon,
       is_read: false,
     }));
-
     const chunkSize = 100;
     for (let i = 0; i < msgRows.length; i += chunkSize) {
       await sb('user_messages', {
@@ -704,7 +703,30 @@ const actions = {
       });
     }
 
-    // 4. Increment template send_count
+    // 4. Send push notifications to subscribed devices
+    try {
+      const userIds = users.map(u => u.id);
+      const subs = await sb(
+        `push_subscriptions?user_id=in.(${userIds.join(',')})&select=subscription`
+      ) || [];
+
+      if (subs.length) {
+        await fetch(`${process.env.APP_URL}/api/send-push`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            subscriptions: subs.map(s => s.subscription),
+            title:         tpl.title,
+            body:          tpl.body,
+            url:           '/homepage.html',
+          }),
+        });
+      }
+    } catch(e) {
+      console.warn('[Fixia Push] Push send failed:', e.message);
+    }
+
+    // 5. Increment template send_count
     await sb(`message_templates?id=eq.${templateId}`, {
       method:  'PATCH',
       headers: { 'Prefer': 'return=minimal' },

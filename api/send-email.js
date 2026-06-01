@@ -296,7 +296,7 @@ const templates = {
         and start getting discovered by customers in your area.
       </p>
       ${alertBox('💡 Tip: The more complete your profile and the more reviews you collect, the higher you\'ll rank in search results!', 'success')}
-      ${btnPrimary('Go to Provider Dashboard →', APP_URL + '/provider-dashboard.html')}
+      ${btnPrimary('Go to Provider Dashboard →', APP_URL + '/provider.html')}
     `)
   }),
 
@@ -341,7 +341,7 @@ const templates = {
         you receive a special crown badge, priority placement in all search results,
         and exclusive recognition within the Fixia community.
       `, 'success')}
-      ${btnPrimary('View Your Dashboard →', APP_URL + '/provider-dashboard.html')}
+      ${btnPrimary('View Your Dashboard →', APP_URL + '/provider.html')}
     `)
   }),
 
@@ -379,7 +379,7 @@ const templates = {
         ? alertBox('Great job! Keep up the excellent service. Encourage more customers to leave reviews to boost your ranking.', 'success')
         : alertBox('Every review is an opportunity to improve. If you have concerns, feel free to reach out to the customer.', 'info')
       }
-      ${btnPrimary('View My Dashboard →', APP_URL + '/provider-dashboard.html')}
+      ${btnPrimary('View My Dashboard →', APP_URL + '/provider.html')}
     `)
   }),
 

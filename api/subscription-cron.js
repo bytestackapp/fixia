@@ -19,16 +19,15 @@ async function sbFetch(path, opts = {}) {
       ...(opts.headers || {}),
     },
   });
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 async function sendEmail(type, data) {
-  // Reuse your existing FX.sendEmail logic here
-  // or call your email endpoint directly
   await fetch(`${process.env.APP_URL}/api/send-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, ...data }),
+    body: JSON.stringify({ type, data }),
   });
 }
 
@@ -44,7 +43,7 @@ module.exports = async (req, res) => {
   try {
     // Fetch all active/pending paid users with a subscription_end date
     const users = await sbFetch(
-      `users?subscription_end=not.is.null&status=in.(active,pending)&select=*`
+      `users?subscription_end=not.is.null&status=in.(active,pending,hidden)&select=*`
     );
 
     for (const user of users) {
@@ -53,40 +52,22 @@ module.exports = async (req, res) => {
       const isProvider = user.role === 'provider';
 
       try {
-        // T+1 — Follow-up email (expired yesterday)
-        if (daysLeft === -1 && !user.followup_sent) {
-          await sendEmail(isProvider ? 'provider_reactivate' : 'regular_reactivate', {
+        // T-7 — Early email reminder (independent — always checked)
+        if (daysLeft === 7 && !user.reminder_7_sent) {
+          await sendEmail(isProvider ? 'provider_expiry_7' : 'regular_expiry_7', {
             fullName: `${user.first_name} ${user.last_name}`,
             email:    user.email,
+            daysLeft: 7,
           });
           await sbFetch(`users?id=eq.${user.id}`, {
             method: 'PATCH',
-            body: JSON.stringify({ followup_sent: true }),
+            body: JSON.stringify({ reminder_7_sent: true }),
           });
-          results.followup++;
+          results.warned7++;
         }
 
-        // T-0 — Expiry
-        if (daysLeft <= 0 && !user.expiry_sent) {
-          const newStatus = isProvider ? 'hidden' : 'active'; // providers get hidden, regulars downgrade
-          await sbFetch(`users?id=eq.${user.id}`, {
-            method: 'PATCH',
-            body: JSON.stringify({
-              status:       newStatus,
-              package_id:   isProvider ? user.package_id : 'free',
-              ads_free:     false,
-              expiry_sent:  true,
-            }),
-          });
-          await sendEmail(isProvider ? 'provider_expired' : 'regular_expired', {
-            fullName: `${user.first_name} ${user.last_name}`,
-            email:    user.email,
-          });
-          results.expired++;
-        }
-
-        // T-3 — Email + in-app flag
-        else if (daysLeft === 3 && !user.reminder_3_sent) {
+        // T-3 — Email + in-app flag (independent — always checked)
+        if (daysLeft === 3 && !user.reminder_3_sent) {
           await sendEmail(isProvider ? 'provider_expiry_3' : 'regular_expiry_3', {
             fullName: `${user.first_name} ${user.last_name}`,
             email:    user.email,
@@ -99,18 +80,36 @@ module.exports = async (req, res) => {
           results.warned3++;
         }
 
-        // T-7 — Early email reminder
-        else if (daysLeft === 7 && !user.reminder_7_sent) {
-          await sendEmail(isProvider ? 'provider_expiry_7' : 'regular_expiry_7', {
+        // T-0 — Expiry (independent — always checked)
+        if (daysLeft <= 0 && !user.expiry_sent) {
+          const newStatus = isProvider ? 'hidden' : 'active';
+          await sbFetch(`users?id=eq.${user.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              status:      newStatus,
+              package_id:  isProvider ? user.package_id : 'free',
+              ads_free:    false,
+              expiry_sent: true,
+            }),
+          });
+          await sendEmail(isProvider ? 'provider_expired' : 'regular_expired', {
             fullName: `${user.first_name} ${user.last_name}`,
             email:    user.email,
-            daysLeft: 7,
+          });
+          results.expired++;
+        }
+
+        // T+1 — Follow-up email (independent — only fires the day after expiry)
+        if (daysLeft === -1 && !user.followup_sent) {
+          await sendEmail(isProvider ? 'provider_reactivate' : 'regular_reactivate', {
+            fullName: `${user.first_name} ${user.last_name}`,
+            email:    user.email,
           });
           await sbFetch(`users?id=eq.${user.id}`, {
             method: 'PATCH',
-            body: JSON.stringify({ reminder_7_sent: true }),
+            body: JSON.stringify({ followup_sent: true }),
           });
-          results.warned7++;
+          results.followup++;
         }
 
       } catch(userErr) {
@@ -135,6 +134,20 @@ module.exports = async (req, res) => {
           fullName: `${p.first_name} ${p.last_name}`,
           email:    p.email,
         });
+      }
+    }
+
+    // ── Auto-delete rejected accounts older than 30 days ──────────
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    const staleRejected = await sbFetch(
+      `users?force_logout=eq.true&status=in.(rejected)&created_at=lt.${thirtyDaysAgo}&select=id`
+    ) || [];
+    for (const u of staleRejected) {
+      try {
+        await sbFetch(`providers?user_id=eq.${u.id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+        await sbFetch(`users?id=eq.${u.id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+      } catch(e) {
+        results.errors.push(`Stale account delete ${u.id}: ${e.message}`);
       }
     }
 
