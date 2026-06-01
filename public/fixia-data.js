@@ -164,7 +164,7 @@ async function registerPushSubscription() {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
-      applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'  // paste your public key here
+      applicationServerKey: 'BBuzC2DxPe2G7GIdcj-GUiLnTKfXoU3y1Uxu2apeX7kjQjB-nKWVYQbGLhPvb6NAZICPLijndo4zvE4i8padM5w'
     });
 
     const sess = FX.getSession?.();
