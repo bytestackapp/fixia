@@ -707,11 +707,12 @@ const actions = {
     try {
       const userIds = users.map(u => u.id);
       const subs = await sb(
-		`push_subscriptions?user_id=in.(${userIds.join(',')})&select=subscription`
+        `push_subscriptions?user_id=in.(${userIds.join(',')})&select=subscription`
       ) || [];
-
+      console.log('[Push] userIds:', userIds.length, 'subs found:', subs.length);
+    
       if (subs.length) {
-        await fetch(`${APP_URL}/api/send-push`, {
+        const pushRes = await fetch(`${APP_URL}/api/send-push`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
@@ -721,6 +722,7 @@ const actions = {
             url:           '/homepage.html',
           }),
         });
+        console.log('[Push] send-push response:', pushRes.status);
       }
     } catch(e) {
       console.warn('[Fixia Push] Push send failed:', e.message);
