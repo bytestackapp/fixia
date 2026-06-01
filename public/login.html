@@ -649,6 +649,30 @@ async function doLogin() {
     if (result.user.role === 'regular') {
       FX.syncSaved().catch(() => {});
     }
+	
+    // Show notification prompt on login
+    if (Notification.permission === 'default') {
+      const bar = document.createElement('div');
+      bar.style.cssText = `
+        position:fixed;bottom:70px;left:0;right:0;
+        background:#0F1B2D;color:#fff;
+        padding:12px 20px;z-index:9999;
+        display:flex;align-items:center;justify-content:space-between;
+        font-size:0.83rem;font-family:'Plus Jakarta Sans',sans-serif;
+        box-shadow:0 -2px 12px rgba(0,0,0,0.2);
+      `;
+      bar.innerHTML = `
+        <span>🔔 Enable notifications</span>
+        <div style="display:flex;gap:8px;">
+          <button onclick="registerPushSubscription().catch(()=>{});this.closest('div[style]').remove();" style="background:#FF5A1F;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:700;font-size:0.8rem;cursor:pointer;">Allow</button>
+          <button onclick="this.closest('div[style]').remove();" style="background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;font-size:0.8rem;cursor:pointer;">Later</button>
+        </div>
+      `;
+      document.body.appendChild(bar);
+    } else if (Notification.permission === 'granted') {
+      registerPushSubscription().catch(() => {});
+    }
+
     setTimeout(() => {
       if (result.user.role === 'admin')         window.location.href = 'admin.html';
       else if (result.user.role === 'provider') window.location.href = 'homepage.html';

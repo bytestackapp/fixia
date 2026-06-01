@@ -1069,8 +1069,8 @@ try {
   // Load dynamic content
   loadHomepageData();
   
-// Register push notification subscription
-if (!IS_GUEST) {
+// Register push subscription silently if already granted
+if (!IS_GUEST && Notification.permission === 'granted') {
   registerPushSubscription().catch(() => {});
 }
 })();
