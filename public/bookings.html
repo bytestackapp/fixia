@@ -316,7 +316,6 @@ let selectedStars  = 0;
   if (!session) return;
   if (session.role === 'regular' && !session.adsFree) await FX.initAds();
   await load();
-  FX.checkAndShowMessages();
 })();
 
 async function load() {
@@ -419,14 +418,14 @@ function renderCard(inq, idx) {
   /* ══ PROVIDER VIEW ═══════════════════════════════════════════ */
   if (isProvider) {
     const customer  = inq._customer;
-    const custName  = customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown Customer';
+    const custName  = customer ? `${esc(customer.first_name)} ${esc(customer.last_name)}` : 'Unknown Customer';
     const custPhone = customer?.phone || null;
     const isUnread  = inq.provider_has_unread;
 
     const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
       <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
         ${'⭐'.repeat(inq.rating_stars)} Customer rated ${inq.rating_stars}/5
-        ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${inq.rating_comment}"</span>` : ''}
+        ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
       </div>` : '';
 
     let actionBtns = '';
@@ -461,7 +460,7 @@ function renderCard(inq, idx) {
         </div>
         ${inq.user_message ? `
         <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
-          <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${inq.user_message}
+          <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${esc(inq.user_message)}
         </div>` : ''}
         ${ratingDisplay}
         ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}
@@ -471,7 +470,7 @@ function renderCard(inq, idx) {
   /* ══ REGULAR USER VIEW ═══════════════════════════════════════ */
   const prov        = inq._provider;
   const provUser    = inq._provUser;
-  const provName    = prov?.biz_name || 'Unknown Provider';
+  const provName    = esc(prov?.biz_name || 'Unknown Provider');
   const provService = prov?.cat_sub  || '—';
   const provPhone   = provUser?.phone || prov?.phone || null;
   const location    = [prov?.city_name, prov?.province_name].filter(Boolean).join(', ');
@@ -482,7 +481,7 @@ function renderCard(inq, idx) {
   const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
     <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
       ${'⭐'.repeat(inq.rating_stars)} You rated this ${inq.rating_stars}/5
-      ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${inq.rating_comment}"</span>` : ''}
+      ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
     </div>` : '';
 
   let actionBtns = '';
@@ -543,7 +542,7 @@ function renderCard(inq, idx) {
         </div>
       ${inq.user_message ? `
       <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
-        <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${inq.user_message}
+        <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${esc(inq.user_message)}
       </div>` : ''}
       ${ratingDisplay}
       ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}

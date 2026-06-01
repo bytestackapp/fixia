@@ -680,7 +680,7 @@ async function verifyOTPStep() {
   btn.disabled = true; sp.classList.add('on'); bt.style.display = 'none';
 
   try {
-    FX.verifyOTP(email, code);
+    await FX.verifyOTP(email, code);
     setStep(3);
     loadPackages();
   } catch(e) {
@@ -759,9 +759,9 @@ async function goStep5() {
       const d = await r.json();
       const url = d.approvalUrl || d.checkoutUrl;
       if (url) {
-        sessionStorage.setItem('fixia_signup', JSON.stringify(buildFormData()));
-        if (d.orderId)    sessionStorage.setItem('paypal_order_id',    d.orderId);
-        if (d.sessionId)  sessionStorage.setItem('paymongo_session_id', d.sessionId);
+        localStorage.setItem('fixia_signup', JSON.stringify(buildFormData()));
+        if (d.orderId)    localStorage.setItem('paypal_order_id',    d.orderId);
+        if (d.sessionId)  localStorage.setItem('paymongo_session_id', d.sessionId);
         clearTimeout(safetyTimer);
         window.location.href = url; return;
       }
@@ -828,7 +828,10 @@ async function doRegister() {
     document.getElementById('doneBtnIcon').className = 'fa-solid fa-check';
     document.getElementById('doneBtnText').textContent = 'Done';
   }
-
+  
+    localStorage.removeItem('fixia_signup');
+    localStorage.removeItem('paypal_order_id');
+    localStorage.removeItem('paymongo_session_id');
     setStep(5);
   } catch(e) {
     showToast('Registration failed: ' + (e.message || 'Please try again.'), 'error');
@@ -1086,27 +1089,6 @@ function checkStrength(pw) {
   fill.style.background = colors[score] || 'transparent';
 }
 
-// ── Restore state if returning from cancelled payment ─────────
-(function() {
-  const p = new URLSearchParams(window.location.search);
-  if (p.get('cancelled') !== '1') return;
-  const saved = sessionStorage.getItem('fixia_signup');
-  if (saved) {
-    try {
-      const d = JSON.parse(saved);
-      if (d.firstName) document.getElementById('firstName').value   = d.firstName || '';
-      if (d.lastName)  document.getElementById('lastName').value    = d.lastName  || '';
-      if (d.email)     document.getElementById('regEmail').value    = d.email     || '';
-      if (d.phone)     document.getElementById('regPhone').value    = d.phone     || '';
-      if (d.username)  document.getElementById('regUsername').value = d.username  || '';
-      if (d.password)  document.getElementById('regPassword').value = d.password  || '';
-    } catch(e) {}
-  }
-  const step = parseInt(p.get('step')) || 4;
-  setStep(step);
-  setTimeout(() => showToast('Payment was cancelled. You can try again.', 'error'), 300);
-})();
-
 let toastTimer;
 function showToast(msg, type='') {
   const el = document.getElementById('toast');
@@ -1123,7 +1105,7 @@ function showToast(msg, type='') {
 window.addEventListener('DOMContentLoaded', () => {
   const p = new URLSearchParams(window.location.search);
   if (p.get('cancelled') !== '1') return;
-  const saved = sessionStorage.getItem('fixia_signup');
+  const saved = localStorage.getItem('fixia_signup');
   if (saved) {
     try {
       const d = JSON.parse(saved);

@@ -152,18 +152,9 @@ function showState(id) {
 
 (async function init() {
   const params  = new URLSearchParams(window.location.search);
-  const method  = params.get('method');  // 'paypal'
+  const method  = params.get('method');  // 'paypal' | 'paymongo'
   const type    = params.get('type');    // 'regular' | 'provider'
-  const token   = params.get('token');   // PayPal order token
-
-  // No PayPal token — shouldn't land here directly
-  if (!token) {
-    showState('stateError');
-    document.getElementById('errorMsg').textContent = 'Payment was cancelled or no token was returned.';
-    document.getElementById('retryBtn').onclick = () =>
-      window.location.href = type === 'provider' ? 'signup-provider.html' : 'signup-regular.html';
-    return;
-  }
+  const token   = params.get('token');   // PayPal order token (PayPal only)
 
   // Retrieve stored signup data from sessionStorage
   const storageKey = type === 'provider' ? 'fixia_provider_signup' : 'fixia_signup';
@@ -178,7 +169,43 @@ function showState(id) {
     return;
   }
 
-  // Retrieve stored PayPal order ID
+  // ── PayMongo flow ─────────────────────────────────────────────
+  if (method === 'paymongo') {
+    const sessionId = sessionStorage.getItem('paymongo_session_id');
+    if (!sessionId) {
+      showState('stateError');
+      document.getElementById('errorMsg').textContent = 'Payment session not found. Please try again.';
+      document.getElementById('retryBtn').onclick = () =>
+        window.location.href = type === 'provider' ? 'signup-provider.html' : 'signup-regular.html';
+      return;
+    }
+    try {
+      const res  = await fetch('/api/verify-paymongo-payment', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ sessionId }),
+      });
+      const data = await res.json();
+      if (!data.verified) throw new Error(data.error || 'Payment not verified by PayMongo.');
+      await _completeRegistration(type, formData, 'paymongo', data, storageKey);
+    } catch(e) {
+      showState('stateError');
+      document.getElementById('errorMsg').textContent = e.message || 'Verification failed. Please contact support.';
+      document.getElementById('retryBtn').onclick = () =>
+        window.location.href = type === 'provider' ? 'signup-provider.html' : 'signup-regular.html';
+    }
+    return;
+  }
+
+  // ── PayPal flow ───────────────────────────────────────────────
+  if (!token) {
+    showState('stateError');
+    document.getElementById('errorMsg').textContent = 'Payment was cancelled or no token was returned.';
+    document.getElementById('retryBtn').onclick = () =>
+      window.location.href = type === 'provider' ? 'signup-provider.html' : 'signup-regular.html';
+    return;
+  }
+
   const orderId = sessionStorage.getItem('paypal_order_id') || token;
 
   // Call backend to capture + verify payment
@@ -273,9 +300,10 @@ function showState(id) {
       showState('stateProviderSuccess');
     }
 
-    // Clear session storage
+	// Clear session storage
     sessionStorage.removeItem(storageKey);
     sessionStorage.removeItem('paypal_order_id');
+    sessionStorage.removeItem('paymongo_session_id');
 
   } catch(e) {
     showState('stateError');
@@ -284,6 +312,80 @@ function showState(id) {
       window.location.href = type === 'provider' ? 'signup-provider.html' : 'signup-regular.html';
   }
 })();
+
+/* ── Shared registration completion (used by both PayPal and PayMongo) ── */
+async function _completeRegistration(type, formData, payMethod, payData, storageKey) {
+  if (type !== 'provider') {
+    await FX.registerRegular({
+      ...formData,
+      status:           'active',
+      paymentMethod:    payMethod,
+      paymentReference: payData.transactionId,
+      paymentAmount:    payData.amount || '',
+      paymentStatus:    'verified',
+      ads_free:         true,
+    });
+    await FX.sendEmail('regular_welcome', {
+      fullName: `${formData.firstName} ${formData.lastName}`,
+      email:    formData.email,
+      username: formData.username,
+      package:  formData.packageName || 'Fixia Plus',
+    });
+    await FX.sendEmail('regular_payment_notify', {
+      fullName:         `${formData.firstName} ${formData.lastName}`,
+      email:            formData.email,
+      package:          formData.packageName || 'Fixia Plus',
+      paymentMethod:    payMethod === 'paymongo' ? 'PayMongo' : 'PayPal',
+      paymentReference: payData.transactionId,
+      paymentAmount:    `${payData.amount} ${payData.currency || 'PHP'}`,
+    });
+    document.getElementById('regSuccessName').textContent = formData.firstName;
+    document.getElementById('regInfoBox').innerHTML = `
+      <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || 'Fixia Plus'}</span></div>
+      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} ✅ Verified</span></div>
+      <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${payData.transactionId}</span></div>
+      <div class="info-row"><span class="info-label">Amount</span><span class="info-value">${payData.amount} ${payData.currency || 'PHP'}</span></div>`;
+    showState('stateRegularSuccess');
+  } else {
+    await FX.registerProvider({
+      ...formData,
+      paymentMethod:    payMethod,
+      paymentReference: payData.transactionId,
+      paymentAmount:    payData.amount || '',
+      paymentStatus:    'verified',
+    });
+    await FX.sendEmail('provider_signup_confirm', {
+      fullName: `${formData.firstName} ${formData.lastName}`,
+      email:    formData.email,
+      bizName:  formData.bizName,
+      package:  formData.packageName || formData.package,
+    });
+    await FX.sendEmail('provider_signup_notify', {
+      fullName:         `${formData.firstName} ${formData.lastName}`,
+      email:            formData.email,
+      bizName:          formData.bizName,
+      provType:         formData.provType,
+      service:          formData.catSub,
+      location:         formData.cityName,
+      package:          formData.packageName || formData.package,
+      paymentMethod:    payMethod === 'paymongo' ? 'PayMongo' : 'PayPal',
+      paymentReference: payData.transactionId,
+      paymentAmount:    `${payData.amount} ${payData.currency || 'PHP'}`,
+    });
+    document.getElementById('provSuccessBiz').textContent   = formData.bizName;
+    document.getElementById('provSuccessEmail').textContent = formData.email;
+    document.getElementById('provInfoBox').innerHTML = `
+      <div class="info-row"><span class="info-label">Business</span><span class="info-value">${formData.bizName}</span></div>
+      <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || formData.package}</span></div>
+      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} ✅ Verified</span></div>
+      <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${payData.transactionId}</span></div>
+      <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;">⏳ Pending Approval</span></div>`;
+    showState('stateProviderSuccess');
+  }
+  sessionStorage.removeItem(storageKey);
+  sessionStorage.removeItem('paypal_order_id');
+  sessionStorage.removeItem('paymongo_session_id');
+}
 </script>
 
 <script>

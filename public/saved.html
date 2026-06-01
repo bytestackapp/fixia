@@ -202,6 +202,17 @@
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
 
+<div id="clearConfirmModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:480px;">
+    <p style="font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:6px;">Remove All Saved?</p>
+    <p style="font-size:0.82rem;color:var(--text-3);margin-bottom:1.25rem;line-height:1.6;">This will clear your entire saved providers list.</p>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeClearConfirm()" style="flex:1;padding:0.8rem;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="confirmClearAll()" style="flex:1;padding:0.8rem;border:none;border-radius:10px;background:#DC2626;color:#fff;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Remove All</button>
+    </div>
+  </div>
+</div>
+
 <script src="fixia-data.js"></script>
 <script>
 
@@ -320,8 +331,15 @@ function unsave(id) {
 }
 
 function clearAll() {
-  if (!confirm('Remove all saved providers?')) return;
-  FX.clearSaved(); // handles both localStorage and DB
+  const modal = document.getElementById('clearConfirmModal');
+  modal.style.display = 'flex';
+}
+function closeClearConfirm() {
+  document.getElementById('clearConfirmModal').style.display = 'none';
+}
+function confirmClearAll() {
+  closeClearConfirm();
+  FX.clearSaved();
   render();
   showToast('All saved providers cleared');
 }

@@ -64,10 +64,42 @@
 const SUPA_URL = 'https://jqycouhbatdmssfqcyio.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeWNvdWhiYXRkbXNzZnFjeWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjMwOTYsImV4cCI6MjA5MjgzOTA5Nn0.SaPsXj_b1LlxLQPv1YrWm2A2KaU8fDx4PbbQV-etUKk';
 const APP_URL  = window.location.origin;
-
-/* ── API endpoints ───────────────────────────────────────────── */
 const EMAIL_API  = '/api/send-email';
-const PAYPAL_API = '/api/create-paypal-checkout';
+
+
+
+/* ── HTML escape helper — use on ALL user-supplied content in innerHTML ── */
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g,  '&amp;')
+    .replace(/</g,  '&lt;')
+    .replace(/>/g,  '&gt;')
+    .replace(/"/g,  '&quot;')
+    .replace(/'/g,  '&#x27;');
+}
+
+/* ── Secure API helper — routes sensitive writes through /api/db ── */
+async function apiFetch(action, payload = {}) {
+  const session = (() => {
+    try { return JSON.parse(localStorage.getItem('fx_session') || 'null'); } catch { return null; }
+  })();
+  const res = await fetch('/api/db', {
+    method:  'POST',
+    headers: {
+      'Content-Type':     'application/json',
+      'x-session-token':  session?.sessionToken || '',
+      'x-user-id':        session?.userId       || '',
+    },
+    body: JSON.stringify({ action, payload }),
+  });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch { throw new Error(`API error (${res.status}): ${text.substring(0, 80)}`); }
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
 
 /* ══════════════════════════════════════════════════════════════
    CORE SUPABASE REST HELPER
@@ -96,7 +128,7 @@ async function sbFetch(path, options = {}) {
     clearTimeout(timer);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      console.error('Supabase 400 detail:', JSON.stringify(err));
+	  console.error('Supabase error:', res.status);
       throw new Error(err.message || err.details || err.hint || `Supabase error ${res.status}`);
     }
     const text = await res.text();
@@ -121,6 +153,38 @@ async function sbDelete(publicUrl) {
   } catch(e) { console.warn('Storage delete failed:', e); }
 }
 
+
+async function registerPushSubscription() {
+  if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly:      true,
+      applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'  // paste your public key here
+    });
+
+    const sess = FX.getSession?.();
+    if (!sess?.userId) return;
+
+    await sbFetch('push_subscriptions', {
+      method:  'POST',
+      headers: { 'Prefer': 'return=minimal,resolution=merge-duplicates' },
+      body:    JSON.stringify({
+        user_id:      sess.userId,
+        subscription: sub,
+      }),
+    });
+
+    console.log('[Fixia Push] Subscription registered.');
+  } catch(e) {
+    console.warn('[Fixia Push] Registration failed:', e.message);
+  }
+}
+
 /* ── Supabase Storage upload helper ──────────────────────────── */
 async function sbUpload(bucket, path, base64DataUrl, mimeType) {
   const base64 = base64DataUrl.split(',')[1];
@@ -136,7 +200,7 @@ async function sbUpload(bucket, path, base64DataUrl, mimeType) {
       'apikey':        SUPA_KEY,
       'Authorization': `Bearer ${SUPA_KEY}`,
       'Content-Type':  mimeType,
-      'x-upsert':      'true'
+      'x-upsert':      'false'
     },
     body: blob
   });
@@ -185,23 +249,19 @@ async function verifyPassword(password, hash) {
   return data.match === true;
 }
 
-/* ── Legacy FNV-1a hash — for migrating old accounts only.
-   Remove after ~30 days once all active users have logged in. ── */
-function legacyHash(str) {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = (h * 0x01000193) >>> 0;
-  }
-  return h.toString(16).padStart(8, '0');
-}
-
 /* ── UUID generator ──────────────────────────────────────────── */
 function genId() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for very old environments
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  arr[6] = (arr[6] & 0x0f) | 0x40;
+  arr[8] = (arr[8] & 0x3f) | 0x80;
+  return [...arr].map((b, i) =>
+    ([4,6,8,10].includes(i) ? '-' : '') + b.toString(16).padStart(2,'0')
+  ).join('');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -244,22 +304,6 @@ const FX = {
 	// Try bcrypt first (new accounts), then fall back to legacy FNV-1a (old accounts)
     let passwordMatch = await verifyPassword(password, user.password_hash);
     
-    if (!passwordMatch) {
-      // Legacy check: FNV-1a hashes are always exactly 8 hex characters
-      const isLegacyHash = /^[0-9a-f]{8}$/.test(user.password_hash);
-      if (isLegacyHash && legacyHash(password) === user.password_hash) {
-        // Password is correct — silently upgrade the hash to bcrypt in the background
-        hashPassword(password).then(newHash => {
-          sbFetch(`users?id=eq.${user.id}`, {
-            method: 'PATCH',
-            prefer: 'return=minimal',
-            body: JSON.stringify({ password_hash: newHash }),
-          }).catch(() => {});
-        }).catch(() => {});
-        passwordMatch = true;
-      }
-    }
-    
     if (!passwordMatch) return { success: false, error: 'Incorrect password.' };
     if (user.status === 'suspended') return { success: false, error: 'Your account has been suspended. Contact support if you believe this is a mistake.' };
     if (user.status === 'rejected') return { success: false, error: 'Your account application was not approved.' };
@@ -271,28 +315,33 @@ const FX = {
       // pending and needs_compliance providers are allowed in as free tier
     }
 
+    // Build session token — invalidates any other active session for this user
+    const sessionToken = genId();
+
     // Build session
-	const session = {
-      userId:     user.id,
-      role:       user.role,
-      email:      user.email,
-      username:   user.username,
-      firstName:  user.first_name,
-      lastName:   user.last_name,
-      packageId:  user.package_id,
-      adsFree:    user.ads_free,
-      status:     user.status,
-      providerId: user.provider_id || null,
-      avatarUrl:  user.avatar_url  || null,
+    const session = {
+      userId:       user.id,
+      role:         user.role,
+      email:        user.email,
+      username:     user.username,
+      firstName:    user.first_name,
+      lastName:     user.last_name,
+      packageId:    user.package_id,
+      adsFree:      user.ads_free,
+      status:       user.status,
+      providerId:   user.provider_id || null,
+      avatarUrl:    user.avatar_url  || null,
+      sessionToken, // ← stored locally
     };
     this.setSession(session);
     sbFetch(`users?id=eq.${user.id}`, {
       method: 'PATCH',
       prefer: 'return=minimal',
       body: JSON.stringify({
-        last_login_at: new Date().toISOString(),
-        is_inactive: false,
-        force_logout: false,   // ← ADD: reset the flag on every successful login
+        last_login_at:  new Date().toISOString(),
+        is_inactive:    false,
+        force_logout:   false,
+        session_token:  sessionToken, // ← written to DB, overwrites any old session
       }),
     }).catch(() => {});
     
@@ -300,10 +349,36 @@ const FX = {
   },
 
   logout() {
+    const sess = this.getSession();
+    if (sess?.userId) {
+      sbFetch(`users?id=eq.${sess.userId}`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ session_token: null }),
+      }).catch(() => {});
+    }
     this.clearSession();
     window.location.href = 'login.html';
   },
+async checkSession() {
+    const sess = this.getSession();
+    if (!sess || !sess.sessionToken) return true; // guest or old session — let through
+    try {
+      const rows = await sbFetch(`users?id=eq.${sess.userId}&select=session_token,status&limit=1`);
+      const user = rows?.[0];
+      if (!user) return false; // user deleted
+      if (user.status === 'suspended') return false;
+      // Token mismatch means another device logged in
+      return user.session_token === sess.sessionToken;
+    } catch(e) {
+      return true; // network error — don't log out, fail open
+    }
+  },
 
+  async kickUser(userId) {
+    return await apiFetch('kickUser', { userId });
+  },
+  
   /* ════════════════════════════════════════════════════════════
      USERS
   ════════════════════════════════════════════════════════════ */
@@ -353,44 +428,27 @@ const FX = {
   },
 
   async updateUser(id, changes) {
-    const p = {};
-    if (changes.status        != null) p.status           = changes.status;
-    if (changes.packageId          != null) p.package_id        = changes.packageId;
-    if (changes.packageName        != null) p.package_name      = changes.packageName;
-    if (changes.adsFree            != null) p.ads_free          = changes.adsFree;
-    if ('subscriptionStart' in changes)     p.subscription_start = changes.subscriptionStart;
-    if ('subscriptionEnd'   in changes)     p.subscription_end   = changes.subscriptionEnd;
-	if (changes.password) 			   p.password_hash     = await hashPassword(changes.password);
-    if (changes.email)                 p.email             = changes.email.toLowerCase();
-    if (changes.firstName)             p.first_name        = changes.firstName;
-    if (changes.lastName)              p.last_name         = changes.lastName;
-    if (changes.phone)                 p.phone             = changes.phone;
-    if (changes.role)                  p.role              = changes.role;
-    if (changes.paymentStatus != null) p.payment_status    = changes.paymentStatus;
-    if (changes.forceLogout   != null) p.force_logout      = changes.forceLogout;   // ← ADD
-    const rows = await sbFetch(`users?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(p) });
-    const updated = rows?.length ? rows[0] : null;
-
-    // ── Refresh session if this is the currently logged-in user ──
+    // Hash password client-side if changing
+    const payload = { id, changes: { ...changes } };
+    if (changes.password) {
+      payload.changes.passwordHash = await hashPassword(changes.password);
+      delete payload.changes.password;
+    }
+    const result = await apiFetch('updateUser', payload);
+    // Refresh session if this is the currently logged-in user
     const currentSession = this.getSession();
-    if (currentSession && currentSession.userId === id) {
+    if (currentSession && currentSession.userId === id && result) {
       this.setSession({
         ...currentSession,
-        adsFree:   updated?.ads_free   ?? currentSession.adsFree,
-        packageId: updated?.package_id ?? currentSession.packageId,
+        adsFree:   result.ads_free   ?? currentSession.adsFree,
+        packageId: result.package_id ?? currentSession.packageId,
       });
     }
-
-    return updated;
+    return result;
   },
 
 async deleteUser(id) {
-  // Delete avatar from storage
-  const user = await this.getUserById(id);
-  if (user?.avatar_url) await this.deleteAvatar(user.avatar_url);
-  // Cascade: delete provider record if exists
-  await sbFetch(`providers?user_id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
-  await sbFetch(`users?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+  return await apiFetch('deleteUser', { id });
 },
 
 async deleteAvatar(avatarUrl) {
@@ -436,10 +494,7 @@ async _fileToBase64(file) {
 },
 
 async deleteProvider(id) {
-  const rows = await sbFetch(`providers?id=eq.${id}&limit=1`);
-  const p = rows?.[0];
-  if (p?.user_id) await sbFetch(`users?id=eq.${p.user_id}`, { method:'DELETE', prefer:'return=minimal' });
-  await sbFetch(`providers?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' });
+  return await apiFetch('deleteProvider', { id });
 },
 
   async getSetting(key) {
@@ -447,157 +502,199 @@ async deleteProvider(id) {
     return rows?.[0]?.value ?? null;
   },
 
-  async setSetting(key, value) {
-    await sbFetch(`app_settings?key=eq.${key}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ value }),
-      prefer: 'return=minimal',
-    });
-  },
-  
+async setSetting(key, value) {
+  await sbFetch(`app_settings`, {
+    method: 'POST',
+    body: JSON.stringify({ key, value }),
+    prefer: 'resolution=merge-duplicates,return=minimal',
+  });
+},
+ 
+async getPreSignupSettings() {
+  const [mode, regularPkg, providerPkg] = await Promise.all([
+    this.getSetting('presignup_mode'),
+    this.getSetting('presignup_regular_package'),
+    this.getSetting('presignup_provider_package'),
+  ]);
+  return {
+    active:         mode === 'true',
+    regularPackage: regularPkg || null,
+    providerPackage: providerPkg || null,
+  };
+},
+
+async getPreSignupCount() {
+  const [regular, provider] = await Promise.all([
+    sbFetch('users?is_presignup=is.true&role=eq.regular&select=id'),
+    sbFetch('users?is_presignup=is.true&role=eq.provider&select=id'),
+  ]);
+  return {
+    regular:  (regular  || []).length,
+    provider: (provider || []).length,
+  };
+},
+
+/* ════════════════════════════════════════════════════════════
+   REFERRAL SYSTEM
+════════════════════════════════════════════════════════════ */
+// Generate a short unique referral code
+genReferralCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const arr = new Uint8Array(8);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => chars[b % chars.length]).join('');
+},
+
+async getReferralStats(userId) {
+  const user = await this.getUserById(userId);
+  if (!user) return { points: 0, code: null, referrals: [] };
+  const referrals = await sbFetch(`referrals?referrer_id=eq.${userId}&order=created_at.desc&limit=5`) || [];
+  // Enrich each referral with referred user info
+  const enriched = await Promise.all(referrals.map(async r => {
+    const ref = await this.getUserById(r.referred_id);
+    return {
+      ...r,
+      referred_name: ref ? `${ref.first_name} ${ref.last_name}` : '—',
+      referred_role: ref?.role || '—',
+    };
+  }));
+  return {
+    points:    user.referral_points || 0,
+    code:      user.referral_code,
+    referrals: enriched,
+  };
+},
+
+async getReferralPackages(role) {
+  let q = 'packages?referral_points_required=gt.0&is_active=eq.true&order=referral_points_required.asc';
+  if (role) q += `&type=in.(${role},referral)`;
+  return await sbFetch(q) || [];
+},
+
+async redeemReferralPackage(userId, packageId) {
+  const user = await this.getUserById(userId);
+  if (!user) throw new Error('User not found.');
+
+  const pkg = await this.getPackageById(packageId);
+  if (!pkg) throw new Error('Package not found.');
+  if (!pkg.referral_points_required) throw new Error('This package cannot be redeemed with points.');
+
+  // Block if user has any active paid plan (including lifetime with no expiry)
+  const hasActiveExpiry = user.subscription_end && new Date(user.subscription_end) > new Date();
+  const isLifetime = user.package_id && user.package_id !== 'regular-free' && user.package_id !== 'provider-free' && !user.subscription_end;
+
+  if (hasActiveExpiry || isLifetime) {
+    throw new Error('You have an active plan. Please wait for it to expire before redeeming.');
+  }
+
+  if ((user.referral_points || 0) < pkg.referral_points_required) {
+    throw new Error(`You need ${pkg.referral_points_required} points. You have ${user.referral_points || 0}.`);
+  }
+
+  // Calculate expiry
+  const periodDays = pkg.period === 'lifetime' ? null
+    : pkg.period === 'year'   ? 365
+    : pkg.period === '6month' ? 180
+    : pkg.period === '3month' ? 90
+    : pkg.period === 'month'  ? 30 : 30;
+
+  const now = new Date();
+  const subStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).toISOString();
+  const subEnd = periodDays ? calcExpiry(periodDays) : null;
+
+  await sbFetch(`users?id=eq.${userId}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: JSON.stringify({
+      package_id:         pkg.id,
+      package_name:       pkg.name,
+      ads_free:           pkg.ads_free || false,
+      subscription_start: subStart,
+      subscription_end:   subEnd,
+      referral_points:    (user.referral_points || 0) - pkg.referral_points_required,
+      payment_method:     'referral',
+      payment_status:     'referral',
+    }),
+  });
+  return { pkg, newPoints: (user.referral_points || 0) - pkg.referral_points_required };
+},
+
+async creditReferralPoints(referredUserId, points) {
+  // Find who referred this user
+  const referral = await sbFetch(`referrals?referred_id=eq.${referredUserId}&status=eq.pending&limit=1`);
+  const ref = referral?.[0];
+  if (!ref) return; // No pending referral to credit
+
+  // Credit points to referrer
+  const referrer = await this.getUserById(ref.referrer_id);
+  if (!referrer) return;
+
+  await sbFetch(`users?id=eq.${ref.referrer_id}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: JSON.stringify({ referral_points: (referrer.referral_points || 0) + points }),
+  });
+
+  // Mark referral as credited
+  await sbFetch(`referrals?id=eq.${ref.id}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: JSON.stringify({
+      status:         'credited',
+      points_awarded: points,
+      credited_at:    new Date().toISOString(),
+    }),
+  });
+},
+
+async createReferralRecord(referrerId, referredId) {
+  // Check not already exists
+  const existing = await sbFetch(`referrals?referred_id=eq.${referredId}&limit=1`);
+  if (existing?.length) return;
+  await sbFetch('referrals', {
+    method: 'POST',
+    body: JSON.stringify({ referrer_id: referrerId, referred_id: referredId, status: 'pending' }),
+  });
+},
+
   /* ════════════════════════════════════════════════════════════
      REGISTRATION — REGULAR USER
   ════════════════════════════════════════════════════════════ */
   async registerRegular(data) {
-    // Check for existing email / username
-    const byEmail = await this.getUserByEmail(data.email);
-    if (byEmail) throw new Error('An account with this email already exists.');
-    const byUser  = await this.getUserByUsername(data.username);
-    if (byUser)  throw new Error('That username is already taken.');
-
-	const periodDays = data.periodDays ?? null; // null = lifetime
-	const _now = new Date();
-	const subStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate(), 0, 0, 0, 0).toISOString();
-    const subEnd     = data.paymentStatus === 'free'
-      ? null  // free users have no expiry
-      : periodDays === null ? null  // lifetime — no expiry
-      : calcExpiry(periodDays);
-    
-    const isPendingManual = data.status === 'pending' && data.paymentStatus === 'pending';
-    
-    const user = {
-      email:              data.email.trim().toLowerCase(),
-      username:           data.username.trim().toLowerCase(),
-	  password_hash:      await hashPassword(data.password),
-      first_name:         data.firstName,
-      last_name:          data.lastName,
-      phone:              data.phone,
-      role:               'regular',
-      status:             data.status || 'active',
-      // Keep purchased plan info for admin reference but lock to free tier until approved
-      package_id:         isPendingManual ? 'regular-free' : (data.package || 'free'),
-      package_name:       isPendingManual ? 'Free'         : (data.packageName || null),
-      ads_free:           isPendingManual ? false           : (data.ads_free || false),
-      payment_method:     data.paymentMethod    || null,
-      payment_reference:  data.paymentReference || null,
-      payment_amount:     data.paymentAmount    || null,
-      payment_status:     data.paymentStatus    || null,
-      subscription_start: isPendingManual ? null : (data.paymentStatus === 'free' ? null : subStart),
-      subscription_end:   isPendingManual ? null : subEnd,
-      is_inactive:        false,
-	  pending_package_id:   isPendingManual ? (data.package || null) : null,
-    };
-    const rows = await sbFetch('users', { method: 'POST', body: JSON.stringify(user) });
-    return rows?.length ? rows[0] : null;
+    // Hash password client-side before sending to API
+    const passwordHash = await hashPassword(data.password);
+    const referralCode = this.genReferralCode();
+    return await apiFetch('registerRegular', {
+      data: { ...data, passwordHash, referralCode, password: undefined },
+    });
   },
   
   /* ════════════════════════════════════════════════════════════
      REGISTRATION — PROVIDER
   ════════════════════════════════════════════════════════════ */
   async registerProvider(data) {
-    const byEmail = await this.getUserByEmail(data.email);
-    if (byEmail) throw new Error('An account with this email already exists.');
-    const byUser  = await this.getUserByUsername(data.username);
-    if (byUser)  throw new Error('That username is already taken.');
-
-    const periodDays = data.periodDays ?? null; // null = lifetime
-    const _now = new Date();
-	const subStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate(), 0, 0, 0, 0).toISOString();
-    const subEnd     = data.paymentStatus === 'free'
-      ? null  // free users have no expiry
-      : periodDays === null ? null  // lifetime — no expiry
-      : calcExpiry(periodDays);
-	
-	// 1. Upload avatar to Supabase Storage (public bucket)
+    // Upload files client-side first, then send URLs to API
     let avatarUrl = null;
     if (data.avatarFile?.data) {
       const path = `${data.username}_avatar_${Date.now()}.jpg`;
       avatarUrl = await sbUpload('fixia-avatars', path, data.avatarFile.data, 'image/jpeg');
     }
-
-    // 2. Upload ID photo to Supabase Storage (private bucket)
     let idFileUrl = null;
     if (data.idFile?.data) {
       const path = `${data.username}_id_${Date.now()}.jpg`;
       idFileUrl = await sbUpload('fixia-ids', path, data.idFile.data, 'image/jpeg');
     }
-
-    // 2. Upload portfolio photos (public bucket)
     const portfolioUrls = [];
     for (let i = 0; i < (data.portfolio || []).length; i++) {
       const f = data.portfolio[i];
       const path = `${data.username}_port_${i}_${Date.now()}.jpg`;
-      const url = await sbUpload('fixia-portfolio', path, f.data, f.type);
-      portfolioUrls.push(url);
+      portfolioUrls.push(await sbUpload('fixia-portfolio', path, f.data, f.type));
     }
-
-    // 3. Create user row
-	const userRow = {
-      email:             data.email.trim().toLowerCase(),
-      username:          data.username.trim().toLowerCase(),
-	  password_hash:     await hashPassword(data.password),
-      first_name:        data.firstName,
-      last_name:         data.lastName,
-      phone:             data.phone || null,
-      role:              'provider',
-      status:            'pending',
-      package_id:        data.package     || null,
-      package_name:      data.packageName || null,
-      ads_free:          data.package === 'free' ? false : true,
-      is_inactive:       false,
-      avatar_url:        avatarUrl,
-      payment_method:    data.paymentMethod    || null,
-      payment_reference: data.paymentReference || null,
-      payment_amount:    data.paymentAmount    || null,
-      payment_status:    data.paymentStatus    || null,
-      subscription_start: data.paymentStatus === 'free' ? null : subStart,
-      subscription_end:   subEnd,
-    };
-	
-	const provRow = {
-      biz_name:       data.bizName,
-      cat_main:       null,
-      cat_sub:        null,
-      biz_desc:       null,
-      experience:     data.experience || null,
-      region:         data.region     || null,
-      region_name:    data.regionName || null,
-      province:       data.province   || null,
-      province_name:  data.provName   || null,
-      city:           data.city       || null,
-      city_name:      data.cityName   || null,
-      barangay:       data.barangay   || null,
-      barangay_name:  data.brgyName   || null,
-      street_addr:    data.streetAddr || null,
-      id_type:        data.idType     || null,
-      id_file_url:    idFileUrl,
-      avatar_url:     avatarUrl,
-      portfolio_urls: portfolioUrls.length ? portfolioUrls : [],
-      package_id:     data.package    || null,
-      status:         'pending',
-      is_featured:    false,
-      is_elite:       false,
-      avg_rating:     0.0,
-      total_ratings:  0,
-    };
-
-    // Single atomic transaction — if either insert fails, both roll back
-    const result = await sbFetch('rpc/register_provider', {
-      method: 'POST',
-      body: JSON.stringify({ user_data: userRow, prov_data: provRow })
+    const passwordHash = await hashPassword(data.password);
+    const referralCode = this.genReferralCode();
+    return await apiFetch('registerProvider', {
+      data: { ...data, passwordHash, referralCode, avatarUrl, idFileUrl, portfolioUrls, password: undefined, avatarFile: undefined, idFile: undefined, portfolio: undefined },
     });
-
-    return { user: result?.user, provider: result?.provider };
   },
 
   /* ════════════════════════════════════════════════════════════
@@ -739,22 +836,7 @@ async getAllProviders(filters = {}) {
 },
 
   async updateProvider(id, changes) {
-    const p = {};
-    if (changes.status       != null) p.status           = changes.status;
-	if ('idFileUrl' in changes)       p.id_file_url      = changes.idFileUrl;
-    if (changes.isFeatured   != null) p.is_featured       = changes.isFeatured;
-    if (changes.isElite      != null) p.is_elite          = changes.isElite;
-    if (changes.eliteGrantedAt)       p.elite_granted_at  = changes.eliteGrantedAt;
-    if (changes.eliteExpiresAt!=null) p.elite_expires_at  = changes.eliteExpiresAt;
-    if (changes.packageId    != null) p.package_id        = changes.packageId;
-    if (changes.bizName)              p.biz_name          = changes.bizName;
-    if (changes.bizDesc)              p.biz_desc          = changes.bizDesc;
-	if (changes.cityName)             p.city_name         = changes.cityName;
-    if (changes.provinceName)         p.province_name     = changes.provinceName;
-    if (changes.barangayName)         p.barangay_name     = changes.barangayName;
-    if (changes.streetAddr != null)   p.street_addr       = changes.streetAddr;
-    const rows = await sbFetch(`providers?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(p) });
-    return rows?.length ? rows[0] : null;
+    return await apiFetch('updateProvider', { id, changes });
   },
 
 async approveProvider(providerId, userId) {
@@ -771,8 +853,41 @@ async approveProvider(providerId, userId) {
     await sbDelete(prov.id_file_url);
     updates.idFileUrl = null;
   }
+  
   await this.updateProvider(providerId, updates);
   await this.updateUser(userId, { status: 'active' });
+
+  // Notify provider of approval
+  await this.sendUserMessage(userId, {
+    title: '🎉 Application Approved!',
+    body:  `Congratulations! Your provider application has been approved. Your account is now fully active — you can now set up your listings, receive inquiries, and start connecting with customers. Welcome to Fixia!`,
+    type:  'welcome',
+    icon:  '✅',
+  });
+  
+  // Grant featured impression quota if provider has featured package
+  if (isFeatured) {
+    const quotaSetting = await this.getSetting('featured_impression_quota');
+    const quota = parseInt(quotaSetting) || 500;
+    await sbFetch(`providers?id=eq.${providerId}`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ 
+        featured_quota:       quota,
+        featured_impressions: 0,
+      }),
+    });
+  }
+
+  // Credit 5 referral points to referrer now that provider is approved
+  try {
+    const user = await this.getUserById(userId);
+    const isPaid = user?.payment_status === 'verified' || user?.payment_status === 'paid'
+                || user?.payment_method === 'paypal' || user?.payment_method === 'paymongo'
+                || user?.payment_method === 'gcash' || user?.payment_method === 'maya'
+                || user?.payment_method === 'bank';
+    if (isPaid) await this.creditReferralPoints(userId, 5);
+  } catch(e) {}
 },
 
 async rejectProvider(providerId, userId, reason) {
@@ -813,6 +928,8 @@ async approveRegularUser(userId) {
   const periodDays = pkg?.period === 'lifetime' ? null
     : pkg?.period === 'year'  ? 365
     : pkg?.period === 'month' ? 30
+	: pkg?.period === '3month' ? 90
+	: pkg?.period === '6month' ? 180
     : parseInt(pkg?.period)   || 30;
   const subEnd = periodDays ? calcExpiry(periodDays) : null;
 
@@ -837,6 +954,9 @@ async approveRegularUser(userId) {
     type:  'success',
     icon:  '✅',
   });
+    try {
+    await this.creditReferralPoints(userId, 3);
+  } catch(e) {}
 },
 
 async rejectRegularUser(userId, reason) {
@@ -918,6 +1038,7 @@ isSaved(id) {
 },
 
 saveProvider(p) {
+  if (!this.getSession()) return;
   const saved = this.getSaved();
   if (saved.find(s => s.id === p.id)) return;
   saved.push({
@@ -1027,8 +1148,7 @@ async syncSaved() {
       throw new Error('Listing access is temporarily locked while your account is under review.');
     }
     // Enforce listing limit based on package
-    const provider = await this.getProviderById(data.providerId);
-    const pkg = await this.getPackageById(provider?.package_id);
+    const pkg = await this.getPackageById(prov?.package_id);
     const limit = pkg?.listing_limit ?? 5;
     if (limit < 999) {
       const existing = await this.getListingsByProvider(data.providerId);
@@ -1051,41 +1171,11 @@ async syncSaved() {
   },
 
   async updateListing(id, changes) {
-  // ── Limit check when re-activating ───────────────────────
-  if (changes.isActive === true) {
-    const listing    = await sbFetch(`listings?id=eq.${id}&limit=1`).then(r => r?.[0]);
-    if (listing) {
-      const provider = await this.getProviderById(listing.provider_id);
-      const pkg      = await this.getPackageById(provider?.package_id);
-      const limit    = pkg?.listing_limit ?? 0;
-      if (limit < 999) {
-        const active = await sbFetch(
-          `listings?provider_id=eq.${listing.provider_id}&is_active=eq.true`
-        ) || [];
-        if (active.length >= limit) {
-          throw new Error(
-            `Your ${pkg?.name || 'current'} plan allows up to ${limit} active listing${limit !== 1 ? 's' : ''}. ` +
-            `Deactivate another listing first, or upgrade your plan.`
-          );
-        }
-      }
-    }
-  }
-
-  const p = {};
-  if (changes.title            != null) p.title              = changes.title;
-  if (changes.description      != null) p.description        = changes.description;
-  if (changes.priceLabel       != null) p.price_label        = changes.priceLabel;
-  if (changes.isActive         != null) p.is_active          = changes.isActive;
-  if (changes.catMain          != null) p.cat_main           = changes.catMain;
-  if (changes.catSub           != null) p.cat_sub            = changes.catSub;
-  if ('otherServiceDesc' in changes)    p.other_service_desc = changes.otherServiceDesc;
-  const rows = await sbFetch(`listings?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(p) });
-  return rows?.length ? rows[0] : null;
-},
+    return await apiFetch('updateListing', { id, changes });
+  },
 
   async deleteListing(id) {
-    await sbFetch(`listings?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    return await apiFetch('deleteListing', { id });
   },
 
   async getUncategorizedListings() {
@@ -1171,48 +1261,15 @@ async syncSaved() {
   },
 
   async createPackage(data) {
-    const slugId = data.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const row = {
-      id:            slugId,
-      type:          data.type,
-      name:          data.name,
-      price:         data.price,
-      period:        data.period || 'month',
-      booking_limit: data.bookingLimit ?? 5,
-      ads_free:      data.adsFree ?? false,
-      is_featured:   data.isFeatured ?? false,
-      features:      data.features || [],
-	  popular:       data.popular ?? false,
-      badge_label:   data.badgeLabel || 'Popular',
-      icon:          data.icon || '📦',
-      is_active:     data.isActive ?? true,
-      sort_order:    data.sortOrder ?? 99,
-    };
-    const rows = await sbFetch('packages', { method: 'POST', body: JSON.stringify(row) });
-    return rows?.length ? rows[0] : null;
+    return await apiFetch('createPackage', { data });
   },
 
   async updatePackage(id, changes) {
-    const p = {};
-	const fields = ['name','price','period','listing_limit','ads_free','is_featured',
-                    'features','popular','badge_label','icon','is_active','sort_order','type'];
-    const map = {
-      name:'name', price:'price', period:'period', listingLimit:'listing_limit',
-      bookingLimit:'booking_limit',
-      adsFree:'ads_free', isFeatured:'is_featured', features:'features',
-      popular:'popular', badgeLabel:'badge_label', icon:'icon', isActive:'is_active', sortOrder:'sort_order', type:'type'
-    };
-    Object.entries(map).forEach(([k, dbCol]) => {
-      if (changes[k] != null) p[dbCol] = changes[k];
-    });
-    const rows = await sbFetch(`packages?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(p) });
-    return rows?.length ? rows[0] : null;
+    return await apiFetch('updatePackage', { id, changes });
   },
 
   async deletePackage(id) {
-    const PERMANENT = ['regular-free','regular-plus','regular-pro','regular-starter','provider-free','provider-basic','provider-pro','provider-premium'];
-    if (PERMANENT.includes(id)) throw new Error('This is a permanent package and cannot be deleted.');
-    await sbFetch(`packages?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    return await apiFetch('deletePackage', { id });
   },
 
   /* ════════════════════════════════════════════════════════════
@@ -1290,9 +1347,11 @@ async getStats() {
      Free regular users only. Stored in sessionStorage.
   ════════════════════════════════════════════════════════════ */
 AD_CONFIG: {
-  actionsPerAd:   3,
-  minTimeBetween: 2 * 60 * 1000,
-  duration:       5,
+  actionsPerAd:          3,
+  minTimeBetween:        2 * 60 * 1000,
+  duration:              5,
+  inlineInterval:        4,
+  inlineIntervalSearch:  4,
 },
 
 async loadAdConfig() {
@@ -1300,9 +1359,13 @@ async loadAdConfig() {
     const actions  = await this.getSetting('ad_actions_per_popup');
     const minutes  = await this.getSetting('ad_min_minutes');
     const duration = await this.getSetting('ad_skip_seconds');
-    if (actions  && !isNaN(actions))   this.AD_CONFIG.actionsPerAd   = parseInt(actions);
-    if (minutes  && !isNaN(minutes))   this.AD_CONFIG.minTimeBetween = parseFloat(minutes) * 60 * 1000;
-    if (duration && !isNaN(duration))  this.AD_CONFIG.duration       = parseInt(duration);
+    const interval       = await this.getSetting('inline_ad_interval');
+    const intervalSearch = await this.getSetting('inline_ad_interval_search');
+    if (actions        && !isNaN(actions))        this.AD_CONFIG.actionsPerAd         = parseInt(actions);
+    if (minutes        && !isNaN(minutes))        this.AD_CONFIG.minTimeBetween       = parseFloat(minutes) * 60 * 1000;
+    if (duration       && !isNaN(duration))       this.AD_CONFIG.duration             = parseInt(duration);
+    if (interval       && !isNaN(interval))       this.AD_CONFIG.inlineInterval       = parseInt(interval);
+    if (intervalSearch && !isNaN(intervalSearch)) this.AD_CONFIG.inlineIntervalSearch = parseInt(intervalSearch);
   } catch(e) {
     console.warn('[Fixia Ads] Using default AD_CONFIG — DB settings unavailable');
   }
@@ -1322,6 +1385,7 @@ async loadAdConfig() {
   const session = this.getSession();
   if (!session) return;
   if (session.role === 'admin') return;
+  if (session.adsFree) return;
 
     // Increment action count
     const countKey = 'fx_ad_action_count';
@@ -1369,12 +1433,29 @@ async _refreshAdsState() {
     { icon:'🧹', title:'CleanPro Services', sub:'Deep cleaning starting at ₱599', cta:'Book Now', color:'#4A1D96' },
   ],
 
-  _showPopupAd() {
+  async _showPopupAd() {
     if (document.getElementById('fx-popup-ad')) return; // already showing
     sessionStorage.setItem('fx_last_ad', Date.now());
 
-    const ad = this._popupAds[0];
-	if (ad.id) sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+    // Always fetch fresh from Supabase so completed/paused ads are excluded
+    try {
+      const fresh = await this.getAds('popup');
+      if (fresh.length) {
+        FX._popupAds = fresh.map(ad => ({
+          id:    ad.id,
+          icon:  ad.icon  || '📢',
+          title: ad.title,
+          sub:   ad.description || '',
+          cta:   ad.cta_label   || 'Learn More',
+          color: ad.bg_color    || '#0f2027',
+          link:  ad.link_url    || '#',
+        }));
+      }
+    } catch(e) { /* fallback to existing _popupAds if fetch fails */ }
+
+    const ad = this._nextRoundRobin('popup', this._popupAds);
+    if (!ad) return;
+    if (ad.id) sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
 	
     let countdown = this.AD_CONFIG.duration;
 
@@ -1423,10 +1504,10 @@ async _refreshAdsState() {
       <div class="ad-card">
         <button class="ad-skip-btn" id="fxAdSkip" disabled>Skip ${countdown}s</button>
         <div class="ad-badge">Advertisement</div>
-        <div class="ad-icon-big">${ad.icon}</div>
-        <div class="ad-card-title">${ad.title}</div>
-        <div class="ad-card-sub">${ad.sub}</div>
-        <button class="ad-cta" id="fxAdCta">${ad.cta}</button>
+        <div class="ad-icon-big">${esc(ad.icon)}</div>
+        <div class="ad-card-title">${esc(ad.title)}</div>
+        <div class="ad-card-sub">${esc(ad.sub)}</div>
+        <button class="ad-cta" id="fxAdCta">${esc(ad.cta)}</button>
         <div class="ad-upgrade">
           Remove ads? <a href="profile.html?tab=plan">Upgrade to Fixia Plus</a>
         </div>
@@ -1476,37 +1557,28 @@ async _refreshAdsState() {
 
   // Generate and send OTP — stores in sessionStorage for verification
   async sendOTP(email) {
-    const otpEnabled  = await this.getSetting('otp_enabled');
-    const testCode    = await this.getSetting('otp_test_code');
-
-    // If OTP is disabled or a test code is set, skip real email
-    const otp = (testCode && testCode.length === 6)
-      ? testCode
-      : String(Math.floor(100000 + Math.random() * 900000));
-
-    const expiry = Date.now() + 10 * 60 * 1000;
-    sessionStorage.setItem('fx_otp', JSON.stringify({ otp, email, expiry }));
-
-    if (otpEnabled === 'true' && (!testCode || testCode.length !== 6)) {
-      await this.sendEmail('email_otp', { email, otp });
-    }
+    const res = await fetch('/api/send-otp', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to send OTP.');
     return true;
   },
 
   // Verify OTP — returns true if valid, throws if invalid/expired
-  verifyOTP(email, inputOtp) {
-    const raw = sessionStorage.getItem('fx_otp');
-    if (!raw) throw new Error('No OTP found. Please request a new code.');
-    const { otp, email: storedEmail, expiry } = JSON.parse(raw);
-    if (Date.now() > expiry) {
-      sessionStorage.removeItem('fx_otp');
-      throw new Error('This code has expired. Please request a new one.');
-    }
-    if (storedEmail !== email) throw new Error('Email mismatch. Please request a new code.');
-    if (inputOtp.trim() !== otp) throw new Error('Incorrect code. Please try again.');
-    sessionStorage.removeItem('fx_otp');
-    return true;
-  },
+async verifyOTP(email, inputOtp) {
+  const res = await fetch('/api/verify-otp', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ email, otp: inputOtp.trim() }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Verification failed.');
+  if (!data.valid) throw new Error(data.error || 'Incorrect code. Please try again.');
+  return true;
+},
   
   async updateSubscription(userId, periodDays) {
     const u = await this.getUserById(userId);
@@ -1591,30 +1663,30 @@ async checkAndDowngrade(userId) {
         body: JSON.stringify({ package_id: 'provider-free' }),
       });
 
-      // Get all active listings ordered by created_at ascending
-      // (oldest stay, newest get deactivated)
+	  // Get all listings for this provider — deactivate them all (soft delete)
       const listings = await sbFetch(
-        `listings?provider_id=eq.${prov.id}&order=created_at.desc`
+        `listings?provider_id=eq.${prov.id}&is_active=eq.true&order=created_at.desc`
       ) || [];
 
-      const freeLimit  = 0; // provider-free has no listings
-      const toDelete   = listings.slice(freeLimit); // all of them — newest first
+      const toDeactivate = listings; // all active listings get hidden on expiry
 
-      for (const l of toDelete) {
-        await sbFetch(`listings?id=eq.${l.id}`, {
-          method: 'DELETE',
+      if (toDeactivate.length > 0) {
+        const ids = toDeactivate.map(l => l.id).join(',');
+        await sbFetch(`listings?id=in.(${ids})`, {
+          method: 'PATCH',
           prefer: 'return=minimal',
+          body: JSON.stringify({ is_active: false, deactivated_reason: 'subscription_expired' }),
         });
       }
 
-      if (toDelete.length > 0) {
+      if (toDeactivate.length > 0) {
         await sbFetch('user_messages', {
           method: 'POST',
           prefer: 'return=minimal',
           body: JSON.stringify({
             user_id: userId,
-            title:   'Subscription Expired — Listings Deactivated',
-			body:    `Your subscription has expired and your account has been downgraded to Free. ${toDelete.length} listing(s) were permanently removed. Upgrade your plan to add listings again.`,
+            title:   'Subscription Expired — Listings Hidden',
+            body:    `Your subscription has expired and your account has been downgraded to Free. ${toDeactivate.length} listing(s) have been hidden. Renew or upgrade your plan to restore them.`,
             type:    'warning',
             icon:    '⚠️',
             is_read: false,
@@ -1667,7 +1739,7 @@ async calculateUpgrade(userId, newPackageId) {
   const remainingDays = Math.floor(remainingMs / 86400000);
 
   // Remaining value = (remaining days / total days of current plan) × current plan price
-  const periodDays = { month: 30, '6month': 180, year: 365, lifetime: null };
+  const periodDays = { month: 30, '3month': 90, '6month': 180, year: 365, lifetime: null };
   const currentTotalDays = periodDays[currentPkg.period] || 30;
   const remainingValue = parseFloat(
     ((remainingDays / currentTotalDays) * currentPkg.price).toFixed(2)
@@ -1691,36 +1763,22 @@ async calculateUpgrade(userId, newPackageId) {
    UPGRADE — SUBMIT REQUEST
 ════════════════════════════════════════════════════════════ */
 async requestUpgrade(data) {
-  // data: { userId, providerId, currentPackageId, newPackageId,
-  //         currentSubEnd, remainingDays, remainingValue,
-  //         newPlanPrice, carryoverDays,
-  //         paymentMethod, paymentReference, paymentAmount }
-  const row = {
-    user_id:            data.userId,
-    provider_id:        data.providerId || null,
-    current_package_id: data.currentPackageId,
-    new_package_id:     data.newPackageId,
-    current_sub_end:    data.currentSubEnd || null,
-    remaining_days:     data.remainingDays || 0,
-    remaining_value:    data.remainingValue || 0,
-    new_plan_price:     data.newPlanPrice || 0,
-    carryover_days:     data.carryoverDays || 0,
-    payment_method:     data.paymentMethod || null,
-    payment_reference:  data.paymentReference || null,
-    payment_amount:     data.paymentAmount || null,
-    status:             'pending',
-  };
-  const rows = await sbFetch('upgrade_requests', { method: 'POST', body: JSON.stringify(row) });
-  return rows?.[0] || null;
+  return await apiFetch('requestUpgrade', { data });
 },
 
 /* ════════════════════════════════════════════════════════════
    UPGRADE — GET REQUESTS (admin)
 ════════════════════════════════════════════════════════════ */
 async getUpgradeRequests(status = null) {
-  let q = 'upgrade_requests?order=created_at.desc';
+  let q = 'upgrade_requests?archived_at=is.null&order=created_at.desc';
   if (status) q += `&status=eq.${status}`;
   return await sbFetch(q) || [];
+},
+
+async getUpgradeHistory(limit = 50) {
+  return await sbFetch(
+    `upgrade_requests?archived_at=not.is.null&order=archived_at.desc&limit=${limit}`
+  ) || [];
 },
 
 async getUserUpgradeRequest(userId) {
@@ -1734,109 +1792,14 @@ async getUserUpgradeRequest(userId) {
    UPGRADE — APPROVE (admin)
 ════════════════════════════════════════════════════════════ */
 async approveUpgrade(requestId) {
-  const rows = await sbFetch(`upgrade_requests?id=eq.${requestId}&limit=1`);
-  const req  = rows?.[0];
-  if (!req) throw new Error('Upgrade request not found.');
-
-  const newPkg      = await this.getPackageById(req.new_package_id);
-  const periodDays  = { month: 30, '6month': 180, year: 365, lifetime: null };
-  const newPeriodDays = periodDays[newPkg.period] ?? null;
-
-  // New subscription end = new plan days + carryover days
-  const totalDays  = newPeriodDays === null ? null
-    : (newPeriodDays + (req.carryover_days || 0));
-
-  const _now = new Date();
-  const subStart = new Date(
-    _now.getFullYear(), _now.getMonth(), _now.getDate(), 0, 0, 0, 0
-  ).toISOString();
-  const subEnd = totalDays === null ? null : calcExpiry(totalDays);
-
-  // Update user
-  await sbFetch(`users?id=eq.${req.user_id}`, {
-    method: 'PATCH',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      package_id:         req.new_package_id,
-      package_name:       newPkg.name,
-      ads_free:           newPkg.ads_free ?? true,
-      payment_method:     req.payment_method,
-      payment_reference:  req.payment_reference,
-      payment_amount:     req.payment_amount,
-      payment_status:     'verified',
-      subscription_start: subStart,
-      subscription_end:   subEnd,
-    }),
-  });
-
-  // Update provider package if applicable
-  if (req.provider_id) {
-    await sbFetch(`providers?id=eq.${req.provider_id}`, {
-      method: 'PATCH',
-      prefer: 'return=minimal',
-      body: JSON.stringify({ package_id: req.new_package_id }),
-    });
-  }
-
-  // Notify user
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id: req.user_id,
-      title:   'Upgrade Approved! 🎉',
-      body:    `Your upgrade to ${newPkg.name} has been approved. Your unused balance from your current plan has been automatically credited toward your new subscription.${subEnd ? ' Your new subscription is valid until ' + new Date(subEnd).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) + '.' : ''}`,
-      type:    'success',
-      icon:    '🎉',
-      is_read: false,
-    }),
-  });
-
-  // Delete the request record — no audit trail needed
-await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
-  method: 'DELETE',
-  prefer: 'return=minimal',
-});
-
-  return { subStart, subEnd, totalDays };
+  return await apiFetch('approveUpgrade', { requestId });
 },
 
 /* ════════════════════════════════════════════════════════════
    UPGRADE — REJECT (admin)
 ════════════════════════════════════════════════════════════ */
 async rejectUpgrade(requestId, reason) {
-  const rows = await sbFetch(`upgrade_requests?id=eq.${requestId}&limit=1`);
-  const req  = rows?.[0];
-  if (!req) throw new Error('Upgrade request not found.');
-
-  await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
-    method: 'PATCH',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      status:      'rejected',
-      notes:       reason || null,
-      reviewed_at: new Date().toISOString(),
-    }),
-  });
-
-  // Notify user
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id: req.user_id,
-      title:   'Upgrade Request Not Approved',
-      body:    `Your upgrade request could not be approved.${reason ? ' Reason: ' + reason : ' Please contact support if you believe this is a mistake.'}`,
-      type:    'warning',
-      icon:    '❌',
-      is_read: false,
-    }),
-  });
-  
-await sbFetch(`upgrade_requests?id=eq.${requestId}`, {
-  method: 'DELETE',
-  prefer: 'return=minimal',
-});
+  return await apiFetch('rejectUpgrade', { requestId, reason });
 }, 
 
 };
@@ -1855,210 +1818,35 @@ const FX_BOOKING = {
 
   /* ── Create inquiry (user → provider) ───────────────────────── */
   async createBooking(regularUserId, providerId, jobDescription) {
-    // Prevent duplicate active bookings with same provider
-    const existing = await sbFetch(
-      `inquiries?regular_user_id=eq.${regularUserId}&provider_id=eq.${providerId}` +
-      `&status=in.(pending,active,done)&limit=1`
-    );
-    if (existing?.length) {
-      throw new Error('You already have an active booking with this provider.');
-    }
-    const userIp = await this.getUserIP();
-    const row = {
-      regular_user_id:     regularUserId,
-      provider_id:         providerId,
-      user_message:        jobDescription,
-      status:              'pending',
-      user_has_unread:     false,
-      provider_has_unread: true,
-      user_ip:             userIp,
-    };
-    const rows = await sbFetch('inquiries', { method:'POST', body:JSON.stringify(row) });
-    return rows?.[0] || null;
+    return await apiFetch('createBooking', { regularUserId, providerId, jobDescription });
   },
 
 /* ── User books (confirms after reply) ──────────────────────── */
   async activateBooking(inquiryId) {
-    // ── Check provider booking limit first ────────────────────
-    const inquiry = await sbFetch(`inquiries?id=eq.${inquiryId}&limit=1`).then(r => r?.[0]);
-    if (inquiry) {
-      const provider = await this.getProviderById(inquiry.provider_id);
-      const pkg      = await this.getPackageById(provider?.package_id);
-      const limit    = pkg?.booking_limit ?? 5;
-      if (limit < 999) {
-        const active = await sbFetch(
-          `inquiries?provider_id=eq.${inquiry.provider_id}&status=eq.active`
-        ) || [];
-        if (active.length >= limit) {
-          throw new Error(
-            `This provider has reached their active booking limit. Please try again later or choose another provider.`
-          );
-        }
-      }
-    }
-    // ── Proceed with booking ──────────────────────────────────
-    const rows = await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        status:              'active',
-        provider_has_unread: true,
-        user_has_unread:     false,
-      })
-    });
-    return rows?.[0] || null;
+    return await apiFetch('activateBooking', { inquiryId });
   },
 
   /* ── User-initiated cancel/dispute — notifies provider ──────── */
 /* ── User cancels a pending booking (before provider accepts) ── */
 async cancelInquiry(inquiryId) {
-  const inquiries = await sbFetch(`inquiries?id=eq.${inquiryId}&limit=1`);
-  const inq = inquiries?.[0];
-  if (!inq) throw new Error('Booking not found.');
-
-  const users = await sbFetch(`users?id=eq.${inq.regular_user_id}&limit=1`);
-  const user = users?.[0];
-  const userName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'The user';
-
-  const providers = await sbFetch(`providers?id=eq.${inq.provider_id}&limit=1`);
-  const provider = providers?.[0];
-
-  // Message to provider's user account ID (not provider table ID)
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id: provider?.user_id,
-      title:   'Booking Cancelled by User',
-      body:    `${userName} has cancelled their booking with you.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-      type:    'warning',
-      icon:    '🚫',
-      is_read: false,
-    }),
-  });
-
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-  method: 'PATCH', prefer: 'return=minimal',
-  body: JSON.stringify({ status: 'cancelled', user_has_unread: false, provider_has_unread: true })
-});
+  return await apiFetch('cancelInquiry', { inquiryId });
 },
 
 /* ── User disputes after provider marks job done ─────────────── */
 async disputeInquiry(inquiryId) {
-  const inquiries = await sbFetch(`inquiries?id=eq.${inquiryId}&limit=1`);
-  const inq = inquiries?.[0];
-  if (!inq) throw new Error('Booking not found.');
-
-  const users = await sbFetch(`users?id=eq.${inq.regular_user_id}&limit=1`);
-  const user = users?.[0];
-  const userName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'The user';
-
-  const providers = await sbFetch(`providers?id=eq.${inq.provider_id}&limit=1`);
-  const provider = providers?.[0];
-
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id: provider?.user_id,
-      title:   'Booking Disputed by User',
-      body:    `${userName} has disputed the completion of their booking with you.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-      type:    'warning',
-      icon:    '⚠️',
-      is_read: false,
-    }),
-  });
-
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-  method: 'PATCH', prefer: 'return=minimal',
-  body: JSON.stringify({ status: 'disputed', user_has_unread: false, provider_has_unread: true })
-});
+  return await apiFetch('disputeInquiry', { inquiryId });
 },
 
-  // Provider cancels — notifies user
 async providerCancelBooking(inquiryId) {
-  const inquiries = await sbFetch(`inquiries?id=eq.${inquiryId}&limit=1`);
-  const inq = inquiries?.[0];
-  if (!inq) throw new Error('Booking not found.');
-
-  const providers = await sbFetch(`providers?id=eq.${inq.provider_id}&limit=1`);
-  const provider = providers?.[0];
-  const providerName = provider?.biz_name || 'Your provider';
-
-  // Message goes to the regular user's account ID
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id: inq.regular_user_id,
-      title:   'Booking Cancelled by Provider',
-      body:    `${providerName} has cancelled your booking.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-      type:    'warning',
-      icon:    '🚫',
-      is_read: false,
-    }),
-  });
-
-  await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-  method: 'PATCH', prefer: 'return=minimal',
-  body: JSON.stringify({ status: 'cancelled', user_has_unread: true, provider_has_unread: false })
-});
+  return await apiFetch('providerCancelBooking', { inquiryId });
 },
   
-  /* ── Provider marks job done ─────────────────────────────────── */
   async markDone(inquiryId) {
-    const rows = await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        status:          'done',
-        user_has_unread: true,
-        provider_has_unread: false,
-      })
-    });
-    return rows?.[0] || null;
+    return await apiFetch('markDone', { inquiryId });
   },
 
-  /* ── User accepts completion + optional rating ───────────────── */
   async acceptCompletion(inquiryId, stars, comment, anonymous = false) {
-    // Fetch the inquiry FIRST so we have provider_id and regular_user_id
-    const inquiries = await sbFetch(`inquiries?id=eq.${inquiryId}&limit=1`);
-    const inq = inquiries?.[0];
-    if (!inq) throw new Error('Booking not found.');
-
-    const update = {
-      status:              'completed',
-      provider_has_unread: true,
-      user_has_unread:     false,
-    };
-    if (stars) {
-      update.rating_stars   = stars;
-      update.rating_comment = comment || '';
-      update.rated_at       = new Date().toISOString();
-    }
-    await sbFetch(`inquiries?id=eq.${inquiryId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(update),
-      prefer: 'return=minimal',
-    });
-
-    // Insert into ratings table
-	if (stars && inq.provider_id && inq.regular_user_id) {
-      const ratingUser = await FX.getUserById(inq.regular_user_id);
-      const fullName   = ratingUser
-        ? `${ratingUser.first_name} ${ratingUser.last_name}`.trim()
-        : '';
-      const displayName = anonymous && fullName
-        ? fullName.split(' ').map(p => p.slice(0,3) + '***').join(' ')
-        : fullName;
-      await FX.addRating({
-        providerId:  inq.provider_id,
-        userId:      inq.regular_user_id,
-        stars,
-        comment:     comment || '',
-        anonymous,
-        displayName,
-      });
-    }
-    return inq;
+    return await apiFetch('acceptCompletion', { inquiryId, stars, comment, anonymous });
   },
 
   /* ── Get inquiries for regular user ─────────────────────────── */
@@ -2147,72 +1935,42 @@ Object.assign(FX, FX_BOOKING);
 ══════════════════════════════════════════════════════════════ */
 const FX_ADS = {
 
+  _nextRoundRobin(type, ads) {
+    if (!ads.length) return null;
+    const key = `fx_rr_${type}`;
+    const idx = (parseInt(localStorage.getItem(key) || '0')) % ads.length;
+    localStorage.setItem(key, idx + 1);
+    return ads[idx];
+  },
+
   /* ── Get active ads by type ──────────────────────────────────── */
 async getAds(type) {
     try {
-    const now = new Date().toISOString();
-    const rows = await sbFetch(
-      `ads?type=eq.${type}&is_active=eq.true&batch_status=eq.active` +
-      `&order=impression_count.asc`
-    ) || [];
-    // Filter out ads that have reached their impression quota
-    return rows.filter(a => (a.impression_count || 0) < (a.impression_quota || 5000));
-    // Filter out expired ads (ends_at null = runs forever)
-	  return rows.filter(ad => !ad.ends_at || ad.ends_at > now);
+      const rows = await sbFetch(
+        `ads?type=eq.${type}&is_active=eq.true&order=created_at.asc`
+      ) || [];
+      // Only serve ads that haven't reached their impression quota
+      return rows.filter(a => (a.impression_count || 0) < (a.impression_quota || 5000));
     } catch(e) {
       console.warn('[Fixia Ads] getAds failed:', e.message);
       return [];
     }
   },
-
+  
   async getAllAds() {
     return await sbFetch('ads?order=type.asc,sort_order.asc') || [];
   },
 
   async createAd(data) {
-    const row = {
-      type:        data.type,
-      advertiser:  data.advertiser,
-      title:       data.title,
-      description: data.description || '',
-      icon:        data.icon || '📢',
-      image_url:   data.imageUrl   || null,
-      link_url:    data.linkUrl    || '#',
-      cta_label:   data.ctaLabel   || 'Learn More',
-      bg_color:    data.bgColor    || '#0f2027',
-      text_color:  data.textColor  || '#ffffff',
-      is_active:   data.isActive   ?? true,
-      starts_at:   data.startsAt   || new Date().toISOString(),
-      ends_at:     data.endsAt     || null,
-      notes:       data.notes      || '',
-      sort_order:       data.sortOrder       ?? 99,
-      impression_quota: data.impressionQuota ?? 5000,
-      batch_status:     'queued',
-    };
-    const rows = await sbFetch('ads', { method:'POST', body:JSON.stringify(row) });
-    return rows?.[0] || null;
+    return await apiFetch('createAd', { data });
   },
 
   async updateAd(id, changes) {
-    const map = {
-      type:'type', advertiser:'advertiser', title:'title',
-      description:'description', icon:'icon', imageUrl:'image_url',
-      linkUrl:'link_url', ctaLabel:'cta_label', bgColor:'bg_color',
-      textColor:'text_color', isActive:'is_active', startsAt:'starts_at',
-      endsAt:'ends_at', notes:'notes', sortOrder:'sort_order',
-      impressionQuota:'impression_quota', batchStatus:'batch_status',
-      shownFrom:'shown_from', shownUntil:'shown_until',
-    };
-    const p = {};
-    Object.entries(map).forEach(([k, col]) => {
-      if (changes[k] != null) p[col] = changes[k];
-    });
-    const rows = await sbFetch(`ads?id=eq.${id}`, { method:'PATCH', body:JSON.stringify(p) });
-    return rows?.[0] || null;
+    return await apiFetch('updateAd', { id, changes });
   },
 
   async deleteAd(id) {
-    await sbFetch(`ads?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' });
+    return await apiFetch('deleteAd', { id });
   },
 
   /* ── Build inline ad HTML from a DB ad object ────────────────── */
@@ -2220,14 +1978,14 @@ renderInlineAd(ad) {
   return `
     <div class="ad-inline" data-ad-id="${ad.id}" data-ad-link="${ad.link_url || '#'}"
          style="background:linear-gradient(135deg,${ad.bg_color || '#0f2027'},${ad.bg_color || '#1E3048'});border-radius:12px;border:1px solid rgba(255,255,255,0.08);padding:14px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-      <div class="ai-icon" style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${ad.icon || '📢'}</div>
+      <div class="ai-icon" style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${esc(ad.icon || '📢')}</div>
       <div class="ai-body" style="flex:1;min-width:0;">
         <div class="ai-label" style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:1px;">Sponsored</div>
-        <div class="ai-title" style="font-size:0.88rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.title}</div>
+        <div class="ai-title" style="font-size:0.88rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ad.title)}</div>
         ${ad.description ? `<div class="ai-sub" style="font-size:0.72rem;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.description}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;">
-        <button class="ai-btn" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:inherit;">${ad.cta_label || 'Learn More'}</button>
+        <button class="ai-btn" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:inherit;">${esc(ad.cta_label || 'Learn More')}</button>
       </div>
     </div>`;
 },
@@ -2252,7 +2010,8 @@ renderInlineAd(ad) {
   },
 
   /* ── Load inline ads into a container element ────────────────── */
-  async injectInlineAds(containerId, afterEveryN = 4) {
+  async injectInlineAds(containerId, afterEveryN = null) {
+    afterEveryN = afterEveryN ?? this.AD_CONFIG?.inlineInterval ?? 4;
     const session = FX.getSession();
     if (session?.role === 'admin') return;
     try {
@@ -2261,55 +2020,75 @@ renderInlineAd(ad) {
       const container = document.getElementById(containerId);
       if (!container) return;
       const cards = container.querySelectorAll('.provider-card');
-      let adIdx = 0;
+
+      const key     = 'fx_rr_inline_id';
+      const lastId  = localStorage.getItem(key);
+      const ordered = ads; // stable order from Supabase (created_at asc)
+      const lastIdx = ordered.findIndex(a => a.id === lastId);
+      let   nextIdx = (lastIdx + 1) % ordered.length;
+
       cards.forEach((card, i) => {
-        if ((i + 1) % afterEveryN === 0 && adIdx < ads.length) {
+        if ((i + 1) % afterEveryN === 0) {
+          const ad = ordered[nextIdx % ordered.length];
+          nextIdx++;
+          if (!ad) return;
           const adEl = document.createElement('div');
-          adEl.innerHTML = this.renderInlineAd(ads[adIdx % ads.length]);
-		  card.after(adEl.firstElementChild);
-          // Attach click listeners properly so sbFetch is in scope
+          adEl.innerHTML = this.renderInlineAd(ad);
+          card.after(adEl.firstElementChild);
           const injectedAd = card.nextElementSibling;
           const clickHandler = () => {
             const adId   = injectedAd.dataset.adId;
             const adLink = injectedAd.dataset.adLink;
-			if (adId) sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: adId }) }).catch(()=>{});
+            if (adId) sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: adId }) }).catch(()=>{});
             window.open(adLink || '#', '_blank');
           };
           injectedAd.addEventListener('click', clickHandler);
           injectedAd.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
-		  sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ads[adIdx % ads.length].id }) }).catch(()=>{});
-          adIdx++;
+          if (ad.id) sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
         }
       });
-	} catch(e) {
+
+      // Save the last served ad ID for next page load
+      const lastServed = ordered[(nextIdx - 1) % ordered.length];
+      if (lastServed) localStorage.setItem(key, lastServed.id);
+
+    } catch(e) {
       console.warn('[Fixia Ads] Inline ad injection failed:', e.message);
     }
   },
 
-  async checkAndCompleteAd(adId, impressionCount, impressionQuota) {
+async getAdBatches(adId) {
+  const rows = await sbFetch(`ads_batches?ad_id=eq.${adId}&order=batch_number.asc`);
+  return rows || [];
+},
+
+async createAdBatch(adId, quota, batchNumber) {
+  return await apiFetch('createAdBatch', { adId, quota, batchNumber });
+},
+
+async closeAdBatch(adId, impressionCount, clickCount) {
+  await sbFetch(`ads_batches?ad_id=eq.${adId}&status=eq.active`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body:   JSON.stringify({
+      status:           'completed',
+      completed_at:     new Date().toISOString(),
+      impression_count: impressionCount,
+      click_count:      clickCount || 0,
+    }),
+  });
+},
+
+async checkAndCompleteAd(adId, impressionCount, impressionQuota, clickCount) {
   if (impressionCount >= (impressionQuota || 5000)) {
+    await this.closeAdBatch(adId, impressionCount, clickCount);
     await sbFetch(`ads?id=eq.${adId}`, {
-      method:  'PATCH',
-      body:    JSON.stringify({ batch_status: 'completed', is_active: false }),
-      prefer:  'return=minimal',
+      method: 'PATCH',
+      body:   JSON.stringify({ is_active: false, impression_count: impressionCount, click_count: 0 }),
+      prefer: 'return=minimal',
     });
-    // Promote next queued ad of same type
-    const adRows = await sbFetch(`ads?id=eq.${adId}&select=type&limit=1`) || [];
-    const type   = adRows[0]?.type;
-    if (type) {
-      const next = await sbFetch(
-        `ads?batch_status=eq.queued&type=eq.${type}&is_active=eq.true&order=queue_position.asc&limit=1`
-      ) || [];
-      if (next[0]) {
-        await sbFetch(`ads?id=eq.${next[0].id}`, {
-          method:  'PATCH',
-          body:    JSON.stringify({ batch_status: 'active', shown_from: new Date().toISOString(), impression_count: 0 }),
-          prefer:  'return=minimal',
-        });
-      }
-    }
   }
-  },
+},
 
 };
 
@@ -2326,36 +2105,15 @@ const FX_MESSAGES = {
   },
 
   async createTemplate(data) {
-    const row = {
-      title: data.title,
-      body:  data.body,
-      type:  data.type  || 'announcement',
-      icon:  data.icon  || '📢',
-    };
-    const rows = await sbFetch('message_templates', { method:'POST', body:JSON.stringify(row) });
-    return rows?.[0] || null;
+    return await apiFetch('createTemplate', { data });
   },
 
   async updateTemplate(id, data) {
-    const row = {
-      title:      data.title,
-      body:       data.body,
-      type:       data.type || 'announcement',
-      icon:       data.icon || '📢',
-      updated_at: new Date().toISOString(),
-    };
-    await sbFetch(`message_templates?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(row),
-      prefer: 'return=minimal',
-    });
+    return await apiFetch('updateTemplate', { id, data });
   },
 
   async deleteTemplate(id) {
-    await sbFetch(`message_templates?id=eq.${id}`, {
-      method: 'DELETE',
-      prefer: 'return=minimal',
-    });
+    return await apiFetch('deleteTemplate', { id });
   },
 
   /* ── Send messages ───────────────────────────────────────────── */
@@ -2364,53 +2122,11 @@ const FX_MESSAGES = {
    * Snapshots template content into each user_messages row.
    */
   async sendMessage(templateId, recipients) {
-    // 1. Load template
-    const rows = await sbFetch(`message_templates?id=eq.${templateId}&limit=1`);
-    const tpl  = rows?.[0];
-    if (!tpl) throw new Error('Template not found.');
-
-    // 2. Resolve recipient user IDs
-    let users = [];
-    if (recipients === 'all') {
-      users = await sbFetch('users?select=id&status=eq.active&is_inactive=eq.false') || [];
-    } else if (recipients === 'regulars') {
-      users = await sbFetch('users?select=id&role=eq.regular&status=eq.active&is_inactive=eq.false') || [];
-    } else if (recipients === 'providers') {
-      users = await sbFetch('users?select=id&role=eq.provider&status=eq.active&is_inactive=eq.false') || [];
-    } else if (recipients?.userId) {
-      users = [{ id: recipients.userId }];
-    }
-
-    if (!users.length) throw new Error('No recipients found.');
-
-    // 3. Snapshot content into user_messages rows (batch insert)
-    const msgRows = users.map(u => ({
-      user_id: u.id,
-      title:   tpl.title,
-      body:    tpl.body,
-      type:    tpl.type,
-      icon:    tpl.icon,
-      is_read: false,
-    }));
-
-    // Insert in chunks of 100 to avoid request size limits
-    const chunkSize = 100;
-    for (let i = 0; i < msgRows.length; i += chunkSize) {
-      await sbFetch('user_messages', {
-        method: 'POST',
-        body: JSON.stringify(msgRows.slice(i, i + chunkSize)),
-        prefer: 'return=minimal',
-      });
-    }
-
-    // 4. Increment template send_count
-    await sbFetch(`message_templates?id=eq.${templateId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ send_count: tpl.send_count + 1 }),
-      prefer: 'return=minimal',
-    });
-
-    return users.length;
+    return await apiFetch('sendMessage', { templateId, recipients });
+  },
+  
+  async sendMessage(templateId, recipients) {
+    return await apiFetch('sendMessage', { templateId, recipients });
   },
 
   /* ── User-side message fetching ──────────────────────────────── */
@@ -2485,7 +2201,7 @@ async sendUserMessage(userId, { title, body, type = 'info', icon = '📢' }) {
         animation:fxMsgIn 0.3s ease;
       `;
 
-      overlay.innerHTML = `
+overlay.innerHTML = `
         <style>
           @keyframes fxMsgIn {
             from { opacity:0; transform:scale(0.93); }
@@ -2503,29 +2219,26 @@ async sendUserMessage(userId, { title, body, type = 'info', icon = '📢' }) {
           #fx-msg-modal .msg-header {
             background:${s.bg};
             border-bottom:2px solid ${s.border};
-            padding:0.7rem 1.25rem;
+            padding:0.6rem 1.25rem;
             text-align:center;
           }
-          #fx-msg-modal .msg-icon {
-            font-size:1.6rem;
-            margin-bottom:0.1rem;
-          }
-          #fx-msg-modal .msg-label {
-            font-size:0.58rem;font-weight:800;
+          #fx-msg-modal .msg-header-label {
+            font-size:0.8rem;font-weight:800;
             letter-spacing:0.12em;text-transform:uppercase;
-            color:${s.titleColor};margin-bottom:0.2rem;
+            color:${s.titleColor};
           }
           #fx-msg-modal .msg-title {
             font-size:0.95rem;font-weight:800;
-            color:#0F1B2D;line-height:1.3;
+            color:#0F1B2D;line-height:1.2;
+            padding:1rem 1.25rem 0.25rem;
           }
           #fx-msg-modal .msg-body {
-            padding:0.1rem 1.25rem 0.1rem;
-            font-size:0.85rem;color:#4A5568;
-            line-height:0.8;white-space:pre-wrap;
+            padding:0.5rem 1.25rem 1.75rem;
+            font-size:0.83rem;color:#4A5568;
+            line-height:1.5;
           }
           #fx-msg-modal .msg-footer {
-            padding:0 1.25rem 1rem;
+            padding:0 1.25rem 1.25rem;
             display:flex;flex-direction:column;gap:8px;
           }
           #fx-msg-modal .msg-btn {
@@ -2540,18 +2253,16 @@ async sendUserMessage(userId, { title, body, type = 'info', icon = '📢' }) {
             color:#8896A5;font-weight:600;
           }
         </style>
-		<div class="msg-card">
+        <div class="msg-card">
           <div class="msg-header">
-            <span style="font-size:0.8rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:${s.titleColor};">${msg.icon} ${s.label}</span>
+            <span class="msg-header-label">${msg.icon} ${s.label}</span>
           </div>
+          <div class="msg-title">${msg.title}</div>
           <div class="msg-body">
-			<div style="font-size:0.95rem;font-weight:800;color:#0F1B2D;margin-bottom:1px;line-height:1;">${msg.title}</div>
-            <div style="font-size:0.83rem;color:#4A5568;line-height:1.3;white-space:pre-wrap;">${msg.body.trim()}</div>
+            <div style="white-space:pre-wrap;">${msg.body.trim()}</div>
           </div>
           <div class="msg-footer">
-            <button class="msg-btn" id="fxMsgOkBtn">
-              ${currentIndex < messages.length - 1 ? 'Got it, thanks!' : 'Got it, thanks!'}
-            </button>
+            <button class="msg-btn" id="fxMsgOkBtn">Got it, thanks!</button>
             ${messages.length > 1
               ? `<div class="msg-counter">Message ${currentIndex + 1} of ${messages.length}</div>`
               : ''}
@@ -2644,44 +2355,23 @@ const FX_CHANGE_REQUESTS = {
   },
 
   async submitChangeRequest(data) {
-    // data: { userId, providerId, providerName, subject, requestedValue, explanation, file (optional) }
+    // File upload still happens client-side — only the resulting URL is sent to API
     let fileUrl  = null;
     let filePath = null;
-
-    // Upload file if provided
     if (data.file) {
-      const ext      = data.file.name.split('.').pop();
-      filePath       = `requests/${data.providerId}_${Date.now()}.${ext}`;
+      const ext  = data.file.name.split('.').pop();
+      filePath   = `requests/${data.providerId}_${Date.now()}.${ext}`;
       const formData = new FormData();
       formData.append('', data.file);
       const uploadRes = await fetch(
         `${SUPA_URL}/storage/v1/object/fixia-requests/${filePath}`,
-        {
-          method: 'POST',
-          headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` },
-          body: formData,
-        }
+        { method: 'POST', headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }, body: formData }
       );
       if (!uploadRes.ok) throw new Error('File upload failed.');
       fileUrl = `${SUPA_URL}/storage/v1/object/public/fixia-requests/${filePath}`;
     }
-
-    const row = {
-      user_id:         data.userId,
-      provider_id:     data.providerId,
-      provider_name:   data.providerName,
-      subject:         data.subject,
-      requested_value: data.requestedValue,
-      explanation:     data.explanation,
-      file_url:        fileUrl,
-      file_path:       filePath,
-      status:          'pending',
-    };
-
-    await sbFetch('change_requests', {
-      method: 'POST',
-      body:   JSON.stringify(row),
-      prefer: 'return=minimal',
+    return await apiFetch('submitChangeRequest', {
+      data: { ...data, fileUrl, filePath, file: undefined },
     });
   },
 
@@ -2720,7 +2410,7 @@ const FX_CHANGE_REQUESTS = {
           }),
         });
       } catch(e) {
-        console.warn('Location parse failed — skipping auto-update:', e);
+        console.warn('[Fixia] Location parse failed in approveChangeRequest — skipping auto-update. Error:', e.message);
       }
     }
     // Send approval message to provider
@@ -2795,21 +2485,7 @@ Object.assign(FX, FX_CHANGE_REQUESTS);
 const FX_REPORTS = {
 
   async submitReport(data) {
-    // data: { providerId, providerName, userId, userName, reason, details }
-    const row = {
-      provider_id:   data.providerId,
-      provider_name: data.providerName,
-      user_id:       data.userId,
-      user_name:     data.userName,
-      reason:        data.reason,
-      details:       data.details || null,
-      status:        'pending',
-    };
-    await sbFetch('provider_reports', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body:   JSON.stringify(row),
-    });
+    return await apiFetch('submitReport', { data });
   },
 
   async hasReported(providerId, userId) {
@@ -2834,52 +2510,15 @@ const FX_REPORTS = {
   },
 
   async dismissReport(id) {
-    await this.updateReport(id, { status: 'dismissed' });
+    return await apiFetch('dismissReport', { id });
   },
 
   async warnProvider(report) {
-    // Send warning message to provider
-    await sbFetch('user_messages', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body: JSON.stringify({
-        user_id: report.provider_user_id,
-        title:   'Account Warning',
-        body:    `You have been reported for activity that violates our Fair and Good Environment Policy. Please consider this as a formal warning.\n\nPlease review our community guidelines and ensure your conduct meets our standards. Further violations may result in account suspension.`,
-        type:    'warning',
-        icon:    '⚠️',
-        is_read: false,
-      }),
-    });
-    await this.updateReport(report.id, { status: 'warned' });
+    return await apiFetch('warnProvider', { report });
   },
 
 async suspendProvider(report) {
-  const days     = parseInt(await this.getSetting('suspension_days')) || 7;
-  const liftDate = new Date(Date.now() + (days * 86400000));
-  const liftStr  = liftDate.toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
-
-  await sbFetch(`providers?id=eq.${report.provider_id}`, {
-    method: 'PATCH',
-    prefer: 'return=minimal',
-    body:   JSON.stringify({ status: 'suspension_pending', suspended_until: null }),
-  });
-
-  await sbFetch('user_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      user_id:  report.provider_user_id,
-      title:    'Account Suspension Notice',
-      body:     `You have been reported for activity that violates our fair and good environment policy.\n\nUpon acknowledging this message, your account will be suspended for ${days} day${days !== 1 ? 's' : ''} and will automatically be lifted on ${liftStr}.\n\nIf you believe this is a false report, please contact our support team immediately.`,
-      type:     'warning',
-      icon:     '🚫',
-      is_read:  false,
-      metadata: JSON.stringify({ action: 'suspend_on_read', provider_id: report.provider_id, user_id: report.provider_user_id, suspension_days: days }),
-    }),
-  });
-
-  await this.updateReport(report.id, { status: 'suspended' });
+  return await apiFetch('suspendProvider', { report });
 },
 };
 
@@ -2895,183 +2534,99 @@ const FX_FEATURED = {
 
   FEATURED_LIMIT: 3,
 
-  /* ── Get featured providers for homepage ─────────────────────── */
-async getFeaturedProviders() {
-  // 1. Get all approved featured/elite providers + their rotation stats
-  const [allRaw, rotationRaw] = await Promise.all([
-    sbFetch(`providers?status=eq.approved&order=is_elite.desc,avg_rating.desc`),
-    sbFetch(`featured_rotation?order=show_count.asc`),
-  ]);
-  const all          = allRaw || [];
-  const rotationStats = rotationRaw || [];
+  async getFeaturedProviders() {
+    const all = await sbFetch(
+    `providers?status=eq.approved&is_featured=eq.true` +
+    `&select=id,user_id,biz_name,cat_main,cat_sub,province_name,city_name,avatar_url,is_elite,avg_rating,package_id,featured_impressions,featured_quota` +
+    `&order=is_elite.desc,featured_impressions.asc`,
+    { headers: { 'Cache-Control': 'no-cache' } }
+  ) || [];
 
-  const eligible = all.filter(p =>
-    p.is_elite || (p.is_featured && p.featured_status === 'active')
-  );
-  if (!eligible.length) return [];
+    const eligible = all.filter(p =>
+      p.is_elite || ((p.featured_quota > 0) && (p.featured_impressions || 0) < p.featured_quota)
+    );
 
-  // Build a show_count lookup — providers never shown yet get 0
-  const showMap = Object.fromEntries(
-    rotationStats.map(r => [r.provider_id, r.show_count || 0])
-  );
+    if (!eligible.length) return [];
 
-  // 2. Separate elite from regular featured
-  const elite    = eligible.filter(p => p.is_elite);
-  const featured = eligible.filter(p => !p.is_elite && p.is_featured);
+    const result = [
+      ...eligible.filter(p => p.is_elite),
+      ...eligible.filter(p => !p.is_elite),
+    ].slice(0, FX_FEATURED.FEATURED_LIMIT);
 
-  // 3. Elite providers always fill first slots (sorted least-shown first)
-  elite.sort((a, b) => (showMap[a.id] || 0) - (showMap[b.id] || 0));
-  const result = [...elite];
-  const remaining = this.FEATURED_LIMIT - elite.length;
-  if (remaining <= 0) return result.slice(0, this.FEATURED_LIMIT);
-
-  // 4. Sort featured providers by show_count ascending (least-shown first)
-  // Premium package gets a tie-break advantage — treated as if shown one fewer time
-  featured.sort((a, b) => {
-    const aCount = (showMap[a.id] || 0) - (a.package_id?.includes('premium') ? 1 : 0);
-    const bCount = (showMap[b.id] || 0) - (b.package_id?.includes('premium') ? 1 : 0);
-    return aCount - bCount;
-  });
-
-  // Pick top providers to fill remaining slots
-  const seen = new Set(result.map(p => p.id));
-  for (const p of featured) {
-    if (seen.has(p.id)) continue;
-    result.push(p);
-    seen.add(p.id);
-    if (result.length >= this.FEATURED_LIMIT) break;
-  }
-
-  // 5. Record appearances (async, non-blocking)
-    this._recordAppearances(result.map(p => p.id)).catch(() => {});
-  
-    return this._enrichWithListingCategories(result);
-},
-
-  /* ── Record that these providers were shown ──────────────────── */
-  async _recordAppearances(providerIds) {
-    for (const id of providerIds) {
-      // Upsert into featured_rotation
-      const existing = await sbFetch(
-        `featured_rotation?provider_id=eq.${id}&limit=1`
-      );
-      if (existing?.length) {
-        await sbFetch(`featured_rotation?provider_id=eq.${id}`, {
+    // Atomic increment via RPC — prevents race condition on concurrent page loads
+    result.forEach(prov => {
+      sbFetch(`rpc/increment_featured_impression`, {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ provider_id: prov.id }),
+      }).catch(e => console.error(`[Featured] RPC increment failed ${prov.id}:`, e.message));
+    });
+	
+	// Mark providers that just hit their quota as completed
+    result.forEach(prov => {
+      const newCount = (prov.featured_impressions || 0) + 1;
+      if (prov.featured_quota > 0 && newCount >= prov.featured_quota && !prov.is_elite) {
+        sbFetch(`providers?id=eq.${prov.id}`, {
           method: 'PATCH',
-          body: JSON.stringify({
-            show_count: (existing[0].show_count || 0) + 1,
-            last_shown: new Date().toISOString(),
-          }),
           prefer: 'return=minimal',
-        });
-      } else {
-        await sbFetch('featured_rotation', {
-          method: 'POST',
-          body: JSON.stringify({ provider_id: id, show_count: 1 }),
-        });
+          body: JSON.stringify({
+            featured_status: 'completed',
+            is_featured: false,
+          }),
+        }).catch(e => console.error(`[Featured] Status update failed ${prov.id}:`, e.message));
       }
-    }
+    });
+    
+    return FX._enrichWithListingCategories(result);
   },
 
-  /* ── Get rotation stats for admin ───────────────────────────── */
   async getRotationStats() {
-  const [stats, providers] = await Promise.all([
-    sbFetch('featured_rotation?order=show_count.desc&limit=50') || [],
-    sbFetch('providers?select=id,biz_name,is_elite,avg_rating,package_id') || [],
-  ]);
-  const provMap = Object.fromEntries((providers || []).map(p => [p.id, p]));
-  return (stats || []).map(s => ({
-    ...s,
-    biz_name:   provMap[s.provider_id]?.biz_name   || '—',
-    is_elite:   provMap[s.provider_id]?.is_elite    || false,
-    avg_rating: provMap[s.provider_id]?.avg_rating  || 0,
-    package_id: provMap[s.provider_id]?.package_id  || '—',
-  }));
-},
-
-  async getBatchStatus() {
-  const results = await Promise.all([
-    sbFetch(`ad_batches?status=eq.active&order=created_at.desc`),
-    sbFetch(`featured_batches?status=eq.active&order=created_at.desc`),
-    sbFetch(`ads?batch_status=eq.queued&select=id,type&order=queue_position.asc`),
-    sbFetch(`providers?featured_status=eq.queued&is_featured=eq.true&status=eq.approved&select=id`),
-  ]);
-  return {
-    adBatches:   results[0] || [],
-    featBatches: results[1] || [],
-    queuedAds:   results[2] || [],
-    queuedFeat:  results[3] || [],
-  };
-},
-
-async promoteNextBatch(type) {
-  // type: 'inline' | 'popup' | 'featured'
-  const batchSize  = parseInt(await this.getSetting(type === 'featured' ? 'featured_batch_size' : 'ad_batch_size')) || (type === 'featured' ? 3 : 6);
-  const batchDays  = parseInt(await this.getSetting(type === 'featured' ? 'featured_batch_days' : 'ad_batch_days')) || 30;
-  const expires    = new Date(Date.now() + batchDays * 86400000).toISOString();
-
-  if (type === 'featured') {
-    const queued = await sbFetch(
-      `providers?featured_status=eq.queued&is_featured=eq.true&status=eq.approved` +
-      `&order=featured_queue_pos.asc&limit=${batchSize}`
-    ) || [];
-    if (!queued.length) throw new Error('No featured providers in queue.');
-
-    const batch = await sbFetch(`featured_batches`, {
-      method: 'POST',
-      body: JSON.stringify({ slot_count: batchSize, duration_days: batchDays, expires_at: expires }),
-      prefer: 'return=representation',
-    });
-    const batchId = batch?.[0]?.id;
-    if (!batchId) throw new Error('Failed to create batch.');
-
-    // Expire current active batch first
-    await sbFetch(`featured_batches?status=eq.active`, {
-      method: 'PATCH', body: JSON.stringify({ status: 'expired' }), prefer: 'return=minimal',
-    });
-    await sbFetch(`providers?featured_batch_id=not.is.null&featured_status=eq.active`, {
-      method: 'PATCH', body: JSON.stringify({ featured_status: 'completed' }), prefer: 'return=minimal',
-    });
-
-    for (const p of queued) {
-      await sbFetch(`providers?id=eq.${p.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ featured_batch_id: batchId, featured_status: 'active', featured_from: new Date().toISOString(), featured_until: expires }),
-        prefer: 'return=minimal',
-      });
-    }
-  } else {
-    const queued = await sbFetch(
-      `ads?batch_status=eq.queued&type=eq.${type}&order=queue_position.asc&limit=${batchSize}`
-    ) || [];
-    if (!queued.length) throw new Error(`No ${type} ads in queue.`);
-
-    const batch = await sbFetch(`ad_batches`, {
-      method: 'POST',
-      body: JSON.stringify({ type, slot_count: batchSize, duration_days: batchDays, expires_at: expires }),
-      prefer: 'return=representation',
-    });
-    const batchId = batch?.[0]?.id;
-    if (!batchId) throw new Error('Failed to create batch.');
-
-    // Expire current active batch first
-    await sbFetch(`ad_batches?status=eq.active&type=eq.${type}`, {
-      method: 'PATCH', body: JSON.stringify({ status: 'expired' }), prefer: 'return=minimal',
-    });
-    await sbFetch(`ads?batch_id=not.is.null&batch_status=eq.active&type=eq.${type}`, {
-      method: 'PATCH', body: JSON.stringify({ batch_status: 'completed' }), prefer: 'return=minimal',
-    });
-
-    for (const a of queued) {
-      await sbFetch(`ads?id=eq.${a.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ batch_id: batchId, batch_status: 'active', shown_from: new Date().toISOString(), shown_until: expires, impression_count: 0 }),
-        prefer: 'return=minimal',
-      });
-    }
-  }
-},
+  const qs = `select=id,biz_name,is_elite,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc`;
+  const active = await sbFetch(`providers?is_featured=eq.true&${qs}`);
+  return (active || [])
+    .map(p => ({
+        provider_id:    p.id,
+        biz_name:       p.biz_name             || '—',
+        is_elite:       p.is_elite             || false,
+        avg_rating:     p.avg_rating           || 0,
+        package_id:     p.package_id           || '—',
+        show_count:     p.featured_impressions || 0,
+        featured_quota: p.featured_quota       || 0,
+      }));
+  },
 
 };
 
 Object.assign(FX, FX_FEATURED);
+
+/* ══════════════════════════════════════════════════════════════
+   SESSION HEARTBEAT — Runs on every page that loads fixia-data.js
+══════════════════════════════════════════════════════════════ */
+(function startSessionHeartbeat() {
+  const sess = FX.getSession();
+  if (!sess) return;
+
+  async function beat() {
+    const valid = await FX.checkSession();
+    if (!valid) {
+      FX.clearSession();
+      const modal = document.getElementById('sessionConflictModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      } else {
+        window.location.href = 'login.html?reason=session_conflict';
+      }
+    }
+  }
+
+  async function checkMessages() {
+    try { await FX.checkAndShowMessages(); } catch(e) {}
+  }
+
+  setTimeout(() => {
+    beat();
+    checkMessages();
+    setInterval(beat, 120000);
+    setInterval(checkMessages, 120000);
+  }, 10000);
+})();

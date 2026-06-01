@@ -87,6 +87,20 @@
     .login-row button { background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-family:inherit; font-size:0.82rem; }
     .login-row button:hover { text-decoration:underline; }
   </style>
+
+<script src="fixia-data.js"></script>
+  
+<script>
+  (async function() {
+    try {
+      const ps = await FX.getPreSignupSettings();
+      if (ps && ps.active) {
+        window.location.replace('presignup.html');
+      }
+    } catch(e) { /* fail silently, allow page to load normally */ }
+  })();
+</script>
+
 </head>
 <body>
 <div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
@@ -101,7 +115,7 @@
     </div>
 
     <!-- Regular -->
-    <div class="type-card" onclick="window.location.href='signup-regular.html'">
+    <div class="type-card" onclick="goToSignup('signup-regular.html')">
       <div class="type-card-icon icon-regular">🔍</div>
       <div class="type-card-body">
         <div class="type-card-title">Find Services</div>
@@ -116,7 +130,7 @@
     </div>
 
     <!-- Provider -->
-    <div class="type-card" onclick="window.location.href='signup-provider.html'">
+    <div class="type-card" onclick="goToSignup('signup-provider.html')">
       <div class="type-card-icon icon-provider">🔧</div>
       <div class="type-card-body">
         <div class="type-card-title">Offer Services</div>
@@ -138,9 +152,14 @@
 </div>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+function goToSignup(page) {
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  window.location.href = ref ? `${page}?ref=${ref}` : page;
+}
 </script>
 
 </body>

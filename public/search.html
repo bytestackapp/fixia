@@ -316,18 +316,18 @@ function renderResults() {
     card.innerHTML = `
       <div class="provider-avatar">
         ${p.avatar_url
-          ? `<img src="${p.avatar_url}" alt="${p.biz_name}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">`
+          ? `<img src="${p.avatar_url}" alt="${esc(p.biz_name)}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">`
           : initials}
         ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>
       <div class="provider-info">
         <div class="provider-name">
-          ${p.is_elite ? '<span class="elite">👑 </span>' : ''}${p.biz_name}
+          ${p.is_elite ? '<span class="elite">👑 </span>' : ''}${esc(p.biz_name)}
         </div>
-		<div class="provider-service">${[p.city_name, p.province_name].filter(Boolean).join(', ') || '—'}</div>
+		<div class="provider-service">${esc([p.city_name, p.province_name].filter(Boolean).join(', ') || '—')}</div>
         <div class="provider-meta">
           <div class="stars-mini">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
-          <div class="pmeta"><i class="fa-solid fa-location-dot"></i>${p.city_name || '—'}</div>
+          <div class="pmeta"><i class="fa-solid fa-location-dot"></i>${esc(p.city_name || '—')}</div>
         </div>
       </div>
       <div class="provider-right">
@@ -338,7 +338,7 @@ function renderResults() {
       </div>`;
     list.appendChild(card);
   });
-  FX.injectInlineAds('resultsList', 8);
+  FX.injectInlineAds('resultsList', FX.AD_CONFIG?.inlineIntervalSearch ?? 4);
 }
 
 function showEmpty(icon, title, sub) {

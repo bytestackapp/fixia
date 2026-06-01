@@ -414,27 +414,156 @@
 
 <script src="fixia-data.js"></script>
 <script>
-/* ── Session check ───────────────────────────────────────────── */
-(function() {
+/* ── Pre-signup check — runs before everything else ─────────── */
+(async function() {
+  try {
+    const ps = await FX.getPreSignupSettings();
+    if (ps && ps.active) {
+      activateDemoMode();
+    } else {
+      activateRealMode();
+    }
+  } catch(e) {
+    // If the check fails, fall back to real login safely
+    activateRealMode();
+  }
+})();
+
+function activateDemoMode() {
+  // Pre-fill credentials
+  document.getElementById('loginIdentifier').value = 'demo@fixia.app';
+  document.getElementById('loginPassword').value   = 'demo1234';
+
+  // Hide the "Forgot password?" button
+  document.querySelector('[onclick="showPanel(\'panelForgot\')"]').closest('div').style.display = 'none';
+
+  // Replace "Create an Account" button with "Sign Up for Early Access"
+  const createBtn = document.querySelector('[onclick="window.location.href=\'signup.html\'"]');
+  if (createBtn) {
+    createBtn.innerHTML = '<i class="fa-solid fa-rocket"></i> Sign Up for Early Access';
+    createBtn.onclick = function() { window.location.href = 'presignup.html'; };
+  }
+
+  // Override the Sign In button to go to demo-home instead of real login
+  document.getElementById('loginBtn').onclick = function() {
+    const identifier = document.getElementById('loginIdentifier').value.trim();
+    const password   = document.getElementById('loginPassword').value;
+    const isDemo     = identifier === 'demo@fixia.app' && password === 'demo1234';
+    const isAdmin    = identifier.toLowerCase().includes('admin');
+    if (isDemo && !isAdmin) {
+      doDemoLogin();
+    } else {
+      doLoginPresignup(isAdmin);
+    }
+  };
+
+  // Show a demo mode banner above the form
+  const banner = document.createElement('div');
+  banner.className = 'alert alert-info show';
+  banner.style.cssText = 'margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;';
+  banner.innerHTML = '<i class="fa-solid fa-flask"></i> <span><strong>Preview Mode</strong> — This is a demo login. Sign in to explore the app before launch.</span>';
+  document.getElementById('panelLogin').insertBefore(banner, document.getElementById('panelLogin').firstChild);
+
+  // Update logo subtitle
+  const sub = document.querySelector('.logo-sub');
+  if (sub) sub.textContent = 'Preview Mode — Explore before launch';
+}
+
+async function doLoginPresignup(isAdmin) {
+  hideAlert('loginAlert');
+  const identifier = document.getElementById('loginIdentifier').value.trim();
+  const password   = document.getElementById('loginPassword').value;
+
+  if (!identifier || !password) {
+    showAlert('loginAlert', 'Please enter your email/username and password.');
+    return;
+  }
+
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+  try {
+    const result = await FX.login(identifier, password);
+
+    if (!result.success) {
+      showAlert('loginAlert', result.error || 'Invalid credentials. Please try again.');
+      return;
+    }
+
+    // Admin goes to actual app
+    if (isAdmin || result.user.role === 'admin') {
+      showToast('Welcome back! Redirecting…', 'success');
+      setTimeout(() => { window.location.href = 'admin.html'; }, 900);
+      return;
+    }
+
+    // Everyone else goes to demo-home during pre-signup
+    showToast('Welcome! Redirecting to preview…', 'success');
+    setTimeout(() => { window.location.href = 'demo-home.html'; }, 900);
+
+  } catch(e) {
+    showAlert('loginAlert', '⚠️ ' + (e.message || 'Something went wrong. Please try again.'));
+  } finally {
+    btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+  }
+}
+
+function doDemoLogin() {
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+
+  btn.disabled = true;
+  spinner.classList.add('on');
+  btnText.style.display = 'none';
+
+  // Simulate a brief loading moment so it feels real
+  setTimeout(() => {
+    window.location.href = 'demo-home.html';
+  }, 900);
+}
+
+function activateRealMode() {
+  // ── Session conflict message ──────────────────────────────
+  if (new URLSearchParams(window.location.search).get('reason') === 'session_conflict') {
+    const t = document.createElement('div');
+    t.textContent = 'Session ended due to login on another device.';
+    t.style.cssText = `
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#0F1B2D;color:#fff;font-family:inherit;
+      font-size:0.82rem;font-weight:600;line-height:1.6;text-align:center;
+      padding:14px 20px;border-radius:14px;z-index:99999;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);max-width:300px;width:90%;
+      animation:fadeIn 0.3s ease;
+    `;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+    // Clean the URL so refresh doesn't re-trigger it
+    history.replaceState(null, '', 'login.html');
+  }
+  
+  /* ── Session check ─────────────────────────────────────────── */
   const sess = FX.getSession();
   if (!sess) return;
-  // Don't redirect blocked accounts — clear any stale session and stay on login
-if (sess.status === 'suspended') {
-  FX.clearSession();
-  return;
-}
-if (sess.status === 'rejected') {
-  window.location.href = 'homepage.html';
-  return;
-}
-if (sess.status === 'pending' && sess.role !== 'provider' && sess.role !== 'regular') {
-  FX.clearSession();
-  return;
-}
+
+  if (sess.status === 'suspended') {
+    FX.clearSession();
+    return;
+  }
+  if (sess.status === 'rejected') {
+    window.location.href = 'homepage.html';
+    return;
+  }
+  if (sess.status === 'pending' && sess.role !== 'provider' && sess.role !== 'regular') {
+    FX.clearSession();
+    return;
+  }
   if (sess.role === 'admin')         window.location.href = 'admin.html';
   else if (sess.role === 'provider') window.location.href = 'homepage.html';
   else                               window.location.href = 'homepage.html';
-})();
+}
 
 /* ── Panel switching ─────────────────────────────────────────── */
 function showPanel(id) {
@@ -470,7 +599,7 @@ function showToast(msg, type='') {
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-/* ── Login ───────────────────────────────────────────────────── */
+/* ── Login (real mode only) ──────────────────────────────────── */
 document.getElementById('loginPassword').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
@@ -488,7 +617,7 @@ async function doLogin() {
     return;
   }
 
-  const btn = document.getElementById('loginBtn');
+  const btn     = document.getElementById('loginBtn');
   const spinner = document.getElementById('loginSpinner');
   const btnText = document.getElementById('loginBtnText');
   btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
@@ -500,7 +629,6 @@ async function doLogin() {
       showAlert('loginAlert', result.error || 'Invalid credentials. Please try again.');
       return;
     }
-
     if (result.user.status === 'pending' && result.user.role !== 'provider' && result.user.role !== 'regular') {
       FX.clearSession();
       showAlert('loginAlert', '⏳ Your account is pending approval. We\'ll notify you by email once approved.', 'info');
@@ -518,7 +646,7 @@ async function doLogin() {
     }
 
     showToast('Welcome back! Redirecting…', 'success');
-    // Sync saved providers from DB into localStorage (new browser/device support)
+	registerPushSubscription();
     if (result.user.role === 'regular') {
       FX.syncSaved().catch(() => {});
     }
@@ -536,7 +664,7 @@ async function doLogin() {
   }
 }
 
-/* ── Forgot Password ─────────────────────────────────────────── */
+/* ── Forgot Password (real mode only) ───────────────────────── */
 async function doForgot() {
   hideAlert('forgotAlert');
   const email = document.getElementById('forgotEmail').value.trim();
@@ -545,7 +673,7 @@ async function doForgot() {
     return;
   }
 
-  const btn = document.getElementById('forgotBtn');
+  const btn     = document.getElementById('forgotBtn');
   const spinner = document.getElementById('forgotSpinner');
   const btnText = document.getElementById('forgotBtnText');
   btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
@@ -567,7 +695,10 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function toggleFaq(el) {
   const answer = el.nextElementSibling;
   const isOpen = el.classList.contains('open');
-  document.querySelectorAll('.faq-q.open').forEach(q => { q.classList.remove('open'); q.nextElementSibling.classList.remove('open'); });
+  document.querySelectorAll('.faq-q.open').forEach(q => {
+    q.classList.remove('open');
+    q.nextElementSibling.classList.remove('open');
+  });
   if (!isOpen) { el.classList.add('open'); answer.classList.add('open'); }
 }
 

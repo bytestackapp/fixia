@@ -894,7 +894,7 @@ async function verifyOTPStep() {
   btn.disabled = true; sp.classList.add('on'); bt.style.display = 'none';
 
   try {
-    FX.verifyOTP(email, code);
+    await FX.verifyOTP(email, code);
     currentStep = 3;
     go(3);
   } catch(e) {
@@ -1385,11 +1385,11 @@ async function doSubmit() {
       const d = await r.json();
       const url = d.approvalUrl || d.checkoutUrl;
       if (url) {
-        sessionStorage.setItem('fixia_provider_signup', JSON.stringify({
+        localStorage.setItem('fixia_provider_signup', JSON.stringify({
           ...buildFormData(), idFile:null, avatarFile:null
         }));
-        if (d.orderId)    sessionStorage.setItem('paypal_order_id',    d.orderId);
-        if (d.sessionId)  sessionStorage.setItem('paymongo_session_id', d.sessionId);
+        if (d.orderId)    localStorage.setItem('paypal_order_id',    d.orderId);
+        if (d.sessionId)  localStorage.setItem('paymongo_session_id', d.sessionId);
         clearTimeout(safetyTimer);
         window.location.href = url; return;
       }
@@ -1459,6 +1459,9 @@ async function doRegister() {
     document.getElementById('doneBtnIcon').className = 'fa-solid fa-check';
     document.getElementById('doneBtnText').textContent = 'Done';
   } 
+    localStorage.removeItem('fixia_provider_signup');
+    localStorage.removeItem('paypal_order_id');
+    localStorage.removeItem('paymongo_session_id');
     go(7);
 
   } catch(e) {
@@ -1549,7 +1552,7 @@ function hideAlert(id) {
 (function() {
   const p = new URLSearchParams(window.location.search);
   if (p.get('cancelled') !== '1') return;
-  const saved = sessionStorage.getItem('fixia_provider_signup');
+  const saved = localStorage.getItem('fixia_provider_signup');
   if (saved) {
     try {
       const d = JSON.parse(saved);
@@ -1584,7 +1587,7 @@ function showToast(msg, type='') {
 window.addEventListener('DOMContentLoaded', () => {
   const p = new URLSearchParams(window.location.search);
   if (p.get('cancelled') !== '1') return;
-  const saved = sessionStorage.getItem('fixia_provider_signup');
+  const saved = localStorage.getItem('fixia_provider_signup');
   if (saved) {
     try {
       const d = JSON.parse(saved);

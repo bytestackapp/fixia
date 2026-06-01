@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Demo Homepage (Pre-Launch Preview)
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f2027">
+  <link rel="manifest" href="/manifest.json">
+  <title>Fixia — Explore the App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F5F7FA; --card:#FFFFFF; --border:#E8ECF0;
+      --gold:#F59E0B; --green:#10B981; --red:#DC3545;
+      --radius-sm:8px; --radius-md:14px; --radius-lg:20px;
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.06);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:0 8px 32px rgba(0,0,0,0.13);
+      --nav-h:56px; --bottom-h:62px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h) + 16px);-webkit-font-smoothing:antialiased;}
+
+    /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
+    .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
+    .nav-logo span{color:var(--brand);}
+    .nav-search{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
+    .nav-search input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:0.82rem;font-family:inherit;cursor:pointer;}
+    .nav-search input::placeholder{color:rgba(255,255,255,0.45);}
+    .nav-search i{color:rgba(255,255,255,0.45);font-size:12px;}
+    .nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+    /* ── EARLY ACCESS BANNER ─────────────────────────────────── */
+    .early-banner{background:linear-gradient(90deg,#FF5A1F,#D94200);padding:9px 16px;display:flex;align-items:center;gap:10px;position:relative;}
+    .early-banner-text{flex:1;font-size:0.72rem;color:#fff;line-height:1.4;}
+    .early-banner-text strong{font-size:0.78rem;display:block;margin-bottom:1px;}
+    .early-dismiss{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0;}
+    .early-banner.hidden{display:none;}
+
+    /* ── LOCATION BAR ────────────────────────────────────────── */
+    .loc-bar{background:var(--navy-mid);padding:8px 16px;display:flex;align-items:center;gap:6px;font-size:0.78rem;color:rgba(255,255,255,0.75);cursor:pointer;}
+    .loc-bar i{color:var(--brand);font-size:12px;}
+    .loc-bar strong{color:#fff;}
+    .loc-bar .change{margin-left:auto;color:var(--brand);font-size:0.75rem;font-weight:600;}
+
+    /* ── SECTION LABELS ──────────────────────────────────────── */
+    .section-label{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .section-label .dot{width:6px;height:6px;border-radius:50%;background:var(--brand);}
+
+    /* ── CATEGORY PILLS ──────────────────────────────────────── */
+    .cats-section{padding:14px 16px 0;}
+    .cats-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+    .cats-scroll::-webkit-scrollbar{display:none;}
+    .cat-pill{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-size:0.75rem;font-weight:700;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+    .cat-pill:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light);}
+    .cat-pill span{font-size:1rem;}
+
+    /* ── FEATURED CARDS ──────────────────────────────────────── */
+    .featured-section{padding:16px 16px 0;}
+    #featuredList{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .featured-card{background:var(--navy);border-radius:14px;overflow:hidden;position:relative;cursor:pointer;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.08);min-width:0;transition:transform 0.15s;}
+    .featured-card:active{transform:scale(0.97);}
+    .fc-img{width:100%;height:68px;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;flex-shrink:0;}
+    .fc-img img{width:100%;height:100%;object-fit:cover;display:block;}
+    .fc-body{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;}
+    .fc-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.55);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:20px;display:flex;align-items:center;gap:3px;}
+    .fc-rating{font-size:0.7rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:2px;}
+    .fc-rating i{font-size:9px;}
+    .fc-name{font-size:0.78rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .fc-service{font-size:0.62rem;color:rgba(255,255,255,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .fc-loc{font-size:0.62rem;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:3px;}
+    .fc-loc i{color:var(--brand);font-size:9px;}
+
+    /* ── PROVIDER CARDS ──────────────────────────────────────── */
+    .nearby-section{padding:16px 16px 0;}
+    .provider-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow 0.15s;position:relative;}
+    .provider-card:active{box-shadow:var(--shadow-md);}
+    .provider-avatar{width:44px;height:44px;border-radius:12px;background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.25rem;position:relative;overflow:hidden;}
+    .provider-avatar img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+    .online-dot{position:absolute;bottom:3px;right:3px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--card);}
+    .provider-info{flex:1;min-width:0;}
+    .provider-name{font-size:0.78rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .provider-service{font-size:0.65rem;color:var(--brand);font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .provider-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .pmeta-item{display:flex;align-items:center;gap:3px;font-size:0.7rem;color:var(--text-3);}
+    .pmeta-item i{font-size:10px;}
+    .stars-row{display:flex;align-items:center;gap:2px;}
+    .stars-row i{color:var(--gold);font-size:10px;}
+    .stars-row span{font-size:0.7rem;color:var(--text-2);font-weight:600;}
+    .provider-action{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;flex-shrink:0;}
+    .verified-badge{background:#ECFDF5;color:#065F46;font-size:0.6rem;font-weight:700;letter-spacing:0.04em;padding:3px 7px;border-radius:20px;text-transform:uppercase;display:flex;align-items:center;gap:3px;}
+    .contact-btn{background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.65rem;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;}
+
+    /* ── COMING SOON MODAL ───────────────────────────────────── */
+    .cs-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
+    .cs-overlay.active{display:flex;animation:fadeIn 0.2s;}
+    .cs-sheet{background:var(--card);width:100%;max-width:480px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:0 0 36px;animation:slideUp 0.3s ease;}
+    .cs-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+    .cs-icon{font-size:2.8rem;text-align:center;margin:20px 0 8px;}
+    .cs-title{font-size:1.1rem;font-weight:800;color:var(--navy);text-align:center;margin-bottom:6px;}
+    .cs-sub{font-size:0.8rem;color:var(--text-3);text-align:center;line-height:1.7;margin-bottom:20px;padding:0 24px;}
+    .cs-actions{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+    .cs-btn-primary{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(255,90,31,0.3);display:flex;align-items:center;justify-content:center;gap:8px;}
+    .cs-btn-secondary{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:#fff;color:var(--navy);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .cs-dismiss{text-align:center;margin-top:10px;font-size:0.72rem;color:var(--text-3);cursor:pointer;padding:4px;}
+    .cs-dismiss:hover{color:var(--brand);}
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+
+    /* ── AD BANNER ───────────────────────────────────────────── */
+    .ad-banner{margin:14px 16px 0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative;overflow:hidden;}
+    .ad-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.08);}
+    .ad-icon{font-size:2rem;flex-shrink:0;}
+    .ad-text{flex:1;}
+    .ad-label{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:2px;}
+    .ad-title{font-size:0.9rem;font-weight:700;color:#fff;line-height:1.3;}
+    .ad-sub{font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:2px;}
+    .ad-btn{background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+
+    /* ── COMING SOON CHIP ON CARDS ───────────────────────────── */
+    .cs-chip{position:absolute;top:8px;right:8px;background:rgba(255,90,31,0.9);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+
+    .spacer{height:16px;}
+
+    /* ── DEMO PROVIDER PANEL ─────────────────────────────────────── */
+    .dp-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);overflow-y:auto;}
+    .dp-overlay.active{display:block;animation:fadeIn 0.2s;}
+    .dp-page{background:var(--bg);min-height:100%;max-width:480px;margin:0 auto;padding-bottom:80px;position:relative;}
+    .dp-topnav{position:sticky;top:0;z-index:10;background:var(--navy);height:56px;display:flex;align-items:center;padding:0 14px;gap:10px;}
+    .dp-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .dp-nav-title{flex:1;color:rgba(255,255,255,0.85);font-size:0.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .dp-hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:18px 16px 0;}
+    .dp-hero-inner{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+    .dp-avatar{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,#FF5A1F,#D94200);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+    .dp-hero-info{flex:1;padding-top:4px;}
+    .dp-hero-name{font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:2px;}
+    .dp-hero-loc{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+    .dp-badges{display:flex;gap:5px;flex-wrap:wrap;}
+    .dpbadge{font-size:0.58rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+    .dpbadge-green{background:rgba(16,185,129,0.2);color:#34D399;}
+    .dpbadge-gold{background:rgba(245,158,11,0.25);color:#FBBF24;}
+    .dpbadge-brand{background:rgba(255,90,31,0.2);color:#FF8C5A;}
+    .dp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.08);}
+    .dp-stat{background:rgba(255,255,255,0.04);padding:10px 6px;text-align:center;}
+    .dp-stat-val{font-size:1.1rem;font-weight:800;color:#fff;}
+    .dp-stat-label{font-size:0.58rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+    .dp-contact{display:flex;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:9;}
+    .dp-btn-inquire{flex:2;padding:11px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(255,90,31,0.3);}
+    .dp-btn-save{flex:1;padding:11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;color:var(--navy);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .dp-body{padding:14px 16px;}
+    .dp-sec{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+    .dp-sec-title{font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .dp-sec-title i{color:var(--brand);}
+    .dp-about{font-size:0.84rem;color:var(--text-2);line-height:1.7;}
+    .dp-detail-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem;}
+    .dp-detail-row:last-child{border-bottom:none;}
+    .dp-detail-icon{width:28px;height:28px;border-radius:8px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--brand);flex-shrink:0;}
+    .dp-detail-label{color:var(--text-3);font-size:0.72rem;}
+    .dp-detail-val{color:var(--text);font-weight:600;margin-top:1px;}
+    .dp-listing{padding:11px 0;border-bottom:1px solid var(--border);}
+    .dp-listing:last-child{border-bottom:none;}
+    .dp-li-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px;}
+    .dp-li-title{font-size:0.88rem;font-weight:700;color:var(--navy);}
+    .dp-li-price{font-size:0.78rem;font-weight:700;color:var(--brand);flex-shrink:0;}
+    .dp-li-desc{font-size:0.78rem;color:var(--text-2);line-height:1.55;}
+    .dp-review{padding:11px 0;border-bottom:1px solid var(--border);}
+    .dp-review:last-child{border-bottom:none;}
+    .dp-rv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .dp-rv-name{font-size:0.8rem;font-weight:700;color:var(--navy);}
+    .dp-rv-date{font-size:0.68rem;color:var(--text-3);}
+    .dp-rv-stars{display:flex;gap:1px;margin-bottom:4px;}
+    .dp-rv-stars i{color:var(--gold);font-size:11px;}
+    .dp-rv-comment{font-size:0.8rem;color:var(--text-2);line-height:1.6;}
+    .dp-preview-bar{background:linear-gradient(90deg,#FF5A1F,#D94200);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+    .dp-preview-bar i{color:rgba(255,255,255,0.8);font-size:0.8rem;}
+    .dp-preview-bar span{font-size:0.75rem;color:#fff;line-height:1.4;}
+
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAV ──────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-logo">fix<span>ia</span></div>
+  <div class="nav-search" onclick="comingSoon('search')">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" placeholder="Search services, providers…" readonly/>
+  </div>
+  <button class="nav-icon-btn" onclick="comingSoon('notifications')" title="Notifications">
+    <i class="fa-regular fa-bell"></i>
+  </button>
+  <button class="nav-icon-btn" onclick="window.location.href='presignup.html'" title="Sign Up Free" style="background:var(--brand);font-size:11px;font-weight:800;width:auto;padding:0 10px;gap:4px;display:flex;align-items:center;">
+  <i class="fa-solid fa-rocket"></i> Join
+  </button>
+</nav>
+
+<!-- ── EARLY ACCESS BANNER ──────────────────────────────────── -->
+<div class="early-banner" id="earlyBanner">
+  <div class="early-banner-text">
+    <strong>🚀 You're in Early Access!</strong>
+    Full launch coming soon — explore a preview of what's ahead.
+  </div>
+  <button class="early-dismiss" onclick="dismissBanner()" title="Dismiss">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+</div>
+
+<!-- ── LOCATION BAR ──────────────────────────────────────────── -->
+<div class="loc-bar" onclick="comingSoon('location')">
+  <i class="fa-solid fa-location-dot"></i>
+  <span>Showing services in: <strong>Metro Manila</strong></span>
+  <span class="change"><i class="fa-solid fa-chevron-down"></i> Change</span>
+</div>
+
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Categories -->
+  <section class="cats-section">
+    <div class="section-label"><div class="dot"></div> Browse by Category</div>
+    <div class="cats-scroll">
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🔧</span> Plumbing</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>⚡</span> Electrical</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🧹</span> Cleaning</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🎨</span> Painting</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>❄️</span> Aircon</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🛠️</span> Carpentry</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🌿</span> Landscaping</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>📦</span> Moving</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>🔒</span> Security</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span>📱</span> Tech Repair</div>
+    </div>
+  </section>
+
+  <!-- Featured Providers -->
+  <section class="featured-section">
+    <div class="section-label"><div class="dot"></div> Featured Providers</div>
+    <div id="featuredList"></div>
+  </section>
+
+  <!-- Ad Banner -->
+  <div class="ad-banner" onclick="comingSoon('provider')" style="margin:14px 16px 0;">
+    <div class="ad-icon">🎁</div>
+    <div class="ad-text">
+      <div class="ad-label">Early Access Offer</div>
+      <div class="ad-title">List your services for free</div>
+      <div class="ad-sub">Join as a provider before launch</div>
+    </div>
+    <button class="ad-btn" onclick="event.stopPropagation();window.location.href='presignup.html'">Join Now</button>
+  </div>
+
+  <!-- Nearby Providers -->
+  <section class="nearby-section">
+    <div class="section-label"><div class="dot"></div> Providers Near You</div>
+    <div id="nearbyGrid"></div>
+    <div class="spacer"></div>
+  </section>
+
+</main>
+
+<!-- ── DEMO PROVIDER PANEL ───────────────────────────────────── -->
+<div class="dp-overlay" id="dpOverlay">
+  <div class="dp-page">
+    <nav class="dp-topnav">
+      <button class="dp-back" onclick="closeDemoProvider()"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="dp-nav-title" id="dpNavTitle">Provider Profile</div>
+      <button class="dp-back" onclick="comingSoon('saved')" title="Save"><i class="fa-regular fa-bookmark"></i></button>
+      <button class="dp-back" onclick="comingSoon('share')" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
+    </nav>
+
+    <div class="dp-preview-bar">
+      <i class="fa-solid fa-flask"></i>
+      <span><strong>Preview Mode</strong> — This is a sample profile. Full profiles unlock at launch.</span>
+    </div>
+
+    <div class="dp-hero">
+      <div class="dp-hero-inner">
+        <div class="dp-avatar" id="dpAvatar"></div>
+        <div class="dp-hero-info">
+          <div class="dp-hero-name" id="dpName"></div>
+          <div class="dp-hero-loc" id="dpLoc"></div>
+          <div class="dp-badges" id="dpBadges"></div>
+        </div>
+      </div>
+      <div class="dp-stats">
+        <div class="dp-stat"><div class="dp-stat-val" id="dpRating"></div><div class="dp-stat-label">Rating</div></div>
+        <div class="dp-stat"><div class="dp-stat-val" id="dpReviews"></div><div class="dp-stat-label">Reviews</div></div>
+        <div class="dp-stat"><div class="dp-stat-val" id="dpServices"></div><div class="dp-stat-label">Services</div></div>
+      </div>
+    </div>
+
+    <div class="dp-contact">
+      <button class="dp-btn-inquire" onclick="comingSoon('contact')">
+        <i class="fa-solid fa-phone-volume"></i> Inquire
+      </button>
+      <button class="dp-btn-save" onclick="comingSoon('saved')">
+        <i class="fa-regular fa-bookmark"></i> Save
+      </button>
+    </div>
+
+    <div class="dp-body">
+      <div class="dp-sec">
+        <div class="dp-sec-title"><i class="fa-solid fa-circle-info"></i> About</div>
+        <div class="dp-about" id="dpAbout"></div>
+        <div style="margin-top:12px;" id="dpDetails"></div>
+      </div>
+
+      <div class="dp-sec">
+        <div class="dp-sec-title"><i class="fa-solid fa-list-check"></i> Services Offered</div>
+        <div id="dpListings"></div>
+      </div>
+
+      <div class="dp-sec">
+        <div class="dp-sec-title"><i class="fa-solid fa-star"></i> Customer Reviews</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+          <div style="font-size:2rem;font-weight:900;color:var(--navy);line-height:1;" id="dpRatingBig"></div>
+          <div>
+            <div style="font-size:1.5rem;color:var(--gold);line-height:1;">★</div>
+            <div style="font-size:0.72rem;font-weight:700;color:var(--text-3);" id="dpRatingLabel"></div>
+          </div>
+        </div>
+        <div id="dpReviewsList"></div>
+        <div style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--text-3);padding:10px;background:var(--bg);border-radius:8px;">
+          <i class="fa-solid fa-lock" style="color:var(--brand);"></i> More reviews visible after launch
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:8px 0 4px;">
+        <button onclick="comingSoon('contact')" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(255,90,31,0.3);display:flex;align-items:center;justify-content:center;gap:8px;">
+          <i class="fa-solid fa-phone-volume"></i> Inquire about this Provider
+        </button>
+        <div style="margin-top:10px;font-size:0.75rem;color:var(--text-3);">
+          Not ready yet? <span style="color:var(--brand);font-weight:700;cursor:pointer;" onclick="closeDemoProvider()">Go back to explore</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── COMING SOON MODAL ─────────────────────────────────────── -->
+<div class="cs-overlay" id="csOverlay" onclick="handleCsOverlay(event)">
+  <div class="cs-sheet">
+    <div class="cs-handle"></div>
+    <div class="cs-icon" id="csIcon">🚀</div>
+    <div class="cs-title" id="csTitle">Coming Soon!</div>
+    <div class="cs-sub" id="csSub">This feature will be available when Fixia officially launches. Sign up now to get early access.</div>
+    <div class="cs-actions">
+      <button class="cs-btn-primary" onclick="window.location.href='presignup.html'">
+        <i class="fa-solid fa-rocket"></i> Join Early Access
+      </button>
+    </div>
+    <div class="cs-dismiss" onclick="closeCs()">Maybe later</div>
+  </div>
+</div>
+
+<!-- ── BOTTOM NAV ────────────────────────────────────────────── -->
+<nav class="bottom-nav">
+  <button class="bnav-item active"><i class="fa-solid fa-house"></i>Home</button>
+  <button class="bnav-item" onclick="comingSoon('saved')"><i class="fa-regular fa-bookmark"></i>Saved</button>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="comingSoon('browse')">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <button class="bnav-item" onclick="comingSoon('bookings')"><i class="fa-solid fa-clipboard-list"></i>Bookings</button>
+  <button class="bnav-item" onclick="comingSoon('profile')"><i class="fa-regular fa-user"></i>Profile</button>
+</nav>
+
+<script>
+
+/* ── Dummy Data ────────────────────────────────────────────── */
+const FEATURED = [
+  { id:'f1', name:'Ramon Cruz',  biz:'RamonFix Plumbing', service:'Master Plumber', rating:'4.9', reviews:128, loc:'Quezon City',  avatar:'👨🏽‍🔧', color:'#1a3a2a',
+    desc:'Licensed master plumber with 12 years of experience. Specializing in leak repairs, pipe installation, bathroom renovation, and emergency plumbing across Metro Manila.',
+    services:[{title:'Leak Detection & Repair', price:'₱350/hr', desc:'Fast and accurate leak detection using modern tools.'},{title:'Pipe Installation', price:'₱500/hr', desc:'New pipe layout for residential and commercial units.'},{title:'Bathroom Renovation', price:'₱8,000+', desc:'Full bathroom plumbing overhaul including fixtures.'}],
+    reviews_data:[{name:'Ben T.', stars:5, date:'May 2025', comment:'Super bilis mag-ayos! Professional talaga si Kuya Ramon.'},{name:'Anna L.', stars:5, date:'Apr 2025', comment:'Fixed our leak in under an hour. Highly recommended!'}],
+    city:'Quezon City', member:'January 2023', elite:true, featured:true },
+  { id:'f2', name:'Ana Reyes',   biz:'Ana Creative Paints', service:'Interior Painter', rating:'4.8', reviews:94, loc:'Makati', avatar:'👩🏽‍🎨', color:'#2a1a3a',
+    desc:'Professional interior and exterior painter. Clean, odor-managed work with premium paints. Serving BGC, Makati, and Mandaluyong with 8 years of experience.',
+    services:[{title:'Interior Painting (per room)', price:'₱2,500+', desc:'Walls, ceiling, and trim. Paint brand of your choice.'},{title:'Exterior Painting', price:'₱5,000+', desc:'Weather-resistant paints for gates, fences, facades.'},{title:'Furniture Repainting', price:'₱800+', desc:'Restore old furniture with a fresh coat.'}],
+    reviews_data:[{name:'Mark S.', stars:5, date:'May 2025', comment:'Napakaganda ng output! Walang mantsa, malinis ang trabaho.'},{name:'Lyn P.', stars:4, date:'Mar 2025', comment:'Great painter, on time and very tidy.'}],
+    city:'Makati', member:'March 2022', elite:false, featured:true },
+  { id:'f3', name:'Jose Santos',  biz:'Santos Electrical Services', service:'Electrical Works', rating:'5.0', reviews:203, loc:'Pasig', avatar:'👨🏽‍💼', color:'#1a2a3a',
+    desc:'PRC-licensed electrician offering residential and commercial electrical services. Over 15 years of safe, code-compliant work across Metro Manila.',
+    services:[{title:'Panel Board Installation', price:'₱3,500+', desc:'Upgrade or install new circuit breaker panels.'},{title:'Outlet & Wiring Works', price:'₱250/point', desc:'Add new outlets, switches, or rewire existing circuits.'},{title:'Emergency Electrical Repair', price:'₱500 callout + labor', desc:'24/7 emergency response for electrical issues.'}],
+    reviews_data:[{name:'Rico V.', stars:5, date:'May 2025', comment:'Legit na licensed electrician. Maayos at mabilis!'},{name:'Clara J.', stars:5, date:'Apr 2025', comment:'Fixed our panel board. No issues since. 10/10!'}],
+    city:'Pasig', member:'June 2021', elite:true, featured:true },
+];
+
+const NEARBY = [
+  { id:'n1', name:'Maria Dela Cruz',    biz:'Maria Clean PH', service:'Home Cleaning Specialist',    rating:'4.9', reviews:87,  loc:'Mandaluyong', dist:'1.2 km', avatar:'👩🏽‍💼', online:true,  verified:true,
+    desc:'Meticulous home cleaning professional. Experienced in deep cleaning, post-construction cleanup, and regular maintenance cleaning. Trusted by over 80 households.',
+    services:[{title:'Regular Home Cleaning', price:'₱600/session', desc:'Dusting, mopping, vacuuming, kitchen and bathroom cleaning.'},{title:'Deep Cleaning', price:'₱1,500+', desc:'Full top-to-bottom deep clean including appliances.'}],
+    reviews_data:[{name:'Trish A.', stars:5, date:'May 2025', comment:'Our go-to cleaner! Always thorough and on time.'},{name:'James K.', stars:5, date:'Apr 2025', comment:'Left the place spotless. Highly recommend!'}],
+    city:'Mandaluyong', member:'February 2023', elite:false, featured:false },
+  { id:'n2', name:'Carlos Mendoza',     biz:'CoolBreeze Aircon Services', service:'Aircon Installation & Repair', rating:'4.7', reviews:142, loc:'Taguig', dist:'2.4 km', avatar:'👨🏽‍🔧', online:true,  verified:true,
+    desc:'Certified aircon technician with expertise in all major brands — Daikin, Carrier, Panasonic, Samsung. Installation, cleaning, and repair for homes and offices.',
+    services:[{title:'Aircon Cleaning (window type)', price:'₱350', desc:'Coil wash and general cleaning.'},{title:'Aircon Installation', price:'₱1,200+', desc:'Supply and install bracket, copper tubing, and drain line.'},{title:'Refrigerant Recharge', price:'₱800+', desc:'Check for leaks and recharge Freon.'}],
+    reviews_data:[{name:'Noel B.', stars:5, date:'May 2025', comment:'Maasikaso at mabilis! Malamig na ulit ang aircon namin.'},{name:'Sha R.', stars:4, date:'Apr 2025', comment:'Good service, fair price.'}],
+    city:'Taguig', member:'August 2022', elite:false, featured:false },
+  { id:'n3', name:'Liza Bautista',      biz:'Liza Custom Carpentry', service:'Carpentry & Furniture',    rating:'4.8', reviews:61,  loc:'Pasay', dist:'3.1 km', avatar:'👩🏽‍', online:false, verified:true,
+    desc:'Custom furniture maker and carpenter. Cabinets, shelves, bed frames, and table sets made to order. 10 years crafting quality pieces for homes across Manila.',
+    services:[{title:'Custom Cabinet', price:'₱5,000+', desc:'Kitchen, bedroom, or living room cabinets to spec.'},{title:'Furniture Repair', price:'₱500+', desc:'Fix broken chairs, tables, drawers, and more.'}],
+    reviews_data:[{name:'Gino P.', stars:5, date:'Apr 2025', comment:'Gawa niya yung cabinet namin — sobrang ganda at matibay!'},{name:'Cel M.', stars:5, date:'Mar 2025', comment:'Very skilled and detail-oriented.'}],
+    city:'Pasay', member:'November 2022', elite:false, featured:false },
+  { id:'n4', name:'Roberto Villanueva', biz:'SecureView CCTV', service:'Security & CCTV Setup', rating:'4.6', reviews:55,  loc:'Parañaque', dist:'3.8 km', avatar:'👨🏽‍💻', online:true,  verified:false,
+    desc:'CCTV installation specialist for homes and small businesses. NVR/DVR setup, camera placement planning, remote viewing configuration, and maintenance.',
+    services:[{title:'CCTV Installation (2 cameras)', price:'₱4,500+', desc:'Supply and install 2 HD cameras with DVR.'},{title:'Remote Viewing Setup', price:'₱500', desc:'Configure mobile app access to your CCTV.'}],
+    reviews_data:[{name:'Remy O.', stars:5, date:'Apr 2025', comment:'Malinaw ang camera, maganda ang setup. Salamat!'},{name:'Dave T.', stars:4, date:'Mar 2025', comment:'Good work, responsive.'}],
+    city:'Parañaque', member:'May 2023', elite:false, featured:false },
+  { id:'n5', name:'Grace Aquino',       biz:'GraceClean Sanitation', service:'Deep Cleaning & Sanitation', rating:'5.0', reviews:210, loc:'Las Piñas', dist:'4.2 km', avatar:'👩🏽‍⚕️', online:false, verified:true,
+    desc:'Sanitation and disinfection expert. Specializing in post-flood cleanup, post-construction, and full-property disinfection. Serving Las Piñas, Muntinlupa, and Alabang.',
+    services:[{title:'Full Property Disinfection', price:'₱2,000+', desc:'EPA-approved disinfectants, full coverage.'},{title:'Post-Flood Cleanup', price:'₱3,500+', desc:'Debris removal, drying, and disinfection.'}],
+    reviews_data:[{name:'Tony L.', stars:5, date:'May 2025', comment:'Best cleaning service! Sobrang linis after nila.'},{name:'Luz F.', stars:5, date:'Apr 2025', comment:'Professional and very thorough.'}],
+    city:'Las Piñas', member:'September 2021', elite:false, featured:false },
+  { id:'n6', name:'Dante Reyes',        biz:'GreenScape Garden PH', service:'Landscaping & Garden Care', rating:'4.8', reviews:78,  loc:'Muntinlupa', dist:'5.0 km', avatar:'👨🏽‍🌾', online:true,  verified:true,
+    desc:'Professional landscaper and garden maintenance specialist. Garden design, lawn care, tree trimming, and plant installation for residential properties.',
+    services:[{title:'Garden Maintenance', price:'₱800/visit', desc:'Mowing, trimming, weeding, and watering.'},{title:'Landscape Design & Install', price:'₱5,000+', desc:'Full garden redesign with plants and hardscape.'}],
+    reviews_data:[{name:'Mila C.', stars:5, date:'May 2025', comment:'Ang ganda ng garden namin ngayon. Talentado si Kuya Dante!'},{name:'Rod B.', stars:5, date:'Apr 2025', comment:'Very creative and hardworking.'}],
+    city:'Muntinlupa', member:'April 2022', elite:false, featured:false },
+];
+
+/* ── Render Featured ───────────────────────────────────────── */
+function renderFeatured() {
+  const list = document.getElementById('featuredList');
+  list.innerHTML = FEATURED.map(p => `
+    <div class="featured-card" onclick="openDemoProvider('${p.id}')">
+      <div class="fc-img" style="background:${p.color};">${p.avatar}</div>
+      <div class="fc-badge"><i class="fa-solid fa-star" style="color:var(--gold);font-size:8px;"></i> ${p.rating}</div>
+      <div class="cs-chip">Preview</div>
+      <div class="fc-body">
+        <div class="fc-rating"><i class="fa-solid fa-star"></i>${p.rating} <span style="color:rgba(255,255,255,0.4);font-weight:400;">(${p.reviews})</span></div>
+        <div class="fc-name">${p.name}</div>
+        <div class="fc-service">${p.service}</div>
+        <div class="fc-loc"><i class="fa-solid fa-location-dot"></i>${p.loc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Render Nearby ─────────────────────────────────────────── */
+function renderNearby() {
+  const grid = document.getElementById('nearbyGrid');
+  grid.innerHTML = NEARBY.map(p => `
+    <div class="provider-card" onclick="openDemoProvider('${p.id}')">
+      <div class="provider-avatar">
+        ${p.avatar}
+        ${p.online ? '<div class="online-dot"></div>' : ''}
+      </div>
+      <div class="provider-info">
+        <div class="provider-name">${p.name}</div>
+        <div class="provider-service">${p.service}</div>
+        <div class="provider-meta">
+          <div class="stars-row">
+            <i class="fa-solid fa-star"></i>
+            <span>${p.rating} (${p.reviews})</span>
+          </div>
+          <div class="pmeta-item"><i class="fa-solid fa-location-dot"></i>${p.dist}</div>
+          <div class="pmeta-item"><i class="fa-solid fa-map-marker-alt"></i>${p.loc}</div>
+        </div>
+      </div>
+      <div class="provider-action">
+        ${p.verified ? '<div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>' : '<div></div>'}
+        <button class="contact-btn" onclick="event.stopPropagation();openDemoProvider('${p.id}')">
+          <i class="fa-solid fa-comment"></i> View
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Demo Provider Panel ───────────────────────────────────── */
+const ALL_PROVIDERS = [...FEATURED, ...NEARBY];
+
+function openDemoProvider(id) {
+  const p = ALL_PROVIDERS.find(x => x.id === id);
+  if (!p) return;
+
+  document.getElementById('dpNavTitle').textContent = p.biz || p.name;
+  document.getElementById('dpAvatar').textContent   = p.avatar;
+  document.getElementById('dpName').textContent     = p.biz || p.name;
+  document.getElementById('dpLoc').textContent      = p.city || p.loc;
+  document.getElementById('dpRating').textContent   = p.rating;
+  document.getElementById('dpReviews').textContent  = p.reviews;
+  document.getElementById('dpServices').textContent = p.services.length;
+  document.getElementById('dpAbout').textContent    = p.desc;
+  document.getElementById('dpRatingBig').textContent = p.rating;
+  document.getElementById('dpRatingLabel').textContent = `Based on ${p.reviews} reviews`;
+
+  // Badges
+  let badges = '<span class="dpbadge dpbadge-green">✅ Verified</span>';
+  if (p.elite)    badges += ' <span class="dpbadge dpbadge-gold">👑 Fixia Elite</span>';
+  if (p.featured) badges += ' <span class="dpbadge dpbadge-brand">⭐ Featured</span>';
+  document.getElementById('dpBadges').innerHTML = badges;
+
+  // Details
+  document.getElementById('dpDetails').innerHTML = `
+    <div class="dp-detail-row">
+      <div class="dp-detail-icon"><i class="fa-solid fa-location-dot"></i></div>
+      <div><div class="dp-detail-label">Location</div><div class="dp-detail-val">${p.city || p.loc}, Metro Manila</div></div>
+    </div>
+    <div class="dp-detail-row">
+      <div class="dp-detail-icon"><i class="fa-solid fa-wrench"></i></div>
+      <div><div class="dp-detail-label">Main Service</div><div class="dp-detail-val">${p.service}</div></div>
+    </div>
+    <div class="dp-detail-row">
+      <div class="dp-detail-icon"><i class="fa-solid fa-calendar-days"></i></div>
+      <div><div class="dp-detail-label">Member Since</div><div class="dp-detail-val">${p.member}</div></div>
+    </div>`;
+
+  // Services
+  document.getElementById('dpListings').innerHTML = p.services.map(s => `
+    <div class="dp-listing">
+      <div class="dp-li-head">
+        <div class="dp-li-title">${s.title}</div>
+        <div class="dp-li-price">${s.price}</div>
+      </div>
+      <div class="dp-li-desc">${s.desc}</div>
+    </div>`).join('');
+
+  // Reviews
+  document.getElementById('dpReviewsList').innerHTML = p.reviews_data.map(r => `
+    <div class="dp-review">
+      <div class="dp-rv-head">
+        <div class="dp-rv-name">${r.name}</div>
+        <div class="dp-rv-date">${r.date}</div>
+      </div>
+      <div class="dp-rv-stars">${'<i class="fa-solid fa-star"></i>'.repeat(r.stars)}</div>
+      <div class="dp-rv-comment">${r.comment}</div>
+    </div>`).join('');
+
+  // Open
+  const overlay = document.getElementById('dpOverlay');
+  overlay.classList.add('active');
+  overlay.scrollTop = 0;
+}
+
+function closeDemoProvider() {
+  document.getElementById('dpOverlay').classList.remove('active');
+}
+
+/* ── Coming Soon Modal ─────────────────────────────────────── */
+const CS_CONTENT = {
+  search:        { icon:'🔍', title:'Search Coming Soon',        sub:'Find providers by service, name, or location — launching very soon!' },
+  browse:        { icon:'📂', title:'Browse Coming Soon',        sub:'Explore all service categories and filter by location, rating, and more.' },
+  provider:      { icon:'👤', title:'Provider Profiles Coming Soon', sub:'Full provider profiles with reviews, portfolio, and booking — launching soon.' },
+  contact:       { icon:'💬', title:'Messaging Coming Soon',     sub:'Chat directly with providers, request quotes, and schedule jobs.' },
+  notifications: { icon:'🔔', title:'Notifications Coming Soon', sub:"You'll get real-time updates on bookings, messages, and offers at launch." },
+  saved:         { icon:'🔖', title:'Saved Coming Soon',         sub:'Save your favorite providers and revisit them anytime after launch.' },
+  bookings:      { icon:'📋', title:'Bookings Coming Soon',      sub:'Manage all your service bookings, schedules, and history in one place.' },
+  profile:       { icon:'👤', title:'Profile Coming Soon',       sub:'Your personal dashboard — manage your account, settings, and reviews.' },
+  location:      { icon:'📍', title:'Location Filter Coming Soon', sub:'Filter providers by your exact city or barangay when we go live.' },
+};
+
+function comingSoon(type) {
+  const c = CS_CONTENT[type] || { icon:'🚀', title:'Coming Soon!', sub:'This feature will be available at launch.' };
+  document.getElementById('csIcon').textContent  = c.icon;
+  document.getElementById('csTitle').textContent = c.title;
+  document.getElementById('csSub').textContent   = c.sub;
+  document.getElementById('csOverlay').classList.add('active');
+}
+
+function closeCs() {
+  document.getElementById('csOverlay').classList.remove('active');
+}
+
+function handleCsOverlay(e) {
+  if (e.target === document.getElementById('csOverlay')) closeCs();
+}
+
+/* ── Early Access Banner ───────────────────────────────────── */
+function dismissBanner() {
+  document.getElementById('earlyBanner').classList.add('hidden');
+  sessionStorage.setItem('fixia_demo_banner_dismissed', '1');
+}
+
+/* ── Init ──────────────────────────────────────────────────── */
+renderFeatured();
+renderNearby();
+
+// Restore banner dismissal
+if (sessionStorage.getItem('fixia_demo_banner_dismissed') === '1') {
+  document.getElementById('earlyBanner').classList.add('hidden');
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

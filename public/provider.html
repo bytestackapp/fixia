@@ -401,7 +401,7 @@ async function renderPage() {
     }
   }
   document.getElementById('heroName').textContent   = provider.biz_name;
-  const headerLoc = [provider.city_name, provider.province_name].filter(Boolean).join(', '); // keep header short
+  const headerLoc = [provider.city_name?.replace(/^City of (.+)/, '$1 City'), provider.province_name].filter(Boolean).join(', ');
   document.getElementById('heroService').textContent = headerLoc || '—';
 
   // Elite
@@ -430,7 +430,12 @@ if (provider.status === 'approved') {
   // About
   document.getElementById('aboutText').textContent = provider.biz_desc || 'No description provided.';
 
-  const loc = [provider.street_addr, provider.barangay_name, provider.city_name, provider.province_name].filter(Boolean).join(', ');
+  const loc = [
+    provider.street_addr || null,
+    provider.barangay_name && provider.barangay_name !== 'Select Barangay…' ? provider.barangay_name : null,
+    provider.city_name?.replace(/^City of (.+)/, '$1 City'),
+    provider.province_name
+  ].filter(Boolean).join(', ');
   const mainService = listings?.[0]?.cat_sub || null;
   const memberSince = provider.created_at
     ? new Date(provider.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'long' })
@@ -440,12 +445,12 @@ if (provider.status === 'approved') {
     ${loc ? `
     <div class="detail-row">
       <div class="detail-icon"><i class="fa-solid fa-location-dot"></i></div>
-      <div><div class="detail-label">Location</div><div class="detail-val">${loc}</div></div>
+      <div><div class="detail-label">Location</div><div class="detail-val">${esc(loc)}</div></div>
     </div>` : ''}
     ${mainService ? `
     <div class="detail-row">
       <div class="detail-icon"><i class="fa-solid fa-wrench"></i></div>
-      <div><div class="detail-label">Main Service</div><div class="detail-val">${mainService}</div></div>
+      <div><div class="detail-label">Main Service</div><div class="detail-val">${esc(mainService)}</div></div>
     </div>` : ''}
     ${memberSince ? `
     <div class="detail-row">
@@ -480,11 +485,11 @@ if (!session || !FX.getSession()?.adsFree) {
     document.getElementById('listingsBody').innerHTML = activeListing.map(l => `
       <div class="listing-item">
         <div class="li-head">
-          <div class="li-title">${l.title}</div>
-          ${l.price_label ? `<div class="li-price">${l.price_label}</div>` : ''}
+          <div class="li-title">${esc(l.title)}</div>
+          ${l.price_label ? `<div class="li-price">${esc(l.price_label)}</div>` : ''}
         </div>
         <div class="li-sub">${CAT_LABELS[l.cat_main] || l.cat_main || ''} &nbsp; • &nbsp; ${l.cat_sub || ''}</div>
-        <div class="li-desc">${l.description || ''}</div>
+        <div class="li-desc">${esc(l.description)}</div>
       </div>`).join('');
   }
 
@@ -545,7 +550,7 @@ function renderReviews() {
           <div class="ri-stars">${stars}</div>
           <div class="ri-date">${fmtDate(r.created_at)}</div>
         </div>
-        ${r.comment ? `<div class="ri-comment">${r.comment}</div>` : '<div class="ri-comment" style="color:var(--text-3);font-style:italic;font-size:0.75rem;">No comment left.</div>'}
+        ${r.comment ? `<div class="ri-comment">${esc(r.comment)}</div>` : '<div class="ri-comment" style="color:var(--text-3);font-style:italic;font-size:0.75rem;">No comment left.</div>'}
       </div>`;
     }).join('')}`;
 }
@@ -555,13 +560,13 @@ function renderReviews() {
 ══════════════════════════════════════════════════════════════ */
 function callProvider() {
   const phone = providerUser?.phone;
-  if (!phone) { alert('Contact number not available.'); return; }
+  if (!phone) { showToast('Contact number not available.', '#92400e'); return; }
   window.location.href = `tel:${phone}`;
 }
 
 function smsProvider() {
   const phone = providerUser?.phone;
-  if (!phone) { alert('Contact number not available.'); return; }
+  if (!phone) { showToast('Contact number not available.', '#92400e'); return; }
   window.location.href = `sms:${phone}`;
 }
 
@@ -635,8 +640,8 @@ function shareProfile() {
     navigator.share({ title, url }).catch(() => {});
   } else {
     navigator.clipboard?.writeText(url)
-      .then(() => alert('Link copied to clipboard!'))
-      .catch(() => alert('Share link: ' + url));
+    .then(() => showToast('Link copied to clipboard! 🔗'))
+    .catch(() => showToast('Share link: ' + url, '#92400e'));
   }
 }
 
@@ -758,18 +763,17 @@ function showToast(msg, color) {
 function openInquire() {
   const sess = FX.getSession();
   if (!sess) {
-    if (confirm('Please sign in to contact this provider. Go to login?')) {
-      window.location.href = 'login.html';
-    }
+    showToast('Please sign in to contact this provider.', '#92400e');
+    setTimeout(() => window.location.href = 'login.html', 1800);
     return;
   }
   if (sess.role === 'provider') {
-    alert('Providers cannot contact other providers. Please use a regular account.');
+    showToast('Providers cannot contact other providers. Use a regular account.', '#92400e');
     return;
   }
-  if (!provider) { alert('Provider info not loaded yet. Please wait.'); return; }
+  if (!provider) { showToast('Provider info not loaded yet. Please wait.', '#92400e'); return; }
   if (provider.user_id === sess.userId) {
-    alert('You cannot contact your own profile.');
+    showToast('You cannot contact your own profile.', '#92400e');
     return;
   }
 

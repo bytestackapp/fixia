@@ -127,17 +127,19 @@
     /* ── BUTTONS ─────────────────────────────────────────────── */
     .btn-xs{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:0.68rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
     .btn-xs:active{transform:scale(0.96);}
-    .btn-approve{background:var(--green-bg);color:var(--green-text);}
-    .btn-approve:hover{background:#D1FAE5;}
+    .btn-approve{background:var(--green);color:#fff;}
+	.btn-approve:hover{background:#059669;}
     .btn-reject{background:var(--red-bg);color:var(--red-text);}
     .btn-reject:hover{background:#FEE2E2;}
     .btn-edit{background:var(--blue-bg);color:var(--blue-text);}
     .btn-edit:hover{background:#DBEAFE;}
     .btn-delete{background:var(--red-bg);color:var(--red-text);}
-    .btn-elite{background:var(--gold-bg);color:var(--gold-text);}
-    .btn-elite:hover{background:#FEF3C7;}
+    .btn-elite{background:var(--gold);color:#fff;}
+	.btn-elite:hover{background:#D97706;}
     .btn-view{background:var(--bg);color:var(--text-2);border:1px solid var(--border);}
     .btn-row{display:flex;gap:5px;flex-wrap:wrap;}
+	.btn-dark{background:#1A2332;color:#fff;}
+	.btn-dark:hover{background:#0F1B2D;}
 
     .btn{padding:9px 18px;border:none;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;}
     .btn-brand{background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 4px 14px rgba(255,90,31,0.25);}
@@ -193,7 +195,8 @@
     /* ── PACKAGE CARDS ───────────────────────────────────────── */
     .pkg-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
     .pkg-admin-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px;position:relative;}
-    .pkg-admin-card.inactive{opacity:0.55;}
+    .pkg-admin-card.active-card{background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.25);}
+	.pkg-admin-card.hidden-card{background:rgba(156,163,175,0.10);border-color:rgba(156,163,175,0.30);}
     .pkg-admin-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
     .pkg-admin-icon{font-size:1.5rem;}
     .pkg-admin-name{font-size:0.9rem;font-weight:800;color:var(--navy);}
@@ -336,7 +339,7 @@
         <button class="ftab" id="pendingTabCompliance" onclick="switchPendingTab('compliance',this)">⚠️ Need Compliance</button>
       </div>
       <div class="sec-card">
-        <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-clock"></i> Provider Applications</div></div>
+		<div class="sec-head"><div class="sec-title"><i class="fa-solid fa-clock"></i> Pending Applications</div></div>
         <div id="pendingList"><div class="loading">Loading…</div></div>
         <div id="complianceList" style="display:none;"><div class="loading">Loading…</div></div>
       </div>
@@ -625,13 +628,44 @@
       </div>
     </div>
   </div>
-  
+  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
+      <i class="fa-solid fa-rectangle-ad" style="color:var(--brand);"></i> Inline Ad Behaviour
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+      Manage inline ad placement between provider listings. Changes apply on the next page load.
+    </div>
+	<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Homepage — Ad Interval</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Number of provider cards shown before an inline ad appears.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="inlineAdIntervalInput" type="number" min="1" max="20" placeholder="4"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('inline_ad_interval','inlineAdIntervalInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+      </div>
+    </div>
+    <div style="padding:10px 0;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Search — Ad Interval</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Number of provider cards shown before an inline ad appears.</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="inlineAdIntervalSearchInput" type="number" min="1" max="20" placeholder="4"
+               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('inline_ad_interval_search','inlineAdIntervalSearchInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">
+          Save
+        </button>
+      </div>
+    </div>	
+  </div>
   <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
     <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
       <i class="fa-solid fa-rectangle-ad" style="color:var(--brand);"></i> Pop-Up Ad Behaviour
     </div>
     <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-      Controls how often pop-up ads appear for free regular users. Changes take effect immediately on next page load.
+      Manage pop-up ad frequency for free users. Changes apply on the next page load.
     </div>
 
     <div style="padding:10px 0;border-bottom:1px solid var(--border);">
@@ -676,14 +710,14 @@
 
 <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
     <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
-      <i class="fa-solid fa-ban" style="color:var(--red);"></i> Provider Suspension
+      <i class="fa-solid fa-store" style="color:var(--brand);"></i> Provider Settings
     </div>
     <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-      How many days a provider remains suspended after acknowledging their suspension notice. After this period their account is automatically restored.
+      Configure global provider behavior including suspension duration and featured homepage appearance settings.
     </div>
     <div style="padding:10px 0;">
       <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Suspension Duration (days)</div>
-      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Default: 7 days.</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Suspension duration for reported providers.</div>
       <div style="display:flex;gap:8px;align-items:center;">
         <input id="suspensionDaysInput" type="number" min="1" max="365" placeholder="7"
                style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
@@ -691,65 +725,75 @@
                 style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
       </div>
     </div>
+    <div style="padding:10px 0;border-top:1px solid var(--border);margin-top:8px;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Featured Impression Quota</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">
+        Featured provider homepage appearances per cycle. Fixia Elite not affected.
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="featuredQuotaInput" type="number" min="100" max="10000" placeholder="500"
+               style="width:100px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
+        <button onclick="saveAdSetting('featured_impression_quota','featuredQuotaInput')"
+                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      </div>
+    </div>	
+	
   </div>
-	  
-  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
-    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
-      <i class="fa-solid fa-layer-group" style="color:var(--brand);"></i> Ad Batch Rotation
-    </div>
-    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-      Controls how many ads run per batch and how long each batch lasts. When a batch expires and the queue is full, the next batch auto-promotes at midnight.
-    </div>
-    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
-      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Ads Per Batch</div>
-      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many ads (inline or popup) run per batch cycle. Default: 6.</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="adBatchSizeInput" type="number" min="1" max="20" placeholder="6"
-               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
-        <button onclick="saveAdSetting('ad_batch_size','adBatchSizeInput')"
-                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
-      </div>
-    </div>
-    <div style="padding:10px 0;">
-      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Ad Batch Duration (days)</div>
-      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many days each ad batch runs before expiring. Default: 30.</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="adBatchDaysInput" type="number" min="1" max="365" placeholder="30"
-               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
-        <button onclick="saveAdSetting('ad_batch_days','adBatchDaysInput')"
-                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
-      </div>
-    </div>
+  
+<div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
+  <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:14px;">
+    <i class="fa-solid fa-rocket" style="color:var(--brand);"></i> Pre-Signup Mode
+  </div>
+  <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+    When active, payment is skipped during signup and users are automatically assigned the selected packages. Use this for pre-launch signups.
   </div>
 
-  <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;margin-top:16px;max-width:480px;">
-    <div style="font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:6px;">
-      <i class="fa-solid fa-star" style="color:var(--brand);"></i> Featured Provider Batch Rotation
+  <!-- Toggle -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+    <div>
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text);">Pre-Signup Mode</div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-top:2px;">When on, payment step is hidden for all new signups.</div>
     </div>
-    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-      Controls how many featured providers run per batch and how long each batch lasts.
+    <label class="toggle">
+      <input type="checkbox" id="presignupModeToggle" onchange="savePresignupMode(this.checked)"/>
+      <div class="toggle-slider"></div>
+    </label>
+  </div>
+
+  <!-- Regular Package -->
+  <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+    <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Regular User Package</div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Package automatically assigned to regular users who sign up during pre-signup mode.</div>
+    <select id="presignupRegularPkg" onchange="savePresignupPkg('presignup_regular_package','presignupRegularPkg')"
+            style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-family:inherit;color:var(--text);">
+      <option value="">— Select a package —</option>
+    </select>
+  </div>
+
+  <!-- Provider Package -->
+  <div style="padding:10px 0;">
+    <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Provider Package</div>
+    <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">Package automatically assigned to providers who sign up during pre-signup mode.</div>
+    <select id="presignupProviderPkg" onchange="savePresignupPkg('presignup_provider_package','presignupProviderPkg')"
+            style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-family:inherit;color:var(--text);">
+      <option value="">— Select a package —</option>
+    </select>
+  </div>
+
+  <!-- Live counter -->
+  <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);display:flex;gap:16px;">
+    <div style="text-align:center;flex:1;">
+      <div id="presignupRegularCount" style="font-size:1.4rem;font-weight:800;color:var(--brand);">—</div>
+      <div style="font-size:0.68rem;color:var(--text-3);font-weight:600;">Regular Sign-ups</div>
     </div>
-    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
-      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Featured Slots Per Batch</div>
-      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many featured providers are shown per batch cycle. Default: 3.</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="featBatchSizeInput" type="number" min="1" max="20" placeholder="3"
-               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
-        <button onclick="saveAdSetting('featured_batch_size','featBatchSizeInput')"
-                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
-      </div>
-    </div>
-    <div style="padding:10px 0;">
-      <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">Featured Batch Duration (days)</div>
-      <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:8px;">How many days each featured batch runs before expiring. Default: 30.</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="featBatchDaysInput" type="number" min="1" max="365" placeholder="30"
-               style="width:90px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:700;font-family:inherit;"/>
-        <button onclick="saveAdSetting('featured_batch_days','featBatchDaysInput')"
-                style="padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
-      </div>
+    <div style="width:1px;background:var(--border);"></div>
+    <div style="text-align:center;flex:1;">
+      <div id="presignupProviderCount" style="font-size:1.4rem;font-weight:800;color:var(--brand);">—</div>
+      <div style="font-size:0.68rem;color:var(--text-3);font-weight:600;">Provider Sign-ups</div>
     </div>
   </div>
+</div>  
+  
 </div>
 
 <!-- ── MESSAGES ──────────────────────────────────────────────── -->
@@ -982,7 +1026,7 @@
 <div id="infoDetailsModal" class="modal">
   <div class="modal-box" style="max-width:480px;width:92%;max-height:85vh;overflow-y:auto;">
     <div class="modal-head">
-      <h3><i class="fa-solid fa-circle-info" style="color:var(--brand);"></i> Provider Info</h3>
+      <h3><i class="fa-solid fa-circle-info" style="color:var(--brand);"></i> Applicant Info</h3>
       <button class="modal-x" onclick="closeModal('infoDetailsModal')">×</button>
     </div>
     <div id="infoDetailsBody" style="padding:1rem;display:flex;flex-direction:column;gap:12px;font-size:0.83rem;">
@@ -1013,20 +1057,29 @@
 
 <!-- ── FEATURED ROTATION STATS MODAL ──────────────────────────── -->
 <div id="rotationStatsModal" class="modal" onclick="if(event.target===this)closeModal('rotationStatsModal')">
-  <div class="modal-box lg">
-    <div class="modal-head">
+  <div class="modal-box lg" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
+    <div class="modal-head" style="flex-shrink:0;">
       <h3><i class="fa-solid fa-rotate" style="color:var(--brand);"></i> Featured Rotation Stats</h3>
       <button class="modal-x" onclick="closeModal('rotationStatsModal')">×</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="flex:1;overflow-y:auto;overflow-x:auto;">
       <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
         All featured providers sorted by most shown. Providers with fewer appearances will automatically 
         be prioritised in the next rotation cycle.
       </p>
       <div id="rotationStats"><div class="loading">Loading…</div></div>
     </div>
-    <div class="modal-foot">
+	<div class="modal-foot" style="flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeModal('rotationStatsModal')">Close</button>
+      <button class="btn btn-secondary" onclick="loadRotationStats()" style="gap:6px;">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+      <button class="btn btn-secondary" onclick="reactivateCompleted()" style="gap:6px;">
+        <i class="fa-solid fa-play"></i> Reactivate
+      </button>
+      <button class="btn btn-brand" onclick="exportRotationStatsExcel()" style="gap:6px;">
+        <i class="fa-solid fa-file-excel"></i> Export
+      </button>
     </div>
   </div>
 </div>
@@ -1076,6 +1129,18 @@
   <div class="page-title">Upgrade Requests</div>
   <div class="page-sub">Review and process pending provider plan upgrade submissions.</div>
 
+  <!-- Tab toggle -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;margin-top:4px;">
+    <button id="upgradeTabPending" onclick="switchUpgradeTab('pending')"
+      style="padding:6px 16px;border-radius:8px;border:none;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;">
+      ⏳ Pending
+    </button>
+    <button id="upgradeTabHistory" onclick="switchUpgradeTab('history')"
+      style="padding:6px 16px;border-radius:8px;border:none;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text-2);">
+      🗂 History
+    </button>
+  </div>
+
   <div class="sec-card">
     <div class="sec-head">
       <div class="sec-title"><i class="fa-solid fa-arrow-trend-up"></i> Pending Approvals</div>
@@ -1083,6 +1148,7 @@
     <div id="upgradesContainer">
       <div class="loading">Loading…</div>
     </div>
+	<div id="upgradeHistoryContainer" style="display:none;"></div>
   </div>
 </div>
 
@@ -1205,19 +1271,25 @@
 
 <!-- ── AD DETAILS MODAL ────────────────────────────────────────── -->
 <div id="adDetailsModal" class="modal" onclick="if(event.target===this)closeModal('adDetailsModal')">
-  <div class="modal-box lg">
-    <div class="modal-head">
+  <div class="modal-box lg" style="display:flex;flex-direction:column;max-height:90vh;overflow:hidden;">
+    <div class="modal-head" style="flex-shrink:0;">
       <h3 id="adDetailsTitle"><i class="fa-solid fa-chart-bar" style="color:var(--brand);"></i> Ad Details</h3>
       <button class="modal-x" onclick="closeModal('adDetailsModal')">×</button>
     </div>
-    <div class="modal-body">
-      <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
-        Summary of all ads for this type. Share with advertisers as a performance report.
+    <div class="modal-body" style="flex:1;overflow-y:auto;overflow-x:auto;">
+	  <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:14px;line-height:1.6;">
+        Full batch history for all ads of this type. Each row represents one completed or active batch run.
       </p>
       <div id="adDetailsTable"></div>
     </div>
-    <div class="modal-foot">
+    <div class="modal-foot" style="flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeModal('adDetailsModal')">Close</button>
+      <button class="btn btn-secondary" onclick="refreshAdDetails()" style="gap:6px;">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+      <button class="btn btn-brand" onclick="exportAdDetailsExcel()" style="gap:6px;">
+        <i class="fa-solid fa-file-excel"></i> Export to Excel
+      </button>
     </div>
   </div>
 </div>
@@ -1280,16 +1352,17 @@
       <div class="form-group">
         <label class="form-label">Impression Quota</label>
         <div style="font-size:0.72rem;color:var(--text-3);margin-bottom:6px;">How many impressions this ad runs for before completing. e.g. 5000 ≈ 1 month.</div>
-        <input class="form-input" id="adQuota" type="number" min="100" placeholder="5000"/>
+		<input class="form-input" id="adQuota" type="number" min="100" placeholder="5000"/>
       </div>
       <div class="form-group">
         <label class="form-label">Internal Notes <span style="font-weight:400;color:var(--text-3);">(not shown to users)</span></label>
         <textarea class="form-textarea" id="adNotes" placeholder="e.g. Paid ₱5,000 for 5,000 impressions — ref #INV-001"></textarea>
       </div>
     </div>
-    <div class="modal-foot">
+	<div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal('adModal')">Cancel</button>
-      <button class="btn btn-brand" onclick="saveAd()"><i class="fa-solid fa-floppy-disk"></i> Save Ad</button>
+      <button class="btn btn-brand" id="saveAdBtn" onclick="saveAd()"><i class="fa-solid fa-floppy-disk"></i> Save Ad</button>
+      <button class="btn btn-elite" id="reRunAdBtn" onclick="reRunAd()" style="display:none;"><i class="fa-solid fa-rotate-right"></i> Re-Run</button>
     </div>
   </div>
 </div>
@@ -1324,6 +1397,76 @@
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal('rejectModal')">Cancel</button>
       <button class="btn btn-danger" onclick="confirmReject()"><i class="fa-solid fa-ban"></i> Reject</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── RE-RUN AD CONFIRM MODAL ─────────────────────────────── -->
+<div id="reRunModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-rotate-right" style="color:var(--gold);"></i> Re-Run Ad</h3>
+      <button class="modal-x" onclick="closeModal('reRunModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;margin-bottom:10px;">
+        You are about to start a <strong>fresh batch</strong> for this ad.
+      </p>
+      <ul style="font-size:0.82rem;color:var(--text-2);line-height:1.9;padding-left:18px;margin-bottom:14px;">
+        <li>Impression count resets to <strong>0</strong></li>
+        <li>Quota will be set to <strong><span id="reRunQuotaPreview">—</span> impressions</strong></li>
+        <li>Previous batch is saved to history</li>
+      </ul>
+      <p style="font-size:0.8rem;color:var(--text-3);">This cannot be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('reRunModal')">Cancel</button>
+      <button class="btn btn-elite" onclick="confirmReRunAd()"><i class="fa-solid fa-rotate-right"></i> Yes, Re-Run</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOCATION PICKER MODAL ─────────────────────────────────── -->
+<div id="locationPickerModal" class="modal">
+  <div class="modal-box sm">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-location-dot" style="color:var(--brand);"></i> Edit Location</h3>
+      <button class="modal-x" onclick="closeModal('locationPickerModal')">×</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="form-group">
+        <label class="form-label">Region</label>
+        <select class="form-input" id="provSelRegion" onchange="provLoadProvinces(null)">
+          <option value="">Loading regions…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Province</label>
+        <select class="form-input" id="provSelProvince" onchange="provLoadCities(null)" disabled>
+          <option value="">Select Province…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / Municipality</label>
+        <select class="form-input" id="provSelCity" onchange="provLoadBarangays(null)" disabled>
+          <option value="">Select City / Municipality…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Barangay <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <select class="form-input" id="provSelBrgy" disabled>
+          <option value="">Select Barangay…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Street Address <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <input class="form-input" id="provStreetAddr" placeholder="e.g. 123 Rizal St."/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('locationPickerModal')">Cancel</button>
+      <button class="btn btn-brand" onclick="confirmLocationPick()"><i class="fa-solid fa-check"></i> Confirm</button>
     </div>
   </div>
 </div>
@@ -1527,6 +1670,7 @@
         <div class="form-group"><label class="form-label">Period</label>
           <select class="form-select" id="pkgPeriod">
             <option value="month">Monthly Plan</option>
+			<option value="3month">3-Month Plan</option>
 			<option value="6month">6-Month Plan</option>
             <option value="year">Annual Plan</option>
             <option value="lifetime">Lifetime Access</option>
@@ -1537,6 +1681,9 @@
         </div>
         <div class="form-group"><label class="form-label">Booking Limit <span style="font-weight:400;color:var(--text-3);">(999 = unlimited)</span></label>
           <input class="form-input" type="number" id="pkgBookingLimit" min="0" placeholder="5" value="5"/>
+        </div>
+		<div class="form-group"><label class="form-label">Redeem Points <span style="font-weight:400;color:var(--text-3);">(0 = unavailable)</span></label>
+          <input class="form-input" type="number" id="pkgReferralPoints" min="0" placeholder="0" value="0"/>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Sort Order</label><input class="form-input" type="number" id="pkgSort" placeholder="1" value="1"/>
@@ -1554,7 +1701,7 @@
           <span class="toggle-label">Show Badge</span>
           <input type="text" id="pkgBadgeLabel" class="form-input" placeholder="Popular" value="Popular" style="width:140px;padding:0.3rem 0.6rem;font-size:0.8rem;margin-left:8px;">
         </div>
-        <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgActive" checked><div class="toggle-slider"></div></label><span class="toggle-label">Active (visible to users)</span></div>
+        <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="pkgActive" checked><div class="toggle-slider"></div></label><span class="toggle-label">Visible to users (Active)</span></div>
       </div>
     </div>
     <div class="modal-foot">
@@ -1614,6 +1761,25 @@ let currentEditUser = null;
   loadAds().catch(() => {});
 })();
 
+/* ── Session heartbeat for admin ────────────────────────────── */
+(function startAdminHeartbeat() {
+  const sess = FX.getSession();
+  if (!sess) return;
+
+  async function beat() {
+    const valid = await FX.checkSession();
+    if (!valid) {
+      FX.clearSession();
+      window.location.href = 'login.html';
+    }
+  }
+
+  setTimeout(() => {
+    beat();
+    setInterval(beat, 120000);
+  }, 10000);
+})();
+
 /* ══════════════════════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════════════════════ */
@@ -1667,12 +1833,22 @@ async function loadUncatBadge() {
 ══════════════════════════════════════════════════════════════ */
 async function loadPending() {
   try {
-    const [pending, compliance, pendingRegularManual] = await Promise.all([
+    const [pending, compliance, rawRegulars] = await Promise.all([
       FX.getAllProviders({ status: 'pending' }),
       FX.getAllProviders({ status: 'needs_compliance' }),
       FX.getAllUsers({ role: 'regular', status: 'pending' }),
     ]);
-    const pendingRegulars = await FX.getAllUsers({ role: 'regular', status: 'pending' });
+
+    // Enrich pending regulars with their pending_package_id resolved to a name
+    const enrichedRegulars = await Promise.all(rawRegulars.map(async user => {
+      const pkgId = user.pending_package_id || user.package_id;
+      const pkgs  = pkgId ? await FX.getPackageById(pkgId) : null;
+      return {
+        ...user,
+        package_name: pkgs?.name || user.package_name || user.package_id || 'Free',
+        role: 'regular',
+      };
+    }));
 
     // Enrich pending providers with their user payment data
     const enrichedProviders = await Promise.all(pending.map(async prov => {
@@ -1695,7 +1871,7 @@ async function loadPending() {
       const user = await FX.getUserById(prov.user_id);
       return { ...prov, payment_method: user?.payment_method || null, payment_reference: user?.payment_reference || null, payment_amount: user?.payment_amount || null, payment_status: user?.payment_status || null, package_name: user?.package_name || null, first_name: user?.first_name || null, last_name: user?.last_name || null, role: 'provider' };
     }));
-    const allPending = [...enrichedProviders, ...enrichedCompliance, ...pendingRegularManual];
+    const allPending = [...enrichedProviders, ...enrichedCompliance, ...enrichedRegulars];
     const countEl = document.getElementById('pendingCount');
     if (countEl) {
       countEl.textContent = allPending.length;
@@ -1766,19 +1942,48 @@ async function loadSettings() {
     const actions  = await FX.getSetting('ad_actions_per_popup');
     const minutes  = await FX.getSetting('ad_min_minutes');
     const skipSecs = await FX.getSetting('ad_skip_seconds');
-	const suspensionDays = await FX.getSetting('suspension_days');
-	if (suspensionDays) document.getElementById('suspensionDaysInput').value = suspensionDays;
-    const adBatchSize = await FX.getSetting('ad_batch_size');
-    const adBatchDays = await FX.getSetting('ad_batch_days');
-    const featBatchSize = await FX.getSetting('featured_batch_size');
-    const featBatchDays = await FX.getSetting('featured_batch_days');
+    const inlineInterval       = await FX.getSetting('inline_ad_interval');
+    const inlineIntervalSearch = await FX.getSetting('inline_ad_interval_search');
+	const suspensionDays   = await FX.getSetting('suspension_days');
+    const featuredQuota    = await FX.getSetting('featured_impression_quota');
+    if (suspensionDays) document.getElementById('suspensionDaysInput').value  = suspensionDays;
+    if (featuredQuota)  document.getElementById('featuredQuotaInput').value   = featuredQuota;
     if (actions)      document.getElementById('adActionsInput').value    = actions;
     if (minutes)      document.getElementById('adMinutesInput').value    = minutes;
     if (skipSecs)     document.getElementById('adSkipInput').value       = skipSecs;
-    if (adBatchSize)  document.getElementById('adBatchSizeInput').value  = adBatchSize;
-    if (adBatchDays)  document.getElementById('adBatchDaysInput').value  = adBatchDays;
-    if (featBatchSize) document.getElementById('featBatchSizeInput').value = featBatchSize;
-    if (featBatchDays) document.getElementById('featBatchDaysInput').value = featBatchDays;
+	if (inlineInterval)       document.getElementById('inlineAdIntervalInput').value       = inlineInterval;
+    if (inlineIntervalSearch) document.getElementById('inlineAdIntervalSearchInput').value = inlineIntervalSearch;
+	
+    // Pre-signup settings
+    const presignupMode    = await FX.getSetting('presignup_mode');
+    const presignupRegPkg  = await FX.getSetting('presignup_regular_package');
+    const presignupProvPkg = await FX.getSetting('presignup_provider_package');
+    document.getElementById('presignupModeToggle').checked = presignupMode === 'true';
+    
+    // Populate package dropdowns
+    const allPkgs = await FX.getAllPackages();
+    const regSelect  = document.getElementById('presignupRegularPkg');
+    const provSelect = document.getElementById('presignupProviderPkg');
+    regSelect.innerHTML  = '<option value="">— Select a package —</option>';
+    provSelect.innerHTML = '<option value="">— Select a package —</option>';
+    allPkgs.forEach(pkg => {
+      if (pkg.type === 'regular') {
+        const opt = new Option(`${pkg.icon || ''} ${pkg.name} (${pkg.period})`, pkg.id);
+        if (pkg.id === presignupRegPkg) opt.selected = true;
+        regSelect.appendChild(opt);
+      }
+      if (pkg.type === 'provider') {
+        const opt = new Option(`${pkg.icon || ''} ${pkg.name} (${pkg.period})`, pkg.id);
+        if (pkg.id === presignupProvPkg) opt.selected = true;
+        provSelect.appendChild(opt);
+      }
+    });
+    
+    // Load counters
+    const counts = await FX.getPreSignupCount();
+    document.getElementById('presignupRegularCount').textContent  = counts.regular;
+    document.getElementById('presignupProviderCount').textContent = counts.provider;
+
   } catch(e) {
     showToast('Failed to load settings: ' + e.message, 'error');
   }
@@ -1812,12 +2017,50 @@ async function clearTestOtp() {
   } catch(e) { showToast(e.message, 'error'); }
 }
 
+async function savePresignupMode(checked) {
+  try {
+    await FX.setSetting('presignup_mode', checked ? 'true' : 'false');
+    showToast(checked ? '🚀 Pre-Signup Mode activated.' : 'Pre-Signup Mode deactivated.');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function savePresignupPkg(key, selectId) {
+  const val = document.getElementById(selectId).value;
+  try {
+    await FX.setSetting(key, val);
+    showToast('Package saved ✅');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
 async function saveAdSetting(key, inputId) {
   const val = document.getElementById(inputId).value.trim();
   if (!val || isNaN(val)) { showToast('Please enter a valid number.', 'error'); return; }
   try {
     await FX.setSetting(key, val);
-    showToast('Ad setting saved ✅', 'success');
+
+    // When featured quota changes, update all active featured providers immediately
+    if (key === 'featured_impression_quota') {
+      const newQuota = parseInt(val);
+    
+      // Update active featured providers
+      await sbFetch(`providers?is_featured=eq.true`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ featured_quota: newQuota }),
+      });
+    
+      // Also update non-featured providers who had a quota set
+      await sbFetch(`providers?is_featured=eq.false&featured_quota=gt.0`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ featured_quota: newQuota }),
+      });
+    
+      showToast('Featured quota saved and applied to all featured providers ✅', 'success');
+      return;
+    }
+
+    showToast('Setting saved ✅', 'success');
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -2020,24 +2263,26 @@ const allSuspicious = [
 }
 
 async function deleteRating(id, providerId) {
-  if (!confirm('Remove this rating? This cannot be undone.')) return;
-  try {
-    // Delete the rating
-    await sbFetch(`ratings?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
-
-    // Recalculate provider's avg_rating and total_ratings
-    const remaining = await sbFetch(`ratings?provider_id=eq.${providerId}&select=stars`).then(r => r || []);
-    const total     = remaining.length;
-    const avg       = total ? remaining.reduce((sum, r) => sum + r.stars, 0) / total : 0;
-    await sbFetch(`providers?id=eq.${providerId}`, {
-      method:  'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body:    JSON.stringify({ avg_rating: Math.round(avg * 10) / 10, total_ratings: total }),
-    });
-
-    showToast('Rating removed and provider score updated.');
-    await loadSuspicious();
-  } catch(e) { showToast(e.message, 'error'); }
+  document.getElementById('confirmMsg').textContent = 'Remove this rating? This cannot be undone.';
+  openModal('confirmModal');
+  document.getElementById('confirmOkBtn').onclick = async () => {
+    closeModal('confirmModal');
+    try {
+      await sbFetch(`ratings?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+      const remaining = await sbFetch(`ratings?provider_id=eq.${providerId}&select=stars`).then(r => r || []);
+      const total     = remaining.length;
+      const avg       = total ? remaining.reduce((sum, r) => sum + r.stars, 0) / total : 0;
+      await sbFetch(`providers?id=eq.${providerId}`, {
+        method:  'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body:    JSON.stringify({ avg_rating: Math.round(avg * 10) / 10, total_ratings: total }),
+      });
+      showToast('Rating removed.');
+      loadSuspicious();
+    } catch(e) {
+      showToast('Failed to delete rating: ' + e.message, 'error');
+    }
+  };
 }
 
 function renderPendingList(list, containerId) {
@@ -2054,13 +2299,18 @@ function renderPendingList(list, containerId) {
     row.innerHTML = `
 	  <div style="flex:1;min-width:0;">
         <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">
-          ${p.role === 'regular' ? (p.first_name + ' ' + p.last_name) : (p.biz_name || '—')}
+          ${p.role === 'regular' ? (esc(p.first_name) + ' ' + esc(p.last_name)) : esc(p.biz_name || '—')}
         </div>
         <div style="font-size:0.73rem;color:var(--text-3);">
-          ${p.role === 'regular' ? '👤 Regular User · ' + (p.package_name || p.package_id || 'Free') : p.cat_sub + ' · ' + p.city_name + (p.province_name ? ', '+p.province_name : '')}
+          ${p.role === 'regular' ? '👤 Regular User · ' + esc(p.package_name || p.package_id || 'Free') : esc(p.cat_sub) + ' · ' + esc(p.city_name?.replace(/^City of (.+)/, '$1 City') || '') + (p.province_name ? ', '+esc(p.province_name) : '')}
         </div>
         <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px;">
-          ${p.role === 'regular' ? '💳 ' + (p.payment_method || '—') + ' · Ref: ' + (p.payment_reference || '—') : '📍 ' + [p.street_addr, p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ')}
+          ${p.role === 'regular' ? '💳 ' + (p.payment_method || '—') + ' · Ref: ' + (p.payment_reference || '—') : '📍 ' + [
+            p.street_addr || null,
+            p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : null,
+            p.city_name?.replace(/^City of (.+)/, '$1 City'),
+            p.province_name
+          ].filter(Boolean).join(', ')}
         </div>
       </div>
 	  <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">
@@ -2213,7 +2463,12 @@ function openInfoDetails(p) {
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
         <span style="color:var(--text-3);font-weight:600;">Location</span>
-        <span style="font-weight:700;color:var(--navy);">${[p.street_addr, p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ') || '—'}</span>
+        <span style="font-weight:700;color:var(--navy);">${[
+          p.street_addr || null,
+          p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : null,
+          p.city_name?.replace(/^City of (.+)/, '$1 City'),
+          p.province_name
+        ].filter(Boolean).join(', ') || '—'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
         <span style="color:var(--text-3);font-weight:600;">ID Type</span>
@@ -2365,7 +2620,7 @@ function renderProviders(search = '') {
 
     return `<tr>
       <td>
-        <div style="font-weight:700;font-size:0.85rem;">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
+        <div style="font-weight:700;font-size:0.85rem;">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
       </td>
       <td>
         <button class="btn-xs btn-view" onclick="openProviderDetails('${p.id}')">🔍 View</button>
@@ -2394,7 +2649,7 @@ function openProviderDetails(id) {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="width:40px;height:40px;border-radius:10px;background:var(--brand-light);
                   display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔧</div>
-      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
     </div>
 
     <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
@@ -2471,13 +2726,13 @@ function renderRegulars(search = '') {
 
   list.forEach(u => { _regularDataMap[u.id] = u; });
 
-  const pkg = u => allPackages.find(pk => pk.id === u.package_id);
+  const pkg = u => (allPackages || []).find(pk => pk.id === u.package_id);
   const pkgLabel = u => u.package_name || pkg(u)?.name || u.package_id || 'Free';
 
   tbody.innerHTML = list.map(u => `
     <tr>
       <td>
-        <div style="font-weight:700;font-size:0.85rem;">${u.first_name} ${u.last_name}</div>
+        <div style="font-weight:700;font-size:0.85rem;">${esc(u.first_name)} ${esc(u.last_name)}</div>
       </td>
       <td>
         <button class="btn-xs btn-view" onclick="openRegularDetails('${u.id}')">🔍 View</button>
@@ -2486,6 +2741,9 @@ function renderRegulars(search = '') {
       <td>${statusBadge(u.status, u.is_inactive)}</td>
       <td>
         <div class="btn-row">
+		  <button class="btn-xs" style="background:#FFF5F5;color:#991B1B;" onclick="kickUser('${u.id}','${esc(u.first_name || u.username)}')" title="Force logout this user">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
           <button class="btn-xs btn-edit" onclick="openEditUser('${u.id}')"><i class="fa-solid fa-pen"></i></button>
           <button class="btn-xs btn-delete" onclick="confirmDelete('user','${u.id}','${esc(u.first_name + ' ' + u.last_name)}')"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -2501,7 +2759,7 @@ function openRegularDetails(id) {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="width:40px;height:40px;border-radius:10px;background:var(--blue-bg);
                   display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
-      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${u.first_name} ${u.last_name}</div>
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${esc(u.first_name)} ${esc(u.last_name)}</div>
     </div>
 
     <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
@@ -2611,26 +2869,22 @@ async function openEditProvider(providerId) {
       <label class="form-label">Business Name</label>
       <input class="form-input" id="provBizName" value="${p.biz_name || ''}"/>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">City / Municipality</label>
-        <input class="form-input" id="provCityName" value="${p.city_name || ''}"/>
+	  <div class="form-group">
+        <label class="form-label">Location</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="form-input" id="provLocationDisplay" readonly
+            style="flex:1;background:var(--input-bg);cursor:default;color:var(--text-2);"
+            value="${[p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : '', p.city_name, p.province_name, p.region_name].filter(Boolean).join(', ')}"/>
+          <button type="button" onclick="openLocationPicker()"
+            style="padding:8px 14px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">
+            <i class="fa-solid fa-location-dot"></i> Change
+          </button>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Province</label>
-        <input class="form-input" id="provProvinceName" value="${p.province_name || ''}"/>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Barangay <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
-        <input class="form-input" id="provBarangayName" value="${p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : ''}"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Street Address <span style="font-size:0.7rem;color:var(--text-3);font-weight:400;">(optional)</span></label>
-        <input class="form-input" id="provStreetAddr" value="${p.street_addr || ''}"/>
-      </div>
-    </div>
+    <input type="hidden" id="provHiddenRegion"   value="${p.region_name || ''}"/>
+    <input type="hidden" id="provHiddenProvince" value="${p.province_name || ''}"/>
+    <input type="hidden" id="provHiddenCity"     value="${p.city_name || ''}"/>
+    <input type="hidden" id="provHiddenBrgy"     value="${p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : ''}"/>
   `;
 
   document.getElementById('provModalFoot').innerHTML = `
@@ -2655,9 +2909,10 @@ async function saveProviderEdit() {
       packageId:      newPackageId,
       isFeatured:     newPkg?.is_featured ?? false,
       bizName:        document.getElementById('provBizName').value.trim(),
-      cityName:       document.getElementById('provCityName').value.trim(),
-      provinceName:   document.getElementById('provProvinceName').value.trim(),
-      barangayName:   document.getElementById('provBarangayName').value.trim(),
+      regionName:   document.getElementById('provHiddenRegion').value,
+      cityName:     document.getElementById('provHiddenCity').value,
+      provinceName: document.getElementById('provHiddenProvince').value,
+      barangayName: document.getElementById('provHiddenBrgy').value,
       streetAddr:     document.getElementById('provStreetAddr').value.trim(),
     });
 
@@ -2708,6 +2963,21 @@ async function saveProviderEdit() {
     alertEl.className = 'alert alert-error show';
     alertEl.textContent = 'Error: ' + e.message;
   }
+}
+
+async function kickUser(userId, name) {
+  document.getElementById('confirmMsg').textContent =
+    `Force logout "${name}"? They will be signed out on all devices immediately.`;
+  document.getElementById('confirmOkBtn').onclick = async () => {
+    closeModal('confirmModal');
+    try {
+      await FX.kickUser(userId);
+      showToast(`${name} has been signed out of all devices.`, '');
+    } catch(e) {
+      showToast('Error: ' + e.message, 'error');
+    }
+  };
+  openModal('confirmModal');
 }
 
 async function viewRegularUser(userId) {
@@ -2779,7 +3049,7 @@ function renderPackages() {
 
     const renderCard = (pkg, el) => {
     const card = document.createElement('div');
-    card.className = `pkg-admin-card${pkg.is_active ? '' : ' inactive'}`;
+    card.className = `pkg-admin-card${pkg.is_active ? ' active-card' : ' hidden-card'}`;
     const listLabel    = pkg.listing_limit >= 999 ? 'Unlimited listings'      : `${pkg.listing_limit} listings`;
 	const bookingLabel = pkg.booking_limit >= 999 ? 'Unlimited active bookings': `${pkg.booking_limit} active bookings`;
     card.innerHTML = `
@@ -2795,7 +3065,7 @@ function renderPackages() {
 		📋 ${listLabel} · 📅 ${bookingLabel}<br/>
         ${pkg.ads_free ? '✅ Ads-free' : '❌ Ads shown'}<br/>
         ${pkg.is_featured ? '✅ Featured' : '❌ Not featured'}<br/>
-        Sort: ${pkg.sort_order} · ${pkg.is_active ? '<span style="color:var(--green);">Active</span>' : '<span style="color:var(--red);">Inactive</span>'}
+        Sort: ${pkg.sort_order} · ${pkg.is_active ? '<span style="color:var(--green);">Active</span>' : '<span style="color:var(--red);">Hidden</span>'}
       </div>
       <div class="pkg-admin-actions">
         <button class="btn-xs btn-edit" onclick="editPackage('${pkg.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
@@ -2826,6 +3096,7 @@ function openPackageModal(type) {
   document.getElementById('pkgPeriod').value = 'month';
   document.getElementById('pkgListings').value = '5';
   document.getElementById('pkgBookingLimit').value = '5';
+  document.getElementById('pkgReferralPoints').value = '0';
   document.getElementById('pkgSort').value   = '99';
   document.getElementById('pkgFeatures').value = '';
   document.getElementById('pkgAdsFree').checked  = false;
@@ -2847,6 +3118,7 @@ function editPackage(id) {
   document.getElementById('pkgPeriod').value = pkg.period;
   document.getElementById('pkgListings').value = pkg.listing_limit;
   document.getElementById('pkgBookingLimit').value = pkg.booking_limit ?? 5;
+  document.getElementById('pkgReferralPoints').value = pkg.referral_points_required ?? 0;
   document.getElementById('pkgSort').value   = pkg.sort_order;
   document.getElementById('pkgFeatures').value = (pkg.features || []).join('\n');
   document.getElementById('pkgAdsFree').checked  = pkg.ads_free;
@@ -2867,6 +3139,7 @@ async function savePackage() {
     period:       document.getElementById('pkgPeriod').value,
     listingLimit: (() => { const v = parseInt(document.getElementById('pkgListings').value); return isNaN(v) ? 5 : v; })(),
 	bookingLimit: (() => { const v = parseInt(document.getElementById('pkgBookingLimit').value); return isNaN(v) ? 5 : v; })(),
+	referralPointsRequired: (() => { const v = parseInt(document.getElementById('pkgReferralPoints').value); return isNaN(v) ? 0 : v; })(),
     sortOrder:    parseInt(document.getElementById('pkgSort').value) || 99,
     features:     document.getElementById('pkgFeatures').value.split('\n').map(s=>s.trim()).filter(Boolean),
     adsFree:      document.getElementById('pkgAdsFree').checked,
@@ -2997,8 +3270,6 @@ function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
 }
 
-function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-
 function showAlert(id, msg, type='error') {
   const el = document.getElementById(id); if (!el) return;
   el.className = `alert alert-${type} show`; el.textContent = msg;
@@ -3053,49 +3324,96 @@ function renderAdGrid(type, containerId) {
     return;
   }
   el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">` +
-    list.map(ad => `
-      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:12px;${!ad.is_active ? 'opacity:0.55;' : ''}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <div style="width:36px;height:36px;border-radius:10px;background:${ad.bg_color || '#0f2027'};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${ad.icon || '📢'}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:0.82rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.title}</div>
-            <div style="font-size:0.68rem;color:var(--text-3);">${ad.advertiser}</div>
+    list.map(ad => {
+      const isActive    = ad.is_active === true;
+      const isExhausted = (ad.impression_count || 0) >= (ad.impression_quota || 5000);
+      const isCompleted = !isActive && isExhausted;
+      const isPaused    = !isActive && !isExhausted;
+
+      const cardBg     = isActive    ? 'rgba(34,197,94,0.07)'   : isPaused ? 'rgba(245,158,11,0.07)'   : 'rgba(59,130,246,0.07)';
+      const cardBorder = isActive    ? 'rgba(34,197,94,0.25)'   : isPaused ? 'rgba(245,158,11,0.25)'   : 'rgba(59,130,246,0.25)';
+      const btnClass   = isActive    ? 'btn-approve'             : isPaused ? 'btn-elite'               : 'btn-dark';
+      const btnLabel   = isActive
+        ? '<i class="fa-solid fa-circle-check"></i> Active'
+        : isPaused
+        ? '<i class="fa-solid fa-pause"></i> Paused'
+        : '<i class="fa-solid fa-flag-checkered"></i> Completed';
+
+      const pct = Math.min(100, Math.round(((ad.impression_count||0) / (ad.impression_quota||5000)) * 100));
+
+      return `
+        <div style="background:${cardBg};border:1.5px solid ${cardBorder};border-radius:var(--radius-md);padding:12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:${ad.bg_color || '#0f2027'};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${ad.icon || '📢'}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.82rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.title}</div>
+              <div style="font-size:0.68rem;color:var(--text-3);">${ad.advertiser}</div>
+            </div>
           </div>
-        </div>
-        <div style="font-size:0.72rem;color:var(--text-2);margin-bottom:8px;line-height:1.5;">${ad.description || '—'}</div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.65rem;color:var(--text-3);margin-bottom:8px;flex-wrap:wrap;">
-          <span>${ad.is_active ? '<span style="color:var(--green-text);">✅ Active</span>' : '<span style="color:var(--red-text);">❌ Inactive</span>'}</span>
-          <span>${
-            ad.batch_status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>' :
-            ad.batch_status === 'queued'    ? `<span style="color:var(--text-3);">⏳ Queued #${ad.queue_position || '—'}</span>` :
-            ad.batch_status === 'completed' ? '<span style="color:var(--text-3);">✔ Completed</span>' : '—'
-          }</span>
-          ${ad.shown_from  ? `<span>From: ${fmtDate(ad.shown_from)}</span>`  : ''}
-          ${ad.shown_until ? `<span>Until: ${fmtDate(ad.shown_until)}</span>` : ''}
-        </div>
-        <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:6px;">
-          👁 ${ad.impression_count || 0} / ${ad.impression_quota || 5000} impressions
-          <div style="margin-top:4px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;">
-            <div style="height:100%;border-radius:2px;background:var(--brand);width:${Math.min(100, Math.round(((ad.impression_count||0)/(ad.impression_quota||5000))*100))}%;transition:width 0.3s;"></div>
+          <div style="font-size:0.72rem;color:var(--text-2);margin-bottom:10px;line-height:1.5;">${ad.description || '—'}</div>
+          <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:10px;">
+            👁 ${ad.impression_count || 0} / ${ad.impression_quota || 5000} impressions &nbsp;&nbsp;●&nbsp;&nbsp; 🖱 ${ad.click_count || 0} clicks
+            <div style="margin-top:4px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;">
+              <div style="height:100%;border-radius:2px;background:${pct >= 100 ? 'var(--red-text)' : 'var(--brand)'};width:${pct}%;transition:width 0.3s;"></div>
+            </div>
           </div>
-        </div>
-        <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:8px;">
-          🖱 ${ad.click_count || 0} clicks
-          ${ad.shown_from ? `&nbsp;·&nbsp; From: ${fmtDate(ad.shown_from)}` : ''}
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn-xs btn-edit" onclick="editAd('${ad.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
-          <button class="btn-xs btn-delete" onclick="confirmDelete('ad','${ad.id}','${esc(ad.title)}')"><i class="fa-solid fa-trash"></i></button>
-          <button class="btn-xs ${ad.batch_status === 'active' ? 'btn-reject' : 'btn-approve'}" onclick="toggleAd('${ad.id}',${ad.batch_status !== 'active'})">
-            ${ad.batch_status === 'active' ? 'Pause' : 'Activate'}
-          </button>
-          ${ad.batch_status === 'queued' ? `
-          <button class="btn-xs btn-approve" onclick="promoteAdNow('${ad.id}')">
-            <i class="fa-solid fa-forward-step"></i> Promote
-          </button>` : ''}
-        </div>
-      </div>`
-    ).join('') + '</div>';
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn-xs btn-edit" onclick="editAd('${ad.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="btn-xs btn-delete" onclick="confirmDelete('ad','${ad.id}','${esc(ad.title)}')"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn-xs ${btnClass}"
+              onclick="${!isCompleted ? `toggleAd('${ad.id}',${!isActive})` : ''}"
+              ${isCompleted ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''}>
+              ${btnLabel}
+            </button>
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+}
+
+async function reactivateCompleted() {
+  const btn = event.currentTarget;
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Reactivating…';
+
+  try {
+    // Get current quota setting
+    const quotaSetting = await FX.getSetting('featured_impression_quota');
+    const quota = parseInt(quotaSetting) || 200;
+
+    // Find all completed providers
+    const completed = await sbFetch(
+      `providers?is_featured=eq.false&featured_quota=gt.0&select=id,biz_name`
+    ) || [];
+
+    if (!completed.length) {
+      showToast('No completed providers to reactivate.', '');
+      btn.disabled = false;
+      btn.innerHTML = original;
+      return;
+    }
+
+    // Reactivate each one
+    await Promise.all(completed.map(p =>
+      sbFetch(`providers?id=eq.${p.id}`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({
+          is_featured:          true,
+          featured_impressions: 0,
+          featured_quota:       quota,
+        }),
+      })
+    ));
+
+    showToast(`✅ ${completed.length} provider(s) reactivated with quota ${quota}.`, 'success');
+    await loadRotationStats(); // refresh table immediately
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
 }
 
 async function loadRotationStats() {
@@ -3113,7 +3431,8 @@ async function loadRotationStats() {
           <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Package</th>
           <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Rating</th>
           <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Times Shown</th>
-          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Last Shown</th>
+          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Quota</th>
+          <th style="padding:8px 12px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);border-bottom:1px solid var(--border);">Progress</th>
         </tr></thead>
         <tbody>
           ${stats.map(s => `
@@ -3124,110 +3443,199 @@ async function loadRotationStats() {
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">${s.package_id || '—'}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">⭐ ${s.avg_rating || 0}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--navy);">${s.show_count}</td>
-              <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-3);">${fmtDate(s.last_shown)}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-3);">${s.featured_quota || '—'}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div style="flex:1;height:4px;border-radius:2px;background:var(--border);overflow:hidden;min-width:60px;">
+                    <div style="height:100%;border-radius:2px;background:var(--brand);width:${s.featured_quota ? Math.min(100,Math.round((s.show_count/s.featured_quota)*100)) : 0}%;"></div>
+                  </div>
+                  <span style="font-size:0.68rem;color:var(--text-3);">${s.featured_quota ? Math.min(100,Math.round((s.show_count/s.featured_quota)*100)) : 0}%</span>
+                </div>
+              </td>
             </tr>`).join('')}
         </tbody>
       </table>`;
-  } catch(e) {}
+  } catch(e) {
+    console.error('[Rotation Stats]', e.message);
+    document.getElementById('rotationStats').innerHTML =
+      `<div class="empty-state"><p>Could not load rotation stats: ${e.message}</p></div>`;
+  }
 }
 
-function openAdDetails(type) {
+async function refreshAdDetails() {
+  const btn = event.currentTarget;
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing…';
+
+  try {
+	// Re-fetch fresh ad data from Supabase
+    allAds = await FX.getAllAds();
+
+    // Re-render using current modal type (inline or popup)
+    const title = document.getElementById('adDetailsTitle').textContent || '';
+    const type  = title.toLowerCase().includes('pop') ? 'popup' : 'inline';
+    await openAdDetails(type);
+
+    showToast('Ad details refreshed ✅', 'success');
+  } catch(e) {
+    showToast('Refresh failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+async function openAdDetails(type) {
   const label = type === 'inline' ? 'Inline Ads' : 'Pop-Up Ads';
   document.getElementById('adDetailsTitle').innerHTML =
-    `<i class="fa-solid fa-chart-bar" style="color:var(--brand);"></i> ${label} — Details`;
-  const list = allAds.filter(a => a.type === type);
-  const el   = document.getElementById('adDetailsTable');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><p>No ads found for this type.</p></div>';
-  } else {
-    const pct = a => Math.min(100, Math.round(((a.impression_count||0)/(a.impression_quota||5000))*100));
+    `<i class="fa-solid fa-chart-bar" style="color:var(--brand);"></i> ${label} — Batch History`;
+  const el = document.getElementById('adDetailsTable');
+  el.innerHTML = '<div style="color:var(--text-3);font-size:0.8rem;padding:12px 0;">Loading batch history…</div>';
+  openModal('adDetailsModal');
+
+  try {
+    const adMap = {};
+    allAds.filter(a => a.type === type).forEach(a => { adMap[a.id] = a; });
+    const adIds = Object.keys(adMap);
+
+    if (!adIds.length) {
+      el.innerHTML = '<div class="empty-state"><p>No ads found for this type.</p></div>';
+      return;
+    }
+
+    // Fetch batch history from ads_batches
+    const batches = await sbFetch(
+      `ads_batches?ad_id=in.(${adIds.join(',')})&order=started_at.desc`
+    ) || [];
+
+    // Show any ad (active OR completed) that has no batch record yet as a live row
+    const batchedAdIds = new Set(batches.map(b => b.ad_id));
+    const liveRows = allAds
+      .filter(a => a.type === type && !batchedAdIds.has(a.id))
+      .map(a => {
+        const isExhausted = (a.impression_count || 0) >= (a.impression_quota || 5000);
+        return {
+          _isLive:          true,
+          ad_id:            a.id,
+          batch_number:     1,
+          impression_quota: a.impression_quota || 5000,
+          impression_count: a.impression_count || 0,
+		  click_count:      a.click_count || 0,
+          status:           a.is_active ? 'active' : isExhausted ? 'completed' : 'paused',
+          started_at:       a.created_at,
+          completed_at:     !a.is_active && isExhausted ? a.updated_at : null,
+        };
+      });
+
+    const allRows = [...liveRows, ...batches];
+
+    if (!allRows.length) {
+      el.innerHTML = '<div class="empty-state"><p>No batch history yet.</p></div>';
+      return;
+    }
+
+    const thStyle = `padding:8px 10px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);border-bottom:1px solid var(--border);white-space:nowrap;`;
+    const tdStyle = `padding:9px 10px;border-bottom:1px solid var(--border);`;
+
     el.innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
         <thead><tr>
-          ${['Ad Name','Advertiser','Status','Impressions','Clicks','Shown From','Completes At'].map(h =>
-            `<th style="padding:8px 10px;text-align:left;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);border-bottom:1px solid var(--border);white-space:nowrap;">${h}</th>`
-          ).join('')}
+          ${['Ad Name','Advertiser','Batch','Status','Impressions','Clicks','Started','Completed'].map(h =>
+            `<th style="${thStyle}">${h}</th>`).join('')}
         </tr></thead>
         <tbody>
-          ${list.map(a => `
-            <tr>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);white-space:nowrap;">${a.icon || '📢'} ${a.title}</td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-2);white-space:nowrap;">${a.advertiser || '—'}</td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;">
-                ${a.batch_status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>'   :
-                  a.batch_status === 'queued'    ? `<span style="color:var(--text-3);">⏳ Queued #${a.queue_position||'—'}</span>` :
-                  a.batch_status === 'completed' ? '<span style="color:var(--text-3);">✔ Completed</span>' : '—'}
-              </td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);">
-                <div style="font-size:0.75rem;font-weight:700;color:var(--navy);">${a.impression_count||0} / ${a.impression_quota||5000}</div>
-                <div style="margin-top:3px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;min-width:80px;">
-                  <div style="height:100%;border-radius:2px;background:var(--brand);width:${pct(a)}%;"></div>
-                </div>
-              </td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);">${a.click_count||0}</td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-3);white-space:nowrap;">${a.shown_from ? fmtDate(a.shown_from) : '—'}</td>
-              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-3);white-space:nowrap;">${a.shown_until ? fmtDate(a.shown_until) : '—'}</td>
-            </tr>`).join('')}
+          ${allRows.map(b => {
+            const ad  = adMap[b.ad_id] || {};
+            const liveCount = b.status === 'active' ? (ad.impression_count || 0) : (b.impression_count || 0);
+            const pct = Math.min(100, Math.round((liveCount / (b.impression_quota||5000)) * 100));
+            const statusHtml =
+              b.status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>'  :
+              b.status === 'completed' ? '<span style="color:var(--blue);font-weight:700;">✔ Completed</span>'      : '—';
+            return `
+              <tr>
+                <td style="${tdStyle}font-weight:600;color:var(--navy);white-space:nowrap;">${ad.icon || '📢'} ${ad.title || '—'}</td>
+                <td style="${tdStyle}color:var(--text-2);white-space:nowrap;">${ad.advertiser || '—'}</td>
+                <td style="${tdStyle}font-weight:700;color:var(--navy);">#${b.batch_number}</td>
+                <td style="${tdStyle}white-space:nowrap;">${statusHtml}</td>
+                <td style="${tdStyle}">
+                  <div style="font-size:0.75rem;font-weight:700;color:var(--navy);">${liveCount} / ${b.impression_quota||5000}</div>
+                  <div style="margin-top:3px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;min-width:80px;">
+                    <div style="height:100%;border-radius:2px;background:var(--brand);width:${pct}%;"></div>
+                  </div>
+                </td>
+				<td style="${tdStyle}font-weight:700;color:var(--navy);">
+                  🖱 ${b._isLive ? (ad.click_count || 0) : (b.click_count || 0)}
+                </td>
+                <td style="${tdStyle}color:var(--text-3);white-space:nowrap;">${b.started_at ? fmtDate(b.started_at) : '—'}</td>
+                <td style="${tdStyle}color:var(--text-3);white-space:nowrap;">${b.completed_at ? fmtDate(b.completed_at) : '<span style="color:var(--green-text);font-weight:600;">Still running</span>'}</td>
+              </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
-  }
-  openModal('adDetailsModal');
-}
-
-async function loadBatchStatus() {
-  try {
-    const { adBatches, featBatches, queuedAds, queuedFeat } = await FX.getBatchStatus();
-    const el = document.getElementById('batchStatusBlock');
-    if (!el) return;
-
-    const inlineBatch = adBatches.find(b => b.type === 'inline');
-    const popupBatch  = adBatches.find(b => b.type === 'popup');
-    const featBatch   = featBatches[0];
-
-    const qInline = queuedAds.filter(a => a.type === 'inline').length;
-    const qPopup  = queuedAds.filter(a => a.type === 'popup').length;
-    const qFeat   = queuedFeat.length;
-
-    const row = (label, batch, queued, type) => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div>
-          <div style="font-size:0.83rem;font-weight:700;color:var(--navy);">${label}</div>
-          ${batch
-            ? `<div style="font-size:0.72rem;color:var(--green-text);margin-top:2px;">✅ Active batch — expires ${fmtDate(batch.expires_at)}</div>`
-            : `<div style="font-size:0.72rem;color:var(--red-text);margin-top:2px;">⏳ No active batch — ${queued} in queue</div>`
-          }
-        </div>
-        <button class="btn btn-secondary" style="padding:5px 12px;font-size:0.75rem;" onclick="manualPromote('${type}')">
-          <i class="fa-solid fa-forward-step"></i> Promote Now
-        </button>
-      </div>`;
-
-    el.innerHTML =
-      row('Inline Ads',          inlineBatch, qInline, 'inline') +
-      row('Pop-Up Ads',           popupBatch,  qPopup,  'popup') +
-      row('Featured Providers',   featBatch,   qFeat,   'featured');
-  } catch(e) {}
-}
-
-async function manualPromote(type) {
-  try {
-    await FX.promoteNextBatch(type);
-    showToast(`${type} batch promoted successfully ✅`, 'success');
-    loadBatchStatus();
-    if (type !== 'featured') loadAds();
-    else loadRotationStats();
   } catch(e) {
-    showToast(e.message, 'error');
+    el.innerHTML = `<div class="empty-state"><p>Failed to load batch history: ${e.message}</p></div>`;
   }
+}
+
+function exportAdDetailsExcel(type) {
+  const title   = document.getElementById('adDetailsTitle').textContent || '';
+  const isPopup = title.toLowerCase().includes('pop');
+  const label   = isPopup ? 'Popup_Ads' : 'Inline_Ads';
+
+  // Read from the currently rendered table
+  const table = document.querySelector('#adDetailsTable table');
+  if (!table) { showToast('No data to export.', 'error'); return; }
+
+  const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+  const rows    = [...table.querySelectorAll('tbody tr')].map(tr =>
+    [...tr.querySelectorAll('td')].map(td => td.textContent.trim())
+  );
+
+  downloadCSV([headers, ...rows], `Fixia_${label}_BatchHistory_${fmtDateFile()}.csv`);
+  showToast('Export downloaded ✅', 'success');
+}
+
+function exportRotationStatsExcel() {
+  const el = document.getElementById('rotationStats');
+  // Parse from current rendered table
+  const rows = [];
+  const headers = ['Provider', 'Package', 'Rating', 'Times Shown', 'Last Shown'];
+  rows.push(headers);
+
+  el.querySelectorAll('tbody tr').forEach(tr => {
+    const cells = [...tr.querySelectorAll('td')].map(td => td.textContent.trim());
+    rows.push(cells);
+  });
+
+  if (rows.length <= 1) { showToast('No data to export.', 'error'); return; }
+  downloadCSV(rows, `Fixia_Featured_Rotation_${fmtDateFile()}.csv`);
+  showToast('Export downloaded ✅', 'success');
+}
+
+function downloadCSV(rows, filename) {
+  const csv = rows.map(r =>
+    r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function fmtDateFile() {
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
 }
 
 async function promoteAdNow(adId) {
   try {
     const defaultQuota = await FX.getSetting('default_impression_quota') || '5000';
     await FX.updateAd(adId, {
-      batchStatus:  'active',
-      shownFrom:    new Date().toISOString(),
-      isActive:     true,
+      isActive: true,
     });
     showToast('Ad promoted and now running ✅', 'success');
     await loadAds();
@@ -3255,7 +3663,7 @@ async function openAdModal(type) {
   openModal('adModal');
 }
 
-function editAd(id) {
+async function editAd(id) {
   const ad = allAds.find(a => a.id === id);
   if (!ad) return;
   document.getElementById('adId').value             = ad.id;
@@ -3272,6 +3680,24 @@ function editAd(id) {
   document.getElementById('adNotes').value          = ad.notes || '';
   document.getElementById('adQuota').value          = ad.impression_quota || 5000;
   document.getElementById('adAlert').className      = 'alert';
+
+  const isExhausted = (ad.impression_count || 0) >= (ad.impression_quota || 5000);
+  const isCompleted = !ad.is_active && isExhausted;
+  const saveBtn     = document.getElementById('saveAdBtn');
+  const reRunBtn    = document.getElementById('reRunAdBtn');
+
+  // Toggle Save / Re-Run buttons
+  if (isCompleted) {
+    saveBtn.disabled        = true;
+    saveBtn.style.opacity   = '0.4';
+    saveBtn.style.cursor    = 'not-allowed';
+    reRunBtn.style.display  = 'inline-flex';
+  } else {
+    saveBtn.disabled        = false;
+    saveBtn.style.opacity   = '';
+    saveBtn.style.cursor    = '';
+    reRunBtn.style.display  = 'none';
+  }
   openModal('adModal');
 }
 
@@ -3282,7 +3708,7 @@ async function saveAd() {
   const quota      = parseInt(document.getElementById('adQuota').value) || 5000;
   if (!advertiser) { showAlert('adAlert','Advertiser name is required.'); return; }
   if (!title)      { showAlert('adAlert','Ad title is required.'); return; }
-  if (quota < 100) { showAlert('adAlert','Impression quota must be at least 100.'); return; }
+  if (quota < 5) { showAlert('adAlert','Impression quota must be at least 5.'); return; }
 
   const data = {
     type:             document.getElementById('adType').value,
@@ -3297,12 +3723,14 @@ async function saveAd() {
     notes:            document.getElementById('adNotes').value.trim(),
     impressionQuota:  quota,
     isActive:         true,
-    startsAt:         new Date().toISOString(),
   };
 
   try {
-    if (id) { await FX.updateAd(id, data); }
-    else     { await FX.createAd(data); }
+    if (id) {
+      await FX.updateAd(id, data);
+    } else {
+      await FX.createAd(data);
+    }
     closeModal('adModal');
     showToast('Ad saved ✅', 'success');
     await loadAds();
@@ -3311,10 +3739,90 @@ async function saveAd() {
   }
 }
 
+function reRunAd() {
+  const quota = parseInt(document.getElementById('adQuota').value) || 5000;
+  document.getElementById('reRunQuotaPreview').textContent = quota.toLocaleString();
+  openModal('reRunModal');
+}
+
+async function confirmReRunAd() {
+  const id    = document.getElementById('adId').value;
+  const quota = parseInt(document.getElementById('adQuota').value) || 5000;
+  const ad    = allAds.find(a => a.id === id);
+  if (!ad) return;
+
+  try {
+    closeModal('reRunModal');
+
+    // Get existing batches
+    const batches     = await FX.getAdBatches(id);
+    const activeBatch = batches.find(b => b.status === 'active');
+
+    if (activeBatch) {
+      // Close existing active batch with final impression count
+      await FX.closeAdBatch(id, ad.impression_count || 0, ad.click_count || 0);
+    } else if (!batches.length) {
+      // Truly no batch records at all — this is the very first re-run
+      // Save the original run as completed before starting the new one
+      await sbFetch('ads_batches', {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify({
+          ad_id:            id,
+          batch_number:     1,
+          impression_quota: ad.impression_quota || 5000,
+          impression_count: ad.impression_count || 0,
+          click_count:      ad.click_count || 0,
+          status:           'completed',
+          started_at:       ad.created_at,
+          completed_at:     new Date().toISOString(),
+        }),
+      });
+    }
+    // If batches exist but none are active, the last one is already
+    // marked completed — no action needed, just create the new batch below
+
+    // Re-fetch to get accurate count for next batch number
+    const refreshed = await FX.getAdBatches(id);
+    const nextBatch = refreshed.length + 1;
+
+    // Create new active batch record
+    await FX.createAdBatch(id, quota, nextBatch);
+
+    // Reset the ad
+    await FX.updateAd(id, {
+      impressionCount: 0,
+      clickCount:      0,
+      impressionQuota: quota,
+      isActive:        true,
+    });
+
+    closeModal('adModal');
+    showToast(`✅ Batch #${nextBatch} started — ${quota.toLocaleString()} impressions`, 'success');
+    await loadAds();
+  } catch(e) {
+    showToast('Re-run failed: ' + e.message, 'error');
+  }
+}
+
 async function toggleAd(id, active) {
   try {
-    await FX.updateAd(id, { isActive: active });
-    showToast(active ? 'Ad activated ✅' : 'Ad paused', '');
+    // Option A safeguard — block activation if quota is 100% exhausted
+    if (active) {
+      const ad = allAds.find(a => a.id === id);
+      if (ad) {
+        const impressions = ad.impression_count || 0;
+        const quota       = ad.impression_quota || 5000;
+        if (impressions >= quota) {
+          showToast('⛔ Quota exhausted.', 'error');
+          return;
+        }
+      }
+    }
+    await FX.updateAd(id, {
+      isActive: active,
+    });
+    showToast(active ? 'Ad activated ✅' : 'Ad paused ⏸', '');
     await loadAds();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
@@ -3689,7 +4197,7 @@ function openReviewModal(id) {
       </div>
       <div style="padding:8px 0;border-bottom:1px solid var(--border);">
         <div style="color:var(--text-3);font-weight:600;margin-bottom:4px;">Explanation</div>
-        <div style="color:var(--navy);line-height:1.6;white-space:pre-wrap;">${r.explanation}</div>
+        <div style="color:var(--navy);line-height:1.6;white-space:pre-wrap;">${esc(r.explanation)}</div>
       </div>
       ${r.file_url ? `
       <div style="padding:8px 0;">
@@ -3792,7 +4300,7 @@ function renderReportsTable() {
   tbody.innerHTML = allReports.map(r => `
     <tr>
       <td><div style="font-weight:700;font-size:0.85rem;">${r.provider_name}</div></td>
-      <td><div style="font-size:0.78rem;color:var(--text-2);max-width:150px;">${r.reason}</div></td>
+      <td><div style="font-size:0.78rem;color:var(--text-2);max-width:150px;">${esc(r.reason)}</div></td>
       <td><div style="font-size:0.78rem;color:var(--text-3);">Anonymous</div></td>
       <td style="font-size:0.75rem;color:var(--text-3);">${fmtDate(r.created_at)}</td>
       <td>
@@ -3826,12 +4334,12 @@ async function openReviewReport(id) {
       </div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
         <span style="color:var(--text-3);font-weight:600;">Reason</span>
-        <span style="font-weight:700;color:var(--red);text-align:right;max-width:60%;">${r.reason}</span>
+        <span style="font-weight:700;color:var(--red);text-align:right;max-width:60%;">${esc(r.reason)}</span>
       </div>
       ${r.details ? `
       <div style="padding:8px 0;border-bottom:1px solid var(--border);">
         <div style="color:var(--text-3);font-weight:600;margin-bottom:4px;">Details</div>
-        <div style="color:var(--navy);line-height:1.6;">${r.details}</div>
+        <div style="color:var(--navy);line-height:1.6;">${esc(r.details)}</div>
       </div>` : ''}
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
         <span style="color:var(--text-3);font-weight:600;">Status</span>
@@ -4052,6 +4560,64 @@ let _currentUpgradeReq = null;
 
 const _upgradeDataMap = {};
 
+function switchUpgradeTab(tab) {
+  const isPending = tab === 'pending';
+  document.getElementById('upgradesContainer').style.display        = isPending ? '' : 'none';
+  document.getElementById('upgradeHistoryContainer').style.display  = isPending ? 'none' : '';
+  document.getElementById('upgradeTabPending').style.background     = isPending ? 'var(--brand)' : 'var(--bg)';
+  document.getElementById('upgradeTabPending').style.color          = isPending ? '#fff' : 'var(--text-2)';
+  document.getElementById('upgradeTabHistory').style.background     = isPending ? 'var(--bg)' : 'var(--brand)';
+  document.getElementById('upgradeTabHistory').style.color          = isPending ? 'var(--text-2)' : '#fff';
+  if (!isPending) loadUpgradeHistory();
+}
+
+async function loadUpgradeHistory() {
+  const container = document.getElementById('upgradeHistoryContainer');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:0.82rem;">Loading history…</div>';
+  try {
+    const history = await FX.getUpgradeHistory(100);
+    if (!history.length) {
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:0.82rem;">No archived upgrade requests yet.</div>';
+      return;
+    }
+    container.innerHTML = `
+      <table class="data-table" style="width:100%;">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Package</th>
+            <th>Method</th>
+            <th>Reference</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Archived</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${history.map(r => `
+            <tr>
+              <td style="font-size:0.8rem;">${esc(r.user_id?.substring(0,8) || '—')}…</td>
+              <td><span class="badge badge-brand" style="font-size:0.72rem;">${esc(r.new_package_id || '—')}</span></td>
+              <td style="font-size:0.8rem;">${esc(r.payment_method || '—')}</td>
+              <td style="font-size:0.75rem;font-family:monospace;">${esc(r.payment_reference || '—')}</td>
+              <td style="font-size:0.8rem;font-weight:700;color:var(--green);">₱${esc(String(r.payment_amount || '—'))}</td>
+              <td>
+                <span class="badge ${r.status === 'approved' ? 'badge-green' : 'badge-red'}" style="font-size:0.72rem;">
+                  ${r.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                </span>
+              </td>
+              <td style="font-size:0.75rem;color:var(--text-3);">
+                ${r.archived_at ? new Date(r.archived_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—'}
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--red);font-size:0.82rem;">Failed to load history: ${esc(e.message)}</div>`;
+  }
+}
+
 async function loadUpgradeRequests() {
   const wrap = document.getElementById('upgradesContainer');
   wrap.innerHTML = '<div class="loading">Loading…</div>';
@@ -4201,7 +4767,7 @@ function openUpgradeDetails(reqId) {
 
     ${req.notes ? `
     <div style="background:var(--red-bg);border-radius:8px;padding:10px 12px;font-size:0.78rem;color:var(--red-text);">
-      <i class="fa-solid fa-circle-info"></i> ${req.notes}
+      <i class="fa-solid fa-circle-info"></i> ${esc(req.notes)}
     </div>` : ''}
 
     <div style="font-size:0.7rem;color:var(--text-3);margin-top:12px;text-align:right;">
@@ -4271,12 +4837,151 @@ async function confirmRejectUpgrade() {
   }
 }
 
-</script>
+/* ── PSGC Location Dropdowns ─────────────────────────────────── */
+const PSGC = 'https://psgc.gitlab.io/api';
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+function resetSel(sel, ph) { sel.innerHTML = `<option value="">${ph}</option>`; }
+
+async function provLoadRegions(preselect) {
+  const sel = document.getElementById('provSelRegion');
+  sel.disabled = true;
+  try {
+    const d = await fetch(`${PSGC}/regions/`).then(r => r.json());
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(reg => {
+      const o = document.createElement('option');
+      o.value = reg.code; o.textContent = reg.name; sel.appendChild(o);
+    });
+    if (preselect) {
+      const match = d.find(r => r.name.toLowerCase() === preselect.toLowerCase());
+      if (match) { sel.value = match.code; await provLoadProvinces(match.name); }
+    }
+  } catch(e) { console.error('PSGC regions:', e); }
+  sel.disabled = false;
+}
+
+async function provLoadProvinces(preselect) {
+  const regCode = document.getElementById('provSelRegion').value;
+  const sp = document.getElementById('provSelProvince');
+  const sc = document.getElementById('provSelCity');
+  const sb = document.getElementById('provSelBrgy');
+  resetSel(sp,'Select Province…'); resetSel(sc,'Select City / Municipality…'); resetSel(sb,'Select Barangay…');
+  sc.disabled = true; sb.disabled = true;
+  if (!regCode) { sp.disabled = true; return; }
+  sp.disabled = false;
+  try {
+    const d = await fetch(`${PSGC}/regions/${regCode}/provinces/`).then(r => r.json());
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    if (!d.length) {
+      const o = document.createElement('option');
+      o.value = 'metro-manila'; o.textContent = 'Metro Manila'; o.selected = true;
+      sp.appendChild(o); sp.disabled = true;
+      await provLoadCitiesForRegion(regCode, preselect);
+      return;
+    }
+    d.forEach(p => { const o = document.createElement('option'); o.value = p.code; o.textContent = p.name; sp.appendChild(o); });
+    if (preselect) {
+      const match = d.find(p => p.name.toLowerCase() === preselect.toLowerCase());
+      if (match) { sp.value = match.code; await provLoadCities(match.name); }
+    }
+  } catch(e) {}
+}
+
+async function provLoadCitiesForRegion(regCode, preselect) {
+  const sc = document.getElementById('provSelCity');
+  sc.disabled = false;
+  try {
+    const d = await fetch(`${PSGC}/regions/${regCode}/cities-municipalities/`).then(r => r.json());
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name.replace(/^City of (.+)/, '$1 City'); sc.appendChild(o); });
+    if (preselect) {
+      const match = d.find(c => c.name.toLowerCase() === preselect.toLowerCase());
+      if (match) { sc.value = match.code; await provLoadBarangays(null); }
+    }
+  } catch(e) {}
+}
+
+async function provLoadCities(preselect) {
+  const pc = document.getElementById('provSelProvince').value;
+  const sc = document.getElementById('provSelCity');
+  const sb = document.getElementById('provSelBrgy');
+  resetSel(sc,'Select City / Municipality…'); resetSel(sb,'Select Barangay…'); sb.disabled = true;
+  if (!pc) { sc.disabled = true; return; }
+  sc.disabled = false;
+  try {
+    const d = await fetch(`${PSGC}/provinces/${pc}/cities-municipalities/`).then(r => r.json());
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name.replace(/^City of (.+)/, '$1 City'); sc.appendChild(o); });
+    if (preselect) {
+      const match = d.find(c => c.name.toLowerCase() === preselect.toLowerCase());
+      if (match) { sc.value = match.code; await provLoadBarangays(null); }
+    }
+  } catch(e) {}
+}
+
+async function provLoadBarangays(preselect) {
+  const cc = document.getElementById('provSelCity').value;
+  const sb = document.getElementById('provSelBrgy');
+  resetSel(sb,'Select Barangay…');
+  if (!cc) { sb.disabled = true; return; }
+  sb.disabled = false;
+  try {
+    const d = await fetch(`${PSGC}/cities-municipalities/${cc}/barangays/`).then(r => r.json());
+    d.sort((a,b) => a.name.localeCompare(b.name));
+    d.forEach(b => { const o = document.createElement('option'); o.value = b.code; o.textContent = b.name; sb.appendChild(o); });
+    if (preselect) {
+      const match = d.find(b => b.name.toLowerCase() === preselect.toLowerCase());
+      if (match) sb.value = match.code;
+    }
+  } catch(e) {}
+}
+
+function openLocationPicker() {
+  const p = allProviders?.find(pr => pr.id === document.getElementById('provEditId').value);
+  document.getElementById('provStreetAddr').value = p?.street_addr || '';
+  openModal('locationPickerModal');
+  provLoadRegions(p?.region_name || '').then(() => {
+    if (p?.barangay_name && p.barangay_name !== 'Select Barangay…') {
+      setTimeout(() => provLoadBarangays(p.barangay_name), 3000);
+    }
+  });
+}
+
+function confirmLocationPick() {
+  const regionEl  = document.getElementById('provSelRegion');
+  const provEl    = document.getElementById('provSelProvince');
+  const cityEl    = document.getElementById('provSelCity');
+  const brgyEl    = document.getElementById('provSelBrgy');
+
+  const regionName = regionEl.options[regionEl.selectedIndex]?.text || '';
+  const provName   = provEl.options[provEl.selectedIndex]?.text   || '';
+  const cityName   = cityEl.options[cityEl.selectedIndex]?.text   || '';
+  const brgyName   = brgyEl.options[brgyEl.selectedIndex]?.text   || '';
+
+  // Update the display field
+  const display = [
+    brgyName !== 'Select Barangay…' ? brgyName : '',
+    cityName !== 'Select City / Municipality…' ? cityName : '',
+    provName !== 'Select Province…' ? provName : '',
+    regionName !== 'Loading regions…' ? regionName : '',
+  ].filter(Boolean).join(', ');
+
+  document.getElementById('provLocationDisplay').value = display;
+
+  // Store values in hidden fields for saveProviderEdit to read
+  document.getElementById('provHiddenRegion').value   = regionName;
+  document.getElementById('provHiddenProvince').value = provName !== 'Select Province…' ? provName : '';
+  document.getElementById('provHiddenCity').value     = cityName !== 'Select City / Municipality…' ? cityName : '';
+  document.getElementById('provHiddenBrgy').value     = brgyName !== 'Select Barangay…' ? brgyName : '';
+
+  closeModal('locationPickerModal');
+}
+
+
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 </script>
 
 </body>

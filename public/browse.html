@@ -338,16 +338,16 @@ const session = FX.getSession();
       <div class="feat-card" onclick="window.location.href='provider.html?id=${p.id}'">
        <div class="feat-card-img" style="background:linear-gradient(135deg,#0F1B2D,#1E3048);position:relative;overflow:hidden;">
           ${p.avatar_url
-            ? `<img src="${p.avatar_url}" alt="${p.biz_name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+            ? `<img src="${p.avatar_url}" alt="${esc(p.biz_name)}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
             : CAT_EMOJIS[p._listing_cats_main?.[0] || p.cat_main] || '🔧'}
           <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:0.82rem;font-weight:700;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:3px;">
             <i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}
           </div>
         </div>
         <div class="feat-card-body">
-          <div class="feat-card-name">${p.is_elite ? '👑 ' : ''}${p.biz_name}</div>
-          <div class="feat-card-sub">${p._listing_cats?.length ? p._listing_cats[0] : (p.cat_sub || 'General Services')}</div>
-          <div class="feat-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.province_name || p.city_name || '—'}</div>
+          <div class="feat-card-name">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+          <div class="feat-card-sub">${esc(p._listing_cats?.length ? p._listing_cats[0] : (p.cat_sub || 'General Services'))}</div>
+          <div class="feat-card-loc"><i class="fa-solid fa-location-dot"></i> ${esc(p.province_name || p.city_name || '—')}</div>
         </div>
       </div>`).join('');
   } catch(e) {}
