@@ -155,22 +155,16 @@ async function sbDelete(publicUrl) {
 
 
 async function registerPushSubscription() {
-  if (!('PushManager' in window) || !('serviceWorker' in navigator)) {
-    alert('[Push] Not supported'); return;
-  }
+  if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
   const permission = await Notification.requestPermission();
-  alert('[Push] Permission: ' + permission);
   if (permission !== 'granted') return;
   try {
     const reg = await navigator.serviceWorker.ready;
-    alert('[Push] SW ready');
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
-      applicationServerKey: 'BNtCfMYnylxamVQafnkb_wc6QfggZBcHd9bFGyXBdlgcXHUXv9s-Tva5gyd5jOhXU5Dx3n1tVo6V8VIyWZgUKrE'
+      applicationServerKey: 'BBuzC2DxPe2G7GIdcj-GUiLnTKfXoU3y1Uxu2apeX7kjQjB-nKWVYQbGLhPvb6NAZICPLijndo4zvE4i8padM5w'
     });
-    alert('[Push] Subscribed: ' + JSON.stringify(sub));
     const sess = FX.getSession?.();
-    alert('[Push] Session: ' + (sess?.userId || 'NONE'));
     if (!sess?.userId) return;
     await sbFetch('push_subscriptions', {
       method:  'POST',
@@ -180,9 +174,9 @@ async function registerPushSubscription() {
         subscription: sub,
       }),
     });
-    alert('[Push] Saved!');
+    console.log('[Fixia Push] Subscription registered.');
   } catch(e) {
-    alert('[Push] Error: ' + e.message);
+    console.warn('[Fixia Push] Registration failed:', e.message);
   }
 }
 
