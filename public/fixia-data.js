@@ -155,19 +155,27 @@ async function sbDelete(publicUrl) {
 
 
 async function registerPushSubscription() {
-  if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
+  if (!('PushManager' in window) || !('serviceWorker' in navigator)) {
+    alert('[Push] PushManager not supported on this browser/device.');
+    return;
+  }
 
   const permission = await Notification.requestPermission();
+  alert('[Push] Permission: ' + permission);
   if (permission !== 'granted') return;
 
   try {
     const reg = await navigator.serviceWorker.ready;
+    alert('[Push] SW ready. Subscribing...');
+
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
       applicationServerKey: 'BBuzC2DxPe2G7GIdcj-GUiLnTKfXoU3y1Uxu2apeX7kjQjB-nKWVYQbGLhPvb6NAZICPLijndo4zvE4i8padM5w'
     });
+    alert('[Push] Subscribed! Saving to DB...');
 
     const sess = FX.getSession?.();
+    alert('[Push] Session userId: ' + (sess?.userId || 'NONE'));
     if (!sess?.userId) return;
 
     await sbFetch('push_subscriptions', {
@@ -178,10 +186,9 @@ async function registerPushSubscription() {
         subscription: sub,
       }),
     });
-
-    console.log('[Fixia Push] Subscription registered.');
+    alert('[Push] Saved to DB successfully!');
   } catch(e) {
-    console.warn('[Fixia Push] Registration failed:', e.message);
+    alert('[Push] Error: ' + e.message);
   }
 }
 
