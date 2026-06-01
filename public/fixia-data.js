@@ -166,17 +166,25 @@ async function registerPushSubscription() {
     });
     const sess = FX.getSession?.();
     if (!sess?.userId) return;
-    await sbFetch('push_subscriptions', {
+
+    const response = await fetch(`${SUPA_URL}/rest/v1/push_subscriptions`, {
       method:  'POST',
-      headers: { 'Prefer': 'return=minimal,resolution=merge-duplicates' },
-      body:    JSON.stringify({
+      headers: {
+        'apikey':        SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation,resolution=merge-duplicates',
+      },
+      body: JSON.stringify({
         user_id:      sess.userId,
         subscription: sub,
       }),
     });
-    console.log('[Fixia Push] Subscription registered.');
+
+    const result = await response.json();
+    console.log('[Fixia Push] Result:', JSON.stringify(result));
   } catch(e) {
-    console.warn('[Fixia Push] Registration failed:', e.message);
+    console.warn('[Fixia Push] Error:', e.message);
   }
 }
 
