@@ -707,7 +707,7 @@ const actions = {
     try {
       const userIds = users.map(u => u.id);
       const subs = await sb(
-        `push_subscriptions?user_id=in.(${userIds.map(id => `"${id}"`).join(',')})&select=subscription`
+		`push_subscriptions?user_id=in.(${userIds.join(',')})&select=subscription`
       ) || [];
 
       if (subs.length) {
