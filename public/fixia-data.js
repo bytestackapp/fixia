@@ -160,10 +160,19 @@ async function registerPushSubscription() {
   if (permission !== 'granted') return;
   try {
     const reg = await navigator.serviceWorker.ready;
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = atob(base64);
+      return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+    }
+
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
-      applicationServerKey: 'Vr1Egxx8cQ_2RSf5I4UvpbFrHctuyU2b35sSR8FcWmXoqBeZVQaEiscJ9dXsW-PjBSwv1KGIJ09u3t0E7B5ZWg'
+      applicationServerKey: urlBase64ToUint8Array('Vr1Egxx8cQ_2RSf5I4UvpbFrHctuyU2b35sSR8FcWmXoqBeZVQaEiscJ9dXsW-PjBSwv1KGIJ09u3t0E7B5ZWg')
     });
+
     const sess = FX.getSession?.();
     if (!sess?.userId) return;
 
@@ -177,12 +186,11 @@ async function registerPushSubscription() {
       },
       body: JSON.stringify({
         user_id:      sess.userId,
-        subscription: sub,
+        subscription: sub.toJSON(),
       }),
     });
 
-    const result = await response.json();
-    console.log('[Fixia Push] Result:', JSON.stringify(result));
+    console.log('[Fixia Push] Saved:', response.status);
   } catch(e) {
     console.warn('[Fixia Push] Error:', e.message);
   }
