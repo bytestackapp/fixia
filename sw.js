@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixia-v6';  // increment this every time you update fixia-data.js
+const CACHE_NAME = 'fixia-v7';  // increment this every time you update fixia-data.js
 
 const STATIC_ASSETS = [];
 /* production — uncomment when ready to deploy:
