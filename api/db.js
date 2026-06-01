@@ -545,7 +545,7 @@ const actions = {
       linkUrl:'link_url', ctaLabel:'cta_label', bgColor:'bg_color',
       textColor:'text_color', isActive:'is_active', startsAt:'starts_at',
       endsAt:'ends_at', notes:'notes', sortOrder:'sort_order',
-      impressionQuota:'impression_quota', impressionCount:'impression_count',
+	  impressionQuota:'impression_quota', impressionCount:'impression_count', clickCount:'click_count',
     };
     const p = {};
     Object.entries(map).forEach(([k, col]) => {
