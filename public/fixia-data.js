@@ -173,7 +173,7 @@ async function registerPushSubscription() {
         'apikey':        SUPA_KEY,
         'Authorization': `Bearer ${SUPA_KEY}`,
         'Content-Type':  'application/json',
-        'Prefer':        'return=representation,resolution=merge-duplicates',
+        'Prefer':        'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify({
         user_id:      sess.userId,
@@ -2626,10 +2626,10 @@ Object.assign(FX, FX_FEATURED);
     try { await FX.checkAndShowMessages(); } catch(e) {}
   }
 
-  setTimeout(() => {
-    beat();
-    checkMessages();
-    setInterval(beat, 120000);
-    setInterval(checkMessages, 120000);
-  }, 10000);
+setTimeout(() => {
+  beat();
+  checkMessages();
+  setInterval(beat, 120000);
+  setInterval(checkMessages, 120000);
+}, 10000);
 })();

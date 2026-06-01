@@ -1070,7 +1070,7 @@ try {
   loadHomepageData();
   
   // Register push notification subscription
-  if (!IS_GUEST && Notification.permission === 'default') {
+  if (!IS_GUEST && Notification.permission === 'default' && !localStorage.getItem('push_declined')) {
     // Show a subtle banner prompting the user to enable notifications
     const banner = document.createElement('div');
     banner.id = 'push-banner';
@@ -1083,13 +1083,22 @@ try {
     `;
     banner.innerHTML = `
       <span>🔔 Enable notifications to stay updated</span>
-      <button onclick="
-        registerPushSubscription().catch(()=>{});
-        document.getElementById('push-banner').remove();
-      " style="
-        background:#F5A623;color:#fff;border:none;border-radius:8px;
-        padding:6px 12px;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;
-      ">Enable</button>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button onclick="
+          registerPushSubscription().catch(()=>{});
+          document.getElementById('push-banner').remove();
+        " style="
+          background:#F5A623;color:#fff;border:none;border-radius:8px;
+          padding:6px 12px;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;
+        ">Enable</button>
+        <button onclick="
+          localStorage.setItem('push_declined', '1');
+          document.getElementById('push-banner').remove();
+        " style="
+          background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:none;border-radius:8px;
+          padding:6px 12px;font-weight:600;font-size:0.8rem;cursor:pointer;white-space:nowrap;
+        ">Not now</button>
+      </div>
     `;
     document.body.appendChild(banner);
 
