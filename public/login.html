@@ -646,7 +646,6 @@ async function doLogin() {
     }
 
     showToast('Welcome back! Redirecting…', 'success');
-    registerPushSubscription().catch(() => {});
     if (result.user.role === 'regular') {
       FX.syncSaved().catch(() => {});
     }
