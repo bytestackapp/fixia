@@ -711,7 +711,7 @@ const actions = {
       ) || [];
 
       if (subs.length) {
-        await fetch(`${process.env.APP_URL}/api/send-push`, {
+        await fetch(`${APP_URL}/api/send-push`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
