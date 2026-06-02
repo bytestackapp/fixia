@@ -351,7 +351,7 @@ const FX = {
         last_login_at:  new Date().toISOString(),
         is_inactive:    false,
         force_logout:   false,
-        session_token:  sessionToken, // ← written to DB, overwrites any old session
+        session_token:  sessionToken,
       }),
     }).catch(() => {});
     
