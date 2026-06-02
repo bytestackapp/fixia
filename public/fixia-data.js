@@ -185,7 +185,7 @@ async function registerPushSubscription() {
 
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly:      true,
-      applicationServerKey: urlBase64ToUint8Array('Vr1Egxx8cQ_2RSf5I4UvpbFrHctuyU2b35sSR8FcWmXoqBeZVQaEiscJ9dXsW-PjBSwv1KGIJ09u3t0E7B5ZWg')
+      applicationServerKey: urlBase64ToUint8Array('BKlXcfZMS9QcyRGrakQs1GPeOkenA56ZzeB68uYPlqFEPIuaMlyQdtL2wFTktnsMrr_TcjuSLjzaP8f_aAFYSrY')
     });
     pushLog('Subscribed: ' + sub.endpoint.slice(0, 40) + '...');
 
