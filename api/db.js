@@ -1033,7 +1033,7 @@ const actions = {
       body: JSON.stringify({ status: 'active', provider_has_unread: true, user_has_unread: false }),
     });
     const prov2 = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
-    if (prov2?.user_id) pushToUser(prov2.user_id).catch(() => {});
+    if (prov2?.user_id) await pushToUser(prov2.user_id);
     return rows?.[0] || null;
   },
 
@@ -1066,7 +1066,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: false, provider_has_unread: true }),
     });
-	if (provider?.user_id) pushToUser(provider.user_id).catch(() => {});
+	if (provider?.user_id) await pushToUser(provider.user_id);
     return { ok: true };
   },
 
@@ -1099,7 +1099,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: true, provider_has_unread: false }),
     });
-	pushToUser(inq.regular_user_id).catch(() => {});
+	await pushToUser(inq.regular_user_id);
     return { ok: true };
   },
 
@@ -1132,7 +1132,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'disputed', user_has_unread: false, provider_has_unread: true }),
     });
-	if (provider?.user_id) pushToUser(provider.user_id).catch(() => {});
+	if (provider?.user_id) await pushToUser(provider.user_id);
     return { ok: true };
   },
 
@@ -1155,7 +1155,7 @@ const actions = {
       method: 'PATCH',
       body: JSON.stringify({ status: 'done', user_has_unread: true, provider_has_unread: false }),
     });
-	pushToUser(inq.regular_user_id).catch(() => {});
+	await pushToUser(inq.regular_user_id);
     return rows?.[0] || null;
   },
 
@@ -1176,7 +1176,7 @@ const actions = {
     await sb(`inquiries?id=eq.${inquiryId}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(update) });
 	
 	const provForPush = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
-	if (provForPush?.user_id) pushToUser(provForPush.user_id).catch(() => {});
+	if (provForPush?.user_id) await pushToUser(provForPush.user_id);
 
 	if (stars && inq.provider_id && inq.regular_user_id) {
       const ratingUser = (await sb(`users?id=eq.${inq.regular_user_id}&select=first_name,last_name&limit=1`))?.[0];
