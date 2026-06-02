@@ -45,6 +45,26 @@ async function sbDeleteFile(publicUrl) {
   });
 }
 
+/* ── Send push notification to a user ───────────────────────── */
+async function pushToUser(userId) {
+  try {
+    const subs = await sb(`push_subscriptions?user_id=eq.${userId}&select=subscription`) || [];
+    if (!subs.length) return;
+    await fetch(`${APP_URL}/api/send-push`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        subscriptions: subs.map(s => s.subscription),
+        title: 'Fixia',
+        body:  'You have a new notification.',
+        url:   '/notifications.html',
+      }),
+    });
+  } catch(e) {
+    console.warn('[Push] pushToUser failed:', e.message);
+  }
+}
+
 /* ── Auth: validate session token, return user ───────────────── */
 async function requireAuth(req, requiredRole = null) {
   const sessionToken = req.headers['x-session-token'];
@@ -1012,6 +1032,8 @@ const actions = {
       method: 'PATCH',
       body: JSON.stringify({ status: 'active', provider_has_unread: true, user_has_unread: false }),
     });
+    const prov2 = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
+    if (prov2?.user_id) pushToUser(prov2.user_id).catch(() => {});
     return rows?.[0] || null;
   },
 
@@ -1044,6 +1066,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: false, provider_has_unread: true }),
     });
+	if (provider?.user_id) pushToUser(provider.user_id).catch(() => {});
     return { ok: true };
   },
 
@@ -1076,6 +1099,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: true, provider_has_unread: false }),
     });
+	pushToUser(inq.regular_user_id).catch(() => {});
     return { ok: true };
   },
 
@@ -1108,6 +1132,7 @@ const actions = {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'disputed', user_has_unread: false, provider_has_unread: true }),
     });
+	if (provider?.user_id) pushToUser(provider.user_id).catch(() => {});
     return { ok: true };
   },
 
@@ -1130,6 +1155,7 @@ const actions = {
       method: 'PATCH',
       body: JSON.stringify({ status: 'done', user_has_unread: true, provider_has_unread: false }),
     });
+	pushToUser(inq.regular_user_id).catch(() => {});
     return rows?.[0] || null;
   },
 
@@ -1148,8 +1174,11 @@ const actions = {
     const update = { status: 'completed', provider_has_unread: true, user_has_unread: false };
     if (stars) { update.rating_stars = stars; update.rating_comment = comment || ''; update.rated_at = new Date().toISOString(); }
     await sb(`inquiries?id=eq.${inquiryId}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(update) });
+	
+	const provForPush = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
+	if (provForPush?.user_id) pushToUser(provForPush.user_id).catch(() => {});
 
-    if (stars && inq.provider_id && inq.regular_user_id) {
+	if (stars && inq.provider_id && inq.regular_user_id) {
       const ratingUser = (await sb(`users?id=eq.${inq.regular_user_id}&select=first_name,last_name&limit=1`))?.[0];
       const fullName = ratingUser ? `${ratingUser.first_name} ${ratingUser.last_name}`.trim() : '';
       const displayName = anonymous && fullName ? fullName.split(' ').map(p => p.slice(0, 3) + '***').join(' ') : fullName;
@@ -1163,7 +1192,7 @@ const actions = {
         method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
         body: JSON.stringify({ avg_rating: Math.round(avg * 10) / 10, total_ratings: allRatings.length }),
       });
-      const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=biz_name,user_id&limit=1`))?.[0];
+      const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=biz_name,user_id&limit=1`))?.[0]; // ← ADD BACK
       if (provider?.user_id) {
         const provUser = (await sb(`users?id=eq.${provider.user_id}&select=email&limit=1`))?.[0];
         if (provUser?.email) {
