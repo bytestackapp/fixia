@@ -209,7 +209,9 @@
 </head>
 <body>
 
-<div id="pushLog" style="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#0f0;font-size:0.7rem;padding:8px;z-index:99999;max-height:200px;overflow-y:auto;font-family:monospace;display:none;"></div>
+<div id="pushLog" style="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.92);color:#0f0;font-size:0.75rem;padding:8px 8px 40px;z-index:99999;max-height:300px;overflow-y:auto;font-family:monospace;display:none;">
+  <button onclick="document.getElementById('pushLog').style.display='none'" style="position:fixed;top:8px;right:8px;background:#ff5a1f;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;z-index:99999;">Close</button>
+</div>
 
 <div class="bg-shapes">
   <div class="shape"></div><div class="shape"></div>
@@ -658,7 +660,7 @@ async function doLogin() {
       if (result.user.role === 'admin')         window.location.href = 'admin.html';
       else if (result.user.role === 'provider') window.location.href = 'homepage.html';
       else                                      window.location.href = 'homepage.html';
-    }, 3000);
+    }, 15000);
     
       } catch(e) {
         console.error('[Fixia Login Error]', e);
