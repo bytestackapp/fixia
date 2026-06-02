@@ -365,6 +365,7 @@ logout() {
       method: 'DELETE',
       prefer: 'return=minimal',
     }).catch(() => {});
+
     sbFetch(`users?id=eq.${sess.userId}`, {
       method: 'PATCH',
       prefer: 'return=minimal',
