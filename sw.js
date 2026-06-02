@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.0.8';                 // bump this on every deployment
+const CACHE_VERSION = 'v1.0.9';                 // bump this on every deployment
 const CACHE_NAME = `fixia-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [];
