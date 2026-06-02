@@ -358,14 +358,15 @@ const FX = {
     return { success: true, user };
   },
 
-logout() {
+async logout() {
   const sess = this.getSession();
   if (sess?.userId) {
-    sbFetch(`push_subscriptions?user_id=eq.${sess.userId}`, {
-      method: 'DELETE',
-      prefer: 'return=minimal',
-    }).catch(() => {});
-
+    try {
+      await sbFetch(`push_subscriptions?user_id=eq.${sess.userId}`, {
+        method: 'DELETE',
+        prefer: 'return=minimal',
+      });
+    } catch(e) {}
     sbFetch(`users?id=eq.${sess.userId}`, {
       method: 'PATCH',
       prefer: 'return=minimal',
