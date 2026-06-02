@@ -360,6 +360,7 @@ const FX = {
 
 logout() {
   const sess = this.getSession();
+   alert('logout userId: ' + sess?.userId); // ← temporary debug
   if (sess?.userId) {
     // Remove push subscription for this user
     fetch(`${SUPA_URL}/rest/v1/push_subscriptions?user_id=eq.${sess.userId}`, {
