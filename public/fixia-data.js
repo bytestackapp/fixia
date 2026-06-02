@@ -360,17 +360,11 @@ const FX = {
 
 logout() {
   const sess = this.getSession();
-   alert('logout userId: ' + sess?.userId); // ← temporary debug
   if (sess?.userId) {
-    // Remove push subscription for this user
-    fetch(`${SUPA_URL}/rest/v1/push_subscriptions?user_id=eq.${sess.userId}`, {
+    sbFetch(`push_subscriptions?user_id=eq.${sess.userId}`, {
       method: 'DELETE',
-      headers: {
-        'apikey':        SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_KEY}`,
-      },
+      prefer: 'return=minimal',
     }).catch(() => {});
-
     sbFetch(`users?id=eq.${sess.userId}`, {
       method: 'PATCH',
       prefer: 'return=minimal',
