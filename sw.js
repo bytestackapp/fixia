@@ -1,4 +1,5 @@
-const CACHE_NAME = 'fixia-v19';  // increment this every time you update fixia-data.js
+const CACHE_VERSION = 'v1.0.0';                 // bump this on every deployment
+const CACHE_NAME = `fixia-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [];
 /* production — uncomment when ready to deploy:
