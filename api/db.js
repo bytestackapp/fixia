@@ -1002,6 +1002,8 @@ const actions = {
       user_has_unread: false, provider_has_unread: true,
     };
     const rows = await sb('inquiries', { method: 'POST', body: JSON.stringify(row) });
+	const prov = (await sb(`providers?id=eq.${providerId}&select=user_id&limit=1`))?.[0];
+    if (prov?.user_id) await pushToUser(prov.user_id);
     return rows?.[0] || null;
   },
 
