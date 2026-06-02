@@ -358,18 +358,28 @@ const FX = {
     return { success: true, user };
   },
 
-  logout() {
-    const sess = this.getSession();
-    if (sess?.userId) {
-      sbFetch(`users?id=eq.${sess.userId}`, {
-        method: 'PATCH',
-        prefer: 'return=minimal',
-        body: JSON.stringify({ session_token: null }),
-      }).catch(() => {});
-    }
-    this.clearSession();
-    window.location.href = 'login.html';
-  },
+logout() {
+  const sess = this.getSession();
+  if (sess?.userId) {
+    // Remove push subscription for this user
+    fetch(`${SUPA_URL}/rest/v1/push_subscriptions?user_id=eq.${sess.userId}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey':        SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`,
+      },
+    }).catch(() => {});
+
+    sbFetch(`users?id=eq.${sess.userId}`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ session_token: null }),
+    }).catch(() => {});
+  }
+  this.clearSession();
+  window.location.href = 'login.html';
+},
+
 async checkSession() {
     const sess = this.getSession();
     if (!sess || !sess.sessionToken) return true; // guest or old session — let through
