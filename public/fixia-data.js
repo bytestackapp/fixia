@@ -155,11 +155,26 @@ async function sbDelete(publicUrl) {
 
 
 async function registerPushSubscription() {
-  if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
+  function pushLog(msg) {
+    const el = document.getElementById('pushLog');
+    if (!el) return;
+    el.style.display = 'block';
+    el.innerHTML += msg + '<br>';
+    el.scrollTop = el.scrollHeight;
+  }
+
+  pushLog('Starting...');
+  if (!('PushManager' in window) || !('serviceWorker' in navigator)) {
+    pushLog('ERROR: PushManager or serviceWorker not supported');
+    return;
+  }
   const permission = await Notification.requestPermission();
+  pushLog('Permission: ' + permission);
   if (permission !== 'granted') return;
   try {
+    pushLog('Waiting for SW...');
     const reg = await navigator.serviceWorker.ready;
+    pushLog('SW ready: ' + reg.active?.state);
 
     function urlBase64ToUint8Array(base64String) {
       const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -172,9 +187,11 @@ async function registerPushSubscription() {
       userVisibleOnly:      true,
       applicationServerKey: urlBase64ToUint8Array('Vr1Egxx8cQ_2RSf5I4UvpbFrHctuyU2b35sSR8FcWmXoqBeZVQaEiscJ9dXsW-PjBSwv1KGIJ09u3t0E7B5ZWg')
     });
+    pushLog('Subscribed: ' + sub.endpoint.slice(0, 40) + '...');
 
     const sess = FX.getSession?.();
-    if (!sess?.userId) return;
+    pushLog('Session userId: ' + sess?.userId);
+    if (!sess?.userId) { pushLog('ERROR: No session'); return; }
 
     const response = await fetch(`${SUPA_URL}/rest/v1/push_subscriptions`, {
       method:  'POST',
@@ -189,10 +206,9 @@ async function registerPushSubscription() {
         subscription: sub.toJSON(),
       }),
     });
-
-    console.log('[Fixia Push] Saved:', response.status);
+    pushLog('Supabase status: ' + response.status);
   } catch(e) {
-    console.warn('[Fixia Push] Error:', e.message);
+    pushLog('ERROR: ' + e.message);
   }
 }
 
