@@ -189,7 +189,6 @@ async function registerPushSubscription() {
         subscription: sub.toJSON(),
       }),
     });
-	alert('Push save status: ' + response.status);
     console.log('[Fixia Push] Saved:', response.status);
   } catch(e) {
     console.warn('[Fixia Push] Error:', e.message);
