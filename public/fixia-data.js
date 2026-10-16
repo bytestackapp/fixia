@@ -1812,6 +1812,12 @@ async approveUpgrade(requestId) {
   return await apiFetch('approveUpgrade', { requestId });
 },
 
+async applyPaypalUpgrade({ userId, packageId, transactionId, amount, paymentMethod }) {
+  return await apiFetch('applyPaypalUpgrade', {
+    userId, packageId, transactionId, amount, paymentMethod
+  });
+},
+
 /* ════════════════════════════════════════════════════════════
    UPGRADE — REJECT (admin)
 ════════════════════════════════════════════════════════════ */
@@ -2646,4 +2652,60 @@ setTimeout(() => {
   setInterval(beat, 120000);
   setInterval(checkMessages, 120000);
 }, 10000);
+})();
+
+/* ── Pull to Refresh ─────────────────────────────────────────── */
+(function initPullToRefresh() {
+  let startY = 0;
+  let pulling = false;
+  let indicator = null;
+
+  function createIndicator() {
+    const el = document.createElement('div');
+    el.id = 'ptr-indicator';
+    el.style.cssText = `
+      position:fixed;top:0;left:0;right:0;z-index:99999;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--navy,#0F1B2D);color:#fff;
+      font-size:0.75rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
+      height:0;overflow:hidden;transition:height 0.2s;
+      gap:8px;
+    `;
+    el.innerHTML = `<span id="ptr-icon" style="display:inline-block;transition:transform 0.3s;">↓</span> Pull to refresh`;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (window.scrollY === 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dist = e.touches[0].clientY - startY;
+    if (dist > 0) {
+      if (!indicator) indicator = createIndicator();
+      const h = Math.min(dist * 0.4, 56);
+      indicator.style.height = h + 'px';
+      const icon = document.getElementById('ptr-icon');
+      if (icon) icon.style.transform = dist > 80 ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!pulling || !indicator) return;
+    const dist = e.changedTouches[0].clientY - startY;
+    if (dist > 80) {
+      indicator.style.height = '44px';
+      indicator.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;"></span> Refreshing…`;
+      setTimeout(() => window.location.reload(), 500);
+    } else {
+      indicator.style.height = '0';
+    }
+    pulling = false;
+    startY = 0;
+  }, { passive: true });
 })();

@@ -140,6 +140,17 @@
       </button>
     </div>
 
+    <!-- PayPal Success — Upgrade -->
+    <div id="stateUpgradeSuccess" class="state">
+      <span class="big-icon">🚀</span>
+      <div class="state-title" style="color:var(--green-text);">Upgrade Confirmed!</div>
+      <div class="state-msg">Your plan has been upgraded successfully.</div>
+      <div class="info-box" id="upgInfoBox"></div>
+      <button class="btn btn-brand" onclick="window.location.href='profile.html?tab=plan'">
+        <i class="fa-solid fa-crown"></i> View My Plan
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -152,9 +163,48 @@ function showState(id) {
 
 (async function init() {
   const params  = new URLSearchParams(window.location.search);
-  const method  = params.get('method');  // 'paypal' | 'paymongo'
-  const type    = params.get('type');    // 'regular' | 'provider'
-  const token   = params.get('token');   // PayPal order token (PayPal only)
+  const method  = params.get('method');
+  const type    = params.get('type');
+  const token   = params.get('token');
+  const source  = params.get('source');  // 'upgrade'
+  const userId  = params.get('userId');
+
+  // ── UPGRADE FLOW ─────────────────────────────────────────────
+  if (source === 'upgrade' && userId) {
+    try {
+      const orderId = sessionStorage.getItem('paypal_order_id') || token;
+      const r = await fetch('/api/verify-paypal-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await r.json();
+      if (!data.verified) throw new Error(data.error || 'Payment not verified.');
+
+      const packageId = params.get('packageId') || sessionStorage.getItem('upgrade_package_id');
+
+      await FX.applyPaypalUpgrade({
+        userId,
+        packageId,
+        transactionId: data.transactionId,
+        amount:        data.amount,
+        paymentMethod: 'paypal',
+      });
+
+      document.getElementById('upgInfoBox').innerHTML = `
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal ✅ Verified</span></div>
+        <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId}</span></div>
+        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₱${data.amount}</span></div>`;
+      showState('stateUpgradeSuccess');
+      sessionStorage.removeItem('paypal_order_id');
+      sessionStorage.removeItem('upgrade_package_id');
+    } catch(e) {
+      showState('stateError');
+      document.getElementById('errorMsg').textContent = e.message || 'Verification failed.';
+      document.getElementById('retryBtn').onclick = () => window.location.href = 'profile.html?tab=plan';
+    }
+    return;
+  }
 
   // Retrieve stored signup data from sessionStorage
   const storageKey = type === 'provider' ? 'fixia_provider_signup' : 'fixia_signup';

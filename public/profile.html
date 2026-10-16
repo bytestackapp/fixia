@@ -78,7 +78,7 @@
     .tab-btn.active{color:var(--brand);border-bottom-color:var(--brand);}
 
     /* ── PANELS ──────────────────────────────────────────────── */
-    .panel{display:none;padding:14px 16px;animation:fadeIn 0.2s;}
+    .panel{display:none;padding:14px 16px 58px;animation:fadeIn 0.2s;}
     .panel.active{display:block;}
 
     /* ── SECTION CARD ────────────────────────────────────────── */
@@ -328,7 +328,7 @@
     <div class="sec-title"><i class="fa-solid fa-circle-info"></i> Account Info</div>
     <div id="overviewInfo"><div class="load-spinner"></div></div>
   </div>
-  <div class="sec">
+  <div class="sec"">
     <div class="sec-title"><i class="fa-solid fa-grid-2"></i> Quick Actions</div>
 	<div class="menu-item" onclick="openReferralModal()">
       <div class="menu-icon" style="background:var(--brand-light);"><i class="fa-solid fa-gift" style="color:var(--brand);"></i></div>
@@ -856,7 +856,7 @@ function loadListingSubcats() {
             <div style="font-size:0.78rem;color:#8896A5;line-height:1.7;max-width:320px;margin-top:2rem;padding-top:1.5rem;border-top:1px solid #E2E8F0;">
               Have inquiries or need further assistance?<br>
 			  You may contact our Support Team at:<br><br>
-              E-mail: <a href="mailto:noreply.bytestack@gmail.com" style="color:#FF5A1F;font-weight:700;text-align:left;">noreply.bytestack@gmail.com</a><br>
+              E-mail: <a href="mailto:support.fixia@gmail.com" style="color:#FF5A1F;font-weight:700;text-align:left;">support.fixia@gmail.com</a><br>
               Facebook: <a href="https://www.facebook.com/share/18WYchWMH7/?mibextid=wwXIfr" target="_blank" style="color:#FF5A1F;font-weight:700;text-align:left;">Fixia PH</a>
             </div>
           </div>`;
@@ -1208,7 +1208,7 @@ async function renderPlanTab() {
     // Next button
     html += `
       <button class="btn btn-brand" id="upgNextBtn" disabled
-              style="width:100%;justify-content:center;opacity:0.5;"
+              style="width:100%;justify-content:center;margin-top:8px;margin-bottom:4px;"
               onclick="openUpgradeModal(_selectedUpgradePkg)">
         <i class="fa-solid fa-arrow-right"></i> Next
       </button>`;
@@ -2201,14 +2201,16 @@ async function proceedUpgradePayment() {
       const endpoint = _upgPayMethod === 'paypal'
         ? '/api/create-paypal-checkout'
         : '/api/create-paymongo-checkout';
+
+      sessionStorage.setItem('upgrade_package_id', _upgradeTarget.packageId);
+
       const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount:    _upgradeTarget.calc.newPlanPrice,
-          packageId: _upgradeTarget.packageId,
-          userId:    session.userId,
-          type:      'upgrade',
+          package: _upgradeTarget.packageId,
+          type:    session.role,
+          userId:  session.userId,
         }),
       });
       const d = await r.json();

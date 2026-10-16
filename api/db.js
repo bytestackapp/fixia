@@ -289,6 +289,86 @@ const actions = {
     return { ok: true, subStart, subEnd, totalDays };
   },
 
+/* ── applyPaypalUpgrade ──────────────────────────────────────
+     Requires: authenticated user (self only)
+     Payload:  { userId, packageId, transactionId, amount, paymentMethod }
+     Called by: payment-success.html after PayPal upgrade payment
+  ─────────────────────────────────────────────────────────── */
+  async applyPaypalUpgrade(payload, callerUser) {
+    const { userId, packageId, transactionId, amount, paymentMethod } = payload;
+    if (!userId || !packageId) throw { status: 400, message: 'Missing userId or packageId.' };
+    if (callerUser.role !== 'admin' && callerUser.id !== userId) {
+      throw { status: 403, message: 'You can only upgrade your own account.' };
+    }
+
+    // Fetch new package
+    const pkgRows = await sb(`packages?id=eq.${encodeURIComponent(packageId)}&limit=1`);
+    const newPkg = pkgRows?.[0];
+    if (!newPkg) throw { status: 404, message: 'Package not found.' };
+
+    // Fetch current user
+    const userRows = await sb(`users?id=eq.${userId}&limit=1`);
+    const user = userRows?.[0];
+    if (!user) throw { status: 404, message: 'User not found.' };
+
+    // Calculate subscription dates with carryover
+    const periodDays = { month: 30, '3month': 90, '6month': 180, year: 365, lifetime: null };
+    const newPeriodDays = periodDays[newPkg.period] ?? null;
+
+    // Carryover remaining days from current subscription
+    let carryoverDays = 0;
+    if (user.subscription_end) {
+      const remaining = Math.ceil((new Date(user.subscription_end) - new Date()) / 86400000);
+      if (remaining > 0) carryoverDays = remaining;
+    }
+
+    const totalDays = newPeriodDays === null ? null : (newPeriodDays + carryoverDays);
+    const subStart  = new Date(new Date().setHours(0,0,0,0)).toISOString();
+    const subEnd    = totalDays === null ? null : calcExpiry(totalDays);
+
+    // Update user
+    await sb(`users?id=eq.${userId}`, {
+      method:  'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        package_id:         packageId,
+        package_name:       newPkg.name,
+        ads_free:           newPkg.ads_free ?? true,
+        payment_method:     paymentMethod || 'paypal',
+        payment_reference:  transactionId || '',
+        payment_amount:     amount || '',
+        payment_status:     'verified',
+        subscription_start: subStart,
+        subscription_end:   subEnd,
+        expiry_sent:        false,
+        reminder_3_sent:    false,
+        reminder_7_sent:    false,
+        followup_sent:      false,
+      }),
+    });
+
+    // Update provider package if applicable
+    const provRows = await sb(`providers?user_id=eq.${userId}&select=id&limit=1`);
+    const prov = provRows?.[0];
+    if (prov) {
+      await sb(`providers?id=eq.${prov.id}`, {
+        method:  'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body:    JSON.stringify({ package_id: packageId }),
+      });
+      await sb(
+        `listings?provider_id=eq.${prov.id}&is_active=eq.false&deactivated_reason=eq.subscription_expired`,
+        {
+          method:  'PATCH',
+          headers: { 'Prefer': 'return=minimal' },
+          body:    JSON.stringify({ is_active: true, deactivated_reason: null }),
+        }
+      );
+    }
+
+    return { ok: true, subStart, subEnd, totalDays };
+  },
+  
   /* ── rejectUpgrade ──────────────────────────────────────────
      Requires: admin
      Payload:  { requestId, reason }
@@ -1051,19 +1131,7 @@ const actions = {
     if (callerUser.role !== 'admin' && callerUser.id !== inq.regular_user_id) {
       throw { status: 403, message: 'You can only cancel your own bookings.' };
     }
-    const user = (await sb(`users?id=eq.${inq.regular_user_id}&select=first_name,last_name&limit=1`))?.[0];
-    const userName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'The user';
     const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
-    if (provider?.user_id) {
-      await sb('user_messages', {
-        method: 'POST', headers: { 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-          user_id: provider.user_id, title: 'Booking Cancelled by User',
-          body: `${userName} has cancelled their booking with you.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-          type: 'warning', icon: '🚫', is_read: false,
-        }),
-      });
-    }
     await sb(`inquiries?id=eq.${inquiryId}`, {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: false, provider_has_unread: true }),
@@ -1087,16 +1155,6 @@ const actions = {
         throw { status: 403, message: 'You can only cancel your own bookings.' };
       }
     }
-    const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=biz_name&limit=1`))?.[0];
-    const providerName = provider?.biz_name || 'Your provider';
-    await sb('user_messages', {
-      method: 'POST', headers: { 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        user_id: inq.regular_user_id, title: 'Booking Cancelled by Provider',
-        body: `${providerName} has cancelled your booking.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-        type: 'warning', icon: '🚫', is_read: false,
-      }),
-    });
     await sb(`inquiries?id=eq.${inquiryId}`, {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'cancelled', user_has_unread: true, provider_has_unread: false }),
@@ -1117,19 +1175,7 @@ const actions = {
     if (callerUser.role !== 'admin' && callerUser.id !== inq.regular_user_id) {
       throw { status: 403, message: 'You can only dispute your own bookings.' };
     }
-    const user = (await sb(`users?id=eq.${inq.regular_user_id}&select=first_name,last_name&limit=1`))?.[0];
-    const userName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'The user';
     const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=user_id&limit=1`))?.[0];
-    if (provider?.user_id) {
-      await sb('user_messages', {
-        method: 'POST', headers: { 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-          user_id: provider.user_id, title: 'Booking Disputed by User',
-          body: `${userName} has disputed the completion of their booking with you.\n\nJob Description:\n"${inq.user_message || 'No description provided.'}"`,
-          type: 'warning', icon: '⚠️', is_read: false,
-        }),
-      });
-    }
     await sb(`inquiries?id=eq.${inquiryId}`, {
       method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'disputed', user_has_unread: false, provider_has_unread: true }),
@@ -1194,13 +1240,6 @@ const actions = {
         method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
         body: JSON.stringify({ avg_rating: Math.round(avg * 10) / 10, total_ratings: allRatings.length }),
       });
-      const provider = (await sb(`providers?id=eq.${inq.provider_id}&select=biz_name,user_id&limit=1`))?.[0]; // ← ADD BACK
-      if (provider?.user_id) {
-        const provUser = (await sb(`users?id=eq.${provider.user_id}&select=email&limit=1`))?.[0];
-        if (provUser?.email) {
-          await sendEmail('rating_notify_provider', { email: provUser.email, bizName: provider.biz_name, stars, comment: comment || '(no comment)', newAvg: Math.round(avg * 10) / 10 });
-        }
-      }
     }
     try {
       const booker = (await sb(`users?id=eq.${inq.regular_user_id}&select=payment_status,referral_points&limit=1`))?.[0];
@@ -1364,6 +1403,7 @@ const ROLE_MAP = {
   submitReport:          null,
   submitChangeRequest:   null,
   requestUpgrade:        null,
+  applyPaypalUpgrade:    null,
 };
 
 /* ── Main handler ────────────────────────────────────────────── */

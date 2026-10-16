@@ -125,10 +125,15 @@ module.exports = async (req, res) => {
           brand_name:  'Fixia',
           landing_page:'BILLING',
           user_action: 'PAY_NOW',
-          return_url:  `${APP_URL}/payment-success.html?method=paypal&type=${type || 'regular'}`,
-          cancel_url:  type === 'provider'
-            ? `${APP_URL}/signup-provider.html?cancelled=1&step=6`
-            : `${APP_URL}/signup-regular.html?cancelled=1&step=4`,
+            const isUpgrade = !!req.body.userId;
+            return_url: isUpgrade
+              ? `${APP_URL}/payment-success.html?method=paypal&source=upgrade&userId=${req.body.userId}&packageId=${packageId}`
+              : `${APP_URL}/payment-success.html?method=paypal&type=${type || 'regular'}`,
+            cancel_url: isUpgrade
+              ? `${APP_URL}/profile.html?tab=plan&cancelled=1`
+              : type === 'provider'
+                ? `${APP_URL}/signup-provider.html?cancelled=1&step=6`
+                : `${APP_URL}/signup-regular.html?cancelled=1&step=4`,
         },
       }),
     });
