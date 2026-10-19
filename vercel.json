@@ -1,6 +1,6 @@
 {
-<<<<<<< HEAD
-  "version": 2, "name": "fixia",
+  "version": 2,
+  "name": "fixia",
   "builds": [
     { "src": "public/**", "use": "@vercel/static" },
     { "src": "sw.js", "use": "@vercel/static" },
@@ -16,91 +16,31 @@
     { "src": "/", "dest": "/public/presignup.html" },
     { "src": "/(.*)", "dest": "/public/$1.html" }
   ],
-  "crons": [ { "path": "/api/subscription-cron", "schedule": "0 17 * * *" } ],
-  "headers": [
-    { "source": "/api/(.*)", "headers": [
-      { "key": "Access-Control-Allow-Origin", "value": "*" },
-      { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-      { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, x-session-token, x-user-id" } ] },
-    { "source": "/(css|js|images)/(.*)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" } ] },
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "X-Frame-Options", "value": "DENY" } ] }
-=======
-  "version": 2,
-  "name": "fixia",
-  "builds": [
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "sw.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "manifest.json",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.js"
-    },
-    {
-      "src": "/sw.js",
-      "dest": "/sw.js"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf))",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/(.+\\.html)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/public/presignup.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1.html"
-    }
-  ],
-
   "crons": [
-    {
-      "path": "/api/subscription-cron",
-      "schedule": "0 17 * * *"
-    }
+    { "path": "/api/subscription-cron", "schedule": "0 17 * * *" }
   ],
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin",  "value": "https://gofixia.vercel.app" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://gofixia.vercel.app" },
         { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, x-session-token, x-user-id" }
+      ]
+    },
+    {
+      "source": "/(css|js|images)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options",        "value": "DENY" },
-        { "key": "X-XSS-Protection",       "value": "1; mode=block" }
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
       ]
     }
->>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
   ]
 }
