@@ -1,6 +1,0 @@
-VAPID_PUBLIC_KEY = BKlXcfZMS9QcyRGrakQs1GPeOkenA56ZzeB68uYPlqFEPIuaMlyQdtL2wFTktnsMrr_TcjuSLjzaP8f_aAFYSrY
-
-
-VAPID_PRIVATE_KEY = _JCfZa9E6t3XfSewpE2yla3jENY5hMX3hefUQOEqU-M
-
-C:\Installer\node-v22.18.0-win-x64\node.exe C:\Users\marvin.gonda\Desktop\genkeys.js
