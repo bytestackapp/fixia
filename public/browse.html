@@ -13,11 +13,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+<<<<<<< HEAD
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="/manifest.json">
   
   <title>Browse — Fixia</title>
+=======
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f2027">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>Browse — Fixia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
   <style>
     :root {
       --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
@@ -118,8 +128,11 @@
     .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
     .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}	
   </style>
+<<<<<<< HEAD
 <link rel="stylesheet" href="css/icons.css">
 <link rel="stylesheet" href="css/fixia.css">
+=======
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 </head>
 <body>
 
@@ -258,9 +271,13 @@
   <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
 </nav>
 
+<<<<<<< HEAD
 <script src="env-config.js"></script>
 <script src="fixia-data.js"></script>
 <script src="js/fx-boot.js"></script>
+=======
+<script src="fixia-data.js"></script>
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 <script>
 const SUBCATS = {
   home:   [{icon:'fa-wrench',name:'Plumbing'},{icon:'fa-snowflake',name:'Aircon Service'},{icon:'fa-bolt',name:'Electrical'},{icon:'fa-paint-roller',name:'Painting'},{icon:'fa-hammer',name:'Carpentry'},{icon:'fa-shield',name:'Waterproofing'},{icon:'fa-door-closed',name:'Door & Window'},{icon:'fa-fire',name:'Gas & LPG'},{icon:'fa-broom',name:'Deep Cleaning'}],
@@ -386,7 +403,11 @@ async function refreshNotifBadge() {
   } catch(e) {}
 }
 refreshNotifBadge();
+<<<<<<< HEAD
 FX.every(refreshNotifBadge, 30000);
+=======
+setInterval(refreshNotifBadge, 10000);
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 
 function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeSignOutModal(); }
 function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }

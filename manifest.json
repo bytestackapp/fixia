@@ -1,6 +1,38 @@
+<<<<<<< HEAD
 { "name": "Fixia", "short_name": "Fixia PH", "start_url": "/homepage.html", "display": "standalone",
   "background_color": "#F5F6F8", "theme_color": "#ffffff", "orientation": "portrait",
   "icons": [
     { "src": "/images/fixia-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/images/fixia-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/images/fixia-icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" } ] }
+=======
+{
+  "name": "Fixia",
+  "short_name": "Fixia PH",
+  "start_url": "/homepage.html",
+  "display": "standalone",
+  "background_color": "#0f2027",
+  "theme_color": "#0f2027",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/public/images/fixia-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/public/images/fixia-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/public/images/fixia-icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070

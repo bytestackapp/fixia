@@ -13,11 +13,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+<<<<<<< HEAD
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="/manifest.json">
   
   <title>Payment — Fixia</title>
+=======
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f2027">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>Payment — Fixia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
   <style>
     :root {
       --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
@@ -76,8 +86,11 @@
     .logo-name{font-size:1.4rem;font-weight:800;color:var(--navy);letter-spacing:-0.04em;}
     .logo-name span{color:var(--brand);}
   </style>
+<<<<<<< HEAD
 <link rel="stylesheet" href="css/icons.css">
 <link rel="stylesheet" href="css/fixia.css">
+=======
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 </head>
 <body>
 <div class="bg-shapes">
@@ -154,9 +167,13 @@
   </div>
 </div>
 
+<<<<<<< HEAD
 <script src="env-config.js"></script>
 <script src="fixia-data.js"></script>
 <script src="js/fx-boot.js"></script>
+=======
+<script src="fixia-data.js"></script>
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 <script>
 function showState(id) {
   document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
@@ -174,7 +191,11 @@ function showState(id) {
   // ── UPGRADE FLOW ─────────────────────────────────────────────
   if (source === 'upgrade' && userId) {
     try {
+<<<<<<< HEAD
       const orderId = localStorage.getItem('paypal_order_id') || token;
+=======
+      const orderId = sessionStorage.getItem('paypal_order_id') || token;
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
       const r = await fetch('/api/verify-paypal-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,7 +219,11 @@ function showState(id) {
         <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId}</span></div>
         <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₱${data.amount}</span></div>`;
       showState('stateUpgradeSuccess');
+<<<<<<< HEAD
       localStorage.removeItem('paypal_order_id');
+=======
+      sessionStorage.removeItem('paypal_order_id');
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
       sessionStorage.removeItem('upgrade_package_id');
     } catch(e) {
       showState('stateError');
@@ -211,7 +236,11 @@ function showState(id) {
   // Retrieve stored signup data from sessionStorage
   const storageKey = type === 'provider' ? 'fixia_provider_signup' : 'fixia_signup';
   let formData = null;
+<<<<<<< HEAD
   try { formData = JSON.parse(localStorage.getItem(storageKey)); } catch(e) {}
+=======
+  try { formData = JSON.parse(sessionStorage.getItem(storageKey)); } catch(e) {}
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 
   if (!formData) {
     showState('stateError');
@@ -223,7 +252,11 @@ function showState(id) {
 
   // ── PayMongo flow ─────────────────────────────────────────────
   if (method === 'paymongo') {
+<<<<<<< HEAD
     const sessionId = localStorage.getItem('paymongo_session_id');
+=======
+    const sessionId = sessionStorage.getItem('paymongo_session_id');
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
     if (!sessionId) {
       showState('stateError');
       document.getElementById('errorMsg').textContent = 'Payment session not found. Please try again.';
@@ -258,7 +291,11 @@ function showState(id) {
     return;
   }
 
+<<<<<<< HEAD
   const orderId = localStorage.getItem('paypal_order_id') || token;
+=======
+  const orderId = sessionStorage.getItem('paypal_order_id') || token;
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 
   // Call backend to capture + verify payment
   try {
@@ -353,9 +390,15 @@ function showState(id) {
     }
 
 	// Clear session storage
+<<<<<<< HEAD
     localStorage.removeItem(storageKey);
     localStorage.removeItem('paypal_order_id');
     localStorage.removeItem('paymongo_session_id');
+=======
+    sessionStorage.removeItem(storageKey);
+    sessionStorage.removeItem('paypal_order_id');
+    sessionStorage.removeItem('paymongo_session_id');
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 
   } catch(e) {
     showState('stateError');
@@ -434,9 +477,15 @@ async function _completeRegistration(type, formData, payMethod, payData, storage
       <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;">⏳ Pending Approval</span></div>`;
     showState('stateProviderSuccess');
   }
+<<<<<<< HEAD
   localStorage.removeItem(storageKey);
   localStorage.removeItem('paypal_order_id');
   localStorage.removeItem('paymongo_session_id');
+=======
+  sessionStorage.removeItem(storageKey);
+  sessionStorage.removeItem('paypal_order_id');
+  sessionStorage.removeItem('paymongo_session_id');
+>>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 }
 </script>
 
