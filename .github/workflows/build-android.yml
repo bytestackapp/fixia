@@ -1,0 +1,35 @@
+name: Build Android APK
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '17' }
+      - run: npm ci
+      - name: Copy web app into www (APK has no admin page / service worker)
+        run: |
+          mkdir -p www && cp -r public/. www/
+          rm -f www/admin.html www/sw.js
+      - name: Write env-config.js from secrets
+        run: node scripts/generate-env.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          API_BASE: ${{ secrets.API_BASE }}
+      - name: Write signing keystore from secret
+        run: echo "${{ secrets.FIXIA_KEYSTORE_B64 }}" | base64 -d > android/app/fixia.keystore
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew
+      - name: Build release APK
+        run: cd android && ./gradlew assembleRelease
+        env:
+          FIXIA_KEYSTORE_PASSWORD: ${{ secrets.FIXIA_KEYSTORE_PASSWORD }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fixia
+          path: android/app/build/outputs/apk/release/fixia.apk

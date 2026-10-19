@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Bookings Page — Regular User
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>My Bookings — Fixia</title>
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F0F2F5; --card:#FFFFFF; --border:#E8ECF0;
+      --green:#10B981; --green-bg:#ECFDF5; --green-text:#065F46;
+      --gold:#F59E0B; --gold-bg:#FFFBEB; --gold-text:#92400E;
+      --red:#DC3545; --red-bg:#FFF5F5; --red-text:#991B1B;
+      --blue:#3B82F6; --blue-bg:#EFF6FF; --blue-text:#1E40AF;
+      --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.07);
+      --nav-h:56px; --bottom-h:62px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+    /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
+    .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-0.04em;}
+    .nav-logo span{color:var(--brand);}
+    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
+    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+    .nav-search-wrap span{color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;}
+
+    /* ── PAGE HEADER ─────────────────────────────────────────── */
+	.page-header{background:var(--navy-mid);padding:8px 16px;}
+	.ph-sub{font-size:0.78rem; color:rgba(255,255,255,0.75);}	
+	
+    /* ── FILTER TABS ─────────────────────────────────────────── */
+    .filter-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:50;}
+    .filter-tabs::-webkit-scrollbar{display:none;}
+    .ftab{flex-shrink:0;padding:11px 16px;font-size:0.72rem;font-weight:700;color:var(--text-3);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+    .ftab.active{color:var(--brand);border-bottom-color:var(--brand);}
+
+    /* ── BODY ────────────────────────────────────────────────── */
+    .body{padding:14px 16px;}
+
+    /* ── BOOKING CARD ────────────────────────────────────────── */
+    .booking-card{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);animation:slideUp 0.3s ease both;position:relative;}
+    .booking-card.unread{}
+    .bc-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+    .bc-avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+    .bc-info{flex:1;min-width:0;}
+    .bc-name{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bc-service{font-size:0.7rem;color:var(--brand);font-weight:600;margin-bottom:4px;}
+    .bc-time{font-size:0.65rem;color:var(--text-3);}
+    .bc-status{flex-shrink:0;}
+
+    /* Status badges */
+    .status-badge{font-size:0.62rem;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;display:inline-flex;align-items:center;gap:3px;}
+    .sb-inquiring{background:#EFF6FF;color:#1E40AF;}
+    .sb-replied  {background:var(--gold-bg);color:var(--gold-text);}
+    .sb-declined {background:var(--red-bg);color:var(--red-text);}
+    .sb-cancelled{background:#F5F7FA;color:var(--text-3);}
+    .sb-active   {background:var(--green-bg);color:var(--green-text);}
+    .sb-done     {background:var(--brand-light);color:var(--brand-dark);}
+    .sb-completed{background:var(--green-bg);color:var(--green-text);}
+
+    /* Message bubbles */
+    .msg-wrap{margin-bottom:10px;}
+    .msg-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:4px;}
+    .msg-bubble{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;font-size:0.8rem;color:var(--text-2);line-height:1.6;}
+    .msg-bubble.provider{background:var(--brand-light);border-left:3px solid var(--brand);}
+
+    /* Provider contact footer */
+    .contact-footer{background:var(--navy-mid);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .cf-text{font-size:0.7rem;color:rgba(255,255,255,0.6);line-height:1.5;}
+    .cf-text strong{color:#fff;display:block;margin-bottom:2px;}
+    .cf-btns{display:flex;gap:6px;flex-shrink:0;}
+    .cf-btn{width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;}
+    .cf-btn-call{background:var(--green);color:#fff;}
+    .cf-btn-sms {background:var(--blue-bg);color:var(--blue-text);}
+
+    /* Action buttons */
+    .bc-actions{display:flex;gap:7px;flex-wrap:wrap;}
+    .action-btn{flex:1;padding:10px 8px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .action-btn:active{transform:scale(0.97);}
+    .btn-book    {background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 3px 10px rgba(255,90,31,0.3);}
+    .btn-cancel  {background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
+    .btn-accept  {background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.3);}
+    .btn-view    {background:var(--bg);color:var(--text-2);border:1.5px solid var(--border);}
+    .btn-rate    {background:var(--gold-bg);color:var(--gold-text);border:1px solid rgba(245,158,11,0.3);}
+
+    /* ── STAR PICKER ─────────────────────────────────────────── */
+    .star-picker{display:flex;gap:8px;margin:8px 0;}
+    .star-picker i{font-size:1.8rem;color:var(--border);cursor:pointer;transition:color 0.15s;}
+    .star-picker i.lit{color:var(--gold);}
+
+    /* ── EMPTY / LOADING ─────────────────────────────────────── */
+    .state-box{text-align:center;padding:3rem 1rem;}
+    .state-icon{font-size:2.5rem;margin-bottom:10px;}
+    .state-title{font-size:0.95rem;font-weight:800;color:var(--navy);margin-bottom:4px;}
+    .state-sub{font-size:0.8rem;color:var(--text-3);line-height:1.6;margin-bottom:1.25rem;}
+    .state-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:12px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;}
+    .load-spinner{width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:2rem auto;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ── MODAL ───────────────────────────────────────────────── */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
+    .modal-overlay.open{display:flex;animation:fadeIn 0.2s;}
+    .modal-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;animation:slideUp 0.3s ease;}
+	@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+	
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+    .modal-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);}
+    .modal-title{font-size:0.95rem;font-weight:800;color:var(--navy);}
+    .modal-body{padding:14px 18px;}
+    .modal-foot{padding:10px 18px 0;display:flex;gap:8px;}
+    .modal-foot .action-btn{flex:1;}
+    .form-label{display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;}
+    .form-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.87rem;font-family:inherit;resize:vertical;min-height:100px;color:var(--text);transition:all 0.2s;}
+    .form-textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,90,31,0.1);}
+    .modal-alert{font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-bottom:8px;display:none;}
+    .modal-alert.show{display:block;}
+    .modal-alert.err{background:var(--red-bg);color:var(--red-text);}
+
+    /* ── TOAST ───────────────────────────────────────────────── */
+    .toast{position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--navy);color:#fff;border-radius:var(--radius-sm);padding:0.7rem 1.4rem;font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+	.toast.success{background:var(--navy);}
+    .toast.error{background:var(--red);}
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}	
+	
+  </style>
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/fixia.css">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo">fix<span>ia</span></div>
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span>Search services…</span>
+  </div>
+  <button class="nav-icon-btn" onclick="goToNotifications()" title="Notifications" style="position:relative;">
+    <i class="fa-regular fa-bell"></i>
+    <span id="notifBellBadge" style="display:none;position:absolute;top:3px;right:3px;background:var(--brand);color:#fff;font-size:0.45rem;font-weight:800;min-width:14px;height:14px;border-radius:20px;border:1.5px solid var(--navy);align-items:center;justify-content:center;padding:0 3px;"></span>
+  </button>
+  <button class="nav-icon-btn" onclick="openSignOutModal()" title="Sign Out">
+    <i class="fa-solid fa-right-from-bracket"></i>
+  </button>
+</nav>
+
+<!-- SUN HEADER -->
+<div class="page-header">
+  <div class="ph-sub">Manage and track your service bookings</div>
+</div>
+
+<!-- FILTER TABS -->
+<div class="filter-tabs">
+  <button class="ftab active" onclick="setTab('all',this)">All</button>
+  <button class="ftab" onclick="setTab('pending',this)">Pending</button>
+  <button class="ftab" onclick="setTab('active',this)">Active</button>
+  <button class="ftab" onclick="setTab('done',this)">Done</button>
+  <button class="ftab" onclick="setTab('completed',this)">Completed</button>
+</div>
+
+<!-- BODY -->
+<div class="body" id="bodyContent">
+  <div class="load-spinner"></div>
+</div>
+
+<!-- SIGN OUT CONFIRMATION MODAL -->
+<div class="modal-overlay" id="signOutModal" onclick="handleOverlay(event,'signOutModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--red);"></i> &nbsp; Sign Out</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
+        Are you sure you want to sign out?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn" onclick="closeSignOutModal()">Cancel</button>
+      <button class="action-btn" onclick="FX.logout()" style="background:linear-gradient(135deg,#dc3545,#b02030);color:#fff;box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+        <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ACCEPT COMPLETION MODAL (with rating) -->
+<div class="modal-overlay" id="acceptModal" onclick="handleOverlay(event,'acceptModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🎉 Accept Job Completion</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.83rem;color:var(--text-2);line-height:1.6;margin-bottom:14px;">
+        Confirm that <strong id="acceptProvName">this provider</strong> has completed the job to your satisfaction.
+        You'll then be asked to leave a rating.
+      </p>
+      <div class="form-label">Rate your experience <span style="color:var(--text-3);font-weight:400;">(optional)</span></div>
+      <div class="star-picker" id="starPicker">
+        <i class="fa-solid fa-star" data-n="1" onclick="pickStar(1)"></i>
+        <i class="fa-solid fa-star" data-n="2" onclick="pickStar(2)"></i>
+        <i class="fa-solid fa-star" data-n="3" onclick="pickStar(3)"></i>
+        <i class="fa-solid fa-star" data-n="4" onclick="pickStar(4)"></i>
+        <i class="fa-solid fa-star" data-n="5" onclick="pickStar(5)"></i>
+      </div>
+      <div class="form-group" style="margin-top:8px;">
+        <label class="form-label">Comment <span style="color:var(--text-3);font-weight:400;">(optional)</span></label>
+        <textarea class="form-textarea" id="ratingComment" placeholder="Share your experience…" style="min-height:75px;"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:8px;">
+        <div>
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text);">Post anonymously</div>
+          <div id="anonPreview" style="font-size:0.68rem;color:var(--text-3);margin-top:2px;">Your name will be shown</div>
+        </div>
+        <label style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;">
+          <input type="checkbox" id="anonToggle" onchange="updateAnonPreview()" style="opacity:0;width:0;height:0;">
+          <span style="position:absolute;cursor:pointer;inset:0;background:#CBD5E0;border-radius:11px;transition:0.2s;"
+                id="anonTrack"></span>
+          <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"
+                id="anonThumb"></span>
+        </label>
+      </div>
+      <div class="modal-alert err" id="acceptAlert"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn btn-cancel" onclick="closeModal('acceptModal')">Cancel</button>
+      <button class="action-btn btn-accept" onclick="confirmAccept()">
+        <i class="fa-solid fa-check"></i> Accept & Rate
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL CONFIRM MODAL -->
+<div class="modal-overlay" id="cancelModal" onclick="handleOverlay(event,'cancelModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title">Cancel Inquiry?</div></div>
+    <div class="modal-body">
+      <p style="font-size:0.83rem;color:var(--text-2);line-height:1.6;">
+        Are you sure you want to cancel this inquiry?
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn btn-view" onclick="closeModal('cancelModal')">Keep It</button>
+      <button class="action-btn btn-cancel" onclick="confirmCancel()">
+        <i class="fa-solid fa-xmark"></i> Yes, Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <a class="bnav-item active" href="bookings.html">
+    <i class="fa-solid fa-clipboard-list"></i>Bookings
+  </a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="env-config.js"></script>
+<script src="fixia-data.js"></script>
+<script src="js/fx-boot.js"></script>
+<script>
+const session = FX.requireAuth();
+let allInquiries = [];
+let currentTab   = 'all';
+let activeAcceptId = null;
+let activeCancelId = null;
+let selectedStars  = 0;
+
+/* ── Init ──────────────────────────────────────────────────── */
+(async function init() {
+  if (!session) return;
+  if (session.role === 'regular' && !session.adsFree) await FX.initAds();
+  await load();
+})();
+
+async function load() {
+  try {
+    if (session.role === 'provider') {
+	  const providerData = await FX.getProviderByUserId(session.userId);
+      if (!providerData) { allInquiries = []; render(); return; }
+      allInquiries = await FX.getProviderInquiries(providerData.id);
+      allInquiries = await Promise.all(allInquiries.map(async inq => {
+        const user = await FX.getUserById(inq.regular_user_id);
+        return { ...inq, _provider: providerData, _provUser: null, _customer: user };
+      }));
+    } else {
+      allInquiries = await FX.getUserInquiries(session.userId);
+      const provIds = [...new Set(allInquiries.map(i => i.provider_id))];
+      const provMap = {};
+      await Promise.all(provIds.map(async id => {
+        const p = await FX.getProviderById(id);
+        if (p) provMap[id] = p;
+      }));
+      allInquiries = await Promise.all(allInquiries.map(async inq => {
+        const prov = provMap[inq.provider_id];
+        const user = prov ? await FX.getUserById(prov.user_id) : null;
+        return { ...inq, _provider: prov, _provUser: user };
+      }));
+    }
+
+    render();
+
+    // Mark read
+  } catch(e) {
+    console.error('[load] CRASHED:', e);
+    document.getElementById('bodyContent').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">⚠️</div>
+        <div class="state-title">Failed to load</div>
+        <div class="state-sub">${e.message}</div>
+      </div>`;
+  }
+}
+
+/* ── Tab filter ─────────────────────────────────────────────── */
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+/* ── Render ─────────────────────────────────────────────────── */
+function render() {
+  const body = document.getElementById('bodyContent');
+  let list = allInquiries;
+  if (currentTab !== 'all') list = list.filter(i => i.status === currentTab);
+
+  if (!list.length) {
+    const emptyMsgs = {
+      all:       { icon:'📋', title:'No bookings yet', sub:'Find a provider and tap "Inquire" to get started.', btn:true },
+      pending:   { icon:'📤', title:'No pending bookings', sub:'Bookings waiting for the provider to start will appear here.' },
+      active:    { icon:'⚡', title:'No active bookings', sub:'Once you confirm a booking, it appears here.' },
+      done:      { icon:'🎉', title:'Nothing to accept', sub:'When a provider marks a job done, it will appear here for your acceptance.' },
+      completed: { icon:'✅', title:'No completed jobs yet', sub:'Your finished and rated jobs will appear here.' },
+    };
+    const e = emptyMsgs[currentTab] || emptyMsgs.all;
+    body.innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">${e.icon}</div>
+        <div class="state-title">${e.title}</div>
+        <div class="state-sub">${e.sub}</div>
+        ${e.btn ? `<button class="state-btn" onclick="window.location.href='browse.html'"><i class="fa-solid fa-border-all"></i> Browse Providers</button>` : ''}
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = list.map((inq, idx) => renderCard(inq, idx)).join('');
+}
+
+function renderCard(inq, idx) {
+  const isProvider = session.role === 'provider';
+  const timeAgo    = fmtTimeAgo(inq.updated_at);
+
+  /* ── shared status map ───────────────────────────────────── */
+  const statusMap = isProvider ? {
+    pending:   ['sb-inquiring', '📤 Pending'],
+    active:    ['sb-active',    '⚡ Active'],
+    done:      ['sb-done',      '🎉 Marked Done'],
+    completed: ['sb-completed', '✅ Completed'],
+    cancelled: ['sb-cancelled', '🚫 Cancelled by You'],
+    disputed:  ['sb-cancelled', '⚠️ Disputed by User'],
+  } : {
+    pending:   ['sb-inquiring', '📤 Pending'],
+    active:    ['sb-active',    '⚡ Active'],
+    done:      ['sb-done',      '🎉 Job Done'],
+    completed: ['sb-completed', '✅ Completed'],
+    cancelled: ['sb-cancelled', '🚫 Cancelled by Provider'],
+    disputed:  ['sb-cancelled', '⚠️ Disputed by You'],
+  };
+  const [sbClass, sbLabel] = statusMap[inq.status] || ['sb-inquiring', inq.status];
+
+  /* ══ PROVIDER VIEW ═══════════════════════════════════════════ */
+  if (isProvider) {
+    const customer  = inq._customer;
+    const custName  = customer ? `${esc(customer.first_name)} ${esc(customer.last_name)}` : 'Unknown Customer';
+    const custPhone = customer?.phone || null;
+    const isUnread  = inq.provider_has_unread;
+
+    const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
+      <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
+        ${'⭐'.repeat(inq.rating_stars)} Customer rated ${inq.rating_stars}/5
+        ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
+      </div>` : '';
+
+    let actionBtns = '';
+    if (inq.status === 'pending' || inq.status === 'active') {
+      actionBtns = `
+        <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+          <i class="fa-solid fa-xmark"></i> Cancel
+        </button>
+        ${custPhone ? `
+        <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${custPhone}'">
+          <i class="fa-solid fa-phone"></i> Call
+        </button>
+        <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='sms:${custPhone}'">
+          <i class="fa-solid fa-comment-sms"></i> SMS
+        </button>` : ''}
+        <button class="action-btn btn-accept" onclick="openMarkDone('${inq.id}')">
+          <i class="fa-solid fa-flag-checkered"></i> Mark Done
+        </button>`;
+    }
+
+    return `
+      <div class="booking-card ${isUnread ? 'unread' : ''}" style="animation-delay:${idx*0.05}s">
+		<div class="bc-head">
+          <div class="bc-avatar">👤</div>
+          <div class="bc-info">
+            <div class="bc-name">${custName}</div>
+          </div>
+          <div class="bc-status">
+            <span class="status-badge ${sbClass}">${sbLabel}</span>
+            <div class="bc-time" style="text-align:right;margin-top:3px;margin-right:3px;">${timeAgo}</div>
+          </div>
+        </div>
+        ${inq.user_message ? `
+        <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
+          <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${esc(inq.user_message)}
+        </div>` : ''}
+        ${ratingDisplay}
+        ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}
+      </div>`;
+  }
+
+  /* ══ REGULAR USER VIEW ═══════════════════════════════════════ */
+  const prov        = inq._provider;
+  const provUser    = inq._provUser;
+  const provName    = esc(prov?.biz_name || 'Unknown Provider');
+  const provService = prov?.cat_sub  || '—';
+  const provPhone   = provUser?.phone || prov?.phone || null;
+  const location    = [prov?.city_name, prov?.province_name].filter(Boolean).join(', ');
+  const catEmojis   = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
+  const emoji       = catEmojis[prov?.cat_main] || '🔧';
+  const isUnread    = inq.user_has_unread;
+
+  const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
+    <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
+      ${'⭐'.repeat(inq.rating_stars)} You rated this ${inq.rating_stars}/5
+      ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
+    </div>` : '';
+
+  let actionBtns = '';
+  if (inq.status === 'pending') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>`;
+  }
+  if (inq.status === 'active') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      ${provPhone ? `
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${provPhone}'">
+        <i class="fa-solid fa-phone"></i> Call
+      </button>
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='sms:${provPhone}'">
+        <i class="fa-solid fa-comment-sms"></i> SMS
+      </button>` : ''}
+      <button class="action-btn btn-view" onclick="window.location.href='provider.html?id=${prov?.id}'">
+        <i class="fa-solid fa-eye"></i> View
+      </button>`;
+  }
+  if (inq.status === 'done') {
+    actionBtns = `
+      <button class="action-btn btn-cancel" onclick="openCancel('${inq.id}')">
+        <i class="fa-solid fa-xmark"></i> Dispute
+      </button>
+      ${provPhone ? `
+      <button class="action-btn" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,0.3);" onclick="window.location.href='tel:${provPhone}'">
+        <i class="fa-solid fa-phone"></i> Call
+      </button>` : ''}
+      <button class="action-btn btn-accept" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
+        <i class="fa-solid fa-check"></i> Confirm
+      </button>`;
+  }
+  if (inq.status === 'completed' && !inq.rating_stars) {
+    actionBtns = `
+      <button class="action-btn btn-rate" onclick="openAccept('${inq.id}','${provName.replace(/'/g,"\\'")}')">
+        <i class="fa-solid fa-star"></i> Leave a Rating
+      </button>`;
+  }
+
+  return `
+    <div class="booking-card ${isUnread ? 'unread' : ''}" style="animation-delay:${idx*0.05}s">
+		<div class="bc-head">
+          <div class="bc-avatar">${emoji}</div>
+          <div class="bc-info">
+            <div class="bc-name">${provName}</div>
+            <div class="bc-service">${[provService !== '—' ? provService : '', location].filter(Boolean).join(' · ')}</div>
+          </div>
+          <div class="bc-status">
+            <span class="status-badge ${sbClass}">${sbLabel}</span>
+            <div class="bc-time" style="text-align:right;margin-top:3px;margin-right:3px;">${timeAgo}</div>
+          </div>
+        </div>
+      ${inq.user_message ? `
+      <div style="font-size:0.8rem;color:var(--text-2);background:var(--bg);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.6;">
+        <span style="font-weight:700;color:var(--navy);">Job Description:</span> ${esc(inq.user_message)}
+      </div>` : ''}
+      ${ratingDisplay}
+      ${actionBtns ? `<div class="bc-actions">${actionBtns}</div>` : ''}
+    </div>`;
+}
+
+/* ── Actions ────────────────────────────────────────────────── */
+async function doBook(id) {
+  try {
+    await FX.activateBooking(id);
+    FX.adTrigger('booking_confirmed');
+    await load();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openCancel(id) {
+  const inq = allInquiries.find(i => i.id === id);
+  const isDone = inq?.status === 'done';
+  const modalTitle = document.querySelector('#cancelModal .modal-title');
+  const modalSub   = document.querySelector('#cancelModal .modal-sub');
+  if (modalTitle) modalTitle.textContent = isDone ? 'Dispute Completion?' : 'Cancel Booking?';
+  if (modalSub)   modalSub.textContent   = isDone
+    ? 'This will cancel the booking. Contact the provider to resolve the issue and start a new booking if needed.'
+    : 'This will cancel the booking and notify the provider.';
+  activeCancelId = id;
+  openModal('cancelModal');
+}
+
+let _markDoneId = null;
+function openMarkDone(id) {
+  _markDoneId = id;
+  document.getElementById('markDoneModal').classList.add('open');
+}
+
+function closeMarkDone() {
+  _markDoneId = null;
+  document.getElementById('markDoneModal').classList.remove('open');
+}
+
+async function confirmMarkDone() {
+  if (!_markDoneId) return;
+  const btn = document.getElementById('markDoneConfirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Marking…';
+  try {
+    await FX.markDone(_markDoneId);
+    closeMarkDone();
+    await load();
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-flag-checkered"></i> Yes, Mark as Done';
+  }
+}
+
+async function confirmCancel() {
+  if (!activeCancelId) return;
+  closeModal('cancelModal');
+  try {
+    if (session.role === 'provider') {
+      await FX.providerCancelBooking(activeCancelId);
+    } else {
+      const inq = allInquiries.find(i => i.id === activeCancelId);
+      if (inq?.status === 'done') {
+        await FX.disputeInquiry(activeCancelId);
+      } else {
+        await FX.cancelInquiry(activeCancelId);
+      }
+    }
+    showToast('Booking cancelled.', 'error');
+    await load();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openAccept(id, provName) {
+  activeAcceptId = id;
+  selectedStars  = 0;
+  document.getElementById('acceptProvName').textContent = provName;
+  document.getElementById('ratingComment').value = '';
+  document.getElementById('acceptAlert').className = 'modal-alert err';
+  document.querySelectorAll('#starPicker i').forEach(s => s.classList.remove('lit'));
+  // Reset anonymous toggle
+  document.getElementById('anonToggle').checked = false;
+  document.getElementById('anonTrack').style.background = '#CBD5E0';
+  document.getElementById('anonThumb').style.left = '3px';
+  updateAnonPreview();
+  openModal('acceptModal');
+}
+
+function updateAnonPreview() {
+  const on     = document.getElementById('anonToggle').checked;
+  const track  = document.getElementById('anonTrack');
+  const thumb  = document.getElementById('anonThumb');
+  const preview = document.getElementById('anonPreview');
+  track.style.background = on ? 'var(--brand)' : '#CBD5E0';
+  thumb.style.left       = on ? '21px' : '3px';
+  const name = session?.firstName || '';
+  const last = session?.lastName  || '';
+  if (on) {
+    const masked = maskName(name) + ' ' + maskName(last);
+    preview.textContent = `Shown as: ${masked.trim()}`;
+  } else {
+    preview.textContent = `Your name will be shown: ${name} ${last}`.trim();
+  }
+}
+
+function maskName(str) {
+  if (!str) return '';
+  return str.slice(0, 3) + '***';
+}
+
+function pickStar(n) {
+  selectedStars = n;
+  document.querySelectorAll('#starPicker i').forEach((s,i) => {
+    s.classList.toggle('lit', i < n);
+  });
+}
+
+async function confirmAccept() {
+  if (!activeAcceptId) return;
+  const btn = document.querySelector('#acceptModal .btn-accept');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…'; }
+  try {
+    const comment   = document.getElementById('ratingComment').value.trim();
+    const anonymous = document.getElementById('anonToggle').checked;
+    await FX.acceptCompletion(activeAcceptId, selectedStars || null, comment, anonymous);
+    closeModal('acceptModal');
+    // Load runs in background — toast shows immediately without waiting
+    load();
+    FX.adTrigger('job_accepted');
+  } catch(e) {
+    const al = document.getElementById('acceptAlert');
+    al.textContent = e.message;
+    al.className = 'modal-alert err show';
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Accept & Rate'; }
+  }
+}
+
+/* ── Modal helpers ──────────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+/* ── Utils ──────────────────────────────────────────────────── */
+function fmtTimeAgo(d) {
+  if (!d) return '—';
+  const diff = Date.now() - new Date(d).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const days = Math.floor(h / 24);
+  return `${days}d ago`;
+}
+
+let toastTimer;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast show ${type}`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function goToNotifications() {
+  const sess = FX.getSession();
+  if (!sess) { window.location.href = 'login.html'; return; }
+  window.location.href = 'notifications.html';
+}
+
+async function refreshNotifBadge() {
+  try {
+    const sess = FX.getSession();
+    if (!sess) return;
+
+    let count = 0;
+
+    if (sess.role === 'regular') {
+      count = await FX.getUnreadCount('regular', sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) count = await FX.getUnreadCount('provider', pd.id);
+    }
+
+    const badge = document.getElementById('notifBellBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(e) {}
+}
+refreshNotifBadge();
+FX.every(refreshNotifBadge, 30000);
+
+function openSignOutModal()  { document.getElementById('signOutModal').classList.add('open'); }
+function closeSignOutModal() { document.getElementById('signOutModal').classList.remove('open'); }
+
+</script>
+
+<!-- MARK DONE MODAL -->
+<div class="modal-overlay" id="markDoneModal" onclick="if(event.target===this)closeMarkDone()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+	<div class="modal-head" style="display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-size:0.95rem;font-weight:800;"><i class="fa-solid fa-flag-checkered" style="color:var(--brand);"></i> Job Completed</h3>
+      <button class="modal-x" onclick="closeMarkDone()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-3);">✕</button>
+    </div>
+    <div style="padding:14px 18px;font-size:0.85rem;color:var(--text-2);line-height:1.6;">
+      This marks the job as completed on your side. Final completion is subject to customer approval.
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="closeMarkDone()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+      <button onclick="confirmMarkDone()" id="markDoneConfirmBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i class="fa-solid fa-flag-checkered"></i> Job Completed
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
+
+</body>
+</html>

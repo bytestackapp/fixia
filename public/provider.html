@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Provider Public Profile Page
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>Provider — Fixia</title>
+  <style>
+    :root {
+      --brand:#FF5A1F; --brand-dark:#D94200; --brand-light:#FFF0EB;
+      --navy:#0F1B2D; --navy-mid:#1E3048;
+      --text:#1A2332; --text-2:#4A5568; --text-3:#8896A5;
+      --bg:#F0F2F5; --card:#FFFFFF; --border:#E8ECF0;
+      --green:#10B981; --green-bg:#ECFDF5; --green-text:#065F46;
+      --gold:#F59E0B; --gold-bg:#FFFBEB;
+      --red:#DC3545; --red-bg:#FFF5F5; --red-text:#991B1B;
+	  --blue-bg:#EFF6FF; --blue-text:#1E40AF;
+      --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+      --shadow-sm:0 1px 4px rgba(0,0,0,0.07);
+      --shadow-md:0 4px 16px rgba(0,0,0,0.10);
+      --nav-h:56px; --bottom-h:62px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+
+    /* ── TOP NAV ─────────────────────────────────────────────── */
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
+    .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .nav-search-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 10px;height:36px;gap:7px;cursor:pointer;overflow:hidden;}
+    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;flex-shrink:0;}
+    .nav-search-wrap span{color:rgba(255,255,255,0.75);font-size:0.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .nav-share{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:20px 16px 0;}
+    .hero-inner{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+    .hero-avatar{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,#FF5A1F,#D94200);display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:800;color:#fff;flex-shrink:0;position:relative;}
+    .elite-crown{position:absolute;top:-10px;right:-10px;font-size:1.1rem;}
+    .hero-info{flex:1;min-width:0;padding-top:4px;}
+    .hero-name{font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:3px;}
+    .hero-service{font-size:0.75rem;color:rgba(255,255,255,0.55);margin-bottom:8px;}
+    .hero-badges{display:flex;gap:5px;flex-wrap:wrap;}
+    .hbadge{font-size:0.58rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;}
+    .hbadge-green{background:rgba(16,185,129,0.2);color:#34D399;}
+    .hbadge-gold{background:rgba(245,158,11,0.25);color:#FBBF24;}
+    .hbadge-brand{background:rgba(255,90,31,0.2);color:#FF8C5A;}
+
+    /* ── STATS BAR ───────────────────────────────────────────── */
+    .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.08);}
+    .sbar-item{background:rgba(255,255,255,0.04);padding:10px 6px;text-align:center;}
+    .sbar-val{font-size:1.1rem;font-weight:800;color:#fff;}
+    .sbar-label{font-size:0.58rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+
+    /* ── CONTACT BAR ─────────────────────────────────────────── */
+    .contact-bar{display:flex;gap:10px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:var(--nav-h);z-index:50;}
+    .contact-btn{flex:1;padding:11px;border:none;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;}
+    .contact-btn-inquire{background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 4px 12px rgba(255,90,31,0.3);flex:2;}
+    .contact-btn-inquire:hover{transform:translateY(-1px);}
+    .contact-btn-call{background:var(--green-bg);color:var(--green-text);border:1px solid rgba(16,185,129,0.3);}
+    .contact-btn-msg{background:var(--blue-bg);color:var(--blue-text);border:1px solid rgba(59,130,246,0.3);}
+	.contact-btn-book{background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;box-shadow:0 4px 12px rgba(255,90,31,0.3);flex:2;}
+
+    /* ── BODY ────────────────────────────────────────────────── */
+    .body{padding:14px 16px;animation:fadeIn 0.3s;}
+
+    /* ── SECTION CARD ────────────────────────────────────────── */
+    .sec{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+    .sec-title{font-size:0.82rem;font-weight:800;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .sec-title i{color:var(--brand);}
+
+    /* ── ABOUT ───────────────────────────────────────────────── */
+    .about-text{font-size:0.84rem;color:var(--text-2);line-height:1.7;}
+    .detail-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-icon{width:28px;height:28px;border-radius:8px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--brand);flex-shrink:0;}
+    .detail-label{color:var(--text-3);font-size:0.72rem;}
+    .detail-val{color:var(--text);font-weight:600;margin-top:1px;}
+
+    /* ── LISTINGS ────────────────────────────────────────────── */
+    .listing-item{padding:11px 0;border-bottom:1px solid var(--border);}
+    .listing-item:last-child{border-bottom:none;}
+    .li-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+    .li-title{font-size:0.88rem;font-weight:700;color:var(--navy);}
+    .li-price{font-size:0.78rem;font-weight:700;color:var(--brand);flex-shrink:0;}
+    .li-sub{font-size:0.7rem;color:var(--text-3);margin-bottom:4px;}
+    .li-desc{font-size:0.78rem;color:var(--text-2);line-height:1.55;}
+
+    /* ── REVIEWS ─────────────────────────────────────────────── */
+    .rating-summary{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+    .rating-big{font-size:2rem;font-weight:900;color:var(--navy);line-height:1;}
+    .rating-star-icon{font-size:1.5rem;color:var(--gold);line-height:1;}
+    .rating-label{font-size:0.72rem;font-weight:700;color:var(--text-3);}
+    .rating-count{font-size:0.72rem;color:var(--text-3);}
+
+    .review-item{padding:11px 0;border-bottom:1px solid var(--border);}
+    .review-item:last-child{border-bottom:none;}
+    .ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .ri-stars{display:flex;gap:1px;align-items:center;}
+    .ri-date{font-size:0.68rem;color:var(--text-3);}
+    .ri-comment{font-size:0.8rem;color:var(--text-2);line-height:1.6;}
+
+    /* ── RATE THIS PROVIDER ──────────────────────────────────── */
+    .rate-section{background:var(--brand-light);border:1.5px solid rgba(255,90,31,0.2);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;}
+    .rate-title{font-size:0.85rem;font-weight:800;color:var(--brand-dark);margin-bottom:8px;}
+    .star-picker{display:flex;gap:6px;margin-bottom:10px;}
+    .star-picker i{font-size:1.6rem;color:var(--border);cursor:pointer;transition:color 0.15s;}
+    .star-picker i.selected{color:var(--gold);}
+    .rate-comment{width:100%;padding:8px 10px;border:1.5px solid rgba(255,90,31,0.2);border-radius:var(--radius-sm);font-size:0.83rem;font-family:inherit;resize:vertical;min-height:65px;color:var(--text);background:#fff;}
+    .rate-comment:focus{outline:none;border-color:var(--brand);}
+    .rate-btn{margin-top:8px;padding:9px 20px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;border:none;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+    .rate-alert{font-size:0.75rem;margin-top:6px;padding:6px 10px;border-radius:6px;display:none;}
+    .rate-alert.show{display:block;}
+    .rate-alert.ok{background:var(--green-bg);color:var(--green-text);}
+    .rate-alert.err{background:var(--red-bg);color:var(--red-text);}
+
+    /* ── AD INLINE ───────────────────────────────────────────── */
+    .ad-inline{background:linear-gradient(90deg,#0f2027,#203a43);border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;}
+    .ai-label{font-size:0.55rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.3);text-transform:uppercase;}
+    .ai-title{font-size:0.82rem;font-weight:700;color:#fff;}
+    .ai-sub{font-size:0.68rem;color:rgba(255,255,255,0.5);}
+    .ai-icon{font-size:1.8rem;flex-shrink:0;}
+    .ai-btn{margin-left:auto;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:0.68rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;flex-shrink:0;font-family:inherit;}
+
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+
+    /* ── MODAL (image lightbox) ──────────────────────────────── */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
+    .lightbox.open{display:flex;}
+    .lightbox img{max-width:100%;max-height:90vh;border-radius:var(--radius-sm);object-fit:contain;}
+    .lightbox-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.2rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+    /* ── LOADING / EMPTY ─────────────────────────────────────── */
+    .loading-state{text-align:center;padding:3rem 1rem;color:var(--text-3);font-size:0.85rem;}
+    .load-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .empty{text-align:center;padding:1.5rem;color:var(--text-3);font-size:0.8rem;}
+
+    /* ── Inquire Modal ───────────────────────────────────────── */
+    .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:flex-end;justify-content:center;}
+    .modal-overlay.active{display:flex;animation:fadeIn 0.2s;}
+    .modal-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 28px;max-height:90vh;overflow-y:auto;}
+    .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;}
+	
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
+	#reviewTooltip.show { display:block !important; }
+	
+  </style>
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/fixia.css">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <button class="nav-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span id="navTitle" style="color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Loading…</span>
+  </div>
+  <button class="nav-share" id="saveBtn" onclick="toggleSave()" title="Save"><i class="fa-regular fa-bookmark"></i></button>
+  <button class="nav-share" onclick="shareProfile()" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
+  <button class="nav-share" id="reportBtn" onclick="openReportModal()" title="Report" style="display:none;"><i class="fa-solid fa-flag"></i></button>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection" style="display:none;">
+  <div class="hero-inner">
+    <div class="hero-avatar" id="heroAvatar">?
+      <div class="elite-crown" id="heroEliteCrown" style="display:none;">👑</div>
+    </div>
+    <div class="hero-info">
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-service" id="heroService">—</div>
+      <div class="hero-badges" id="heroBadges"></div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="sbar-item"><div class="sbar-val" id="sbRating">—</div><div class="sbar-label">Rating</div></div>
+    <div class="sbar-item"><div class="sbar-val" id="sbReviews">—</div><div class="sbar-label">Reviews</div></div>
+    <div class="sbar-item"><div class="sbar-val" id="sbListings">—</div><div class="sbar-label">Services</div></div>
+  </div>
+</div>
+
+<!-- CONTACT BAR -->
+<div class="contact-bar" id="contactBar" style="display:none;">
+  <button class="contact-btn contact-btn-inquire" id="inquireBtn" onclick="openInquire()">
+    <i class="fa-solid fa-phone-volume"></i> Inquire
+  </button>
+  <button class="contact-btn contact-btn-call" id="callBtn" onclick="callProvider()" style="display:none;">
+    <i class="fa-solid fa-phone"></i> Call
+  </button>
+  <button class="contact-btn contact-btn-msg" id="smsBtn" onclick="smsProvider()" style="display:none;">
+    <i class="fa-solid fa-comment-sms"></i> SMS
+  </button>
+  <button class="contact-btn contact-btn-book" id="bookBtn" onclick="openBooking()" style="display:none;">
+    <i class="fa-solid fa-calendar-check"></i> Book
+  </button>
+</div>
+
+<!-- BODY -->
+<div class="body" id="bodySection" style="display:none;">
+
+  <!-- About -->
+  <div class="sec">
+    <div class="sec-title"><i class="fa-solid fa-circle-info"></i> About</div>
+    <div class="about-text" id="aboutText">—</div>
+    <div style="margin-top:12px;" id="detailRows"></div>
+  </div>
+
+  <!-- Inline Ad (free users only) -->
+  <div id="adSlot"></div>
+
+  <!-- Services / Listings -->
+  <div class="sec" id="listingsSec" style="display:none;">
+    <div class="sec-title"><i class="fa-solid fa-list-check"></i> Services Offered</div>
+    <div id="listingsBody"></div>
+  </div>
+
+  <!-- Rate this provider -->
+  <div class="rate-section" id="rateSection" style="display:none;">
+    <div class="rate-title"><i class="fa-solid fa-star" style="color:var(--gold);"></i> Rate this Provider</div>
+    <div class="star-picker" id="starPicker">
+      <i class="fa-solid fa-star" data-star="1" onclick="pickStar(1)"></i>
+      <i class="fa-solid fa-star" data-star="2" onclick="pickStar(2)"></i>
+      <i class="fa-solid fa-star" data-star="3" onclick="pickStar(3)"></i>
+      <i class="fa-solid fa-star" data-star="4" onclick="pickStar(4)"></i>
+      <i class="fa-solid fa-star" data-star="5" onclick="pickStar(5)"></i>
+    </div>
+    <textarea class="rate-comment" id="rateComment" placeholder="Share your experience… (optional)"></textarea>
+    <div class="rate-alert" id="rateAlert"></div>
+    <button class="rate-btn" onclick="submitRating()">
+      <i class="fa-solid fa-paper-plane"></i> Submit Rating
+    </button>
+  </div>
+
+  <!-- Reviews -->
+  <div class="sec">
+    <div class="sec-title" style="display:flex;align-items:center;gap:6px;">
+      <i class="fa-solid fa-star"></i> Customer Reviews
+      <span style="position:relative;display:inline-flex;align-items:center;" id="reviewInfoWrap">
+        <i class="fa-solid fa-circle-question"
+           style="font-size:0.85rem;color:var(--text-3);cursor:pointer;"
+           onclick="document.getElementById('reviewTooltip').classList.toggle('show')"></i>
+        <span id="reviewTooltip"
+              style="display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);
+                     background:var(--navy);color:#fff;font-size:0.68rem;font-weight:500;line-height:1.5;
+                     padding:6px 10px;border-radius:8px;width:200px;text-align:center;z-index:99;
+                     box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+          Only customers with completed bookings can leave reviews for this provider.
+          <span style="position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);
+                       width:0;height:0;border-left:5px solid transparent;
+                       border-right:5px solid transparent;border-top:5px solid var(--navy);"></span>
+        </span>
+      </span>
+    </div>
+    <div id="reviewsBody"><div class="empty">Loading reviews…</div></div>
+  </div>
+
+</div>
+
+<!-- Loading state -->
+<div id="loadingState" class="loading-state">
+  <div class="load-spinner"></div>
+  Loading provider…
+</div>
+
+<!-- Error state -->
+<div id="errorState" style="display:none;text-align:center;padding:3rem 1rem;">
+  <div style="font-size:2.5rem;margin-bottom:8px;">😕</div>
+  <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:4px;">Provider not found</div>
+  <div style="font-size:0.8rem;color:var(--text-3);margin-bottom:1rem;">This provider may no longer be active on Fixia.</div>
+  <button onclick="window.location.href='homepage.html'" style="background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
+    Back to Home
+  </button>
+</div>
+
+<!-- Image Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">×</button>
+  <img id="lightboxImg" src="" alt="Portfolio"/>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <a class="bnav-item" href="bookings.html">
+    <i class="fa-solid fa-clipboard-list"></i>Bookings
+  </a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="env-config.js"></script>
+<script src="fixia-data.js"></script>
+<script src="js/fx-boot.js"></script>
+<script>
+
+const CAT_LABELS = {
+  home:'Home Services', auto:'Automotive', garden:'Garden & Lawn',
+  elec:'Electrical', beauty:'Beauty & Wellness', health:'Health & Care',
+  tech:'Tech & IT', build:'Construction', clean:'Cleaning',
+  pet:'Pet Services', event:'Events', edu:'Education & Tutoring',
+  other:'Others',
+};
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+let provider = null;
+let providerUser = null;
+let listings = [];
+let reviews  = [];
+let selectedStars = 0;
+const session = FX.getSession();
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+(async function init() {
+  // Init pop-up ads for free regular users
+  await FX.initAds();
+
+  const params     = new URLSearchParams(window.location.search);
+  const providerId = params.get('id');
+
+  if (!providerId) { showError(); return; }
+
+  try {
+    provider = await FX.getProviderById(providerId);
+    if (!provider || provider.status !== 'approved') { showError(); return; }
+
+    providerUser = await FX.getUserById(provider.user_id);
+    [listings, reviews] = await Promise.all([
+      FX.getListingsByProvider(providerId),
+      FX.getRatingsByProvider(providerId),
+    ]);
+
+    renderPage();
+  } catch(e) {
+    showError();
+  }
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════════ */
+async function renderPage() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('heroSection').style.display  = 'block';
+  document.getElementById('contactBar').style.display   = 'flex';
+  document.getElementById('bodySection').style.display  = 'block';
+
+  const avatarEl = document.getElementById('heroAvatar');
+  if (provider.avatar_url) {
+    avatarEl.innerHTML = `
+      <img src="${provider.avatar_url}" alt="Avatar"
+           style="width:100%;height:100%;object-fit:cover;border-radius:18px;display:block;"/>
+      <div class="elite-crown" id="heroEliteCrown" style="display:none;">👑</div>`;
+  } else {
+    const initials = (providerUser?.first_name?.[0] || '') + (providerUser?.last_name?.[0] || '');
+    avatarEl.childNodes[0].nodeValue = initials || '?';
+  }
+  document.getElementById('navTitle').textContent   = provider.biz_name;
+  // Show report button for all logged-in users (except viewing own profile)
+  if (session && (session.role === 'regular' || session.role === 'admin') && provider.user_id !== session.userId) {
+    const reportBtn = document.getElementById('reportBtn');
+    reportBtn.style.display = 'flex';
+    // Check if already reported
+    const alreadyReported = await FX.hasReported(provider.id, session.userId);
+    if (alreadyReported) {
+      reportBtn.innerHTML = '<i class="fa-solid fa-flag" style="color:var(--red);"></i>';
+      reportBtn.title = 'Already reported';
+      reportBtn.onclick = null;
+      reportBtn.style.cursor = 'default';
+    }
+  }
+  document.getElementById('heroName').textContent   = provider.biz_name;
+  const headerLoc = [provider.city_name?.replace(/^City of (.+)/, '$1 City'), provider.province_name].filter(Boolean).join(', ');
+  document.getElementById('heroService').textContent = headerLoc || '—';
+
+  // Elite
+  if (provider.is_elite) {
+    document.getElementById('heroEliteCrown').style.display = 'block';
+    document.getElementById('heroBadges').innerHTML +=
+      '<span class="hbadge hbadge-gold">👑 Fixia Elite</span>';
+  }
+  if (provider.is_featured) {
+    document.getElementById('heroBadges').innerHTML +=
+      '<span class="hbadge hbadge-brand">⭐ Featured</span>';
+  }
+if (provider.status === 'approved') {
+  document.getElementById('heroBadges').innerHTML +=
+    '<span class="hbadge hbadge-green">✅ Verified</span>';
+} else {
+  document.getElementById('heroBadges').innerHTML +=
+    '<span class="hbadge" style="background:var(--red);color:#fff;">⚠ Unverified</span>';
+}
+
+  // Stats
+  document.getElementById('sbRating').textContent   = provider.avg_rating   || '0.0';
+  document.getElementById('sbReviews').textContent  = provider.total_ratings || '0';
+  document.getElementById('sbListings').textContent = listings.length;
+
+  // About
+  document.getElementById('aboutText').textContent = provider.biz_desc || 'No description provided.';
+
+  const loc = [
+    provider.street_addr || null,
+    provider.barangay_name && provider.barangay_name !== 'Select Barangay…' ? provider.barangay_name : null,
+    provider.city_name?.replace(/^City of (.+)/, '$1 City'),
+    provider.province_name
+  ].filter(Boolean).join(', ');
+  const mainService = listings?.[0]?.cat_sub || null;
+  const memberSince = provider.created_at
+    ? new Date(provider.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'long' })
+    : null;
+
+  document.getElementById('detailRows').innerHTML = `
+    ${loc ? `
+    <div class="detail-row">
+      <div class="detail-icon"><i class="fa-solid fa-location-dot"></i></div>
+      <div><div class="detail-label">Location</div><div class="detail-val">${esc(loc)}</div></div>
+    </div>` : ''}
+    ${mainService ? `
+    <div class="detail-row">
+      <div class="detail-icon"><i class="fa-solid fa-wrench"></i></div>
+      <div><div class="detail-label">Main Service</div><div class="detail-val">${esc(mainService)}</div></div>
+    </div>` : ''}
+    ${memberSince ? `
+    <div class="detail-row">
+      <div class="detail-icon"><i class="fa-solid fa-calendar-days"></i></div>
+      <div><div class="detail-label">Member Since</div><div class="detail-val">${memberSince}</div></div>
+    </div>` : ''}`;
+
+  // Inline ad for free regular users
+if (!session || !FX.getSession()?.adsFree) {
+  try {
+    const inlineAds = await FX.getAds('inline');
+    if (inlineAds.length) {
+      const ad = inlineAds[0];
+      document.getElementById('adSlot').innerHTML = FX.renderInlineAd(ad);
+      const injected = document.getElementById('adSlot').firstElementChild;
+      const clickHandler = () => {
+        sbFetch('rpc/increment_ad_click', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+        window.open(ad.link_url || '#', '_blank');
+      };
+      injected.addEventListener('click', clickHandler);
+      injected.querySelector('.ai-btn')?.addEventListener('click', e => { e.stopPropagation(); clickHandler(); });
+      sbFetch('rpc/increment_ad_impression', { method:'POST', prefer:'return=minimal', body: JSON.stringify({ ad_id: ad.id }) }).catch(()=>{});
+	  FX.checkAndCompleteAd(ad.id, (ad.impression_count || 0) + 1, ad.impression_quota).catch(() => {});
+    }
+  } catch(e) {}
+}
+
+  // Listings
+  const activeListing = listings.filter(l => l.is_active);
+  if (activeListing.length) {
+    document.getElementById('listingsSec').style.display = 'block';
+    document.getElementById('listingsBody').innerHTML = activeListing.map(l => `
+      <div class="listing-item">
+        <div class="li-head">
+          <div class="li-title">${esc(l.title)}</div>
+          ${l.price_label ? `<div class="li-price">${esc(l.price_label)}</div>` : ''}
+        </div>
+        <div class="li-sub">${CAT_LABELS[l.cat_main] || l.cat_main || ''} &nbsp; • &nbsp; ${l.cat_sub || ''}</div>
+        <div class="li-desc">${esc(l.description)}</div>
+      </div>`).join('');
+  }
+
+  // Rating section — only show if user has a completed booking with this provider
+  if (session && (session.role === 'regular' || session.role === 'admin')) {
+    try {
+      const bookings = await FX.getUserInquiries(session.userId);
+      const hasCompleted = bookings.some(b =>
+        b.provider_id === provider.id && b.status === 'completed' && !b.rating_stars
+      );
+      if (hasCompleted) {
+        document.getElementById('rateSection').style.display = 'block';
+      } else {
+        // Show info message instead
+        document.getElementById('rateSection').style.display = 'none';
+      }
+	} catch(e) {
+      console.warn('[Fixia] Could not load booking status for rating section:', e.message);
+      document.getElementById('rateSection').style.display = 'none';
+    }
+  }
+
+  // Reviews
+  renderReviews();
+  updateSaveBtn();
+  // Ad trigger — after provider profile fully loaded (natural pause point)
+  FX.adTrigger('provider_loaded');
+}
+
+function renderReviews() {
+  const body = document.getElementById('reviewsBody');
+  if (!reviews.length) {
+    body.innerHTML = '<div class="empty">No reviews yet. Be the first to rate this provider!</div>';
+    return;
+  }
+
+  const avg = provider.avg_rating || 0;
+  const filledStars = Array.from({length:5}, (_,i) =>
+    `<i class="fa-solid fa-star" style="color:${i < Math.round(avg) ? 'var(--gold)' : 'var(--border)'};font-size:16px;"></i>`
+  ).join('');
+
+  body.innerHTML = `
+    <div class="rating-summary">
+      <div class="rating-big">${avg}</div>
+      <div class="rating-star-icon"><i class="fa-solid fa-star"></i></div>
+      <div>
+        <div class="rating-label">Service Rating</div>
+        <div class="rating-count">${reviews.length} review${reviews.length !== 1 ? 's' : ''}</div>
+      </div>
+    </div>
+    ${reviews.map(r => {
+      const stars = Array.from({length:5}, (_,i) =>
+        `<i class="fa-solid fa-star" style="color:${i < r.stars ? 'var(--gold)' : 'var(--border)'};font-size:12px;"></i>`
+      ).join('');
+      return `
+      <div class="review-item">
+        <div class="ri-head">
+          <div class="ri-stars">${stars}</div>
+          <div class="ri-date">${fmtDate(r.created_at)}</div>
+        </div>
+        ${r.comment ? `<div class="ri-comment">${esc(r.comment)}</div>` : '<div class="ri-comment" style="color:var(--text-3);font-style:italic;font-size:0.75rem;">No comment left.</div>'}
+      </div>`;
+    }).join('')}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTACT
+══════════════════════════════════════════════════════════════ */
+function callProvider() {
+  const phone = providerUser?.phone;
+  if (!phone) { showToast('Contact number not available.', '#92400e'); return; }
+  window.location.href = `tel:${phone}`;
+}
+
+function smsProvider() {
+  const phone = providerUser?.phone;
+  if (!phone) { showToast('Contact number not available.', '#92400e'); return; }
+  window.location.href = `sms:${phone}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RATING
+══════════════════════════════════════════════════════════════ */
+function pickStar(n) {
+  selectedStars = n;
+  document.querySelectorAll('#starPicker i').forEach((star, i) => {
+    star.classList.toggle('selected', i < n);
+  });
+}
+
+async function submitRating() {
+  const rateAlert = document.getElementById('rateAlert');
+  rateAlert.className = 'rate-alert';
+
+  if (!session || (session.role !== 'regular' && session.role !== 'admin')) {
+    rateAlert.textContent = 'Please log in as a regular user to leave a rating.';
+    return;
+  }
+  if (!selectedStars) {
+    rateAlert.className = 'rate-alert show err';
+    rateAlert.textContent = 'Please select a star rating first.';
+    return;
+  }
+
+  const comment = document.getElementById('rateComment').value.trim();
+
+  try {
+    await FX.addRating({
+      providerId: provider.id,
+      userId:     session.userId,
+      stars:      selectedStars,
+      comment,
+    });
+
+    rateAlert.className = 'rate-alert show ok';
+    rateAlert.textContent = '✅ Thank you for your rating!';
+
+    // Refresh reviews
+    reviews  = await FX.getRatingsByProvider(provider.id);
+    provider = await FX.getProviderById(provider.id);
+    document.getElementById('sbRating').textContent  = provider.avg_rating   || '0.0';
+    document.getElementById('sbReviews').textContent = provider.total_ratings || '0';
+    renderReviews();
+
+    // Reset picker
+    selectedStars = 0;
+    document.querySelectorAll('#starPicker i').forEach(s => s.classList.remove('selected'));
+    document.getElementById('rateComment').value = '';
+
+    // Hide rate section after submitting
+    setTimeout(() => {
+      document.getElementById('rateSection').style.display = 'none';
+    }, 2000);
+
+  } catch(e) {
+    rateAlert.className = 'rate-alert show err';
+    rateAlert.textContent = 'Failed to submit rating: ' + (e.message || 'Please try again.');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHARE
+══════════════════════════════════════════════════════════════ */
+function shareProfile() {
+  const url   = window.location.href;
+  const title = provider?.biz_name || 'Check out this provider on Fixia';
+  if (navigator.share) {
+    navigator.share({ title, url }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(url)
+    .then(() => showToast('Link copied to clipboard! 🔗'))
+    .catch(() => showToast('Share link: ' + url, '#92400e'));
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════════════════════════════ */
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════════ */
+function showError() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('errorState').style.display   = 'block';
+}
+
+function capitalize(s) {
+  if (!s) return '—';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/* ── Save / Unsave ──────────────────────────────────────────── */
+function toggleSave() {
+  if (!session) { window.location.href = 'login.html'; return; }
+  if (!provider) return;
+  const btn = document.getElementById('saveBtn');
+  if (FX.isSaved(provider.id)) {
+    FX.unsaveProvider(provider.id);
+    btn.innerHTML = '<i class="fa-regular fa-bookmark"></i>';
+    btn.title = 'Save';
+    showSaveToast('Removed from saved');
+  } else {
+    FX.saveProvider(provider);
+    btn.innerHTML = '<i class="fa-solid fa-bookmark" style="color:var(--gold);"></i>';
+    btn.title = 'Saved!';
+    showSaveToast('Provider saved! ✅');
+  }
+}
+
+function updateSaveBtn() {
+  if (!provider) return;
+  const btn = document.getElementById('saveBtn');
+  if (FX.isSaved(provider.id)) {
+    btn.innerHTML = '<i class="fa-solid fa-bookmark" style="color:var(--gold);"></i>';
+    btn.title = 'Saved!';
+  }
+}
+
+function showSaveToast(msg) {
+  let t = document.getElementById('saveToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'saveToast';
+    t.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+12px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--navy);color:#fff;border-radius:8px;padding:0.7rem 1.4rem;font-size:0.82rem;font-weight:600;opacity:0;transition:all 0.35s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; t.style.opacity = '0'; }, 2500);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
+}
+
+// Load notification bell badge
+(async function loadNotifBadge() {
+  const sess = FX.getSession();
+  if (!sess) return;
+  if (sess.role === 'provider' && provider.user_id === sess.userId) return;
+  try {
+    const count = await FX.getUnreadCount('regular', sess.userId);
+    const badge = document.getElementById('notifBellBadge');
+    if (badge && count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'flex';
+    }
+  } catch(e) {}
+})();
+
+/* ── Inquire / Contact / Booking flow ───────────────────────── */
+function showToast(msg, color) {
+  color = color || '#065f46';
+  let toast = document.getElementById('fxToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'fxToast';
+    toast.style.cssText = [
+      'position:fixed','bottom:80px','left:50%',
+      'transform:translateX(-50%) translateY(100px)',
+      'z-index:99999','color:#fff','border-radius:10px',
+      'padding:12px 20px','font-size:0.85rem','font-weight:700',
+      'box-shadow:0 8px 24px rgba(0,0,0,0.25)','white-space:nowrap',
+      'pointer-events:none','opacity:0',
+      'transition:transform 0.3s ease, opacity 0.3s ease',
+    ].join(';');
+    document.body.appendChild(toast);
+  }
+  toast.style.background = color;
+  toast.textContent = msg;
+  toast.getBoundingClientRect();
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  toast.style.opacity = '1';
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(function() {
+    toast.style.transform = 'translateX(-50%) translateY(100px)';
+    toast.style.opacity = '0';
+  }, 3500);
+}
+
+function openInquire() {
+  const sess = FX.getSession();
+  if (!sess) {
+    showToast('Please sign in to contact this provider.', '#92400e');
+    setTimeout(() => window.location.href = 'login.html', 1800);
+    return;
+  }
+  if (sess.role === 'provider') {
+    showToast('Providers cannot contact other providers. Use a regular account.', '#92400e');
+    return;
+  }
+  if (!provider) { showToast('Provider info not loaded yet. Please wait.', '#92400e'); return; }
+  if (provider.user_id === sess.userId) {
+    showToast('You cannot contact your own profile.', '#92400e');
+    return;
+  }
+
+  // Reveal Call, SMS, and Book buttons — hide the Inquire button
+  document.getElementById('inquireBtn').style.display = 'none';
+  document.getElementById('callBtn').style.display = 'flex';
+  document.getElementById('smsBtn').style.display = 'flex';
+  document.getElementById('bookBtn').style.display = 'flex';
+}
+
+/* ── Book flow ───────────────────────────────────────────────── */
+function openBooking() {
+  const sess = FX.getSession();
+  if (!sess) { window.location.href = 'login.html'; return; }
+  document.getElementById('bookProvName').textContent = provider.biz_name;
+  document.getElementById('bookMsg').value = '';
+  document.getElementById('bookAlert').style.display = 'none';
+  document.getElementById('bookModal').classList.add('active');
+}
+
+function closeBooking() {
+  document.getElementById('bookModal').classList.remove('active');
+}
+
+function handleBookOverlay(e) {
+  if (e.target === document.getElementById('bookModal')) closeBooking();
+}
+
+async function submitBooking() {
+  const msg = document.getElementById('bookMsg').value.trim();
+  const alertEl = document.getElementById('bookAlert');
+  alertEl.style.display = 'none';
+
+  if (!msg || msg.length < 10) {
+    alertEl.textContent = 'Please describe the job in at least 10 characters.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('bookSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Booking…';
+
+  try {
+    const sess = FX.getSession();
+    await FX.createBooking(sess.userId, provider.id, msg, sess.role);
+    closeBooking();
+    setTimeout(function() {
+      showToast('✅ Booking sent!');
+    }, 300);
+    setTimeout(function() { FX.adTrigger('booking_sent'); }, 4000);
+  } catch(e) {
+    const errMsg = e.message || 'Failed to send booking. Please try again.';
+    if (errMsg.toLowerCase().includes('already have')) {
+      closeBooking();
+      setTimeout(function() {
+        showToast('⚠️ You already have an active booking with this provider.', '#92400e');
+      }, 300);
+    } else {
+      alertEl.textContent = errMsg;
+      alertEl.style.display = 'block';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Confirm Booking';
+  }
+}
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('reviewInfoWrap')?.contains(e.target)) {
+    document.getElementById('reviewTooltip')?.classList.remove('show');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   REPORT
+══════════════════════════════════════════════════════════════ */
+function openReportModal() {
+  if (!session) { window.location.href = 'login.html'; return; }
+  document.getElementById('reportReason').value  = '';
+  document.getElementById('reportDetails').value = '';
+  document.getElementById('reportAlert').style.display = 'none';
+  document.getElementById('reportModal').classList.add('active');
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('active');
+}
+
+async function submitReport() {
+  const reason  = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value.trim();
+  const alertEl = document.getElementById('reportAlert');
+
+  if (!reason) {
+    alertEl.textContent = 'Please select a reason.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('reportSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
+
+  try {
+    await FX.submitReport({
+      providerId:   provider.id,
+      providerName: provider.biz_name,
+      userId:       session.userId,
+      userName:     `${session.firstName} ${session.lastName}`,
+      reason,
+      details,
+    });
+    closeReportModal();
+    showToast('Report submitted. We\'ll review it within 24–48 hours.');
+
+    // Update report button to show already reported
+    const reportBtn = document.getElementById('reportBtn');
+    reportBtn.innerHTML = '<i class="fa-solid fa-flag" style="color:var(--red);"></i>';
+    reportBtn.title     = 'Already reported';
+    reportBtn.onclick   = null;
+    reportBtn.style.cursor = 'default';
+  } catch(e) {
+    if (e.message?.includes('duplicate') || e.message?.includes('unique')) {
+      closeReportModal();
+      showToast('You have already reported this provider.');
+    } else {
+      alertEl.textContent = 'Error: ' + e.message;
+      alertEl.style.display = 'block';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-flag"></i> Submit Report';
+  }
+}
+
+</script>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookModal" onclick="handleBookOverlay(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head" style="padding:14px 18px 10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-calendar-check" style="color:var(--brand);"></i>
+        Confirm Booking
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-3);margin-top:3px;" id="bookProvName"></div>
+    </div>
+    <div style="padding:14px 18px;">
+      <div style="font-size:0.78rem;color:var(--text-2);line-height:1.6;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:10px 12px;">
+        📋 Describe the job you agreed on. This creates a record so the provider can mark it done and receive your rating.
+      </div>
+      <div style="display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;">
+        Job Description <span style="color:var(--red);">*</span>
+      </div>
+      <textarea id="bookMsg" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;resize:vertical;min-height:100px;color:var(--text);transition:all 0.2s;outline:none;" placeholder="e.g. Aircon cleaning, 1 unit 1.5HP, agreed price ₱500, Quezon City…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div id="bookAlert" style="font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-top:8px;display:none;background:var(--red-bg);color:var(--red-text);"></div>
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="closeBooking()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
+        Cancel
+      </button>
+      <button onclick="submitBooking()" id="bookSubmitBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(255,90,31,0.3);">
+        <i class="fa-solid fa-calendar-check"></i> Confirm Booking
+      </button>
+    </div>
+    <div style="padding:12px 18px 0;text-align:center;font-size:0.7rem;color:var(--text-3);">
+      The provider will be notified and can mark the job done when complete.
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this)closeReportModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head" style="padding:14px 18px 10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">
+        <i class="fa-solid fa-flag" style="color:var(--red);"></i> &nbsp; Report Provider
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-3);margin-top:3px;">Your report is anonymous and will be reviewed by our team.</div>
+    </div>
+    <div style="padding:14px 18px;">
+      <div id="reportAlert" style="display:none;font-size:0.78rem;padding:8px 10px;border-radius:6px;margin-bottom:10px;background:var(--red-bg);color:var(--red-text);"></div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Reason <span style="color:var(--red);">*</span></div>
+        <select id="reportReason" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;color:var(--text);background:#fff;appearance:none;outline:none;">
+          <option value="">— Select a reason —</option>
+          <option value="Fake or misleading profile">Fake or misleading profile</option>
+          <option value="Rude or unprofessional behavior">Rude or unprofessional behavior</option>
+          <option value="Did not show up / no-show">Did not show up / no-show</option>
+          <option value="Overcharging / scam">Overcharging / scam</option>
+          <option value="Inappropriate content">Inappropriate content</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Additional Details <span style="font-size:0.65rem;color:var(--text-3);font-weight:400;text-transform:none;">(optional)</span></div>
+        <textarea id="reportDetails" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-family:inherit;resize:none;min-height:80px;color:var(--text);outline:none;" placeholder="Briefly describe what happened…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 18px;display:flex;gap:8px;">
+      <button onclick="closeReportModal()" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text-2);font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
+        Cancel
+      </button>
+      <button onclick="submitReport()" id="reportSubmitBtn" style="flex:2;padding:11px;border:none;border-radius:10px;background:var(--red);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i class="fa-solid fa-flag"></i> Submit Report
+      </button>
+    </div>
+    <div style="padding:10px 18px 0;text-align:center;font-size:0.68rem;color:var(--text-3);">
+      We'll review your report within 24–48 hours. Your identity remains anonymous.
+    </div>
+  </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
+
+</body>
+</html>

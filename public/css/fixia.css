@@ -1,0 +1,85 @@
+/* ═══ FIXIA GLOBAL THEME — edit tokens here, every page follows ═══ */
+:root{
+  --brand:#F2622B; --brand-dark:#D94F1C; --brand-light:#FFF1EA;
+  --navy:#1B2A3F; --navy-mid:#243650;           /* dark surfaces + heading text */
+  --text:#1F2937; --text-2:#4B5563; --text-3:#8A94A3;
+  --bg:#F5F6F8; --card:#FFFFFF; --border:#E7E9EE;
+  --green:#12A67A; --gold:#E8A317; --red:#D9453B;
+  --radius-sm:10px; --radius-md:14px; --radius-lg:20px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+  --shadow-md:0 6px 20px rgba(16,24,40,.08);
+  --shadow-lg:0 16px 40px rgba(16,24,40,.12);
+  --nav-h:56px; --bottom-h:64px; --rail-w:88px; --content-max:1080px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font)!important;background:var(--bg);color:var(--text);line-height:1.5}
+button,input,select,textarea{font-family:inherit}
+button{touch-action:manipulation}
+::selection{background:var(--brand-light)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ── top bar ── */
+.topnav{background:rgba(255,255,255,.92)!important;backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--border);box-shadow:none!important}
+.nav-logo{color:var(--text)!important}
+.nav-search-wrap,.nav-search{background:var(--bg)!important;border:1px solid var(--border)!important;border-radius:12px!important}
+.nav-search-wrap span,.nav-search input{color:var(--text-2)!important}
+.nav-search-wrap i,.nav-search i{color:var(--text-3)!important}
+.nav-icon-btn,.nav-back,.nav-share{background:var(--bg)!important;color:var(--text-2)!important;border:1px solid var(--border)!important;border-radius:12px!important}
+.nav-icon-btn:hover,.nav-back:hover,.nav-share:hover{background:var(--brand-light)!important;color:var(--brand)!important}
+.page-header,.loc-bar{background:var(--card)!important;border-bottom:1px solid var(--border);color:var(--text-2)!important}
+.ph-sub{color:var(--text-3)!important}.loc-bar strong{color:var(--text)!important}
+
+/* ── cards ── */
+.provider-card,.sec,.listing-card,.booking-card,.profile-section,.review-card,.cat-card,.dp-sec,.stat-card,.sec-card{
+  background:var(--card);border:1px solid var(--border)!important;border-radius:var(--radius-md)!important;box-shadow:var(--shadow-sm)!important;transition:box-shadow .15s,border-color .15s}
+@media(hover:hover){.provider-card:hover,.cat-card:hover{box-shadow:var(--shadow-md)!important;border-color:#D9DEE6!important}}
+.hero,.dp-hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid))}
+.featured-card,.feat-card{border-radius:var(--radius-md)!important;box-shadow:var(--shadow-md)}
+.verified-badge{background:#E8F7F1!important;color:#0B6B4D!important}
+
+/* ── buttons / inputs ── */
+.btn,.action-btn,.contact-btn{border-radius:var(--radius-sm)!important;min-height:40px}
+.btn-brand,.contact-btn-inquire,.contact-btn-book,.btn-book,.loc-apply-btn{background:var(--brand)!important;box-shadow:0 2px 8px rgba(242,98,43,.25)!important}
+.btn-brand:hover,.contact-btn-inquire:hover{background:var(--brand-dark)!important;transform:none!important}
+.form-input,.form-select,.form-textarea,.loc-select{border-radius:var(--radius-sm)!important;border:1.5px solid var(--border)!important;background:#fff}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--brand)!important;box-shadow:0 0 0 3px rgba(242,98,43,.14)!important}
+.chip,.ftab{border-radius:999px}
+
+/* ── bottom nav (mobile) ── */
+.bottom-nav{background:rgba(255,255,255,.96)!important;backdrop-filter:blur(12px);border-top:1px solid var(--border)!important;box-shadow:none!important}
+.bnav-item{color:var(--text-3)}.bnav-item.active{color:var(--brand)}
+.bnav-center-btn{background:var(--brand)!important;box-shadow:0 6px 16px rgba(242,98,43,.35)!important;border-radius:16px!important}
+
+/* ── modals ── */
+.modal-overlay,.modal,.sheet-overlay,.gate-overlay{backdrop-filter:blur(4px);background:rgba(17,24,39,.45)}
+.modal-sheet,.sheet,.gate-sheet,.add-form{background:var(--card);box-shadow:var(--shadow-lg)}
+.toast{border-radius:12px!important;background:var(--navy)}
+
+/* ── sign-in / sign-up pages: light, calm background ── */
+body:has(.bg-shapes){background:linear-gradient(160deg,#F9F3EE,#EEF2F7)!important}
+.bg-shapes .shape{background:rgba(242,98,43,.07)!important}
+.card{box-shadow:var(--shadow-lg)}
+
+/* ── desktop: side rail + centred content + multi-column lists ── */
+@media(min-width:900px){
+  body:has(.bottom-nav){padding-left:var(--rail-w);padding-bottom:0!important}
+  .bottom-nav{top:0;bottom:auto;right:auto;width:var(--rail-w);height:100vh!important;flex-direction:column;justify-content:flex-start;gap:4px;padding:20px 0!important;border-top:0!important;border-right:1px solid var(--border)}
+  .bnav-item{flex:0 0 auto;width:100%;padding:12px 0;font-size:.68rem}
+  .bnav-item i{font-size:1.25rem}
+  .bnav-center{flex:0 0 auto;margin:10px 0}.bnav-center-btn{transform:none!important}
+  :where(main,.body,.panel,.results-header,.results-list,.filter-bar,.cats-section,.featured-section,.nearby-section,.section,#pageContent>.sec,#bodyContent){max-width:var(--content-max);margin-inline:auto}
+  #nearbyGrid,.results-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+  #nearbyGrid>.provider-card,.results-list>.provider-card,.results-list>.ad-inline{margin:0}
+  .saved-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important}
+  .cat-grid{grid-template-columns:repeat(6,1fr)!important}
+  #featuredList{gap:14px}
+  .modal-overlay,.sheet-overlay,.gate-overlay,.modal{align-items:center!important}
+  .modal-sheet,.sheet,.gate-sheet{border-radius:var(--radius-lg)!important;max-width:460px}
+  .subcat-panel{left:var(--rail-w);max-width:560px;margin-inline:auto}
+  .toast{bottom:24px!important}
+}
+@media(min-width:600px) and (max-width:899px){
+  :where(main,.body,.panel,#bodyContent){max-width:720px;margin-inline:auto}
+}

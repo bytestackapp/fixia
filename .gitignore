@@ -1,0 +1,8 @@
+node_modules
+www
+.env
+.env.*
+fixia.keystore
+android/app/fixia.keystore
+fixia-backup.sql
+*.sql.bak

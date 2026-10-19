@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Login Page
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>Login — Fixia</title>
+  <style>
+    :root {
+      --brand:       #FF5A1F;
+      --brand-dark:  #D94200;
+      --brand-light: #FFF0EB;
+      --navy:        #0F1B2D;
+      --navy-mid:    #1E3048;
+      --text:        #1A2332;
+      --text-2:      #4A5568;
+      --text-3:      #8896A5;
+      --bg:          #F5F7FA;
+      --card:        #FFFFFF;
+      --border:      #E8ECF0;
+      --green:       #10B981;
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --shadow-lg:   0 20px 40px rgba(0,0,0,0.15);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(160deg, #0F1B2D 0%, #1E3048 50%, #FF5A1F22 100%);
+      min-height:100vh; display:flex; align-items:center;
+      justify-content:center; padding:1.5rem 1rem;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── Background shapes ───────────────────────────────────── */
+    .bg-shapes { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .shape { position:absolute; border-radius:50%; background:rgba(255,90,31,0.06); animation:float 9s ease-in-out infinite; }
+    .shape:nth-child(1){width:220px;height:220px;top:5%;left:-5%;animation-delay:0s;}
+    .shape:nth-child(2){width:140px;height:140px;top:60%;right:-4%;animation-delay:2.5s;}
+    .shape:nth-child(3){width:80px;height:80px;top:35%;right:12%;animation-delay:5s;}
+    .shape:nth-child(4){width:160px;height:160px;bottom:8%;left:18%;animation-delay:1s;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-22px);}}
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .container { position:relative; z-index:1; width:100%; max-width:420px; }
+    .card {
+      background:rgba(255,255,255,0.98);
+      border-radius:var(--radius-lg);
+      padding:2.25rem 1.75rem;
+      box-shadow:var(--shadow-lg);
+      animation:slideUp 0.45s ease;
+    }
+    @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+
+    /* ── Logo ────────────────────────────────────────────────── */
+    .logo-wrap { text-align:center; margin-bottom:1.75rem; }
+    .logo-sub { font-size:0.82rem; color:var(--text-3); margin-top:2px; }
+
+    /* ── Panels ──────────────────────────────────────────────── */
+    .panel { display:none; }
+    .panel.active { display:block; animation:fadeIn 0.25s ease; }
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+    /* ── Form elements ───────────────────────────────────────── */
+    .form-group { margin-bottom:1rem; }
+    .form-label {
+      display:block; margin-bottom:0.4rem;
+      font-size:0.8rem; font-weight:700;
+      color:var(--text-2); text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .form-input {
+      width:100%; padding:0.78rem 1rem;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-size:0.93rem; transition:all 0.2s;
+      background:#fff; color:var(--text); font-family:inherit;
+    }
+    .form-input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(255,90,31,0.12); }
+    .pw-wrap { position:relative; }
+    .pw-toggle {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:var(--text-3); font-size:0.95rem;
+    }
+    .pw-toggle:hover { color:var(--brand); }
+
+    /* ── Alert ───────────────────────────────────────────────── */
+    .alert { border-radius:var(--radius-sm); padding:0.7rem 0.9rem; font-size:0.85rem; margin-bottom:1rem; display:none; }
+    .alert.show { display:block; animation:fadeIn 0.2s; }
+    .alert-error   { background:rgba(220,53,69,0.08); border:1px solid rgba(220,53,69,0.25); color:#dc3545; }
+    .alert-success { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); color:#065f46; }
+    .alert-info    { background:rgba(255,90,31,0.07); border:1px solid rgba(255,90,31,0.2); color:var(--brand-dark); }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn {
+      width:100%; padding:0.9rem; border:none; border-radius:var(--radius-sm);
+      font-size:0.95rem; font-weight:700; cursor:pointer;
+      transition:all 0.2s; font-family:inherit;
+      display:flex; align-items:center; justify-content:center; gap:0.5rem;
+    }
+    .btn-brand {
+      background:linear-gradient(135deg, #FF5A1F, #D94200);
+      color:#fff; box-shadow:0 4px 14px rgba(255,90,31,0.35);
+    }
+    .btn-brand:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(255,90,31,0.4); }
+    .btn-brand:disabled { opacity:0.65; cursor:not-allowed; transform:none; }
+    .btn-outline {
+      background:#fff; color:var(--navy);
+      border:1.5px solid var(--border); margin-top:0.6rem;
+    }
+    .btn-outline:hover { border-color:var(--brand); color:var(--brand); }
+
+    .spinner {
+      width:16px; height:16px; display:none;
+      border:2.5px solid rgba(255,255,255,0.4);
+      border-top-color:#fff; border-radius:50%;
+      animation:spin 0.7s linear infinite;
+    }
+    .spinner.on { display:inline-block; }
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .divider { display:flex; align-items:center; gap:10px; margin:1.1rem 0; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .divider span { font-size:0.75rem; color:var(--text-3); font-weight:600; }
+
+    /* ── Footer links ────────────────────────────────────────── */
+    .bottom-text { text-align:center; font-size:0.82rem; color:var(--text-3); margin-top:1.25rem; }
+    .bottom-text a, .bottom-text button {
+      color:var(--brand); font-weight:700; background:none; border:none;
+      cursor:pointer; font-family:inherit; font-size:0.82rem; text-decoration:none;
+    }
+    .bottom-text a:hover, .bottom-text button:hover { text-decoration:underline; }
+
+    .footer-links { display:flex; justify-content:center; gap:1.25rem; margin-top:1.5rem; }
+    .footer-links a {
+      font-size:0.75rem; color:var(--text-3); text-decoration:none; font-weight:600;
+    }
+    .footer-links a:hover { color:var(--brand); }
+
+    .back-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      background:none; border:none; cursor:pointer;
+      color:var(--text-3); font-size:0.82rem; font-weight:600;
+      font-family:inherit; margin-bottom:1.25rem; padding:0;
+    }
+    .back-btn:hover { color:var(--brand); }
+
+    /* ── Toast ───────────────────────────────────────────────── */
+    .toast {
+      position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(80px);
+      z-index:9999; background:var(--navy); color:#fff;
+      border-radius:var(--radius-sm); padding:0.75rem 1.5rem;
+      font-size:0.85rem; font-weight:600; opacity:0; transition:all 0.35s;
+      white-space:nowrap; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.2);
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+    .toast.success { background:#065f46; }
+    .toast.error   { background:#dc3545; }
+
+    /* ── Modal ───────────────────────────────────────────────── */
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:1rem; }
+    .modal.open { display:flex; animation:fadeIn 0.2s; }
+    .modal-box { background:#fff; border-radius:var(--radius-md); width:100%; max-width:440px; overflow:hidden; animation:slideUp 0.25s ease; }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 1.4rem; border-bottom:1px solid var(--border); }
+    .modal-head h3 { font-size:0.95rem; font-weight:700; color:var(--navy); }
+    .modal-x { background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text-3); line-height:1; }
+    .modal-x:hover { color:var(--brand); }
+    .modal-body { padding:1.25rem 1.4rem; font-size:0.88rem; color:var(--text-2); line-height:1.7; }
+    .modal-foot { padding:0.9rem 1.4rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; }
+    .modal-foot button { background:var(--brand); color:#fff; border:none; border-radius:var(--radius-sm); padding:0.55rem 1.2rem; font-size:0.875rem; font-weight:700; cursor:pointer; font-family:inherit; }
+
+    /* Support Modal Items */
+    .support-item { display:flex; align-items:center; gap:14px; padding:1rem 1.4rem; cursor:pointer; text-decoration:none; color:inherit; border-bottom:1px solid var(--border); transition:background 0.15s; }
+    .support-item:last-child { border-bottom:none; }
+    .support-item:hover { background:var(--bg); }
+    .support-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .support-text { flex:1; }
+    .support-title { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:2px; }
+    .support-desc { font-size:0.78rem; color:var(--text-3); }
+    .support-badge { font-size:0.6rem; font-weight:700; background:var(--border); color:var(--text-3); border-radius:20px; padding:1px 7px; margin-left:5px; vertical-align:middle; text-transform:uppercase; letter-spacing:0.05em; }
+    .support-arrow { color:var(--border); font-size:0.75rem; flex-shrink:0; }
+    
+    /* FAQ */
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:none; }
+    .faq-q { display:flex; justify-content:space-between; align-items:center; padding:0.9rem 1.4rem; font-size:0.88rem; font-weight:700; color:var(--navy); cursor:pointer; gap:8px; }
+    .faq-q:hover { background:var(--bg); }
+    .faq-arrow { transition:transform 0.2s; color:var(--text-3); font-size:0.75rem; flex-shrink:0; }
+    .faq-q.open .faq-arrow { transform:rotate(180deg); }
+    .faq-a { display:none; padding:0 1.4rem 0.9rem; font-size:0.82rem; color:var(--text-2); line-height:1.7; }
+    .faq-a.open { display:block; }
+
+</style>
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/fixia.css">
+</head>
+<body>
+
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div>
+  <div class="shape"></div><div class="shape"></div>
+</div>
+
+<div class="container">
+  <div class="card">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <img src="images/fixia-icon.png" alt="Fixia Icon" style="width:64px;height:64px;margin-bottom:0.7rem;display:block;margin-left:auto;margin-right:auto;border-radius:18px;box-shadow:0 8px 24px rgba(15,27,45,0.45);">
+      <img src="images/fixia-tag.png" alt="Fixia" style="height:28px;display:block;margin:0 auto 4px;">
+      <div class="logo-sub">Find any service near you</div>
+    </div>
+
+    <!-- ── PANEL: LOGIN ───────────────────────────────────────── -->
+    <div id="panelLogin" class="panel active">
+
+      <div id="loginAlert" class="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email or Username</label>
+        <input id="loginIdentifier" class="form-input" placeholder="Enter email or username" autocomplete="off"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="pw-wrap">
+          <input id="loginPassword" type="password" class="form-input" placeholder="Enter your password"/>
+          <button type="button" class="pw-toggle" onclick="togglePwd('loginPassword','loginPwIcon')">
+            <i id="loginPwIcon" class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div style="text-align:right; margin-bottom:1rem;">
+        <button style="background:none;border:none;color:var(--brand);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;" onclick="showPanel('panelForgot')">
+          Forgot password?
+        </button>
+      </div>
+
+      <button class="btn btn-brand" id="loginBtn" onclick="doLogin()">
+        <span class="spinner" id="loginSpinner"></span>
+        <span id="loginBtnText"><i class="fa-solid fa-right-to-bracket"></i> &nbsp; Sign In</span>
+      </button>
+
+      <div class="divider"><span>New to Fixia?</span></div>
+
+      <button class="btn btn-outline" onclick="window.location.href='signup.html'">
+        <i class="fa-solid fa-user-plus"></i> Create an Account
+      </button>
+
+      <div class="footer-links">
+        <a href="#" onclick="openModal('aboutModal')">About</a>
+        <a href="#" onclick="openModal('supportModal')">Support</a>
+        <a href="#" onclick="openModal('privacyModal')">Privacy</a>
+      </div>
+
+    </div>
+
+    <!-- ── PANEL: FORGOT PASSWORD ─────────────────────────────── -->
+    <div id="panelForgot" class="panel">
+
+      <button class="back-btn" onclick="showPanel('panelLogin')">
+        <i class="fa-solid fa-arrow-left"></i> Back to Login
+      </button>
+
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:1.15rem;font-weight:800;color:var(--navy);margin-bottom:4px;">Forgot Password?</div>
+        <div style="font-size:0.83rem;color:var(--text-3);">Enter your registered email and we'll send a reset link.</div>
+      </div>
+
+      <div id="forgotAlert" class="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input id="forgotEmail" class="form-input" type="email" placeholder="your@email.com"/>
+      </div>
+
+      <button class="btn btn-brand" id="forgotBtn" onclick="doForgot()">
+        <span class="spinner" id="forgotSpinner"></span>
+        <span id="forgotBtnText"><i class="fa-solid fa-paper-plane"></i> Send Reset Link</span>
+      </button>
+
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /container -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- About Modal -->
+<div id="aboutModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-circle-info"></i> &nbsp; About Fixia</h3><button class="modal-x" onclick="closeModal('aboutModal')">×</button></div>
+    <div class="modal-body">
+      <p><strong>Fixia</strong> is a modern service marketplace helping Filipinos discover trusted professionals for home, personal, and technical needs.</p>
+      <p style="margin-top:20px;"><strong>Developer:</strong> ByteStack Labs</p>
+	  <p style="margin-top:10px;"><strong>Version:</strong> 1.0.0 &nbsp; &nbsp;|&nbsp;&nbsp; May 2026
+    </div>
+    <div class="modal-foot"><button onclick="closeModal('aboutModal')">OK</button></div>
+  </div>
+</div>
+
+<!-- Support Modal -->
+<div id="supportModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-headset"></i> &nbsp; Support</h3><button class="modal-x" onclick="closeModal('supportModal')">×</button></div>
+    <div class="modal-body" style="padding:0;">
+
+      <!-- Live Chat -->
+      <a href="https://www.facebook.com/share/18WYchWMH7/?mibextid=wwXIfr" target="_blank" class="support-item">
+        <div class="support-icon" style="background:#0084FF22;color:#0084FF;"><i class="fa-brands fa-facebook-messenger"></i></div>
+        <div class="support-text">
+          <div class="support-title">Live Chat</div>
+          <div class="support-desc">Chat with our support team via Messenger</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </a>
+
+      <!-- FAQ -->
+      <div class="support-item" onclick="closeModal('supportModal'); setTimeout(()=>openModal('faqModal'),150);">
+        <div class="support-icon" style="background:#FF5A1F22;color:var(--brand);"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="support-text">
+          <div class="support-title">FAQ List</div>
+          <div class="support-desc">Browse frequently asked questions</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </div>
+
+      <!-- Email Support -->
+      <a href="mailto:support.fixia@gmail.com" class="support-item">
+        <div class="support-icon" style="background:#16a34a22;color:#16a34a;"><i class="fa-solid fa-envelope"></i></div>
+        <div class="support-text">
+          <div class="support-title">Need Support?</div>
+          <div class="support-desc">support.fixia@gmail.com</div>
+        </div>
+        <i class="fa-solid fa-chevron-right support-arrow"></i>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Modal -->
+<div id="faqModal" class="modal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head"><h3><i class="fa-solid fa-circle-question"></i> FAQ List</h3><button class="modal-x" onclick="closeModal('faqModal')">×</button></div>
+    <div class="modal-body" style="padding:0;max-height:70vh;overflow-y:auto;">
+
+<!-- GENERAL -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">General</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What is Fixia? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Fixia is a local service marketplace that connects customers with trusted professionals near them. Whether you need plumbing, electrical work, beauty services, IT support, or any other skilled service — Fixia helps you find, compare, and book providers with ease.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is Fixia free to use? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Yes! Customers can sign up and browse providers completely free. Service providers can also start for free, with optional paid packages that unlock more listings, higher booking limits, and other premium features.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What areas does Fixia serve? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Fixia is currently serving the Philippines. You can find providers in your city or province by browsing or searching from the home screen. More areas and service categories are being added regularly.</div>
+      </div>
+
+      <!-- ACCOUNTS -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Accounts</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I create an account? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Tap "Create an Account" on the login page. Choose whether you want to find services (customer) or offer services (provider), then complete the registration steps. Providers require a valid government-issued ID for verification.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I reset my password? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">On the login page, tap "Forgot password?" and enter your registered email address. You will receive a password reset link in your inbox. The link expires after 1 hour so use it promptly.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I change my email address or username? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Yes. Go to your Profile and tap the edit icon. You can update your name, phone number, and email. For sensitive changes like your business name or ID, submit a Change Request from your profile and our team will review it.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Why is my account pending? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Provider accounts go through a verification process where our team reviews your submitted ID and profile details. This typically takes 1–2 business days. You will receive a notification by email once your account is approved or if additional information is needed.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          My account was suspended. What do I do? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Suspensions happen when an account violates Fixia's community guidelines. You will receive a message explaining the reason and the suspension duration. If you believe it was a mistake, please contact our support team immediately through the Support option on the login page.</div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Bookings</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does booking a provider work? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Visit a provider’s profile and tap “Inquire” to view their contact details. Reach out to the provider via call or message to discuss your requirements, pricing, and availability. Once both parties agree, tap “Book”, describe your job, and submit the request.<br><br>
+			The provider will receive your booking request and proceed with the service based on your agreement—either by visiting your location or having you visit theirs, depending on the type of service.<br><br>
+			Once the work is completed, the provider will mark the booking as Done, and you will receive a notification. You may then either raise a dispute if there are concerns with the completed work or confirm completion and leave a rating for the provider.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What are the booking statuses? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">
+          <strong>Pending</strong> — Your request has been sent and is waiting for you to confirm.<br><br>
+          <strong>Active</strong> — Booking is confirmed and the job is in progress.<br><br>
+          <strong>Done</strong> — The provider has marked the job complete. You need to confirm and leave a rating.<br><br>
+          <strong>Completed</strong> — You confirmed the job is done. The booking is closed.<br><br>
+          <strong>Cancelled</strong> — The booking was cancelled by either party.<br><br>
+          <strong>Disputed</strong> — You raised a concern about the completion. Contact the provider to resolve.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I cancel a booking? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Yes. You can cancel a pending or active booking from your Bookings page. The provider will be notified automatically. Note that repeated cancellations may affect your standing on the platform.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What if I have a problem with a completed job? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">If the provider marks a job as done but you are not satisfied, tap "Dispute" instead of accepting. This notifies the provider and flags the booking for resolution. Try to resolve it directly with the provider first. If unresolved, contact our support team.</div>
+      </div>
+
+      <!-- PROVIDERS -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">For Providers</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I sign up as a service provider? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Tap "Offer Services" on the sign-up page and complete the registration. You will need to provide your business name, location, a valid government-issued ID, and optional portfolio photos. Your account will be reviewed and activated within 1–2 business days.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What is a Listing? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">A Listing is your service advertisement inside Fixia. It is how customers find you — without at least one active listing, your profile will not appear in search results and customers will not be able to discover or book you.<br><br>Each listing represents a specific service you offer (e.g. "Aircon Cleaning", "Logo Design", "Home Wiring"). It includes a title, description, and price range. When customers search for a service, Fixia matches their keywords against your listing titles and categories — so well-written, specific listings help you get found faster.<br><br>You can create multiple listings depending on your plan, and toggle them on or off anytime from your Profile.</div>
+      </div>
+	  
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I add or manage my service listings? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Go to your Profile and tap "My Listings". From there you can add new listings, edit existing ones, set prices, and toggle listings on or off. The number of active listings you can have depends on your subscription plan.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do provider packages work? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Providers can subscribe to different packages that determine how many listings and active bookings they can have at once, whether they see ads, and other benefits. You can upgrade your plan anytime from your Profile. Unused days from your current plan are credited toward your new plan.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What happens when my subscription expires? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">When your provider subscription expires, your profile is temporarily hidden from search results and your listings are deactivated. You have a 7-day grace period to renew before your account is suspended. You will receive reminder emails at 7 days and 3 days before expiry.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What is an Elite Provider badge? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">The Elite badge (👑) is awarded by Fixia to top-performing providers based on their ratings, reliability, and customer feedback. It is not purchased — it is earned. Elite providers appear more prominently in search results and have greater visibility to potential customers.</div>
+      </div>
+
+      <!-- RATINGS & REVIEWS -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Ratings & Reviews</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I leave a rating for a provider? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">After a provider marks a job as done, go to your Bookings page and tap "Accept & Rate". You can give a star rating and leave a written comment. Ratings can be submitted anonymously if you prefer.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Who can leave a review? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Only customers who have completed a real booking with that provider can leave a review. This ensures all ratings on Fixia are genuine and verified.</div>
+      </div>
+
+      <!-- PAYMENTS & UPGRADES -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Payments & Upgrades</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What payment methods are accepted? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Fixia accepts payments via GCash, Maya, credit/debit card (through PayMongo), and PayPal. Manual bank transfer and cash payment options may also be available for certain plans. Payment is processed securely through our payment partners.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I upgrade my plan? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Go to your Profile and scroll to the Plans section. Choose an upgrade and complete the payment. Your remaining days from your current plan are automatically converted and credited to your new plan — you never lose what you paid for.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Are there refunds? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Fixia subscription fees are generally non-refundable. However, if there is a technical issue with your payment or account activation, please contact our support team and we will review your case. Note that Fixia does not handle payments between customers and providers — those are agreed upon directly.</div>
+      </div>
+
+      <!-- REFERRALS -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Referrals</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does the referral program work? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Share your unique referral link from your Profile. When someone signs up using your link and completes their first booking, you earn referral points. Points can be used to unlock free plan upgrades depending on the available packages. You can track your referrals and points from your Profile.</div>
+      </div>
+
+      <!-- SAFETY & TRUST -->
+      <div style="padding:10px 1.4rem 4px;font-size:0.68rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;">Safety & Trust</div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does Fixia verify providers? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Every provider is required to submit a valid government-issued ID during registration. Our team manually reviews each application before approving the account. Providers who receive reports for misconduct are warned, suspended, or removed depending on the severity.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I report a provider? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Visit the provider's profile page and tap the "Report" button. Select a reason and provide details. Our team will review all reports and take appropriate action. Repeat reports on the same provider are tracked and escalated accordingly.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is my personal data safe? <i class="fa-solid fa-chevron-down faq-arrow"></i>
+        </div>
+        <div class="faq-a">Yes. Fixia takes data security and privacy seriously. All user information is stored using secure systems and handled in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines.<br><br>
+			Your personal information is never sold or shared with unauthorized third parties. Provider identification documents are collected solely for account verification during the signup process, handled with strict confidentiality, and securely deleted once verification is completed.</div>
+      </div>
+
+    </div>
+    <div class="modal-foot"><button onclick="closeModal('faqModal')">Got it</button></div>
+  </div>
+</div>
+
+<!-- Privacy Modal -->
+<div id="privacyModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-shield-halved"></i> &nbsp; Privacy Policy</h3><button class="modal-x" onclick="closeModal('privacyModal')">×</button></div>
+    <div class="modal-body">
+      <p>All user data is securely stored and will not be shared with third parties without explicit consent. Provider-submitted documents (such as government-issued IDs and permits) are collected and used solely for identity verification and platform security.</p>
+	  <p style="margin-top:20px;">ByteStack Labs complies with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines, ensuring that all personal information is processed, protected, and handled in accordance with applicable data privacy regulations.</p>
+    </div>
+    <div class="modal-foot"><button onclick="closeModal('privacyModal')">OK</button></div>
+  </div>
+</div>
+
+<script src="env-config.js"></script>
+<script src="fixia-data.js"></script>
+<script src="js/fx-boot.js"></script>
+<script>
+/* ── Pre-signup check — runs before everything else ─────────── */
+(async function() {
+  try {
+    const ps = await FX.getPreSignupSettings();
+    if (ps && ps.active) {
+      activateDemoMode();
+    } else {
+      activateRealMode();
+    }
+  } catch(e) {
+    // If the check fails, fall back to real login safely
+    activateRealMode();
+  }
+})();
+
+function activateDemoMode() {
+  // Pre-fill credentials
+  document.getElementById('loginIdentifier').value = 'demo@fixia.app';
+  document.getElementById('loginPassword').value   = 'demo1234';
+
+  // Hide the "Forgot password?" button
+  document.querySelector('[onclick="showPanel(\'panelForgot\')"]').closest('div').style.display = 'none';
+
+  // Replace "Create an Account" button with "Sign Up for Early Access"
+  const createBtn = document.querySelector('[onclick="window.location.href=\'signup.html\'"]');
+  if (createBtn) {
+    createBtn.innerHTML = '<i class="fa-solid fa-rocket"></i> Sign Up for Early Access';
+    createBtn.onclick = function() { window.location.href = 'presignup.html'; };
+  }
+
+  // Override the Sign In button to go to demo-home instead of real login
+  document.getElementById('loginBtn').onclick = function() {
+    const identifier = document.getElementById('loginIdentifier').value.trim();
+    const password   = document.getElementById('loginPassword').value;
+    const isDemo     = identifier === 'demo@fixia.app' && password === 'demo1234';
+    const isAdmin    = identifier.toLowerCase().includes('admin');
+    if (isDemo && !isAdmin) {
+      doDemoLogin();
+    } else {
+      doLoginPresignup(isAdmin);
+    }
+  };
+
+  // Show a demo mode banner above the form
+  const banner = document.createElement('div');
+  banner.className = 'alert alert-info show';
+  banner.style.cssText = 'margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;';
+  banner.innerHTML = '<i class="fa-solid fa-flask"></i> <span><strong>Preview Mode</strong> — This is a demo login. Sign in to explore the app before launch.</span>';
+  document.getElementById('panelLogin').insertBefore(banner, document.getElementById('panelLogin').firstChild);
+
+  // Update logo subtitle
+  const sub = document.querySelector('.logo-sub');
+  if (sub) sub.textContent = 'Preview Mode — Explore before launch';
+}
+
+async function doLoginPresignup(isAdmin) {
+  hideAlert('loginAlert');
+  const identifier = document.getElementById('loginIdentifier').value.trim();
+  const password   = document.getElementById('loginPassword').value;
+
+  if (!identifier || !password) {
+    showAlert('loginAlert', 'Please enter your email/username and password.');
+    return;
+  }
+
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+  try {
+    const result = await FX.login(identifier, password);
+
+    if (!result.success) {
+      showAlert('loginAlert', result.error || 'Invalid credentials. Please try again.');
+      return;
+    }
+
+    // Admin goes to actual app
+    if (isAdmin || result.user.role === 'admin') {
+      showToast('Welcome back! Redirecting…', 'success');
+      setTimeout(() => { window.location.href = 'admin.html'; }, 900);
+      return;
+    }
+
+    // Everyone else goes to demo-home during pre-signup
+    showToast('Welcome! Redirecting to preview…', 'success');
+    setTimeout(() => { window.location.href = 'demo-home.html'; }, 900);
+
+  } catch(e) {
+    showAlert('loginAlert', '⚠️ ' + (e.message || 'Something went wrong. Please try again.'));
+  } finally {
+    btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+  }
+}
+
+function doDemoLogin() {
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+
+  btn.disabled = true;
+  spinner.classList.add('on');
+  btnText.style.display = 'none';
+
+  // Simulate a brief loading moment so it feels real
+  setTimeout(() => {
+    window.location.href = 'demo-home.html';
+  }, 900);
+}
+
+function activateRealMode() {
+  // ── Session conflict message ──────────────────────────────
+  if (new URLSearchParams(window.location.search).get('reason') === 'session_conflict') {
+    const t = document.createElement('div');
+    t.textContent = 'Session ended due to login on another device.';
+    t.style.cssText = `
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#0F1B2D;color:#fff;font-family:inherit;
+      font-size:0.82rem;font-weight:600;line-height:1.6;text-align:center;
+      padding:14px 20px;border-radius:14px;z-index:99999;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);max-width:300px;width:90%;
+      animation:fadeIn 0.3s ease;
+    `;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+    // Clean the URL so refresh doesn't re-trigger it
+    history.replaceState(null, '', 'login.html');
+  }
+  
+  /* ── Session check ─────────────────────────────────────────── */
+  const sess = FX.getSession();
+  if (!sess) return;
+
+  if (sess.status === 'suspended') {
+    FX.clearSession();
+    return;
+  }
+  if (sess.status === 'rejected') {
+    window.location.href = 'homepage.html';
+    return;
+  }
+  if (sess.status === 'pending' && sess.role !== 'provider' && sess.role !== 'regular') {
+    FX.clearSession();
+    return;
+  }
+  if (sess.role === 'admin')         window.location.href = 'admin.html';
+  else if (sess.role === 'provider') window.location.href = 'homepage.html';
+  else                               window.location.href = 'homepage.html';
+}
+
+/* ── Panel switching ─────────────────────────────────────────── */
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── Password toggle ─────────────────────────────────────────── */
+function togglePwd(inputId, iconId) {
+  const inp = document.getElementById(inputId);
+  const ico = document.getElementById(iconId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ico.className = inp.type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+}
+
+/* ── Alert ───────────────────────────────────────────────────── */
+function showAlert(id, msg, type='error') {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type} show`;
+  el.innerHTML = msg;
+}
+function hideAlert(id) {
+  document.getElementById(id).className = 'alert';
+}
+
+/* ── Toast ───────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── Login (real mode only) ──────────────────────────────────── */
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('loginIdentifier').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  hideAlert('loginAlert');
+  const identifier = document.getElementById('loginIdentifier').value.trim();
+  const password   = document.getElementById('loginPassword').value;
+
+  if (!identifier || !password) {
+    showAlert('loginAlert', 'Please enter your email/username and password.');
+    return;
+  }
+
+  const btn     = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+  try {
+    const result = await FX.login(identifier, password);
+
+    if (!result.success) {
+      showAlert('loginAlert', result.error || 'Invalid credentials. Please try again.');
+      return;
+    }
+    if (result.user.status === 'pending' && result.user.role !== 'provider' && result.user.role !== 'regular') {
+      FX.clearSession();
+      showAlert('loginAlert', '⏳ Your account is pending approval. We\'ll notify you by email once approved.', 'info');
+      return;
+    }
+    if (result.user.status === 'rejected') {
+      FX.clearSession();
+      showAlert('loginAlert', '❌ Your account application was not approved. Contact support for details.', 'error');
+      return;
+    }
+    if (result.user.status === 'suspended') {
+      FX.clearSession();
+      showAlert('loginAlert', '🚫 Your account has been suspended. Please contact support for assistance.', 'error');
+      return;
+    }
+
+    showToast('Welcome back! Redirecting…', 'success');
+    if (result.user.role === 'regular') {
+      FX.syncSaved().catch(() => {});
+    }
+    
+    registerPushSubscription().catch(() => {}); // ← fires native prompt immediately
+    
+    setTimeout(() => {
+      if (result.user.role === 'admin')         window.location.href = 'admin.html';
+      else if (result.user.role === 'provider') window.location.href = 'homepage.html';
+      else                                      window.location.href = 'homepage.html';
+    }, 3000);
+    
+      } catch(e) {
+        console.error('[Fixia Login Error]', e);
+        showAlert('loginAlert', '⚠️ ' + (e.message || 'Something went wrong. Please try again.'));
+      } finally {
+        btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+      }
+    }
+
+/* ── Forgot Password (real mode only) ───────────────────────── */
+async function doForgot() {
+  hideAlert('forgotAlert');
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    showAlert('forgotAlert', 'Please enter a valid email address.');
+    return;
+  }
+
+  const btn     = document.getElementById('forgotBtn');
+  const spinner = document.getElementById('forgotSpinner');
+  const btnText = document.getElementById('forgotBtnText');
+  btn.disabled = true; spinner.classList.add('on'); btnText.style.display = 'none';
+
+  try {
+    await FX.sendPasswordReset(email);
+    showAlert('forgotAlert', '✅ If that email is registered, a reset link has been sent. Check your inbox.', 'success');
+  } catch(e) {
+    showAlert('forgotAlert', 'Failed to send reset email. Please try again.');
+  } finally {
+    btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
+  }
+}
+
+/* ── Modals ──────────────────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleFaq(el) {
+  const answer = el.nextElementSibling;
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-q.open').forEach(q => {
+    q.classList.remove('open');
+    q.nextElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { el.classList.add('open'); answer.classList.add('open'); }
+}
+
+window.addEventListener('click', e => {
+  document.querySelectorAll('.modal.open').forEach(m => {
+    if (e.target === m) m.classList.remove('open');
+  });
+});
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
+
+<script>
+(function() {
+  if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) return;
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => showToast(false), 2000);
+  });
+
+  function showToast(ios) {
+    const toast = document.createElement('div');
+    toast.id = 'pwaToast';
+    toast.style.cssText = 'position:fixed;top:-100px;left:12px;right:12px;background:#e86c2c;color:#fff;border-radius:16px;padding:14px 16px;z-index:99999;box-shadow:0 8px 32px rgba(232,108,44,0.4);display:flex;align-items:center;gap:12px;transition:top 0.4s ease;';
+	setTimeout(() => toast.style.top = '16px', 50);
+    toast.innerHTML = `
+      <img src="/public/images/fixia-icon.png" style="width:36px;height:36px;border-radius:10px;flex-shrink:0;">
+      <div style="flex:1;">
+        <div style="font-size:0.85rem;font-weight:800;margin-bottom:2px;">Add Fixia to Home Screen</div>
+        <div style="font-size:0.72rem;opacity:0.75;">${ios ? 'Tap Share → Add to Home Screen for the best experience.' : 'Install for faster access and a better experience.'}</div>
+      </div>`;
+    document.body.appendChild(toast);
+
+    // Auto dismiss after 3 seconds
+    setTimeout(() => {
+      toast.style.top = '-100px';
+      setTimeout(() => toast.remove(), 400);
+    }, 5000);
+  }
+
+  window.installPWA = async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  };
+
+  if (isIOS) setTimeout(() => showToast(true), 2000);
+})();
+</script>
+
+</body>
+</html>

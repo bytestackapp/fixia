@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+    FIXIA — Service Marketplace
+    Notifications Page
+    © ByteStack Labs 2025. All Rights Reserved.
+═══════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  
+  <title>Notifications — Fixia</title>
+  <style>
+    :root{--brand:#FF5A1F;--navy:#0F1B2D;--navy-mid:#1E3048;--text:#1A2332;--text-2:#4A5568;--text-3:#8896A5;--bg:#F0F2F5;--card:#fff;--border:#E8ECF0;--green:#10B981;--gold:#F59E0B;--radius-md:12px;--nav-h:56px;--bottom-h:62px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h)+16px);-webkit-font-smoothing:antialiased;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
+    .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .nav-search-wrap{flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.10);border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;padding:0 12px;height:36px;gap:8px;cursor:pointer;}
+    .nav-search-wrap:hover{background:rgba(255,255,255,0.15);}
+    .nav-search-wrap i{color:rgba(255,255,255,0.5);font-size:12px;}
+
+    /* ── PAGE HEADER ─────────────────────────────────────────── */
+	.page-header{background:var(--navy-mid);padding:8px 16px;}
+	.ph-sub{font-size:0.78rem; color:rgba(255,255,255,0.75);}	
+	
+    .notif-item{background:var(--card);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background 0.15s;}
+    .notif-item:hover{background:#FAFBFC;}
+    .notif-item.unread{background:#FFF8F5;}
+    .notif-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+    .notif-body{flex:1;min-width:0;}
+    .notif-title{font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+    .notif-sub{font-size:0.75rem;color:var(--text-3);line-height:1.5;}
+    .notif-time{font-size:0.65rem;color:var(--text-3);margin-top:3px;}
+    .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:4px;}
+    .empty-state{text-align:center;padding:4rem 1rem;}
+    .empty-icon{font-size:3rem;margin-bottom:10px;}
+    .empty-title{font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:4px;}
+    .empty-sub{font-size:0.8rem;color:var(--text-3);line-height:1.6;}
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.07);}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0;color:var(--text-3);font-size:0.58rem;font-weight:600;transition:color 0.15s;border:none;background:none;font-family:inherit;text-decoration:none;position:relative;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-item.active{color:var(--brand);}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(255,90,31,0.4);cursor:pointer;border:none;transform:translateY(-8px);}
+
+	.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+	.nav-icon-btn:hover{background:rgba(255,255,255,0.18);}
+	
+  </style>
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/fixia.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <button class="nav-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i></button>
+  <div class="nav-search-wrap" onclick="window.location.href='search.html'" style="flex:1;">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span style="color:rgba(255,255,255,0.45);font-size:0.82rem;font-family:inherit;">Search services…</span>
+  </div>
+  <button class="nav-icon-btn" onclick="FX.logout()" title="Sign Out">
+    <i class="fa-solid fa-right-from-bracket"></i>
+  </button>
+</nav>
+
+<div class="page-header">
+  <div class="ph-sub">View booking updates and activity alerts</div>
+</div>
+
+<div id="notifList"></div>
+
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center">
+    <button class="bnav-center-btn" onclick="window.location.href='browse.html'">
+      <i class="fa-solid fa-border-all"></i>
+    </button>
+  </div>
+  <a class="bnav-item" href="bookings.html" id="bookingsNavBtn">
+    <i class="fa-solid fa-clipboard-list"></i>Bookings
+  </a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="env-config.js"></script>
+<script src="fixia-data.js"></script>
+<script src="js/fx-boot.js"></script>
+<script>
+const session = FX.getSession();
+
+const STATUS_CONFIG = {
+  active:    { icon:'⚡',  bg:'#ECFDF5', title:'Booking Confirmed!',           msg:'Your booking is now active. The provider will be in touch shortly.' },
+  done:      { icon:'🏁',  bg:'#FFFBEB', title:'Service Marked as Complete',   msg:'The provider marked your job as done. Tap to confirm and leave a rating.' },
+  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by Provider', msg:'The provider has cancelled this booking.' },
+  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'You Disputed This Booking',    msg:'You raised a dispute. Contact the provider to resolve and rebook if needed.' },
+  completed: { icon:'✅',  bg:'#ECFDF5', title:'Booking Completed',            msg:'Your booking has been completed. Thank you for using Fixia!' },
+};
+
+const PROV_CONFIG = {
+  pending:   { icon:'📩',  bg:'#FFF8F5', title:'New Booking Request',         msg:'A user has sent you a booking request.' },
+  active:    { icon:'📋',  bg:'#ECFDF5', title:'Booking Now Active',          msg:'A user confirmed their booking. The job is now active.' },
+  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by You',    msg:'You cancelled this booking. The user has been notified.' },
+  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'User Disputed This Booking',  msg:'The user raised a dispute on this job. Please reach out to resolve.' },
+  completed: { icon:'⭐',  bg:'#FFFBEB', title:'Job Completed & Rated',       msg:'A user confirmed completion and left you a rating.' },
+};
+
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function renderHeader(hasUnread, hasRead) {
+  const existing = document.getElementById('notifHeader');
+  if (existing) existing.remove();
+  const header = document.createElement('div');
+  header.id = 'notifHeader';
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;gap:8px;';
+  header.innerHTML = `
+    <span style="font-size:0.75rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;flex:1;">Notifications</span>
+    <button id="clearAllBtn" onclick="clearAllNotifs()" style="font-size:0.7rem;font-weight:700;background:#FFF0EB;border:none;cursor:${hasUnread ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasUnread ? 'var(--brand)' : '#ccc'};" ${!hasUnread ? 'disabled' : ''}>
+      Clear All
+    </button>
+	<button id="deleteReadBtn" onclick="deleteReadNotifs()" style="font-size:0.7rem;font-weight:700;background:#F5F7FA;border:none;cursor:${hasRead ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasRead ? 'var(--text-2)' : '#ccc'};" ${!hasRead ? 'disabled' : ''}>
+      🗑 Delete Read
+    </button>
+  `;
+  document.getElementById('notifList').before(header);
+}
+
+// Mark a single notification as read when tapped
+async function tapNotif(inquiryId, href, role, providerId) {
+  try {
+    if (role === 'regular') {
+      await FX.markOneReadUser(inquiryId);
+    } else {
+      await FX.markOneReadProvider(inquiryId);
+    }
+    // Update dot on this item
+    const dot = document.getElementById('dot-' + inquiryId);
+    const item = document.getElementById('item-' + inquiryId);
+    if (dot) dot.remove();
+    if (item) item.classList.remove('unread');
+  } catch(e) {}
+  window.location.href = href;
+}
+
+async function clearAllNotifs() {
+  try {
+    if (session.role === 'regular') {
+      await FX.markReadUser(session.userId);
+    } else {
+      const pd = await FX.getProviderByUserId(session.userId);
+      if (pd) await FX.markReadProvider(pd.id);
+    }
+    // Remove all dots and unread styles
+    document.querySelectorAll('.unread-dot').forEach(d => d.remove());
+    document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
+    const stillHasRead = document.querySelectorAll('.notif-item:not(.unread)').length > 0;
+    renderHeader(false, stillHasRead);
+    // Hide bell badge
+    const badge = document.getElementById('notifBellBadge');
+    if (badge) badge.style.display = 'none';
+  } catch(e) {}
+}
+
+async function deleteReadNotifs() {
+  try {
+    const sess = FX.getSession();
+    if (!sess) return;
+    if (sess.role === 'regular') {
+      await FX.deleteReadForUser(sess.userId);
+    } else if (sess.role === 'provider') {
+      const pd = await FX.getProviderByUserId(sess.userId);
+      if (pd) await FX.deleteReadForProvider(pd.id);
+    }
+    await init();
+  } catch(e) {}
+}
+
+async function init() {
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  const list = document.getElementById('notifList');
+  list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--text-3);font-size:0.82rem;">Loading…</div>';
+
+  try {
+    let notifs = [];
+    let role = session.role;
+
+    if (role === 'regular') {
+      const inquiries = await FX.getUserInquiries(session.userId);
+      notifs = inquiries
+        .filter(i => STATUS_CONFIG[i.status] && !i.user_notif_dismissed)
+        .map(i => {
+          const cfg = STATUS_CONFIG[i.status];
+          return {
+            id: i.id,
+            icon: cfg.icon, bg: cfg.bg,
+            title: cfg.title, sub: cfg.msg,
+            time: timeAgo(i.updated_at),
+            unread: !!i.user_has_unread,
+            href: 'bookings.html',
+            role: 'regular',
+          };
+        });
+
+    } else if (role === 'provider') {
+      const pd = await FX.getProviderByUserId(session.userId);
+      if (!pd) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">No Notifications</div></div>';
+        return;
+      }
+      const inquiries = await FX.getProviderInquiries(pd.id);
+      notifs = inquiries
+        .filter(i => PROV_CONFIG[i.status] && !i.provider_notif_dismissed)
+        .map(i => {
+          const cfg = PROV_CONFIG[i.status];
+          return {
+            id: i.id,
+            icon: cfg.icon, bg: cfg.bg,
+            title: cfg.title, sub: cfg.msg,
+            time: timeAgo(i.updated_at),
+            unread: !!i.provider_has_unread,
+            href: 'bookings.html',
+            role: 'provider',
+          };
+        });
+    }
+
+	const hasUnread = notifs.some(n => n.unread);
+	const hasRead   = notifs.some(n => !n.unread);
+	renderHeader(hasUnread, hasRead);
+
+    if (!notifs.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔔</div>
+          <div class="empty-title">No Notifications Yet</div>
+          <div class="empty-sub">Booking updates and status changes will appear here.</div>
+        </div>`;
+      return;
+    }
+
+    // Render — NO markRead here, only on individual tap or Clear All
+    list.innerHTML = notifs.map(n => `
+      <div class="notif-item ${n.unread ? 'unread' : ''}" id="item-${n.id}"
+           onclick="tapNotif('${n.id}','${n.href}','${n.role}')">
+        <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-sub">${n.sub}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        ${n.unread ? `<div class="unread-dot" id="dot-${n.id}"></div>` : ''}
+      </div>`).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load notifications</div><div class="empty-sub">${e.message}</div></div>`;
+  }
+}
+
+init();
+
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
+
+</body>
+</html>
