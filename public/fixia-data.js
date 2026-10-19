@@ -61,13 +61,8 @@
 'use strict';
 
 /* ── Config — replace with your Supabase project values ─────── */
-<<<<<<< HEAD
 const SUPA_URL = window.FX_ENV.SUPA_URL;
 const SUPA_KEY = window.FX_ENV.SUPA_KEY;
-=======
-const SUPA_URL = 'https://jqycouhbatdmssfqcyio.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeWNvdWhiYXRkbXNzZnFjeWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjMwOTYsImV4cCI6MjA5MjgzOTA5Nn0.SaPsXj_b1LlxLQPv1YrWm2A2KaU8fDx4PbbQV-etUKk';
->>>>>>> 2019ab449e74c390791216dce6670ff4c1a77070
 const APP_URL  = window.location.origin;
 const EMAIL_API  = '/api/send-email';
 
