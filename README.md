@@ -7,7 +7,7 @@ node scripts/build-icons.js      # only if you add icons
 node scripts/migrate-pages.js    # applies theme + icons + cache to all pages, makes keys come from env-config.js
 npm install                      # creates package-lock.json (commit it — the workflow uses npm ci)
 ```
-Edit `public/env-config.js` with the NEW Supabase URL + anon key.
+Edit `js/env-config.js` with the NEW Supabase URL + anon key.
 
 Note: service-worker paths changed to `/images/...`, `/css/...` (your Vercel routes already map these to /public).
 
