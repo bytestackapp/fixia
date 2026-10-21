@@ -1,6 +1,6 @@
-const CACHE_VERSION = 'v2.0.0';                 // bump on every deployment
+const CACHE_VERSION = 'v2.0.1';                 // bump on every deployment
 const CACHE_NAME = `fixia-${CACHE_VERSION}`;
-const SHELL = ['/css/fixia.css','/css/icons.css','/js/fx-boot.js','/fixia-data.js','/env-config.js','/homepage.html','/login.html','/manifest.json'];
+const SHELL = ['/css/fixia.css','/css/icons.css','/js/fx-boot.js','/js/fixia-data.js','/js/env-config.js','/homepage.html','/login.html','/manifest.json'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>Promise.allSettled(SHELL.map(u=>c.add(u)))));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE_NAME).map(x=>caches.delete(x)))));e.waitUntil(clients.claim());});
 self.addEventListener('push',e=>{const d=e.data?.json()||{};e.waitUntil(self.registration.showNotification(d.title||'Fixia',{body:d.body||'You have a new notification.',icon:d.icon||'/images/fixia-icon-192.png',badge:d.badge||'/images/fixia-icon-192.png',data:{url:d.url||'/homepage.html'}}));});

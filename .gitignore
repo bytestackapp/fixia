@@ -1,10 +1,26 @@
+# dependencies
 node_modules
+
+# build output
 www
+android/.gradle
+android/build
+android/app/build
+android/local.properties
+
+# secrets
 .env
 .env.*
 fixia.keystore
 android/app/fixia.keystore
+
+# local-only helper scripts (never push)
+*.bat
+
+# backups / misc
 fixia-backup.sql
 *.sql.bak
 .back
 .docs
+.DS_Store
+Thumbs.db

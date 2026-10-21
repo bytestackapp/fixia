@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fixia</string>
+    <string name="title_activity_main">Fixia</string>
+    <string name="package_name">ph.fixia.app</string>
+    <string name="custom_url_scheme">ph.fixia.app</string>
+</resources>

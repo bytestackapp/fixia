@@ -2,7 +2,7 @@
 :root{
   --brand:#F2622B; --brand-dark:#D94F1C; --brand-light:#FFF1EA;
   --navy:#1B2A3F; --navy-mid:#243650;           /* dark surfaces + heading text */
-  --text:#1F2937; --text-2:#4B5563; --text-3:#8A94A3;
+  --text:#1F2937; --text-2:#4B5563; --text-3:#6B7685;
   --bg:#F5F6F8; --card:#FFFFFF; --border:#E7E9EE;
   --green:#12A67A; --gold:#E8A317; --red:#D9453B;
   --radius-sm:10px; --radius-md:14px; --radius-lg:20px;
@@ -83,3 +83,20 @@ body:has(.bg-shapes){background:linear-gradient(160deg,#F9F3EE,#EEF2F7)!importan
 @media(min-width:600px) and (max-width:899px){
   :where(main,.body,.panel,#bodyContent){max-width:720px;margin-inline:auto}
 }
+
+/* ═══ AUDIT FIXES ═══ */
+/* pages used calc(var(--bottom-h)+16px) — invalid (no spaces) → content hid behind the bottom bar */
+body:has(.bottom-nav){padding-bottom:calc(var(--bottom-h) + 16px + env(safe-area-inset-bottom))}
+.toast{bottom:calc(var(--bottom-h) + 12px + env(safe-area-inset-bottom))}
+/* sticky bars must sit under the header INCLUDING the notch inset */
+.filter-bar,.tab-nav,.contact-bar,.filter-tabs{top:calc(var(--nav-h) + env(safe-area-inset-top))!important}
+/* admin top bar buttons were white-on-white after the theme change */
+.nav-btn{background:var(--bg)!important;color:var(--text-2)!important;border:1px solid var(--border)!important}
+.nav-btn.danger{color:var(--red)!important}
+.nav-badge{background:var(--brand-light)!important}
+/* profile.html delete-listing dialog used classes that page never defined */
+body:has(#deleteConfirmModal) .modal-box{background:#fff;border-radius:var(--radius-lg);width:calc(100% - 32px);max-width:420px;margin:auto}
+body:has(#deleteConfirmModal) .modal:has(.modal-box){align-items:center}
+.btn-secondary{background:var(--bg);color:var(--text-2);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red);color:#fff}
+@media(min-width:900px){.modal-sheet,.sheet,.gate-sheet{animation:fadeIn .2s!important}}

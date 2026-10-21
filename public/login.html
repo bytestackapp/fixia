@@ -600,8 +600,8 @@
   </div>
 </div>
 
-<script src="env-config.js"></script>
-<script src="fixia-data.js"></script>
+<script src="js/env-config.js"></script>
+<script src="js/fixia-data.js"></script>
 <script src="js/fx-boot.js"></script>
 <script>
 /* ── Pre-signup check — runs before everything else ─────────── */
@@ -926,7 +926,7 @@ window.addEventListener('click', e => {
     toast.style.cssText = 'position:fixed;top:-100px;left:12px;right:12px;background:#e86c2c;color:#fff;border-radius:16px;padding:14px 16px;z-index:99999;box-shadow:0 8px 32px rgba(232,108,44,0.4);display:flex;align-items:center;gap:12px;transition:top 0.4s ease;';
 	setTimeout(() => toast.style.top = '16px', 50);
     toast.innerHTML = `
-      <img src="/public/images/fixia-icon.png" style="width:36px;height:36px;border-radius:10px;flex-shrink:0;">
+      <img src="/images/fixia-icon.png" style="width:36px;height:36px;border-radius:10px;flex-shrink:0;">
       <div style="flex:1;">
         <div style="font-size:0.85rem;font-weight:800;margin-bottom:2px;">Add Fixia to Home Screen</div>
         <div style="font-size:0.72rem;opacity:0.75;">${ios ? 'Tap Share → Add to Home Screen for the best experience.' : 'Install for faster access and a better experience.'}</div>

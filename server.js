@@ -93,32 +93,26 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── SERVE STATIC FILES from /public ─────────────────────────
-  let filePath = reqPath;
-
-  // Root → homepage
+  // ── SERVE STATIC FILES ──────────────────────────────────────
+  let filePath = decodeURIComponent(reqPath);
   if (filePath === '/') filePath = '/presignup.html';
-
-  // No extension → try .html
   if (!path.extname(filePath)) filePath += '.html';
 
-  const fullPath = path.join(__dirname, 'public', filePath);
-  const ext      = path.extname(fullPath);
-  const mimeType = MIME[ext] || 'application/octet-stream';
+  // css/js/images + sw.js/manifest.json live in the project root; pages live in /public
+  const isAsset = ['/css/', '/js/', '/images/'].some(d => filePath.startsWith(d))
+               || ['/sw.js', '/manifest.json'].includes(filePath);
+  const baseDir  = isAsset ? __dirname : path.join(__dirname, 'public');
+  const fullPath = path.normalize(path.join(baseDir, filePath));
 
+  if (!fullPath.startsWith(baseDir)) {          // block ../ path traversal
+    res.writeHead(403); res.end('Forbidden'); return;
+  }
+
+  const mimeType = MIME[path.extname(fullPath)] || 'application/octet-stream';
   fs.readFile(fullPath, (err, data) => {
     if (err) {
-      // Try without /public prefix (for files in root like sw.js, manifest.json)
-      const rootPath = path.join(__dirname, filePath);
-      fs.readFile(rootPath, (err2, data2) => {
-        if (err2) {
-          res.writeHead(404, { 'Content-Type': 'text/plain' });
-          res.end('404 Not Found: ' + filePath);
-        } else {
-          res.writeHead(200, { 'Content-Type': mimeType });
-          res.end(data2);
-        }
-      });
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('404 Not Found: ' + filePath);
     } else {
       res.writeHead(200, { 'Content-Type': mimeType });
       res.end(data);

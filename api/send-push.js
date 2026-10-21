@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
     title: title || 'Fixia',
     body:  body  || 'You have a new notification.',
     url:   url   || '/homepage.html',
-    icon:  '/public/images/fixia-icon-192.png',
-    badge: '/public/images/fixia-icon-192.png',
+    icon:  '/images/fixia-icon-192.png',
+    badge: '/images/fixia-icon-192.png',
   });
 
   const results = await Promise.allSettled(
