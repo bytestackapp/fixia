@@ -11,14 +11,20 @@
     { "src": "api/**/*.js",    "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)",                    "dest": "/api/$1.js" },
-    { "src": "/sw.js",                       "dest": "/sw.js" },
-    { "src": "/manifest.json",               "dest": "/manifest.json" },
-    { "src": "/((?:css|js|images)/.*)",      "dest": "/$1" },
-    { "src": "/(.+\\.html)",                 "dest": "/public/$1" },
-    { "src": "/",                            "dest": "/public/presignup.html" },
-    { "src": "/(.*)",                        "dest": "/public/$1.html" }
-  ],
+  { "src": "/api/send-otp",                  "dest": "/api/otp.js?action=send" },
+  { "src": "/api/verify-otp",                "dest": "/api/otp.js?action=verify" },
+  { "src": "/api/create-paypal-checkout",    "dest": "/api/payments.js?action=create-paypal" },
+  { "src": "/api/create-paymongo-checkout",  "dest": "/api/payments.js?action=create-paymongo" },
+  { "src": "/api/verify-paypal-payment",     "dest": "/api/payments.js?action=verify-paypal" },
+  { "src": "/api/verify-paymongo-payment",   "dest": "/api/payments.js?action=verify-paymongo" },
+  { "src": "/api/(.*)",                      "dest": "/api/$1.js" },
+  { "src": "/sw.js",                         "dest": "/sw.js" },
+  { "src": "/manifest.json",                 "dest": "/manifest.json" },
+  { "src": "/((?:css|js|images)/.*)",        "dest": "/$1" },
+  { "src": "/(.+\\.html)",                   "dest": "/public/$1" },
+  { "src": "/",                              "dest": "/public/presignup.html" },
+  { "src": "/(.*)",                          "dest": "/public/$1.html" }
+],
   "crons": [
     { "path": "/api/subscription-cron", "schedule": "0 17 * * *" }
   ]
