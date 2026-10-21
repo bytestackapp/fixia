@@ -789,7 +789,7 @@ function applyLocation() {
   const hasCity     = city.value && !cityName.startsWith('Select');
   const hasBrgy     = brgy.value && !brgyName.startsWith('Select');
 
-  if (!hasProvince && !selProv.disabled) {
+  if (!hasProvince && !prov.disabled) {
     const el = document.getElementById('locError');
     el.textContent = 'Please select at least a Province.';
     el.style.display = 'block';
@@ -890,7 +890,7 @@ function renderFeaturedCard(p) {
     <div class="featured-card" onclick="openProvider('${p.id}')">
       <div class="fc-img-placeholder" style="background:${bg};position:relative;">
         ${p.avatar_url
-          ? `<img src="${p.avatar_url}" alt="${p.biz_name}">`
+          ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.biz_name)}">`
           : emoji}
         <div class="fc-badge"><i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}</div>
       </div>
@@ -912,7 +912,7 @@ function renderNearbyCard(p) {
     <div class="provider-card" onclick="openProvider('${p.id}')">
 	  <div class="provider-avatar" style="background:${p.is_elite ? '#FFFBEB' : 'var(--brand-light)'};">
         ${p.avatar_url
-          ? `<img src="${p.avatar_url}" alt="${p.biz_name}" onerror="this.style.display='none';this.parentElement.innerHTML+='<div style=\'font-size:1.25rem\'>${emoji}</div>'">`
+          ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.biz_name)}" onerror="this.style.display='none';this.parentElement.innerHTML+='<div style=\'font-size:1.25rem\'>${emoji}</div>'">`
           : `<div style="font-size:1.25rem;">${emoji}</div>`}
         ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>

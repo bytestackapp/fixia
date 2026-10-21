@@ -27,6 +27,7 @@ async function sb(path, opts = {}) {
     },
   });
   const text = await res.text();
+  if (!res.ok) { let m = 'Database error'; try { m = JSON.parse(text).message || m; } catch(e) {} console.error('[Fixia DB]', res.status, text.slice(0,200)); throw { status: 500, message: m }; }
   return text ? JSON.parse(text) : null;
 }
 
@@ -530,7 +531,9 @@ const actions = {
       name:                     data.name,
       price:                    data.price,
       period:                   data.period        || 'month',
-      booking_limit:            data.bookingLimit  ?? 5,
+      listing_limit: data.listingLimit ?? 5,
+      listing_limit: data.listingLimit ?? 5,
+      booking_limit: data.bookingLimit ?? 5,
       referral_points_required: data.referralPointsRequired ?? 0,
       ads_free:                 data.adsFree       ?? false,
       is_featured:              data.isFeatured    ?? false,
@@ -1267,7 +1270,7 @@ const actions = {
       if (!prov || prov.user_id !== callerUser.id) throw { status: 403, message: 'You can only update your own listings.' };
       if (changes.isActive === true) {
         const pkg = prov.package_id ? (await sb(`packages?id=eq.${encodeURIComponent(prov.package_id)}&select=listing_limit,name&limit=1`))?.[0] : null;
-        const limit = pkg?.listing_limit ?? 0;
+        const limit = pkg?.listing_limit ?? 5;
         if (limit < 999) {
           const active = await sb(`listings?provider_id=eq.${listing.provider_id}&is_active=eq.true`) || [];
           if (active.length >= limit) {

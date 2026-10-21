@@ -1284,13 +1284,13 @@ function renderListings() {
       <div class="lc-head">
         <div class="lc-icon">🔧</div>
         <div class="lc-info">
-          <div class="lc-title">${l.title}</div>
+          <div class="lc-title">${esc(l.title)}</div>
           <div class="lc-sub">${CAT_LABELS[l.cat_main] || l.cat_main || '—'} &nbsp; • &nbsp; ${l.cat_sub || '—'}</div>
         </div>
         <span class="badge ${l.is_active ? 'badge-green' : 'badge-grey'}">${l.is_active ? '✅ Active' : 'Inactive'}</span>
       </div>
       ${l.price_label ? `<div class="lc-price">💰 ${l.price_label}</div>` : ''}
-      <div class="lc-desc">${l.description || ''}</div>
+      <div class="lc-desc">${esc(l.description || '')}</div>
       <div class="lc-actions">
         <button class="btn-xs btn-edit-xs" onclick="editListing('${l.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
         <button class="btn-xs btn-red-xs" onclick="deleteListing('${l.id}')"><i class="fa-solid fa-trash"></i></button>
@@ -1569,13 +1569,13 @@ function renderReviews() {
     const stars = Array.from({length:5}, (_,i) =>
       `<i class="fa-${i < r.stars ? 'solid' : 'regular'} fa-star" style="color:${i < r.stars ? 'var(--gold)' : 'var(--border)'};font-size:12px;"></i>`
     ).join('');
-    const displayName = r.display_name || 'Anonymous';
+    const displayName = esc(r.display_name || 'Anonymous');
     return `
     <div class="review-card">
       <div class="rc-head">
         <div class="rc-left">
           <div class="rc-name">${displayName}</div>
-          <div class="rc-comment">${r.comment || '<em style="color:var(--text-3);">No comment left.</em>'}</div>
+          <div class="rc-comment">${r.comment ? esc(r.comment) : '<em style="color:var(--text-3);">No comment left.</em>'}</div>
         </div>
         <div class="rc-right">
           <div class="rc-stars">${stars}</div>

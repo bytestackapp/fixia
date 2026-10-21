@@ -9,9 +9,12 @@
 const bcrypt = require('bcryptjs');
 
 module.exports = async (req, res) => {
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { action, password, hash } = req.body;
+  const { action, password, hash } = req.body || {};
+  if (typeof password === 'string' && password.length > 128) return res.status(400).json({ error: 'Password too long' });
 
   if (action === 'hash') {
     if (!password) return res.status(400).json({ error: 'Missing password' });

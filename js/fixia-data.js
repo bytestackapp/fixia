@@ -1999,13 +1999,13 @@ async getAds(type) {
   /* ── Build inline ad HTML from a DB ad object ────────────────── */
 renderInlineAd(ad) {
   return `
-    <div class="ad-inline" data-ad-id="${ad.id}" data-ad-link="${ad.link_url || '#'}"
+    <div class="ad-inline" data-ad-id="${ad.id}" data-ad-link="${esc(ad.link_url || '#')}"
          style="background:linear-gradient(135deg,${ad.bg_color || '#0f2027'},${ad.bg_color || '#1E3048'});border-radius:12px;border:1px solid rgba(255,255,255,0.08);padding:14px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
       <div class="ai-icon" style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${esc(ad.icon || '📢')}</div>
       <div class="ai-body" style="flex:1;min-width:0;">
         <div class="ai-label" style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:1px;">Sponsored</div>
         <div class="ai-title" style="font-size:0.88rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ad.title)}</div>
-        ${ad.description ? `<div class="ai-sub" style="font-size:0.72rem;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ad.description}</div>` : ''}
+        ${ad.description ? `<div class="ai-sub" style="font-size:0.72rem;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ad.description)}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;">
         <button class="ai-btn" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer;font-family:inherit;">${esc(ad.cta_label || 'Learn More')}</button>
@@ -2187,10 +2187,7 @@ async sendUserMessage(userId, { title, body, type = 'info', icon = '📢' }) {
   if (!session) return;
 
   // Check force_logout first — show message before deleting account
-  let liveUser;
-  try {
-    liveUser = await this.getUserById(session.userId);
-  } catch(e) { return; }
+  
 
   let messages;
   try {
@@ -2649,8 +2646,8 @@ Object.assign(FX, FX_FEATURED);
 setTimeout(() => {
   beat();
   checkMessages();
-  setInterval(beat, 120000);
-  setInterval(checkMessages, 120000);
+  setInterval(()=>{ if(!document.hidden) beat(); }, 120000);
+  setInterval(()=>{ if(!document.hidden) checkMessages(); }, 120000);
 }, 10000);
 })();
 
@@ -2677,7 +2674,7 @@ setTimeout(() => {
   }
 
   document.addEventListener('touchstart', e => {
-    if (window.scrollY === 0) {
+    if (window.scrollY === 0 && !e.target.closest('.modal-sheet,.modal-box,.modal-popup,.add-form,.subcat-panel,.sheet,.dp-overlay,.gate-sheet,input,textarea,select')) {
       startY = e.touches[0].clientY;
       pulling = true;
     }

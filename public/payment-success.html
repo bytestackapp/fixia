@@ -298,7 +298,7 @@ function showState(id) {
         package:          formData.packageName || 'Fixia Plus',
         paymentMethod:    'PayPal',
         paymentReference: data.transactionId || orderId,
-        paymentAmount:    `$${data.amount} USD`,
+        paymentAmount:    `₱${data.amount}`,
       });
 
       // Show success
@@ -307,7 +307,7 @@ function showState(id) {
         <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || 'Fixia Plus'}</span></div>
         <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal ✅ Verified</span></div>
         <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId || orderId}</span></div>
-        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">$${data.amount} USD</span></div>`;
+        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₱${data.amount}</span></div>`;
       showState('stateRegularSuccess');
     }
 
@@ -338,7 +338,7 @@ function showState(id) {
         package:          formData.packageName || formData.package,
         paymentMethod:    'PayPal',
         paymentReference: data.transactionId || orderId,
-        paymentAmount:    `$${data.amount} USD`,
+        paymentAmount:    `₱${data.amount}`,
       });
 
       document.getElementById('provSuccessBiz').textContent   = formData.bizName;

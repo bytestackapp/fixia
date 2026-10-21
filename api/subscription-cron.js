@@ -5,7 +5,7 @@
  */
 
 const SUPA_URL  = process.env.SUPA_URL;
-const SUPA_KEY  = process.env.SUPA_KEY;
+const SUPA_KEY  = process.env.SUPA_SERVICE_KEY || process.env.SUPA_KEY;
 const CRON_SECRET = process.env.CRON_SECRET; // set this in Vercel env vars
 
 async function sbFetch(path, opts = {}) {
@@ -33,7 +33,7 @@ async function sendEmail(type, data) {
 
 module.exports = async (req, res) => {
   // Protect the cron endpoint
-  if (req.headers.authorization !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET || req.headers.authorization !== `Bearer ${CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
             method: 'PATCH',
             body: JSON.stringify({
               status:      newStatus,
-              package_id:  isProvider ? user.package_id : 'free',
+              package_id:  isProvider ? user.package_id : 'regular-free',
               ads_free:    false,
               expiry_sent: true,
             }),

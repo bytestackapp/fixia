@@ -109,6 +109,8 @@ const server = http.createServer((req, res) => {
   }
 
   const mimeType = MIME[path.extname(fullPath)] || 'application/octet-stream';
+  if (!fullPath.startsWith(path.join(__dirname, 'public'))) { res.writeHead(403); return res.end('Forbidden'); }
+  if (!fullPath.startsWith(path.join(__dirname, 'public'))) { res.writeHead(403); return res.end('Forbidden'); }
   fs.readFile(fullPath, (err, data) => {
     if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -120,7 +122,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '127.0.0.1', () => {
   console.log('');
   console.log('  ✅ Fixia local server running!');
   console.log('');

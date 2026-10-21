@@ -95,7 +95,7 @@
     try {
       const ps = await FX.getPreSignupSettings();
       if (ps && ps.active) {
-        window.location.replace('presignup.html');
+        window.location.replace('presignup.html' + location.search);
       }
     } catch(e) { /* fail silently, allow page to load normally */ }
   })();

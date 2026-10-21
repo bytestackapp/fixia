@@ -298,11 +298,11 @@ function renderCards(saved) {
         <div class="card-top">
         <div class="provider-avatar">
           ${p.avatarUrl
-            ? `<img src="${p.avatarUrl}" alt="${p.bizName}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+            ? `<img src="${p.avatarUrl}" alt="${esc(p.bizName)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
             : catEmoji(p.catMain)}
         </div>
           <div class="provider-info">
-            <div class="provider-name">${p.isElite ? '👑 ' : ''}${p.bizName}</div>
+            <div class="provider-name">${p.isElite ? '👑 ' : ''}${esc(p.bizName)}</div>
             <div class="provider-service">${p.catSub || '—'}</div>
           </div>
         </div>
