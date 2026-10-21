@@ -11,6 +11,13 @@
     { "src": "api/**/*.js",    "use": "@vercel/node" }
   ],
   "routes": [
+  { "src": "/api/(.*)",
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, x-session-token, x-user-id, Authorization"
+  },
+  "continue": true },
   { "src": "/api/send-otp",                  "dest": "/api/otp.js?action=send" },
   { "src": "/api/verify-otp",                "dest": "/api/otp.js?action=verify" },
   { "src": "/api/create-paypal-checkout",    "dest": "/api/payments.js?action=create-paypal" },

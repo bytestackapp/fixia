@@ -1,4 +1,6 @@
 /* FIXIA — /api/otp.js  (merged send-otp + verify-otp) */
+if (req.method === 'OPTIONS') return res.status(200).end();
+
 const crypto   = require('crypto');
 const SUPA_URL = process.env.SUPA_URL;
 const SUPA_KEY = process.env.SUPA_KEY;

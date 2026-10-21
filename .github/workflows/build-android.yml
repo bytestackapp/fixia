@@ -5,31 +5,62 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with: { node-version: 22 }
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
-      - run: npm ci
-      - name: Copy web app into www (APK has no admin page / service worker)
+
+      - name: Check secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          API_BASE: ${{ secrets.API_BASE }}
+          FIXIA_KEYSTORE_B64: ${{ secrets.FIXIA_KEYSTORE_B64 }}
+          FIXIA_KEYSTORE_PASSWORD: ${{ secrets.FIXIA_KEYSTORE_PASSWORD }}
         run: |
-          mkdir -p www && cp -r public/. www/ && cp -r css images js www/
-          rm -f www/admin.html www/sw.js
-      - name: Write env-config.js from secrets
+          for v in SUPABASE_URL SUPABASE_ANON_KEY API_BASE FIXIA_KEYSTORE_B64 FIXIA_KEYSTORE_PASSWORD; do
+            if [ -z "${!v}" ]; then echo "::error::Missing secret $v"; exit 1; fi
+          done
+
+      - run: npm ci
+
+      - name: Build web bundle
+        run: |
+          rm -rf www && mkdir -p www
+          cp -r public/. www/
+          cp -r css images js www/
+          rm -f www/admin.html www/sw.js www/manifest.json
+          echo "<script>location.replace('homepage.html')</script>" > www/index.html
+
+      - name: Write env-config.js
         run: node scripts/generate-env.js
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           API_BASE: ${{ secrets.API_BASE }}
-      - name: Write signing keystore from secret
-        run: echo "${{ secrets.FIXIA_KEYSTORE_B64 }}" | base64 -d > android/app/fixia.keystore
+
+      - name: Write keystore
+        env: { KS: "${{ secrets.FIXIA_KEYSTORE_B64 }}" }
+        run: printf '%s' "$KS" | base64 -d > android/app/fixia.keystore
+
       - run: npx cap sync android
       - run: chmod +x android/gradlew
+
       - name: Build release APK
-        run: cd android && ./gradlew assembleRelease
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
         env:
           FIXIA_KEYSTORE_PASSWORD: ${{ secrets.FIXIA_KEYSTORE_PASSWORD }}
-      - uses: actions/upload-artifact@v7
+
+      - name: Verify signature
+        run: |
+          ls -l android/app/build/outputs/apk/release/
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner verify --print-certs android/app/build/outputs/apk/release/fixia.apk
+
+      - uses: actions/upload-artifact@v4
         with:
           name: fixia
           path: android/app/build/outputs/apk/release/fixia.apk
+          if-no-files-found: error
+          retention-days: 30
