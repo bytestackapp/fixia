@@ -20,7 +20,6 @@ android/app/fixia.keystore
 # backups / misc
 fixia-backup.sql
 *.sql.bak
-.back
-.docs
+.references
 .DS_Store
 Thumbs.db

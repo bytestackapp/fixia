@@ -1072,7 +1072,7 @@ try {
   loadHomepageData();
   
 // Register push subscription silently if already granted
-if (!IS_GUEST && Notification.permission === 'granted') {
+if (!IS_GUEST && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
   registerPushSubscription().catch(() => {});
 }
 })();

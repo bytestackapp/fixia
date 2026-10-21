@@ -63,7 +63,7 @@
 /* ── Config — replace with your Supabase project values ─────── */
 const SUPA_URL = window.FX_ENV.SUPA_URL;
 const SUPA_KEY = window.FX_ENV.SUPA_KEY;
-const APP_URL  = window.location.origin;
+const APP_URL  = window.FX_ENV.SITE_URL || window.location.origin;
 const EMAIL_API  = '/api/send-email';
 
 
@@ -155,7 +155,7 @@ async function sbDelete(publicUrl) {
 
 
 async function registerPushSubscription() {
-  if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
+  if (!('PushManager' in window) || !('serviceWorker' in navigator) || typeof Notification === 'undefined') return;
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') return;
   try {

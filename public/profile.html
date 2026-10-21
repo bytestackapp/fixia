@@ -1426,7 +1426,8 @@ async function openReferralModal() {
     }
 
     // Referral link
-    const link = `${window.location.origin}/signup?ref=${_referralStats.code}`;
+    const link = `${APP_URL}/signup?ref=${_referralStats.code}`;
+    const link = `${APP_URL}/signup?ref=${_referralStats?.code}`;
     document.getElementById('refLinkDisplay').textContent = link;
 
     // Packages
@@ -1521,7 +1522,8 @@ async function redeemPackage(pkgId) {
 }
 
 function copyReferralLink() {
-  const link = `${window.location.origin}/signup?ref=${_referralStats?.code}`;
+  const link = `${APP_URL}/signup?ref=${_referralStats.code}`;
+  const link = `${APP_URL}/signup?ref=${_referralStats?.code}`;
   const btn = document.getElementById('copyRefBtn');
   if (btn) {
     btn.style.transform = 'scale(0.88)';
