@@ -13,7 +13,7 @@ jobs:
       - run: npm ci
       - name: Copy web app into www (APK has no admin page / service worker)
         run: |
-          mkdir -p www && cp -r public/. www/ && cp -r css images js www/ && cp -r css images js www/
+          mkdir -p www && cp -r public/. www/ && cp -r css images js www/
           rm -f www/admin.html www/sw.js
       - name: Write env-config.js from secrets
         run: node scripts/generate-env.js
