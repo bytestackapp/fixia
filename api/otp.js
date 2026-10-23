@@ -1,6 +1,4 @@
 /* FIXIA — /api/otp.js  (merged send-otp + verify-otp) */
-if (req.method === 'OPTIONS') return res.status(200).end();
-
 const crypto   = require('crypto');
 const SUPA_URL = process.env.SUPA_URL;
 const SUPA_KEY = process.env.SUPA_KEY;
@@ -70,7 +68,7 @@ async function verifyOtp(req, res) {
   const { email, otp } = req.body || {};
   if (!email || !otp) return res.status(400).json({ error: 'Missing fields.' });
   try {
-    const hash = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+    const hash = crypto.createHash('sha256').update(String(otp).trim()).digest('hex');
     const rows = await sbFetch(
       `otp_codes?email=eq.${encodeURIComponent(email.trim().toLowerCase())}` +
       `&otp_hash=eq.${hash}&used=eq.false&expires_at=gt.${new Date().toISOString()}&limit=1`
@@ -90,7 +88,8 @@ async function verifyOtp(req, res) {
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).end();
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST')    return res.status(405).end();
   const action = req.query.action;
   if (action === 'send')   return sendOtp(req, res);
   if (action === 'verify') return verifyOtp(req, res);

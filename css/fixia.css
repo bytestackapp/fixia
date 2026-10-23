@@ -9,7 +9,7 @@
   --shadow-sm:0 1px 2px rgba(16,24,40,.05);
   --shadow-md:0 6px 20px rgba(16,24,40,.08);
   --shadow-lg:0 16px 40px rgba(16,24,40,.12);
-  --nav-h:56px; --bottom-h:64px; --rail-w:88px; --content-max:1080px;
+  --nav-h:56px; --bottom-h:64px; --rail-w:240px; --content-max:1080px;
   --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 html{-webkit-text-size-adjust:100%}
@@ -62,13 +62,58 @@ body:has(.bg-shapes){background:linear-gradient(160deg,#F9F3EE,#EEF2F7)!importan
 .bg-shapes .shape{background:rgba(242,98,43,.07)!important}
 .card{box-shadow:var(--shadow-lg)}
 
-/* ── desktop: side rail + centred content + multi-column lists ── */
+/* ── desktop: sidebar (icon left, label right) + centred content + multi-column lists ── */
 @media(min-width:900px){
   body:has(.bottom-nav){padding-left:var(--rail-w);padding-bottom:0!important}
-  .bottom-nav{top:0;bottom:auto;right:auto;width:var(--rail-w);height:100vh!important;flex-direction:column;justify-content:flex-start;gap:4px;padding:20px 0!important;border-top:0!important;border-right:1px solid var(--border)}
-  .bnav-item{flex:0 0 auto;width:100%;padding:12px 0;font-size:.68rem}
-  .bnav-item i{font-size:1.25rem}
-  .bnav-center{flex:0 0 auto;margin:10px 0}.bnav-center-btn{transform:none!important}
+
+  /* sidebar container */
+  .bottom-nav{
+    top:0;bottom:auto;right:auto;left:0;
+    width:var(--rail-w);height:100vh!important;
+    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:4px;
+    padding:16px 12px!important;
+    border-top:0!important;border-right:1px solid var(--border);
+    background:var(--card)!important;box-shadow:none!important;
+    overflow-y:auto;
+  }
+
+  /* logo at the top of the sidebar */
+  .bottom-nav::before{
+    content:"";display:block;flex:0 0 auto;
+    height:40px;margin:4px 8px 18px;
+    background:url("../images/fixia-logo.png") left center/contain no-repeat;
+  }
+
+  /* menu items: icon on the left, text on the right */
+  .bnav-item{
+    flex:0 0 auto;width:100%;
+    flex-direction:row!important;justify-content:flex-start;align-items:center;
+    gap:12px!important;padding:10px 14px!important;
+    font-size:.88rem!important;font-weight:600;
+    border-radius:10px;color:var(--text-2);
+    transition:background .15s,color .15s;
+  }
+  .bnav-item i{font-size:1.1rem!important;width:1.25em;text-align:center}
+  .bnav-item:hover{background:var(--bg);color:var(--text)}
+  .bnav-item.active{background:var(--brand-light);color:var(--brand-dark)}
+
+  /* centre "Browse" button becomes a normal menu row */
+  .bnav-center{flex:0 0 auto;width:100%;margin:0;display:block}
+  .bnav-center-btn{
+    width:100%;height:auto;
+    display:flex;align-items:center;justify-content:flex-start;gap:12px;
+    padding:10px 14px;font-size:1.1rem;
+    background:transparent!important;color:var(--text-2)!important;
+    box-shadow:none!important;border-radius:10px!important;
+    transform:none!important;cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .bnav-center-btn i{width:1.25em;text-align:center}
+  .bnav-center-btn::after{content:"Browse";font-size:.88rem;font-weight:600;font-family:var(--font)}
+  .bnav-center-btn:hover{background:var(--bg)!important;color:var(--text)!important}
+  /* highlight Browse while on browse.html */
+  body:has(#catGrid) .bnav-center-btn{background:var(--brand-light)!important;color:var(--brand-dark)!important}
+
   :where(main,.body,.panel,.results-header,.results-list,.filter-bar,.cats-section,.featured-section,.nearby-section,.section,#pageContent>.sec,#bodyContent){max-width:var(--content-max);margin-inline:auto}
   #nearbyGrid,.results-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
   #nearbyGrid>.provider-card,.results-list>.provider-card,.results-list>.ad-inline{margin:0}
@@ -100,3 +145,30 @@ body:has(#deleteConfirmModal) .modal:has(.modal-box){align-items:center}
 .btn-secondary{background:var(--bg);color:var(--text-2);border:1.5px solid var(--border)}
 .btn-danger{background:var(--red);color:#fff}
 @media(min-width:900px){.modal-sheet,.sheet,.gate-sheet{animation:fadeIn .2s!important}}
+
+/* ── mobile bottom bar: larger ── */
+@media(max-width:899px){
+  :root{--bottom-h:60px}
+  .bnav-item{font-size:.60rem;gap:4px}
+  .bnav-item i{font-size:1.42rem}
+  .bnav-center{flex:0 0 80px}
+  .bnav-center-btn{width:52px;height:52px;font-size:1.6rem;transform:translateY(-14px)}
+}
+@media(max-width:899px){
+  .nav-logo{font-size:1.6rem;margin-right:10px;margin-left:5px}
+}
+@media(min-width:900px){
+  body:has(.bottom-nav) .nav-logo{display:none}
+}
+
+/* ── macaroon category cards (browse.html) ── */
+.cat-card{border-color:transparent!important;background:color-mix(in srgb,var(--mc,#fff) 40%,#fff)!important}
+.cat-card .cat-icon-wrap{background:rgba(255,255,255,.85)!important;border-radius:16px}
+.cat-card .cat-icon-wrap .fxi{width:1.1em;height:1.0em}
+.cat-card .cat-icon-wrap{width:42px;height:42px}
+.cat-card .cat-name{color:var(--navy);font-weight:700}
+.cat-card.selected{outline:2px solid var(--brand);outline-offset:-2px}
+#cat-home{--mc:#CFE0F7} #cat-auto{--mc:#FBD8B8} #cat-garden{--mc:#CBEBD2}
+#cat-elec{--mc:#FAEBA6} #cat-beauty{--mc:#F7CDE2} #cat-edu{--mc:#D9EFC2}
+#cat-health{--mc:#BDE8DF} #cat-tech{--mc:#D6D3F7} #cat-build{--mc:#F8C9C3}
+#cat-clean{--mc:#C3E5F4} #cat-pet{--mc:#F2DFC4} #cat-event{--mc:#E4CFF3}

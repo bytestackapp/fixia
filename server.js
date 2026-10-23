@@ -5,22 +5,21 @@
  *  © ByteStack Labs 2025. All Rights Reserved.
  * ═══════════════════════════════════════════════════════════════
  *
- *  - Serves static files from /public
+ *  - Serves pages from /public and css/js/images/sw.js/manifest.json from the project root
  *  - Proxies /api/* calls to your live Vercel deployment
- *  - Run via fixia.bat or: node server.js
+ *  - Run via: node server.js
  * ═══════════════════════════════════════════════════════════════
  */
 
-const http      = require('http');
-const https     = require('https');
-const fs        = require('fs');
-const path      = require('path');
-const url       = require('url');
+const http  = require('http');
+const https = require('https');
+const fs    = require('fs');
+const path  = require('path');
+const url   = require('url');
 
 const PORT       = 3200;
-const VERCEL_URL = 'https://gofixia.vercel.app'; // your live Vercel URL
+const VERCEL_URL = 'https://gofixia.vercel.app'; // your live Vercel URL (update to your new domain)
 
-// MIME types for static files
 const MIME = {
   '.html': 'text/html',
   '.js':   'application/javascript',
@@ -45,7 +44,7 @@ const server = http.createServer((req, res) => {
   // ── CORS headers for all responses ──────────────────────────
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-session-token, x-user-id');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -67,9 +66,9 @@ const server = http.createServer((req, res) => {
         headers: {
           'Content-Type':   'application/json',
           'Content-Length': Buffer.byteLength(body),
-          ...(req.headers.authorization       ? { 'Authorization':    req.headers.authorization } : {}),
-          ...(req.headers['x-session-token']  ? { 'x-session-token':  req.headers['x-session-token'] } : {}),
-          ...(req.headers['x-user-id']        ? { 'x-user-id':        req.headers['x-user-id'] } : {}),
+          ...(req.headers.authorization       ? { 'Authorization':   req.headers.authorization } : {}),
+          ...(req.headers['x-session-token']  ? { 'x-session-token': req.headers['x-session-token'] } : {}),
+          ...(req.headers['x-user-id']        ? { 'x-user-id':       req.headers['x-user-id'] } : {}),
         },
       };
 
@@ -104,19 +103,24 @@ const server = http.createServer((req, res) => {
   const baseDir  = isAsset ? __dirname : path.join(__dirname, 'public');
   const fullPath = path.normalize(path.join(baseDir, filePath));
 
-  if (!fullPath.startsWith(baseDir)) {          // block ../ path traversal
-    res.writeHead(403); res.end('Forbidden'); return;
+  // Block ../ path traversal (the ONLY access check needed)
+  if (!fullPath.startsWith(baseDir)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('Forbidden');
+    return;
   }
 
   const mimeType = MIME[path.extname(fullPath)] || 'application/octet-stream';
-  if (!fullPath.startsWith(path.join(__dirname, 'public'))) { res.writeHead(403); return res.end('Forbidden'); }
-  if (!fullPath.startsWith(path.join(__dirname, 'public'))) { res.writeHead(403); return res.end('Forbidden'); }
+
   fs.readFile(fullPath, (err, data) => {
     if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('404 Not Found: ' + filePath);
     } else {
-      res.writeHead(200, { 'Content-Type': mimeType });
+      res.writeHead(200, {
+        'Content-Type':  mimeType,
+        'Cache-Control': 'no-store',   // dev only: avoid stale files
+      });
       res.end(data);
     }
   });
