@@ -40,9 +40,6 @@ FX.getSetting=async k=>{const rows=await sbFetch('app_settings?select=key,value'
 /* initAds ran twice per page (auto + explicit) */
 {const oi=FX.initAds.bind(FX);let ip;FX.initAds=()=>ip||(ip=oi());}
 
-/* storage deletes now need the session headers (endpoint is authenticated) */
-window.sbDelete=async u=>{try{if(!u)return;const s=FX.getSession()||{};await fetch('/api/delete-storage-file',{method:'POST',headers:{'Content-Type':'application/json','x-session-token':s.sessionToken||'','x-user-id':s.userId||''},body:JSON.stringify({publicUrl:u})});}catch(e){console.warn(e);}};
-
 /* password reset via server (browser can no longer read reset tokens) */
 const pr=b=>fetch('/api/password-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
 FX.sendPasswordReset=async email=>{await pr({action:'request',email});};

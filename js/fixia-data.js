@@ -145,9 +145,14 @@ async function sbFetch(path, options = {}) {
 async function sbDelete(publicUrl) {
   try {
     if (!publicUrl) return;
+    const s = (() => { try { return JSON.parse(localStorage.getItem('fx_session') || 'null'); } catch { return null; } })() || {};
     await fetch('/api/delete-storage-file', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':    'application/json',
+        'x-session-token': s.sessionToken || '',
+        'x-user-id':       s.userId       || '',
+      },
       body: JSON.stringify({ publicUrl }),
     });
   } catch(e) { console.warn('Storage delete failed:', e); }
@@ -1290,48 +1295,6 @@ async syncSaved() {
   },
 
   /* ════════════════════════════════════════════════════════════
-     PASSWORD RESET
-  ════════════════════════════════════════════════════════════ */
-  async sendPasswordReset(email) {
-    const user = await this.getUserByEmail(email);
-    if (!user) return; // Silent — don't reveal if email exists
-
-    const token   = genId().replace(/-/g, '');
-    const expires = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
-
-    // Store token
-    await sbFetch('password_resets', {
-      method: 'POST',
-      body: JSON.stringify({ user_id: user.id, token, expires_at: expires, used: false })
-    });
-
-    // Send email
-    await this.sendEmail('reset_password', {
-      fullName: `${user.first_name} ${user.last_name}`,
-      email:    user.email,
-      token,
-    });
-  },
-
-  async validateResetToken(token) {
-    const rows = await sbFetch(
-      `password_resets?token=eq.${token}&used=eq.false&expires_at=gt.${new Date().toISOString()}&limit=1`
-    );
-    return rows?.length ? rows[0] : null;
-  },
-
-  async consumeResetToken(token, newPassword) {
-    const record = await this.validateResetToken(token);
-    if (!record) throw new Error('Invalid or expired reset link.');
-    await this.updateUser(record.user_id, { password: newPassword });
-    await sbFetch(`password_resets?id=eq.${record.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ used: true }),
-      prefer: 'return=minimal'
-    });
-  },
-
-  /* ════════════════════════════════════════════════════════════
      ADMIN — STATS
   ════════════════════════════════════════════════════════════ */
 async getStats() {
@@ -2144,10 +2107,6 @@ const FX_MESSAGES = {
    * recipients: 'all' | 'regulars' | 'providers' | { userId: '...' }
    * Snapshots template content into each user_messages row.
    */
-  async sendMessage(templateId, recipients) {
-    return await apiFetch('sendMessage', { templateId, recipients });
-  },
-  
   async sendMessage(templateId, recipients) {
     return await apiFetch('sendMessage', { templateId, recipients });
   },

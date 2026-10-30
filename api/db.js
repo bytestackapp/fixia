@@ -530,8 +530,6 @@ const actions = {
       type:                     data.type,
       name:                     data.name,
       price:                    data.price,
-      period:                   data.period        || 'month',
-      listing_limit: data.listingLimit ?? 5,
       listing_limit: data.listingLimit ?? 5,
       booking_limit: data.bookingLimit ?? 5,
       referral_points_required: data.referralPointsRequired ?? 0,
