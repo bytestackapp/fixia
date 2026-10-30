@@ -504,7 +504,7 @@
         <div class="faq-q" onclick="toggleFaq(this)">
           What is an Elite Provider badge? <i class="fa-solid fa-chevron-down faq-arrow"></i>
         </div>
-        <div class="faq-a">The Elite badge (👑) is awarded by Fixia to top-performing providers based on their ratings, reliability, and customer feedback. It is not purchased — it is earned. Elite providers appear more prominently in search results and have greater visibility to potential customers.</div>
+        <div class="faq-a">The Elite badge (<i class="fa-solid fa-crown fxi fxi-amber"></i>) is awarded by Fixia to top-performing providers based on their ratings, reliability, and customer feedback. It is not purchased — it is earned. Elite providers appear more prominently in search results and have greater visibility to potential customers.</div>
       </div>
 
       <!-- RATINGS & REVIEWS -->
@@ -694,7 +694,7 @@ async function doLoginPresignup(isAdmin) {
     setTimeout(() => { window.location.href = 'demo-home.html'; }, 900);
 
   } catch(e) {
-    showAlert('loginAlert', '⚠️ ' + (e.message || 'Something went wrong. Please try again.'));
+    showAlert('loginAlert', '' + (e.message || 'Something went wrong. Please try again.'));
   } finally {
     btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
   }
@@ -821,17 +821,17 @@ async function doLogin() {
     }
     if (result.user.status === 'pending' && result.user.role !== 'provider' && result.user.role !== 'regular') {
       FX.clearSession();
-      showAlert('loginAlert', '⏳ Your account is pending approval. We\'ll notify you by email once approved.', 'info');
+      showAlert('loginAlert', 'Your account is pending approval. We\'ll notify you by email once approved.', 'info');
       return;
     }
     if (result.user.status === 'rejected') {
       FX.clearSession();
-      showAlert('loginAlert', '❌ Your account application was not approved. Contact support for details.', 'error');
+      showAlert('loginAlert', 'Your account application was not approved. Contact support for details.', 'error');
       return;
     }
     if (result.user.status === 'suspended') {
       FX.clearSession();
-      showAlert('loginAlert', '🚫 Your account has been suspended. Please contact support for assistance.', 'error');
+      showAlert('loginAlert', 'Your account has been suspended. Please contact support for assistance.', 'error');
       return;
     }
 
@@ -850,7 +850,7 @@ async function doLogin() {
     
       } catch(e) {
         console.error('[Fixia Login Error]', e);
-        showAlert('loginAlert', '⚠️ ' + (e.message || 'Something went wrong. Please try again.'));
+        showAlert('loginAlert', '' + (e.message || 'Something went wrong. Please try again.'));
       } finally {
         btn.disabled = false; spinner.classList.remove('on'); btnText.style.display = '';
       }
@@ -872,7 +872,7 @@ async function doForgot() {
 
   try {
     await FX.sendPasswordReset(email);
-    showAlert('forgotAlert', '✅ If that email is registered, a reset link has been sent. Check your inbox.', 'success');
+    showAlert('forgotAlert', 'If that email is registered, a reset link has been sent. Check your inbox.', 'success');
   } catch(e) {
     showAlert('forgotAlert', 'Failed to send reset email. Please try again.');
   } finally {

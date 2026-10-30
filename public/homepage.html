@@ -406,7 +406,7 @@
 <!-- ── GUEST BANNER (hidden for logged-in users) ─────────── -->
 <div class="guest-banner" id="guestBanner" style="display:none;">
   <div class="guest-banner-text">
-    <strong>👋 Welcome to Fixia!</strong>
+    <strong><i class="fa-solid fa-hand fxi"></i> Welcome to Fixia!</strong>
     Sign in to see providers, search services, and contact professionals.
   </div>
   <div style="display:flex;gap:6px;flex-shrink:0;">
@@ -535,7 +535,7 @@
 <div class="gate-overlay" id="gateOverlay" onclick="handleGateOverlayClick(event)">
   <div class="gate-sheet">
     <div class="gate-handle"></div>
-    <div class="gate-icon" id="gateIcon">🔒</div>
+    <div class="gate-icon" id="gateIcon"><i class="fa-solid fa-lock fxi"></i></div>
     <div class="gate-title" id="gateTitle">Sign In to Continue</div>
     <div class="gate-sub" id="gateSub">Create a free account to browse providers, search services, and get in touch with professionals near you.</div>
     <div class="gate-actions">
@@ -845,7 +845,7 @@ const IS_GUEST = !FX.getSession();
 
 function gate(icon, title, sub) {
   if (!IS_GUEST) return false;
-  document.getElementById('gateIcon').textContent  = icon  || '🔒';
+  document.getElementById('gateIcon').innerHTML  = icon  || '<i class="fa-solid fa-lock fxi"></i>';
   document.getElementById('gateTitle').textContent = title || 'Sign In to Continue';
   document.getElementById('gateSub').textContent   = sub   || 'Create a free account to access this feature.';
   document.getElementById('gateOverlay').classList.add('active');
@@ -860,14 +860,14 @@ function handleGateOverlayClick(e) {
 
 /* ── Category emoji map ─────────────────────────────────────── */
 const CAT_EMOJI = {
-  home:'🏠', auto:'🚗', garden:'🌿', elec:'⚡',
-  beauty:'💇', health:'🩺', tech:'💻', build:'🔨',
-  clean:'🧹', pet:'🐾', event:'🎉'
+  home:'<i class="fa-solid fa-house fxi"></i>', auto:'<i class="fa-solid fa-car fxi"></i>', garden:'<i class="fa-solid fa-leaf fxi"></i>', elec:'<i class="fa-solid fa-bolt fxi"></i>',
+  beauty:'<i class="fa-solid fa-scissors fxi"></i>', health:'<i class="fa-solid fa-stethoscope fxi"></i>', tech:'<i class="fa-solid fa-laptop fxi"></i>', build:'<i class="fa-solid fa-hammer fxi"></i>',
+  clean:'<i class="fa-solid fa-broom fxi"></i>', pet:'<i class="fa-solid fa-paw fxi"></i>', event:'<i class="fa-solid fa-party-horn fxi"></i>'
 };
 
 /* ── Render a featured provider card ────────────────────────── */
 function renderFeaturedCard(p) {
-  const emoji = CAT_EMOJI[p.cat_main] || '🔧';
+  const emoji = CAT_EMOJI[p.cat_main] || '<i class="fa-solid fa-wrench fxi"></i>';
   const bgMap = {
     home:'linear-gradient(135deg,#1e3c72,#2a5298)',
     auto:'linear-gradient(135deg,#1a1a2e,#16213e)',
@@ -895,7 +895,7 @@ function renderFeaturedCard(p) {
         <div class="fc-badge"><i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}</div>
       </div>
       <div class="fc-body">
-        <div class="fc-name">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+        <div class="fc-name">${p.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.biz_name)}</div>
         <div class="fc-service">${esc(p._listing_cats?.[0] || p.cat_sub || '—')}</div>
         <div class="fc-loc"><i class="fa-solid fa-location-dot"></i> ${esc(p.province_name || p.city_name?.replace(/^City of (.+)/, '$1 City') || '—')}</div>
       </div>
@@ -904,7 +904,7 @@ function renderFeaturedCard(p) {
 
 /* ── Render a nearby provider card ──────────────────────────── */
 function renderNearbyCard(p) {
-  const emoji = CAT_EMOJI[p._listing_cats_main?.[0] || p.cat_main] || '🔧';
+  const emoji = CAT_EMOJI[p._listing_cats_main?.[0] || p.cat_main] || '<i class="fa-solid fa-wrench fxi"></i>';
   const stars = Array.from({length:5}, (_,i) =>
     `<i class="fa-${i < Math.round(p.avg_rating) ? 'solid' : 'regular'} fa-star"></i>`
   ).join('');
@@ -917,7 +917,7 @@ function renderNearbyCard(p) {
         ${p.status === 'approved' ? '<div class="online-dot"></div>' : ''}
       </div>
       <div class="provider-info">
-        <div class="provider-name">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+        <div class="provider-name">${p.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.biz_name)}</div>
         <div class="provider-service">${esc(p._listing_cats?.[0] || p.cat_sub || '—')}</div>
         <div class="provider-meta">
           <div class="stars-row">${stars}<span>${p.avg_rating || 0} (${p.total_ratings || 0})</span></div>
@@ -927,7 +927,7 @@ function renderNearbyCard(p) {
         </div>
       </div>
       <div class="provider-action">
-        ${p.status === 'approved' ? '<div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>' : '<div class="verified-badge" style="background:var(--red);color:#fff;">⚠ Unverified</div>'}
+        ${p.status === 'approved' ? '<div class="verified-badge"><i class="fa-solid fa-check"></i> Verified</div>' : '<div class="verified-badge" style="background:var(--red);color:#fff;"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Unverified</div>'}
       </div>
     </div>`;
 }
@@ -948,7 +948,7 @@ async function loadHomepageData() {
     document.getElementById('featuredList').innerHTML =
       `<div style="text-align:center;padding:1rem;color:var(--text-3);font-size:0.8rem;">
         ${e.message.includes('not configured')
-          ? '⚠️ Supabase not configured. Update SUPA_URL and SUPA_KEY in fixia-data.js'
+          ? '<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Supabase not configured. Update SUPA_URL and SUPA_KEY in fixia-data.js'
           : 'Could not load featured providers.'
         }
        </div>`;
@@ -1031,7 +1031,7 @@ try {
     const grid = document.getElementById('nearbyGrid');
     if (grid) grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-3);font-size:0.82rem;">
       ${e.message.includes('not configured')
-        ? '⚠️ Supabase not configured. Update fixia-data.js'
+        ? '<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Supabase not configured. Update fixia-data.js'
         : 'Could not load providers. Check your connection.'
       }
     </div>`;
@@ -1055,7 +1055,7 @@ try {
 
   // Search — gated for guests
   document.getElementById('searchInput').addEventListener('focus', () => {
-    if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) {
+    if (gate('<i class="fa-solid fa-magnifying-glass fxi"></i>', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) {
       document.getElementById('searchInput').blur();
     }
   });
@@ -1063,7 +1063,7 @@ try {
     if (e.key === 'Enter') {
       const q = e.target.value.trim();
       if (!q) return;
-      if (gate('🔍', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) return;
+      if (gate('<i class="fa-solid fa-magnifying-glass fxi"></i>', 'Search is for Members', 'Sign in or create a free account to search for services near you.')) return;
       window.location.href = `search.html?q=${encodeURIComponent(q)}`;
     }
   });
@@ -1080,7 +1080,7 @@ if (!IS_GUEST && typeof Notification !== 'undefined' && Notification.permission 
 /* ── Gate wrappers — override functions defined above ────────── */
 const _openProvider = openProvider;
 openProvider = function(id) {
-  if (gate('👷', 'See Full Provider Details', 'Sign in to view contact info, portfolio, and ratings — then get in touch directly.')) return;
+  if (gate('<i class="fa-solid fa-helmet-safety fxi"></i>', 'See Full Provider Details', 'Sign in to view contact info, portfolio, and ratings — then get in touch directly.')) return;
   _openProvider(id);
 };
 
@@ -1088,7 +1088,7 @@ let activeFilter = 'nearby';
 
 function setFilter(el, key) {
   if (IS_GUEST && ['nearby','top','verified'].includes(key)) {
-    gate('📍', 'Filter is for Members', 'Sign in to filter providers by location, rating, and availability.');
+    gate('<i class="fa-solid fa-location-dot fxi"></i>', 'Filter is for Members', 'Sign in to filter providers by location, rating, and availability.');
     return;
   }
   activeFilter = key;
@@ -1101,18 +1101,18 @@ function setFilter(el, key) {
 }
 
 function browseSubcat(cat, sub) {
-  if (gate('🔎', 'Browse Providers', 'Create a free account to browse all providers by category near you.')) return;
+  if (gate('<i class="fa-solid fa-magnifying-glass fxi"></i>', 'Browse Providers', 'Create a free account to browse all providers by category near you.')) return;
   window.location.href = `search.html?cat=${cat}&sub=${encodeURIComponent(sub)}`;
 }
 
 const _openSearch = openSearch;
 openSearch = function() {
-  if (gate('🔍', 'Search is for Members', 'Sign in to search for any service or provider.')) return;
+  if (gate('<i class="fa-solid fa-magnifying-glass fxi"></i>', 'Search is for Members', 'Sign in to search for any service or provider.')) return;
   _openSearch();
 };
 
 openNotif = function() {
-  if (gate('🔔', 'Sign In for Notifications', 'Log in to see your activity and updates.')) return;
+  if (gate('<i class="fa-solid fa-bell fxi"></i>', 'Sign In for Notifications', 'Log in to see your activity and updates.')) return;
   window.location.href = 'notifications.html';
 };
 

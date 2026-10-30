@@ -242,7 +242,7 @@ function render() {
   if (!session) {
     body.innerHTML = `
       <div class="guest-wall">
-        <div class="guest-wall-icon">🔖</div>
+        <div class="guest-wall-icon"><i class="fa-solid fa-bookmark fxi"></i></div>
         <div class="guest-wall-title">Save Your Favourite Providers</div>
         <div class="guest-wall-sub">
           Sign in to bookmark providers you like and find them quickly next time — no more scrolling through search results again.
@@ -261,7 +261,7 @@ function render() {
   if (!saved.length) {
     body.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">🔖</div>
+        <div class="empty-icon"><i class="fa-solid fa-bookmark fxi"></i></div>
         <div class="empty-title">No Saved Providers Yet</div>
         <div class="empty-sub">
           When you find a provider you like, tap the bookmark icon on their profile to save them here for quick access later.
@@ -302,7 +302,7 @@ function renderCards(saved) {
             : catEmoji(p.catMain)}
         </div>
           <div class="provider-info">
-            <div class="provider-name">${p.isElite ? '👑 ' : ''}${esc(p.bizName)}</div>
+            <div class="provider-name">${p.isElite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.bizName)}</div>
             <div class="provider-service">${p.catSub || '—'}</div>
           </div>
         </div>
@@ -347,8 +347,8 @@ function confirmClearAll() {
 }
 
 function catEmoji(cat) {
-  const map = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
-  return map[cat] || '🔧';
+  const map = {home:'<i class="fa-solid fa-house fxi"></i>',auto:'<i class="fa-solid fa-car fxi"></i>',garden:'<i class="fa-solid fa-leaf fxi"></i>',elec:'<i class="fa-solid fa-bolt fxi"></i>',beauty:'<i class="fa-solid fa-scissors fxi"></i>',health:'<i class="fa-solid fa-stethoscope fxi"></i>',tech:'<i class="fa-solid fa-laptop fxi"></i>',build:'<i class="fa-solid fa-hammer fxi"></i>',clean:'<i class="fa-solid fa-broom fxi"></i>',pet:'<i class="fa-solid fa-paw fxi"></i>',event:'<i class="fa-solid fa-party-horn fxi"></i>'};
+  return map[cat] || '<i class="fa-solid fa-wrench fxi"></i>';
 }
 
 let toastTimer;

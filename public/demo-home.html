@@ -222,7 +222,7 @@
 <!-- ── EARLY ACCESS BANNER ──────────────────────────────────── -->
 <div class="early-banner" id="earlyBanner">
   <div class="early-banner-text">
-    <strong>🚀 You're in Early Access!</strong>
+    <strong><i class="fa-solid fa-rocket fxi"></i> You're in Early Access!</strong>
     Full launch coming soon — explore a preview of what's ahead.
   </div>
   <button class="early-dismiss" onclick="dismissBanner()" title="Dismiss">
@@ -244,16 +244,16 @@
   <section class="cats-section">
     <div class="section-label"><div class="dot"></div> Browse by Category</div>
     <div class="cats-scroll">
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🔧</span> Plumbing</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>⚡</span> Electrical</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🧹</span> Cleaning</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🎨</span> Painting</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>❄️</span> Aircon</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🛠️</span> Carpentry</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🌿</span> Landscaping</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>📦</span> Moving</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>🔒</span> Security</div>
-      <div class="cat-pill" onclick="comingSoon('browse')"><span>📱</span> Tech Repair</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-wrench fxi"></i></span> Plumbing</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-bolt fxi"></i></span> Electrical</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-broom fxi"></i></span> Cleaning</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-palette fxi"></i></span> Painting</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-snowflake fxi"></i></span> Aircon</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-wrench fxi"></i></span> Carpentry</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-leaf fxi"></i></span> Landscaping</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-box fxi"></i></span> Moving</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-lock fxi"></i></span> Security</div>
+      <div class="cat-pill" onclick="comingSoon('browse')"><span><i class="fa-solid fa-mobile fxi"></i></span> Tech Repair</div>
     </div>
   </section>
 
@@ -265,7 +265,7 @@
 
   <!-- Ad Banner -->
   <div class="ad-banner" onclick="comingSoon('provider')" style="margin:14px 16px 0;">
-    <div class="ad-icon">🎁</div>
+    <div class="ad-icon"><i class="fa-solid fa-gift fxi"></i></div>
     <div class="ad-text">
       <div class="ad-label">Early Access Offer</div>
       <div class="ad-title">List your services for free</div>
@@ -340,7 +340,7 @@
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
           <div style="font-size:2rem;font-weight:900;color:var(--navy);line-height:1;" id="dpRatingBig"></div>
           <div>
-            <div style="font-size:1.5rem;color:var(--gold);line-height:1;">★</div>
+            <div style="font-size:1.5rem;color:var(--gold);line-height:1;"><i class="fa-solid fa-star fxi fxi-amber"></i></div>
             <div style="font-size:0.72rem;font-weight:700;color:var(--text-3);" id="dpRatingLabel"></div>
           </div>
         </div>
@@ -366,7 +366,7 @@
 <div class="cs-overlay" id="csOverlay" onclick="handleCsOverlay(event)">
   <div class="cs-sheet">
     <div class="cs-handle"></div>
-    <div class="cs-icon" id="csIcon">🚀</div>
+    <div class="cs-icon" id="csIcon"><i class="fa-solid fa-rocket fxi"></i></div>
     <div class="cs-title" id="csTitle">Coming Soon!</div>
     <div class="cs-sub" id="csSub">This feature will be available when Fixia officially launches. Sign up now to get early access.</div>
     <div class="cs-actions">
@@ -395,17 +395,17 @@
 
 /* ── Dummy Data ────────────────────────────────────────────── */
 const FEATURED = [
-  { id:'f1', name:'Ramon Cruz',  biz:'RamonFix Plumbing', service:'Master Plumber', rating:'4.9', reviews:128, loc:'Quezon City',  avatar:'👨🏽‍🔧', color:'#1a3a2a',
+  { id:'f1', name:'Ramon Cruz',  biz:'RamonFix Plumbing', service:'Master Plumber', rating:'4.9', reviews:128, loc:'Quezon City',  avatar:'<i class="fa-solid fa-user fxi"></i>', color:'#1a3a2a',
     desc:'Licensed master plumber with 12 years of experience. Specializing in leak repairs, pipe installation, bathroom renovation, and emergency plumbing across Metro Manila.',
     services:[{title:'Leak Detection & Repair', price:'₱350/hr', desc:'Fast and accurate leak detection using modern tools.'},{title:'Pipe Installation', price:'₱500/hr', desc:'New pipe layout for residential and commercial units.'},{title:'Bathroom Renovation', price:'₱8,000+', desc:'Full bathroom plumbing overhaul including fixtures.'}],
     reviews_data:[{name:'Ben T.', stars:5, date:'May 2025', comment:'Super bilis mag-ayos! Professional talaga si Kuya Ramon.'},{name:'Anna L.', stars:5, date:'Apr 2025', comment:'Fixed our leak in under an hour. Highly recommended!'}],
     city:'Quezon City', member:'January 2023', elite:true, featured:true },
-  { id:'f2', name:'Ana Reyes',   biz:'Ana Creative Paints', service:'Interior Painter', rating:'4.8', reviews:94, loc:'Makati', avatar:'👩🏽‍🎨', color:'#2a1a3a',
+  { id:'f2', name:'Ana Reyes',   biz:'Ana Creative Paints', service:'Interior Painter', rating:'4.8', reviews:94, loc:'Makati', avatar:'<i class="fa-solid fa-user fxi"></i>', color:'#2a1a3a',
     desc:'Professional interior and exterior painter. Clean, odor-managed work with premium paints. Serving BGC, Makati, and Mandaluyong with 8 years of experience.',
     services:[{title:'Interior Painting (per room)', price:'₱2,500+', desc:'Walls, ceiling, and trim. Paint brand of your choice.'},{title:'Exterior Painting', price:'₱5,000+', desc:'Weather-resistant paints for gates, fences, facades.'},{title:'Furniture Repainting', price:'₱800+', desc:'Restore old furniture with a fresh coat.'}],
     reviews_data:[{name:'Mark S.', stars:5, date:'May 2025', comment:'Napakaganda ng output! Walang mantsa, malinis ang trabaho.'},{name:'Lyn P.', stars:4, date:'Mar 2025', comment:'Great painter, on time and very tidy.'}],
     city:'Makati', member:'March 2022', elite:false, featured:true },
-  { id:'f3', name:'Jose Santos',  biz:'Santos Electrical Services', service:'Electrical Works', rating:'5.0', reviews:203, loc:'Pasig', avatar:'👨🏽‍💼', color:'#1a2a3a',
+  { id:'f3', name:'Jose Santos',  biz:'Santos Electrical Services', service:'Electrical Works', rating:'5.0', reviews:203, loc:'Pasig', avatar:'<i class="fa-solid fa-user fxi"></i>', color:'#1a2a3a',
     desc:'PRC-licensed electrician offering residential and commercial electrical services. Over 15 years of safe, code-compliant work across Metro Manila.',
     services:[{title:'Panel Board Installation', price:'₱3,500+', desc:'Upgrade or install new circuit breaker panels.'},{title:'Outlet & Wiring Works', price:'₱250/point', desc:'Add new outlets, switches, or rewire existing circuits.'},{title:'Emergency Electrical Repair', price:'₱500 callout + labor', desc:'24/7 emergency response for electrical issues.'}],
     reviews_data:[{name:'Rico V.', stars:5, date:'May 2025', comment:'Legit na licensed electrician. Maayos at mabilis!'},{name:'Clara J.', stars:5, date:'Apr 2025', comment:'Fixed our panel board. No issues since. 10/10!'}],
@@ -413,32 +413,32 @@ const FEATURED = [
 ];
 
 const NEARBY = [
-  { id:'n1', name:'Maria Dela Cruz',    biz:'Maria Clean PH', service:'Home Cleaning Specialist',    rating:'4.9', reviews:87,  loc:'Mandaluyong', dist:'1.2 km', avatar:'👩🏽‍💼', online:true,  verified:true,
+  { id:'n1', name:'Maria Dela Cruz',    biz:'Maria Clean PH', service:'Home Cleaning Specialist',    rating:'4.9', reviews:87,  loc:'Mandaluyong', dist:'1.2 km', avatar:'<i class="fa-solid fa-user fxi"></i>', online:true,  verified:true,
     desc:'Meticulous home cleaning professional. Experienced in deep cleaning, post-construction cleanup, and regular maintenance cleaning. Trusted by over 80 households.',
     services:[{title:'Regular Home Cleaning', price:'₱600/session', desc:'Dusting, mopping, vacuuming, kitchen and bathroom cleaning.'},{title:'Deep Cleaning', price:'₱1,500+', desc:'Full top-to-bottom deep clean including appliances.'}],
     reviews_data:[{name:'Trish A.', stars:5, date:'May 2025', comment:'Our go-to cleaner! Always thorough and on time.'},{name:'James K.', stars:5, date:'Apr 2025', comment:'Left the place spotless. Highly recommend!'}],
     city:'Mandaluyong', member:'February 2023', elite:false, featured:false },
-  { id:'n2', name:'Carlos Mendoza',     biz:'CoolBreeze Aircon Services', service:'Aircon Installation & Repair', rating:'4.7', reviews:142, loc:'Taguig', dist:'2.4 km', avatar:'👨🏽‍🔧', online:true,  verified:true,
+  { id:'n2', name:'Carlos Mendoza',     biz:'CoolBreeze Aircon Services', service:'Aircon Installation & Repair', rating:'4.7', reviews:142, loc:'Taguig', dist:'2.4 km', avatar:'<i class="fa-solid fa-user fxi"></i>', online:true,  verified:true,
     desc:'Certified aircon technician with expertise in all major brands — Daikin, Carrier, Panasonic, Samsung. Installation, cleaning, and repair for homes and offices.',
     services:[{title:'Aircon Cleaning (window type)', price:'₱350', desc:'Coil wash and general cleaning.'},{title:'Aircon Installation', price:'₱1,200+', desc:'Supply and install bracket, copper tubing, and drain line.'},{title:'Refrigerant Recharge', price:'₱800+', desc:'Check for leaks and recharge Freon.'}],
     reviews_data:[{name:'Noel B.', stars:5, date:'May 2025', comment:'Maasikaso at mabilis! Malamig na ulit ang aircon namin.'},{name:'Sha R.', stars:4, date:'Apr 2025', comment:'Good service, fair price.'}],
     city:'Taguig', member:'August 2022', elite:false, featured:false },
-  { id:'n3', name:'Liza Bautista',      biz:'Liza Custom Carpentry', service:'Carpentry & Furniture',    rating:'4.8', reviews:61,  loc:'Pasay', dist:'3.1 km', avatar:'👩🏽‍', online:false, verified:true,
+  { id:'n3', name:'Liza Bautista',      biz:'Liza Custom Carpentry', service:'Carpentry & Furniture',    rating:'4.8', reviews:61,  loc:'Pasay', dist:'3.1 km', avatar:'<i class="fa-solid fa-user fxi"></i>‍', online:false, verified:true,
     desc:'Custom furniture maker and carpenter. Cabinets, shelves, bed frames, and table sets made to order. 10 years crafting quality pieces for homes across Manila.',
     services:[{title:'Custom Cabinet', price:'₱5,000+', desc:'Kitchen, bedroom, or living room cabinets to spec.'},{title:'Furniture Repair', price:'₱500+', desc:'Fix broken chairs, tables, drawers, and more.'}],
     reviews_data:[{name:'Gino P.', stars:5, date:'Apr 2025', comment:'Gawa niya yung cabinet namin — sobrang ganda at matibay!'},{name:'Cel M.', stars:5, date:'Mar 2025', comment:'Very skilled and detail-oriented.'}],
     city:'Pasay', member:'November 2022', elite:false, featured:false },
-  { id:'n4', name:'Roberto Villanueva', biz:'SecureView CCTV', service:'Security & CCTV Setup', rating:'4.6', reviews:55,  loc:'Parañaque', dist:'3.8 km', avatar:'👨🏽‍💻', online:true,  verified:false,
+  { id:'n4', name:'Roberto Villanueva', biz:'SecureView CCTV', service:'Security & CCTV Setup', rating:'4.6', reviews:55,  loc:'Parañaque', dist:'3.8 km', avatar:'<i class="fa-solid fa-user fxi"></i>', online:true,  verified:false,
     desc:'CCTV installation specialist for homes and small businesses. NVR/DVR setup, camera placement planning, remote viewing configuration, and maintenance.',
     services:[{title:'CCTV Installation (2 cameras)', price:'₱4,500+', desc:'Supply and install 2 HD cameras with DVR.'},{title:'Remote Viewing Setup', price:'₱500', desc:'Configure mobile app access to your CCTV.'}],
     reviews_data:[{name:'Remy O.', stars:5, date:'Apr 2025', comment:'Malinaw ang camera, maganda ang setup. Salamat!'},{name:'Dave T.', stars:4, date:'Mar 2025', comment:'Good work, responsive.'}],
     city:'Parañaque', member:'May 2023', elite:false, featured:false },
-  { id:'n5', name:'Grace Aquino',       biz:'GraceClean Sanitation', service:'Deep Cleaning & Sanitation', rating:'5.0', reviews:210, loc:'Las Piñas', dist:'4.2 km', avatar:'👩🏽‍⚕️', online:false, verified:true,
+  { id:'n5', name:'Grace Aquino',       biz:'GraceClean Sanitation', service:'Deep Cleaning & Sanitation', rating:'5.0', reviews:210, loc:'Las Piñas', dist:'4.2 km', avatar:'<i class="fa-solid fa-user fxi"></i>', online:false, verified:true,
     desc:'Sanitation and disinfection expert. Specializing in post-flood cleanup, post-construction, and full-property disinfection. Serving Las Piñas, Muntinlupa, and Alabang.',
     services:[{title:'Full Property Disinfection', price:'₱2,000+', desc:'EPA-approved disinfectants, full coverage.'},{title:'Post-Flood Cleanup', price:'₱3,500+', desc:'Debris removal, drying, and disinfection.'}],
     reviews_data:[{name:'Tony L.', stars:5, date:'May 2025', comment:'Best cleaning service! Sobrang linis after nila.'},{name:'Luz F.', stars:5, date:'Apr 2025', comment:'Professional and very thorough.'}],
     city:'Las Piñas', member:'September 2021', elite:false, featured:false },
-  { id:'n6', name:'Dante Reyes',        biz:'GreenScape Garden PH', service:'Landscaping & Garden Care', rating:'4.8', reviews:78,  loc:'Muntinlupa', dist:'5.0 km', avatar:'👨🏽‍🌾', online:true,  verified:true,
+  { id:'n6', name:'Dante Reyes',        biz:'GreenScape Garden PH', service:'Landscaping & Garden Care', rating:'4.8', reviews:78,  loc:'Muntinlupa', dist:'5.0 km', avatar:'<i class="fa-solid fa-user fxi"></i>', online:true,  verified:true,
     desc:'Professional landscaper and garden maintenance specialist. Garden design, lawn care, tree trimming, and plant installation for residential properties.',
     services:[{title:'Garden Maintenance', price:'₱800/visit', desc:'Mowing, trimming, weeding, and watering.'},{title:'Landscape Design & Install', price:'₱5,000+', desc:'Full garden redesign with plants and hardscape.'}],
     reviews_data:[{name:'Mila C.', stars:5, date:'May 2025', comment:'Ang ganda ng garden namin ngayon. Talentado si Kuya Dante!'},{name:'Rod B.', stars:5, date:'Apr 2025', comment:'Very creative and hardworking.'}],
@@ -513,9 +513,9 @@ function openDemoProvider(id) {
   document.getElementById('dpRatingLabel').textContent = `Based on ${p.reviews} reviews`;
 
   // Badges
-  let badges = '<span class="dpbadge dpbadge-green">✅ Verified</span>';
-  if (p.elite)    badges += ' <span class="dpbadge dpbadge-gold">👑 Fixia Elite</span>';
-  if (p.featured) badges += ' <span class="dpbadge dpbadge-brand">⭐ Featured</span>';
+  let badges = '<span class="dpbadge dpbadge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span>';
+  if (p.elite)    badges += ' <span class="dpbadge dpbadge-gold"><i class="fa-solid fa-crown fxi fxi-amber"></i> Fixia Elite</span>';
+  if (p.featured) badges += ' <span class="dpbadge dpbadge-brand"><i class="fa-solid fa-star fxi fxi-amber"></i> Featured</span>';
   document.getElementById('dpBadges').innerHTML = badges;
 
   // Details
@@ -566,19 +566,19 @@ function closeDemoProvider() {
 
 /* ── Coming Soon Modal ─────────────────────────────────────── */
 const CS_CONTENT = {
-  search:        { icon:'🔍', title:'Search Coming Soon',        sub:'Find providers by service, name, or location — launching very soon!' },
-  browse:        { icon:'📂', title:'Browse Coming Soon',        sub:'Explore all service categories and filter by location, rating, and more.' },
-  provider:      { icon:'👤', title:'Provider Profiles Coming Soon', sub:'Full provider profiles with reviews, portfolio, and booking — launching soon.' },
-  contact:       { icon:'💬', title:'Messaging Coming Soon',     sub:'Chat directly with providers, request quotes, and schedule jobs.' },
-  notifications: { icon:'🔔', title:'Notifications Coming Soon', sub:"You'll get real-time updates on bookings, messages, and offers at launch." },
-  saved:         { icon:'🔖', title:'Saved Coming Soon',         sub:'Save your favorite providers and revisit them anytime after launch.' },
-  bookings:      { icon:'📋', title:'Bookings Coming Soon',      sub:'Manage all your service bookings, schedules, and history in one place.' },
-  profile:       { icon:'👤', title:'Profile Coming Soon',       sub:'Your personal dashboard — manage your account, settings, and reviews.' },
-  location:      { icon:'📍', title:'Location Filter Coming Soon', sub:'Filter providers by your exact city or barangay when we go live.' },
+  search:        { icon:'<i class="fa-solid fa-magnifying-glass fxi"></i>', title:'Search Coming Soon',        sub:'Find providers by service, name, or location — launching very soon!' },
+  browse:        { icon:'<i class="fa-solid fa-folder fxi"></i>', title:'Browse Coming Soon',        sub:'Explore all service categories and filter by location, rating, and more.' },
+  provider:      { icon:'<i class="fa-solid fa-user fxi"></i>', title:'Provider Profiles Coming Soon', sub:'Full provider profiles with reviews, portfolio, and booking — launching soon.' },
+  contact:       { icon:'<i class="fa-solid fa-comment fxi"></i>', title:'Messaging Coming Soon',     sub:'Chat directly with providers, request quotes, and schedule jobs.' },
+  notifications: { icon:'<i class="fa-solid fa-bell fxi"></i>', title:'Notifications Coming Soon', sub:"You'll get real-time updates on bookings, messages, and offers at launch." },
+  saved:         { icon:'<i class="fa-solid fa-bookmark fxi"></i>', title:'Saved Coming Soon',         sub:'Save your favorite providers and revisit them anytime after launch.' },
+  bookings:      { icon:'<i class="fa-solid fa-clipboard-list fxi"></i>', title:'Bookings Coming Soon',      sub:'Manage all your service bookings, schedules, and history in one place.' },
+  profile:       { icon:'<i class="fa-solid fa-user fxi"></i>', title:'Profile Coming Soon',       sub:'Your personal dashboard — manage your account, settings, and reviews.' },
+  location:      { icon:'<i class="fa-solid fa-location-dot fxi"></i>', title:'Location Filter Coming Soon', sub:'Filter providers by your exact city or barangay when we go live.' },
 };
 
 function comingSoon(type) {
-  const c = CS_CONTENT[type] || { icon:'🚀', title:'Coming Soon!', sub:'This feature will be available at launch.' };
+  const c = CS_CONTENT[type] || { icon:'<i class="fa-solid fa-rocket fxi"></i>', title:'Coming Soon!', sub:'This feature will be available at launch.' };
   document.getElementById('csIcon').textContent  = c.icon;
   document.getElementById('csTitle').textContent = c.title;
   document.getElementById('csSub').textContent   = c.sub;

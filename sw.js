@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v0.0.3';                 // bump on every deployment
+const CACHE_VERSION = 'v0.0.4';                 // bump on every deployment
 const CACHE_NAME = `fixia-${CACHE_VERSION}`;
 const SHELL = ['/css/fixia.css','/css/icons.css','/js/fx-boot.js','/js/fixia-data.js','/js/env-config.js','/homepage.html','/login.html','/manifest.json'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>Promise.allSettled(SHELL.map(u=>c.add(u)))));self.skipWaiting();});

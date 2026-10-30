@@ -179,51 +179,51 @@
   <div class="cat-grid" id="catGrid">
 
     <div class="cat-card" id="cat-home" onclick="openCat('home',this)">
-      <div class="cat-icon-wrap bg-home">🏠</div>
+      <div class="cat-icon-wrap bg-home"><i class="fa-solid fa-house fxi"></i></div>
       <div class="cat-name">Home Services</div>
     </div>
     <div class="cat-card" id="cat-auto" onclick="openCat('auto',this)">
-      <div class="cat-icon-wrap bg-auto">🚗</div>
+      <div class="cat-icon-wrap bg-auto"><i class="fa-solid fa-car fxi"></i></div>
       <div class="cat-name">Automotive</div>
     </div>
     <div class="cat-card" id="cat-garden" onclick="openCat('garden',this)">
-      <div class="cat-icon-wrap bg-garden">🌿</div>
+      <div class="cat-icon-wrap bg-garden"><i class="fa-solid fa-leaf fxi"></i></div>
       <div class="cat-name">Garden & Lawn</div>
     </div>
     <div class="cat-card" id="cat-elec" onclick="openCat('elec',this)">
-      <div class="cat-icon-wrap bg-elec">⚡</div>
+      <div class="cat-icon-wrap bg-elec"><i class="fa-solid fa-bolt fxi"></i></div>
       <div class="cat-name">Electrical</div>
     </div>
     <div class="cat-card" id="cat-beauty" onclick="openCat('beauty',this)">
-      <div class="cat-icon-wrap bg-beauty">💇</div>
+      <div class="cat-icon-wrap bg-beauty"><i class="fa-solid fa-scissors fxi"></i></div>
       <div class="cat-name">Beauty & Wellness</div>
     </div>
     <div class="cat-card" id="cat-edu" onclick="openCat('edu',this)">
-      <div class="cat-icon-wrap bg-edu">📚</div>
+      <div class="cat-icon-wrap bg-edu"><i class="fa-solid fa-book fxi"></i></div>
       <div class="cat-name">Education & Tutoring</div>
     </div>	
     <div class="cat-card" id="cat-health" onclick="openCat('health',this)">
-      <div class="cat-icon-wrap bg-health">🩺</div>
+      <div class="cat-icon-wrap bg-health"><i class="fa-solid fa-stethoscope fxi"></i></div>
       <div class="cat-name">Health & Care</div>
     </div>
     <div class="cat-card" id="cat-tech" onclick="openCat('tech',this)">
-      <div class="cat-icon-wrap bg-tech">💻</div>
+      <div class="cat-icon-wrap bg-tech"><i class="fa-solid fa-laptop fxi"></i></div>
       <div class="cat-name">Tech & IT</div>
     </div>
     <div class="cat-card" id="cat-build" onclick="openCat('build',this)">
-      <div class="cat-icon-wrap bg-build">🔨</div>
+      <div class="cat-icon-wrap bg-build"><i class="fa-solid fa-hammer fxi"></i></div>
       <div class="cat-name">Construction</div>
     </div>
     <div class="cat-card" id="cat-clean" onclick="openCat('clean',this)">
-      <div class="cat-icon-wrap bg-clean">🧹</div>
+      <div class="cat-icon-wrap bg-clean"><i class="fa-solid fa-broom fxi"></i></div>
       <div class="cat-name">Cleaning</div>
     </div>
     <div class="cat-card" id="cat-pet" onclick="openCat('pet',this)">
-      <div class="cat-icon-wrap bg-pet">🐾</div>
+      <div class="cat-icon-wrap bg-pet"><i class="fa-solid fa-paw fxi"></i></div>
       <div class="cat-name">Pet Services</div>
     </div>
     <div class="cat-card" id="cat-event" onclick="openCat('event',this)">
-      <div class="cat-icon-wrap bg-event">🎉</div>
+      <div class="cat-icon-wrap bg-event"><i class="fa-solid fa-party-horn fxi"></i></div>
       <div class="cat-name">Events</div>
     </div>
   </div>
@@ -235,7 +235,7 @@
   <div class="subcat-handle"></div>
   <div class="subcat-head">
     <div class="subcat-head-title">
-      <span id="subcatEmoji">🏠</span>
+      <span id="subcatEmoji"><i class="fa-solid fa-house fxi"></i></span>
       <span id="subcatTitle">Home Services</span>
     </div>
     <button class="subcat-close" onclick="closeSub()"><i class="fa-solid fa-xmark"></i></button>
@@ -285,8 +285,8 @@ const CAT_LABELS = {
 };
 
 const CAT_EMOJIS = {
-  home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',edu:'📚',health:'🩺',
-  tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉',
+  home:'<i class="fa-solid fa-house fxi"></i>',auto:'<i class="fa-solid fa-car fxi"></i>',garden:'<i class="fa-solid fa-leaf fxi"></i>',elec:'<i class="fa-solid fa-bolt fxi"></i>',beauty:'<i class="fa-solid fa-scissors fxi"></i>',edu:'<i class="fa-solid fa-book fxi"></i>',health:'<i class="fa-solid fa-stethoscope fxi"></i>',
+  tech:'<i class="fa-solid fa-laptop fxi"></i>',build:'<i class="fa-solid fa-hammer fxi"></i>',clean:'<i class="fa-solid fa-broom fxi"></i>',pet:'<i class="fa-solid fa-paw fxi"></i>',event:'<i class="fa-solid fa-party-horn fxi"></i>',
 };
 
 let openCatKey = null;
@@ -298,7 +298,7 @@ function openCat(key, el) {
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 
-  document.getElementById('subcatEmoji').textContent = CAT_EMOJIS[key] || '📦';
+  document.getElementById('subcatEmoji').innerHTML = CAT_EMOJIS[key] || '<i class="fa-solid fa-box fxi"></i>';
   document.getElementById('subcatTitle').textContent = CAT_LABELS[key] || key;
 
   const grid = document.getElementById('subcatGrid');
@@ -341,13 +341,13 @@ const session = FX.getSession();
        <div class="feat-card-img" style="background:linear-gradient(135deg,#0F1B2D,#1E3048);position:relative;overflow:hidden;">
           ${p.avatar_url
             ? `<img src="${p.avatar_url}" alt="${esc(p.biz_name)}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
-            : CAT_EMOJIS[p._listing_cats_main?.[0] || p.cat_main] || '🔧'}
+            : CAT_EMOJIS[p._listing_cats_main?.[0] || p.cat_main] || '<i class="fa-solid fa-wrench fxi"></i>'}
           <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:0.82rem;font-weight:700;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:3px;">
             <i class="fa-solid fa-star" style="font-size:9px;color:var(--gold);"></i> ${p.avg_rating || '0.0'}
           </div>
         </div>
         <div class="feat-card-body">
-          <div class="feat-card-name">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+          <div class="feat-card-name">${p.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.biz_name)}</div>
           <div class="feat-card-sub">${esc(p._listing_cats?.length ? p._listing_cats[0] : (p.cat_sub || 'General Services'))}</div>
           <div class="feat-card-loc"><i class="fa-solid fa-location-dot"></i> ${esc(p.province_name || p.city_name || '—')}</div>
         </div>

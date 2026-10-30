@@ -101,19 +101,19 @@
 const session = FX.getSession();
 
 const STATUS_CONFIG = {
-  active:    { icon:'⚡',  bg:'#ECFDF5', title:'Booking Confirmed!',           msg:'Your booking is now active. The provider will be in touch shortly.' },
-  done:      { icon:'🏁',  bg:'#FFFBEB', title:'Service Marked as Complete',   msg:'The provider marked your job as done. Tap to confirm and leave a rating.' },
-  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by Provider', msg:'The provider has cancelled this booking.' },
-  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'You Disputed This Booking',    msg:'You raised a dispute. Contact the provider to resolve and rebook if needed.' },
-  completed: { icon:'✅',  bg:'#ECFDF5', title:'Booking Completed',            msg:'Your booking has been completed. Thank you for using Fixia!' },
+  active:    { icon:'<i class="fa-solid fa-bolt fxi"></i>',  bg:'#ECFDF5', title:'Booking Confirmed!',           msg:'Your booking is now active. The provider will be in touch shortly.' },
+  done:      { icon:'<i class="fa-solid fa-flag fxi"></i>',  bg:'#FFFBEB', title:'Service Marked as Complete',   msg:'The provider marked your job as done. Tap to confirm and leave a rating.' },
+  cancelled: { icon:'<i class="fa-solid fa-rotate-left fxi"></i>',  bg:'#F5F7FA', title:'Booking Cancelled by Provider', msg:'The provider has cancelled this booking.' },
+  disputed:  { icon:'<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i>',  bg:'#FFF5F5', title:'You Disputed This Booking',    msg:'You raised a dispute. Contact the provider to resolve and rebook if needed.' },
+  completed: { icon:'<i class="fa-solid fa-circle-check fxi fxi-green"></i>',  bg:'#ECFDF5', title:'Booking Completed',            msg:'Your booking has been completed. Thank you for using Fixia!' },
 };
 
 const PROV_CONFIG = {
-  pending:   { icon:'📩',  bg:'#FFF8F5', title:'New Booking Request',         msg:'A user has sent you a booking request.' },
-  active:    { icon:'📋',  bg:'#ECFDF5', title:'Booking Now Active',          msg:'A user confirmed their booking. The job is now active.' },
-  cancelled: { icon:'↩️',  bg:'#F5F7FA', title:'Booking Cancelled by You',    msg:'You cancelled this booking. The user has been notified.' },
-  disputed:  { icon:'⚠️',  bg:'#FFF5F5', title:'User Disputed This Booking',  msg:'The user raised a dispute on this job. Please reach out to resolve.' },
-  completed: { icon:'⭐',  bg:'#FFFBEB', title:'Job Completed & Rated',       msg:'A user confirmed completion and left you a rating.' },
+  pending:   { icon:'<i class="fa-solid fa-envelope fxi"></i>',  bg:'#FFF8F5', title:'New Booking Request',         msg:'A user has sent you a booking request.' },
+  active:    { icon:'<i class="fa-solid fa-clipboard-list fxi"></i>',  bg:'#ECFDF5', title:'Booking Now Active',          msg:'A user confirmed their booking. The job is now active.' },
+  cancelled: { icon:'<i class="fa-solid fa-rotate-left fxi"></i>',  bg:'#F5F7FA', title:'Booking Cancelled by You',    msg:'You cancelled this booking. The user has been notified.' },
+  disputed:  { icon:'<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i>',  bg:'#FFF5F5', title:'User Disputed This Booking',  msg:'The user raised a dispute on this job. Please reach out to resolve.' },
+  completed: { icon:'<i class="fa-solid fa-star fxi fxi-amber"></i>',  bg:'#FFFBEB', title:'Job Completed & Rated',       msg:'A user confirmed completion and left you a rating.' },
 };
 
 function timeAgo(ts) {
@@ -140,7 +140,7 @@ function renderHeader(hasUnread, hasRead) {
       Clear All
     </button>
 	<button id="deleteReadBtn" onclick="deleteReadNotifs()" style="font-size:0.7rem;font-weight:700;background:#F5F7FA;border:none;cursor:${hasRead ? 'pointer' : 'default'};font-family:inherit;padding:4px 10px;border-radius:6px;color:${hasRead ? 'var(--text-2)' : '#ccc'};" ${!hasRead ? 'disabled' : ''}>
-      🗑 Delete Read
+      <i class="fa-solid fa-trash fxi"></i> Delete Read
     </button>
   `;
   document.getElementById('notifList').before(header);
@@ -226,7 +226,7 @@ async function init() {
     } else if (role === 'provider') {
       const pd = await FX.getProviderByUserId(session.userId);
       if (!pd) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">No Notifications</div></div>';
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-bell fxi"></i></div><div class="empty-title">No Notifications</div></div>';
         return;
       }
       const inquiries = await FX.getProviderInquiries(pd.id);
@@ -253,7 +253,7 @@ async function init() {
     if (!notifs.length) {
       list.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🔔</div>
+          <div class="empty-icon"><i class="fa-solid fa-bell fxi"></i></div>
           <div class="empty-title">No Notifications Yet</div>
           <div class="empty-sub">Booking updates and status changes will appear here.</div>
         </div>`;
@@ -274,7 +274,7 @@ async function init() {
       </div>`).join('');
 
   } catch(e) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load notifications</div><div class="empty-sub">${e.message}</div></div>`;
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i></div><div class="empty-title">Could not load notifications</div><div class="empty-sub">${e.message}</div></div>`;
   }
 }
 
@@ -288,5 +288,6 @@ init();
   }
 </script>
 
+<script src="js/page-booking.js"></script>
 </body>
 </html>

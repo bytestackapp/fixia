@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  <title>Messages — Fixia</title>
+  <style>
+    :root{--brand:#FF5A1F;--brand-dark:#D94200;--brand-light:#FFF0EB;--navy:#0F1B2D;--text:#1A2332;--text-2:#4A5568;--text-3:#8896A5;--bg:#F0F2F5;--card:#fff;--border:#E8ECF0;--green:#10B981;--green-bg:#ECFDF5;--green-text:#065F46;--gold:#F59E0B;--red:#DC3545;--red-bg:#FFF5F5;--red-text:#991B1B;--nav-h:56px;--bottom-h:62px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h) + 16px);-webkit-font-smoothing:antialiased;}
+    .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
+    .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .nav-title{flex:1;min-width:0;color:#fff;font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .nav-title small{display:block;font-weight:600;font-size:.68rem;color:rgba(255,255,255,.6);}
+    .page-header{background:#1E3048;padding:8px 16px;font-size:.78rem;color:rgba(255,255,255,.75);}
+
+    /* inbox */
+    .row{display:flex;gap:12px;align-items:center;padding:13px 16px;background:var(--card);border-bottom:1px solid var(--border);cursor:pointer;}
+    .row:active{background:#FAFBFC;}
+    .avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;overflow:hidden;}
+    .avatar img{width:100%;height:100%;object-fit:cover;}
+    .row-main{flex:1;min-width:0;}
+    .row-top{display:flex;justify-content:space-between;gap:8px;}
+    .row-name{font-size:.86rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .row-time{font-size:.65rem;color:var(--text-3);flex-shrink:0;}
+    .row-svc{font-size:.7rem;color:var(--brand);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .row-last{font-size:.74rem;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .row.unread .row-name,.row.unread .row-last{color:var(--text);font-weight:800;}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;}
+    .empty{text-align:center;padding:3.5rem 1rem;color:var(--text-3);font-size:.83rem;line-height:1.6;}
+    .empty .ei{font-size:2.6rem;margin-bottom:8px;}
+
+    /* thread */
+    #threadView{display:none;}
+    .svc-bar{background:var(--card);border-bottom:1px solid var(--border);padding:9px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:calc(var(--nav-h) + env(safe-area-inset-top));z-index:50;}
+    .svc-bar b{font-size:.8rem;}
+    .pill{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+    .st-pending{background:#FFFBEB;color:#92400E;}.st-active{background:var(--green-bg);color:var(--green-text);}
+    .st-done{background:var(--brand-light);color:var(--brand-dark);}.st-completed{background:var(--green-bg);color:var(--green-text);}
+    .st-cancelled,.st-declined,.st-disputed{background:var(--red-bg);color:var(--red-text);}
+    .feed{padding:14px 14px 150px;display:flex;flex-direction:column;gap:10px;max-width:640px;margin:0 auto;}
+    .bub{max-width:82%;border-radius:16px;padding:10px 12px;font-size:.8rem;line-height:1.5;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .bub.me{align-self:flex-end;background:var(--brand-light);border-bottom-right-radius:4px;}
+    .bub.them{align-self:flex-start;background:var(--card);border:1px solid var(--border);border-bottom-left-radius:4px;}
+    .bub-h{font-weight:800;color:var(--navy);}
+    .bub-svc{font-size:.72rem;color:var(--brand);font-weight:700;margin-top:2px;}
+    .bub-t{margin-top:4px;color:var(--text-2);white-space:pre-wrap;word-break:break-word;}
+    .bub-time{font-size:.6rem;color:var(--text-3);margin-top:5px;text-align:right;}
+    .actions{position:fixed;left:0;right:0;bottom:calc(var(--bottom-h) + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;z-index:90;}
+    .actions:empty{display:none;}
+    .btn{flex:1;padding:11px 8px;border:none;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;}
+    .btn-brand{background:linear-gradient(135deg,#FF5A1F,#D94200);color:#fff;}
+    .btn-green{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+    .btn-red{background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
+    .btn-blue{background:#EFF6FF;color:#1E40AF;border:1.5px solid rgba(59,130,246,.3);}
+    .btn:disabled{opacity:.6;}
+
+    /* sheets */
+    .ov{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;}
+    .ov.open{display:flex;}
+    .sheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:16px 18px 28px;}
+    .sheet h3{font-size:.95rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
+    .sheet p{font-size:.82rem;color:var(--text-2);line-height:1.6;margin-bottom:12px;}
+    .stars{display:flex;gap:8px;margin:6px 0 10px;}
+    .stars i{font-size:1.8rem;color:var(--border);cursor:pointer;}.stars i.lit{color:var(--gold);}
+    textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;min-height:70px;resize:vertical;}
+    .toast{position:fixed;bottom:calc(var(--bottom-h) + 70px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:.7rem 1.3rem;border-radius:8px;font-size:.82rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;white-space:nowrap;}
+    .toast.show{opacity:1;}.toast.error{background:var(--red);}
+
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--card);border-top:1px solid var(--border);height:calc(var(--bottom-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;align-items:center;}
+    .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--text-3);font-size:.58rem;font-weight:600;text-decoration:none;}
+    .bnav-item i{font-size:1.05rem;}
+    .bnav-center{flex:0 0 64px;display:flex;align-items:center;justify-content:center;}
+    .bnav-center-btn{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;transform:translateY(-8px);}
+  </style>
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/fixia.css">
+</head>
+<body>
+<nav class="topnav">
+  <button class="nav-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></button>
+  <div class="nav-title" id="navTitle">Messages</div>
+</nav>
+<div class="page-header" id="pageSub">Updates on your bookings, all in one place</div>
+
+<div id="listView"><div class="empty">Loading…</div></div>
+
+<div id="threadView">
+  <div class="svc-bar"><b id="svcName">—</b><span class="pill" id="svcStatus"></span></div>
+  <div class="feed" id="feed"></div>
+  <div class="actions" id="actions"></div>
+</div>
+
+<!-- generic confirm -->
+<div class="ov" id="cfOv" onclick="if(event.target===this)closeSheet('cfOv')"><div class="sheet">
+  <h3 id="cfTitle"></h3><p id="cfMsg"></p>
+  <div id="cfExtra"></div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-blue" onclick="closeSheet('cfOv')">Back</button><button class="btn btn-brand" id="cfOk"></button></div>
+</div></div>
+
+<!-- confirm + rate -->
+<div class="ov" id="rateOv" onclick="if(event.target===this)closeSheet('rateOv')"><div class="sheet">
+  <h3>🎉 Confirm job &amp; rate</h3>
+  <p>Rating is for <b id="rateSvc"></b>. Stars and comment are optional.</p>
+  <div class="stars" id="stars"><i class="fa-solid fa-star" data-n="1"></i><i class="fa-solid fa-star" data-n="2"></i><i class="fa-solid fa-star" data-n="3"></i><i class="fa-solid fa-star" data-n="4"></i><i class="fa-solid fa-star" data-n="5"></i></div>
+  <textarea id="rateComment" placeholder="Share your experience…"></textarea>
+  <label style="display:flex;gap:8px;align-items:center;font-size:.8rem;margin:10px 0 14px;"><input type="checkbox" id="rateAnon"> Post anonymously</label>
+  <div style="display:flex;gap:8px;"><button class="btn btn-blue" onclick="closeSheet('rateOv')">Cancel</button><button class="btn btn-green" id="rateOk" onclick="submitRate()"><i class="fa-solid fa-check"></i> Confirm</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottom-nav">
+  <a class="bnav-item" href="homepage.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="bnav-item" href="saved.html"><i class="fa-regular fa-bookmark"></i>Saved</a>
+  <div class="bnav-center"><button class="bnav-center-btn" onclick="location.href='browse.html'"><i class="fa-solid fa-border-all"></i></button></div>
+  <a class="bnav-item" href="bookings.html"><i class="fa-solid fa-clipboard-list"></i>Bookings</a>
+  <a class="bnav-item" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+
+<script src="js/env-config.js"></script>
+<script src="js/fixia-data.js"></script>
+<script src="js/fx-boot.js"></script>
+<script>
+const session = FX.requireAuth(['regular', 'provider']);
+const openId = new URLSearchParams(location.search).get('id');
+let current = null, stars = 0, timer = null;
+
+const EV = {
+  sent:      ['📤', 'Booking sent'],
+  accepted:  ['✅', 'Booking accepted'],
+  declined:  ['🚫', 'Booking declined'],
+  done:      ['🏁', 'Job marked as done'],
+  confirmed: ['⭐', 'Job confirmed'],
+  rated:     ['⭐', 'Rating added'],
+  disputed:  ['⚠️', 'Job disputed'],
+  cancelled: ['↩️', 'Booking cancelled'],
+};
+const ST = { pending:'Pending', active:'In progress', done:'Awaiting confirmation', completed:'Completed', cancelled:'Cancelled', declined:'Declined', disputed:'Disputed' };
+
+function ago(d) {
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return 'now'; if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60); if (h < 24) return h + 'h';
+  return Math.floor(h / 24) + 'd';
+}
+const fmt = d => new Date(d).toLocaleString('en-PH', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+function toast(m, t='') { const e = document.getElementById('toast'); e.textContent = m; e.className = 'toast show ' + t; setTimeout(() => e.classList.remove('show'), 2800); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+function goBack() { if (openId) location.href = 'messages.html'; else history.length > 1 ? history.back() : location.href = 'homepage.html'; }
+
+/* ── inbox ── */
+async function loadInbox() {
+  const el = document.getElementById('listView');
+  try {
+    const { items, role } = await FX.getInbox();
+    if (!items.length) { el.innerHTML = `<div class="empty"><div class="ei">💬</div>No messages yet.<br>${role === 'client' ? 'Book a service and its updates will show up here.' : 'New booking requests will show up here.'}</div>`; return; }
+    el.innerHTML = items.map(i => {
+      const l = i.last, lab = l ? (EV[l.type] || ['', l.type]) : null;
+      return `<div class="row ${i.unread ? 'unread' : ''}" onclick="location.href='messages.html?id=${i.id}'">
+        <div class="avatar">${i.avatar ? `<img src="${esc(i.avatar)}" alt="">` : (role === 'client' ? '🔧' : '👤')}</div>
+        <div class="row-main">
+          <div class="row-top"><div class="row-name">${esc(i.name)}</div><div class="row-time">${ago(i.updated_at)}</div></div>
+          <div class="row-svc">${esc(i.listing_title || 'Service')} · ${ST[i.status] || i.status}</div>
+          <div class="row-last">${lab ? lab[0] + ' ' + (l.mine ? 'You: ' : '') + lab[1] : ''}</div>
+        </div>${i.unread ? '<div class="dot"></div>' : ''}</div>`;
+    }).join('');
+  } catch (e) { el.innerHTML = `<div class="empty">Could not load messages.<br>${esc(e.message)}</div>`; }
+}
+
+/* ── thread ── */
+function bubble(e, role) {
+  const [ic, label] = EV[e.type] || ['', e.type];
+  const stars = e.meta?.stars ? ' · ' + '⭐'.repeat(e.meta.stars) : '';
+  let body = '';
+  if (e.type === 'sent') body = `<div class="bub-svc">${esc(e.meta?.listing_title || current.booking.listing_title || '')}</div>${e.text ? `<div class="bub-t">“${esc(e.text)}”</div>` : ''}`;
+  else if (e.text) body = `<div class="bub-t">${esc(e.text)}</div>`;
+  const who = e.mine ? '' : '';
+  return `<div class="bub ${e.mine ? 'me' : 'them'}"><div class="bub-h">${ic} ${label}${stars}</div>${body}<div class="bub-time">${fmt(e.at)}</div></div>`;
+}
+
+function actionsFor(b, c) {
+  const call = c.phone ? `<a class="btn btn-blue" href="tel:${esc(c.phone)}"><i class="fa-solid fa-phone"></i> Call</a>` : '';
+  const A = (cls, ic, lab, fn) => `<button class="btn ${cls}" onclick="${fn}"><i class="fa-solid ${ic}"></i> ${lab}</button>`;
+  if (b.role === 'provider') {
+    if (b.status === 'pending') return A('btn-red','fa-xmark','Decline',"ask('Decline this booking?','The client will be notified.','Yes, decline','declineBooking')") + A('btn-green','fa-check','Accept',"act('acceptBooking','Booking accepted ✅')");
+    if (b.status === 'active')  return A('btn-red','fa-xmark','Cancel',"ask('Cancel this booking?','Only cancel if both of you agreed to stop.','Yes, cancel','cancelBooking')") + call + A('btn-green','fa-flag-checkered','Mark Done',"ask('Mark job as done?','The client will be asked to confirm and rate.','Mark done','markDone')");
+  } else {
+    if (b.status === 'pending') return A('btn-red','fa-xmark','Cancel',"ask('Cancel this booking?','The provider will be notified.','Yes, cancel','cancelBooking')");
+    if (b.status === 'active')  return A('btn-red','fa-xmark','Cancel',"ask('Cancel this booking?','The provider will be notified.','Yes, cancel','cancelBooking')") + call;
+    if (b.status === 'done')    return A('btn-red','fa-triangle-exclamation','Dispute',"ask('Dispute this job?','Use this if the work was not completed properly.','Dispute','disputeInquiry')") + A('btn-green','fa-check','Confirm &amp; Rate',"openRate()");
+    if (b.status === 'completed' && !b.rated) return A('btn-brand','fa-star','Leave a Rating',"openRate()");
+  }
+  return '';
+}
+
+async function loadThread(first) {
+  try {
+    current = await FX.getThread(openId);
+    const { booking: b, counterpart: c, events } = current;
+    document.getElementById('navTitle').innerHTML = `${esc(c.name)}<small>${b.role === 'client' ? 'Service provider' : 'Client'}</small>`;
+    document.getElementById('svcName').textContent = b.listing_title || 'Service';
+    const p = document.getElementById('svcStatus'); p.textContent = ST[b.status] || b.status; p.className = 'pill st-' + b.status;
+    const feed = document.getElementById('feed');
+    const atBottom = first || (innerHeight + scrollY >= document.body.scrollHeight - 80);
+    feed.innerHTML = events.map(e => bubble(e, b.role)).join('');
+    document.getElementById('actions').innerHTML = actionsFor(b, c);
+    if (atBottom) scrollTo(0, document.body.scrollHeight);
+  } catch (e) { document.getElementById('feed').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+async function act(fn, okMsg, ...args) {
+  document.querySelectorAll('.actions .btn').forEach(b => b.disabled = true);
+  try { await FX[fn](openId, ...args); if (okMsg) toast(okMsg); await loadThread(true); }
+  catch (e) { toast(e.message, 'error'); await loadThread(); }
+}
+function ask(title, msg, label, fn) {
+  document.getElementById('cfTitle').textContent = title;
+  document.getElementById('cfMsg').textContent = msg;
+  document.getElementById('cfOk').textContent = label;
+  document.getElementById('cfOk').onclick = () => { closeSheet('cfOv'); act(fn, ''); };
+  document.getElementById('cfOv').classList.add('open');
+}
+
+/* ── rating ── */
+document.querySelectorAll('#stars i').forEach(s => s.onclick = () => {
+  stars = +s.dataset.n; document.querySelectorAll('#stars i').forEach((x, i) => x.classList.toggle('lit', i < stars));
+});
+function openRate() {
+  stars = 0; document.querySelectorAll('#stars i').forEach(x => x.classList.remove('lit'));
+  document.getElementById('rateComment').value = ''; document.getElementById('rateAnon').checked = false;
+  document.getElementById('rateSvc').textContent = current.booking.listing_title || 'this service';
+  document.getElementById('rateOv').classList.add('open');
+}
+async function submitRate() {
+  const btn = document.getElementById('rateOk'); btn.disabled = true;
+  try {
+    await FX.acceptCompletion(openId, stars || null, document.getElementById('rateComment').value.trim(), document.getElementById('rateAnon').checked);
+    closeSheet('rateOv'); toast('Thank you! Job confirmed ✅'); await loadThread(true);
+  } catch (e) { toast(e.message, 'error'); } finally { btn.disabled = false; }
+}
+
+/* ── boot ── */
+(function init() {
+  if (!session) return;
+  if (openId) {
+    document.getElementById('listView').style.display = 'none';
+    document.getElementById('threadView').style.display = 'block';
+    document.getElementById('pageSub').style.display = 'none';
+    loadThread(true);
+    timer = setInterval(() => { if (!document.hidden) loadThread(); }, 15000);
+  } else {
+    loadInbox();
+    FX.every(loadInbox, 30000);
+  }
+})();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+</script>
+</body>
+</html>

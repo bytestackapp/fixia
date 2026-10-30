@@ -100,7 +100,7 @@
 
     <!-- PayPal Success — Regular -->
     <div id="stateRegularSuccess" class="state">
-      <span class="big-icon">🎉</span>
+      <span class="big-icon"><i class="fa-solid fa-party-horn fxi"></i></span>
       <div class="state-title" style="color:var(--green-text);">Payment Confirmed!</div>
       <div class="state-msg">
         Your Fixia Plus subscription is now active. Welcome aboard, <strong id="regSuccessName"></strong>!
@@ -113,7 +113,7 @@
 
     <!-- PayPal Success — Provider -->
     <div id="stateProviderSuccess" class="state">
-      <span class="big-icon">📋</span>
+      <span class="big-icon"><i class="fa-solid fa-clipboard-list fxi"></i></span>
       <div class="state-title" style="color:var(--navy);">Application Submitted!</div>
       <div class="state-msg">
         Your PayPal payment was confirmed. Your provider application for <strong id="provSuccessBiz"></strong>
@@ -127,7 +127,7 @@
 
     <!-- Error -->
     <div id="stateError" class="state">
-      <span class="big-icon">❌</span>
+      <span class="big-icon"><i class="fa-solid fa-circle-xmark fxi fxi-red"></i></span>
       <div class="state-title" style="color:var(--red);">Payment Failed</div>
       <div class="state-msg" id="errorMsg">
         Your payment could not be verified. You have not been charged. Please try again.
@@ -142,7 +142,7 @@
 
     <!-- PayPal Success — Upgrade -->
     <div id="stateUpgradeSuccess" class="state">
-      <span class="big-icon">🚀</span>
+      <span class="big-icon"><i class="fa-solid fa-rocket fxi"></i></span>
       <div class="state-title" style="color:var(--green-text);">Upgrade Confirmed!</div>
       <div class="state-msg">Your plan has been upgraded successfully.</div>
       <div class="info-box" id="upgInfoBox"></div>
@@ -194,7 +194,7 @@ function showState(id) {
       });
 
       document.getElementById('upgInfoBox').innerHTML = `
-        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal ✅ Verified</span></div>
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal <i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span></div>
         <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId}</span></div>
         <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₱${data.amount}</span></div>`;
       showState('stateUpgradeSuccess');
@@ -305,7 +305,7 @@ function showState(id) {
       document.getElementById('regSuccessName').textContent = formData.firstName;
       document.getElementById('regInfoBox').innerHTML = `
         <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || 'Fixia Plus'}</span></div>
-        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal ✅ Verified</span></div>
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal <i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span></div>
         <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId || orderId}</span></div>
         <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₱${data.amount}</span></div>`;
       showState('stateRegularSuccess');
@@ -346,9 +346,9 @@ function showState(id) {
       document.getElementById('provInfoBox').innerHTML = `
         <div class="info-row"><span class="info-label">Business</span><span class="info-value">${formData.bizName}</span></div>
         <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || formData.package}</span></div>
-        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal ✅ Verified</span></div>
+        <div class="info-row"><span class="info-label">Payment</span><span class="info-value">PayPal <i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span></div>
         <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${data.transactionId || orderId}</span></div>
-        <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;">⏳ Pending Approval</span></div>`;
+        <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;"><i class="fa-solid fa-hourglass-half fxi"></i> Pending Approval</span></div>`;
       showState('stateProviderSuccess');
     }
 
@@ -394,7 +394,7 @@ async function _completeRegistration(type, formData, payMethod, payData, storage
     document.getElementById('regSuccessName').textContent = formData.firstName;
     document.getElementById('regInfoBox').innerHTML = `
       <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || 'Fixia Plus'}</span></div>
-      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} ✅ Verified</span></div>
+      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} <i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span></div>
       <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${payData.transactionId}</span></div>
       <div class="info-row"><span class="info-label">Amount</span><span class="info-value">${payData.amount} ${payData.currency || 'PHP'}</span></div>`;
     showState('stateRegularSuccess');
@@ -429,9 +429,9 @@ async function _completeRegistration(type, formData, payMethod, payData, storage
     document.getElementById('provInfoBox').innerHTML = `
       <div class="info-row"><span class="info-label">Business</span><span class="info-value">${formData.bizName}</span></div>
       <div class="info-row"><span class="info-label">Plan</span><span class="info-value">${formData.packageName || formData.package}</span></div>
-      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} ✅ Verified</span></div>
+      <div class="info-row"><span class="info-label">Payment</span><span class="info-value">${payMethod === 'paymongo' ? 'PayMongo' : 'PayPal'} <i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span></div>
       <div class="info-row"><span class="info-label">Transaction ID</span><span class="info-value" style="font-size:11px;">${payData.transactionId}</span></div>
-      <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;">⏳ Pending Approval</span></div>`;
+      <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:#c97000;"><i class="fa-solid fa-hourglass-half fxi"></i> Pending Approval</span></div>`;
     showState('stateProviderSuccess');
   }
   localStorage.removeItem(storageKey);

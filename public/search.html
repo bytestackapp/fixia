@@ -136,19 +136,19 @@
 <!-- FILTER CHIPS -->
 <div class="filter-bar">
   <button class="chip active" onclick="setFilter('all',this)"><i class="fa-solid fa-border-all"></i> All</button>
-  <button class="chip" onclick="setFilter('elite',this)">👑 Elite</button>
+  <button class="chip" onclick="setFilter('elite',this)"><i class="fa-solid fa-crown fxi fxi-amber"></i> Elite</button>
   <button class="chip" onclick="setFilter('top',this)"><i class="fa-solid fa-star"></i> Top Rated</button>
   <button class="chip" onclick="setFilter('verified',this)"><i class="fa-solid fa-check"></i> Verified</button>
-  <button class="chip" onclick="setFilter('home',this)">🏠 Home</button>
-  <button class="chip" onclick="setFilter('auto',this)">🚗 Auto</button>
-  <button class="chip" onclick="setFilter('elec',this)">⚡ Electrical</button>
-  <button class="chip" onclick="setFilter('build',this)">🔨 Construction</button>
-  <button class="chip" onclick="setFilter('tech',this)">💻 Tech</button>
-  <button class="chip" onclick="setFilter('beauty',this)">💇 Beauty</button>
-  <button class="chip" onclick="setFilter('clean',this)">🧹 Cleaning</button>
-  <button class="chip" onclick="setFilter('garden',this)">🌿 Garden</button>
-  <button class="chip" onclick="setFilter('pet',this)">🐾 Pets</button>
-  <button class="chip" onclick="setFilter('event',this)">🎉 Events</button>
+  <button class="chip" onclick="setFilter('home',this)"><i class="fa-solid fa-house fxi"></i> Home</button>
+  <button class="chip" onclick="setFilter('auto',this)"><i class="fa-solid fa-car fxi"></i> Auto</button>
+  <button class="chip" onclick="setFilter('elec',this)"><i class="fa-solid fa-bolt fxi"></i> Electrical</button>
+  <button class="chip" onclick="setFilter('build',this)"><i class="fa-solid fa-hammer fxi"></i> Construction</button>
+  <button class="chip" onclick="setFilter('tech',this)"><i class="fa-solid fa-laptop fxi"></i> Tech</button>
+  <button class="chip" onclick="setFilter('beauty',this)"><i class="fa-solid fa-scissors fxi"></i> Beauty</button>
+  <button class="chip" onclick="setFilter('clean',this)"><i class="fa-solid fa-broom fxi"></i> Cleaning</button>
+  <button class="chip" onclick="setFilter('garden',this)"><i class="fa-solid fa-leaf fxi"></i> Garden</button>
+  <button class="chip" onclick="setFilter('pet',this)"><i class="fa-solid fa-paw fxi"></i> Pets</button>
+  <button class="chip" onclick="setFilter('event',this)"><i class="fa-solid fa-party-horn fxi"></i> Events</button>
 </div>
 
 <!-- RESULTS HEADER -->
@@ -230,7 +230,7 @@ const session = FX.getSession();
     allProviders = await FX.getProviders({});
     applyFilters();
   } catch(e) {
-    showEmpty('⚠️', 'Failed to load results', 'Please check your connection and try again.');
+    showEmpty('<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i>', 'Failed to load results', 'Please check your connection and try again.');
   }
 
   // Search input live
@@ -298,7 +298,7 @@ function renderResults() {
     `<strong>${filtered.length}</strong> result${filtered.length !== 1 ? 's' : ''} for ${q}`;
 
   if (!filtered.length) {
-    showEmpty('🔍', 'No providers found',
+    showEmpty('<i class="fa-solid fa-magnifying-glass fxi"></i>', 'No providers found',
       currentQuery
         ? `No results for "${currentQuery}". Try a different keyword or category.`
         : 'No providers match this filter yet. Try a different category.');
@@ -324,7 +324,7 @@ function renderResults() {
       </div>
       <div class="provider-info">
         <div class="provider-name">
-          ${p.is_elite ? '<span class="elite">👑 </span>' : ''}${esc(p.biz_name)}
+          ${p.is_elite ? '<span class="elite"><i class="fa-solid fa-crown fxi fxi-amber"></i> </span>' : ''}${esc(p.biz_name)}
         </div>
 		<div class="provider-service">${esc([p.city_name, p.province_name].filter(Boolean).join(', ') || '—')}</div>
         <div class="provider-meta">
@@ -333,7 +333,7 @@ function renderResults() {
         </div>
       </div>
       <div class="provider-right">
-        <span class="verified-badge">✅ Verified</span>
+        <span class="verified-badge"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span>
         <button class="contact-btn" onclick="event.stopPropagation();window.location.href='provider.html?id=${p.id}'">
           <i class="fa-solid fa-eye"></i> View
         </button>

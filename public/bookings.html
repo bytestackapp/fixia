@@ -225,7 +225,7 @@
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-head">
-      <div class="modal-title">🎉 Accept Job Completion</div>
+      <div class="modal-title"><i class="fa-solid fa-party-horn fxi"></i> Accept Job Completion</div>
     </div>
     <div class="modal-body">
       <p style="font-size:0.83rem;color:var(--text-2);line-height:1.6;margin-bottom:14px;">
@@ -352,7 +352,7 @@ async function load() {
     console.error('[load] CRASHED:', e);
     document.getElementById('bodyContent').innerHTML = `
       <div class="state-box">
-        <div class="state-icon">⚠️</div>
+        <div class="state-icon"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i></div>
         <div class="state-title">Failed to load</div>
         <div class="state-sub">${e.message}</div>
       </div>`;
@@ -375,11 +375,11 @@ function render() {
 
   if (!list.length) {
     const emptyMsgs = {
-      all:       { icon:'📋', title:'No bookings yet', sub:'Find a provider and tap "Inquire" to get started.', btn:true },
-      pending:   { icon:'📤', title:'No pending bookings', sub:'Bookings waiting for the provider to start will appear here.' },
-      active:    { icon:'⚡', title:'No active bookings', sub:'Once you confirm a booking, it appears here.' },
-      done:      { icon:'🎉', title:'Nothing to accept', sub:'When a provider marks a job done, it will appear here for your acceptance.' },
-      completed: { icon:'✅', title:'No completed jobs yet', sub:'Your finished and rated jobs will appear here.' },
+      all:       { icon:'<i class="fa-solid fa-clipboard-list fxi"></i>', title:'No bookings yet', sub:'Find a provider and tap "Inquire" to get started.', btn:true },
+      pending:   { icon:'<i class="fa-solid fa-paper-plane fxi"></i>', title:'No pending bookings', sub:'Bookings waiting for the provider to start will appear here.' },
+      active:    { icon:'<i class="fa-solid fa-bolt fxi"></i>', title:'No active bookings', sub:'Once you confirm a booking, it appears here.' },
+      done:      { icon:'<i class="fa-solid fa-party-horn fxi"></i>', title:'Nothing to accept', sub:'When a provider marks a job done, it will appear here for your acceptance.' },
+      completed: { icon:'<i class="fa-solid fa-circle-check fxi fxi-green"></i>', title:'No completed jobs yet', sub:'Your finished and rated jobs will appear here.' },
     };
     const e = emptyMsgs[currentTab] || emptyMsgs.all;
     body.innerHTML = `
@@ -401,19 +401,19 @@ function renderCard(inq, idx) {
 
   /* ── shared status map ───────────────────────────────────── */
   const statusMap = isProvider ? {
-    pending:   ['sb-inquiring', '📤 Pending'],
-    active:    ['sb-active',    '⚡ Active'],
-    done:      ['sb-done',      '🎉 Marked Done'],
-    completed: ['sb-completed', '✅ Completed'],
-    cancelled: ['sb-cancelled', '🚫 Cancelled by You'],
-    disputed:  ['sb-cancelled', '⚠️ Disputed by User'],
+    pending:   ['sb-inquiring', '<i class="fa-solid fa-paper-plane fxi"></i> Pending'],
+    active:    ['sb-active',    '<i class="fa-solid fa-bolt fxi"></i> Active'],
+    done:      ['sb-done',      '<i class="fa-solid fa-party-horn fxi"></i> Marked Done'],
+    completed: ['sb-completed', '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Completed'],
+    cancelled: ['sb-cancelled', '<i class="fa-solid fa-ban fxi fxi-red"></i> Cancelled by You'],
+    disputed:  ['sb-cancelled', '<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Disputed by User'],
   } : {
-    pending:   ['sb-inquiring', '📤 Pending'],
-    active:    ['sb-active',    '⚡ Active'],
-    done:      ['sb-done',      '🎉 Job Done'],
-    completed: ['sb-completed', '✅ Completed'],
-    cancelled: ['sb-cancelled', '🚫 Cancelled by Provider'],
-    disputed:  ['sb-cancelled', '⚠️ Disputed by You'],
+    pending:   ['sb-inquiring', '<i class="fa-solid fa-paper-plane fxi"></i> Pending'],
+    active:    ['sb-active',    '<i class="fa-solid fa-bolt fxi"></i> Active'],
+    done:      ['sb-done',      '<i class="fa-solid fa-party-horn fxi"></i> Job Done'],
+    completed: ['sb-completed', '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Completed'],
+    cancelled: ['sb-cancelled', '<i class="fa-solid fa-ban fxi fxi-red"></i> Cancelled by Provider'],
+    disputed:  ['sb-cancelled', '<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Disputed by You'],
   };
   const [sbClass, sbLabel] = statusMap[inq.status] || ['sb-inquiring', inq.status];
 
@@ -426,7 +426,7 @@ function renderCard(inq, idx) {
 
     const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
       <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
-        ${'⭐'.repeat(inq.rating_stars)} Customer rated ${inq.rating_stars}/5
+        ${'<i class="fa-solid fa-star fxi fxi-amber"></i>'.repeat(inq.rating_stars)} Customer rated ${inq.rating_stars}/5
         ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
       </div>` : '';
 
@@ -451,7 +451,7 @@ function renderCard(inq, idx) {
     return `
       <div class="booking-card ${isUnread ? 'unread' : ''}" style="animation-delay:${idx*0.05}s">
 		<div class="bc-head">
-          <div class="bc-avatar">👤</div>
+          <div class="bc-avatar"><i class="fa-solid fa-user fxi"></i></div>
           <div class="bc-info">
             <div class="bc-name">${custName}</div>
           </div>
@@ -476,13 +476,13 @@ function renderCard(inq, idx) {
   const provService = prov?.cat_sub  || '—';
   const provPhone   = provUser?.phone || prov?.phone || null;
   const location    = [prov?.city_name, prov?.province_name].filter(Boolean).join(', ');
-  const catEmojis   = {home:'🏠',auto:'🚗',garden:'🌿',elec:'⚡',beauty:'💇',health:'🩺',tech:'💻',build:'🔨',clean:'🧹',pet:'🐾',event:'🎉'};
-  const emoji       = catEmojis[prov?.cat_main] || '🔧';
+  const catEmojis   = {home:'<i class="fa-solid fa-house fxi"></i>',auto:'<i class="fa-solid fa-car fxi"></i>',garden:'<i class="fa-solid fa-leaf fxi"></i>',elec:'<i class="fa-solid fa-bolt fxi"></i>',beauty:'<i class="fa-solid fa-scissors fxi"></i>',health:'<i class="fa-solid fa-stethoscope fxi"></i>',tech:'<i class="fa-solid fa-laptop fxi"></i>',build:'<i class="fa-solid fa-hammer fxi"></i>',clean:'<i class="fa-solid fa-broom fxi"></i>',pet:'<i class="fa-solid fa-paw fxi"></i>',event:'<i class="fa-solid fa-party-horn fxi"></i>'};
+  const emoji       = catEmojis[prov?.cat_main] || '<i class="fa-solid fa-wrench fxi"></i>';
   const isUnread    = inq.user_has_unread;
 
   const ratingDisplay = inq.status === 'completed' && inq.rating_stars ? `
     <div style="font-size:0.75rem;color:var(--gold-text);background:var(--gold-bg);border-radius:6px;padding:6px 10px;margin-top:8px;">
-      ${'⭐'.repeat(inq.rating_stars)} You rated this ${inq.rating_stars}/5
+      ${'<i class="fa-solid fa-star fxi fxi-amber"></i>'.repeat(inq.rating_stars)} You rated this ${inq.rating_stars}/5
       ${inq.rating_comment ? `<br/><span style="color:var(--text-2);">"${esc(inq.rating_comment)}"</span>` : ''}
     </div>` : '';
 
@@ -754,7 +754,7 @@ function closeSignOutModal() { document.getElementById('signOutModal').classList
     <div class="modal-handle"></div>
 	<div class="modal-head" style="display:flex;align-items:center;justify-content:space-between;">
       <h3 style="font-size:0.95rem;font-weight:800;"><i class="fa-solid fa-flag-checkered" style="color:var(--brand);"></i> Job Completed</h3>
-      <button class="modal-x" onclick="closeMarkDone()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-3);">✕</button>
+      <button class="modal-x" onclick="closeMarkDone()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-3);"><i class="fa-solid fa-xmark fxi"></i></button>
     </div>
     <div style="padding:14px 18px;font-size:0.85rem;color:var(--text-2);line-height:1.6;">
       This marks the job as completed on your side. Final completion is subject to customer approval.

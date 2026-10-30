@@ -401,7 +401,7 @@
 
 <!-- ── STEP 5: Done ───────────────────────────────────────── -->
 <div id="p5" class="panel" style="text-align:center;padding-top:0.5rem;">
-  <div id="doneIcon" style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+  <div id="doneIcon" style="font-size:3.5rem;margin-bottom:1rem;"><i class="fa-solid fa-party-horn fxi"></i></div>
   <div id="doneTitle" style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-bottom:6px;"></div>
   <div id="doneMsg" style="font-size:0.85rem;color:var(--text-3);line-height:1.7;margin-bottom:1.5rem;"></div>
    <button class="btn btn-brand" id="doneBtn" onclick="window.location.href='login.html'">
@@ -815,14 +815,14 @@ async function doRegister() {
     // Done screen
     const isFree = formData.status === 'active' && formData.paymentMethod === 'none';
     const isInstant = selectedPayCategory === 'instant';
-    document.getElementById('doneIcon').textContent = isFree || isInstant ? '🎉' : '⏳';
+    document.getElementById('doneIcon').innerHTML = isFree || isInstant ? '<i class="fa-solid fa-party-horn fxi"></i>' : '<i class="fa-solid fa-hourglass-half fxi"></i>';
 	document.getElementById('doneTitle').textContent = isFree || isInstant ? 'You\'re all set!' : (isPresignupMode ? 'Pre-Signup Successful!' : 'Payment Submitted!');
     document.getElementById('doneMsg').innerHTML = isFree
       ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your free account is ready. Log in and start finding services near you.`
       : isInstant
       ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your payment was confirmed and your account is now active.`
       : isPresignupMode
-      ? `You're on the list, <strong>${formData.firstName}</strong>! 🎉 You'll be among the first to access Fixia when we launch. An update will be sent to <strong>${formData.email}</strong> on launch day.`
+      ? `You're on the list, <strong>${formData.firstName}</strong>! <i class="fa-solid fa-party-horn fxi"></i> You'll be among the first to access Fixia when we launch. An update will be sent to <strong>${formData.email}</strong> on launch day.`
       : `Thank you, <strong>${formData.firstName}</strong>! We've received your payment details and your application is now under review.<br/><br/>You may log in and use the platform with limited access while our team verifies your account. An update will be sent shortly to <strong>${formData.email}</strong>.`;
 
   if (isPresignupMode) {
@@ -887,7 +887,7 @@ async function loadPackages() {
         pickPackage(pkg);
         grid.innerHTML = `
 			<div style="background:var(--brand-light);border:2px solid var(--brand);border-radius:12px;padding:16px;text-align:center;">
-            <div style="font-size:1.5rem;margin-bottom:6px;">${pkg.icon || '🎁'}</div>
+            <div style="font-size:1.5rem;margin-bottom:6px;">${pkg.icon || '<i class="fa-solid fa-gift fxi"></i>'}</div>
             <div style="font-size:0.9rem;font-weight:800;color:var(--brand);">Pre-Launch Special</div>
             <div style="font-size:0.85rem;font-weight:700;color:var(--text);margin-top:2px;">${pkg.name}</div>
             <div style="font-size:0.75rem;color:var(--text-3);margin-top:4px;">Complimentary package — no payment required.</div>
@@ -910,8 +910,8 @@ async function loadPackages() {
       card.id = `pkg_${pkg.id}`;
       card.onclick = () => pickPackage(pkg);
       card.innerHTML = `
-        ${pkg.popular ? `<div class="pkg-popular-flag">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
-        <div class="pkg-icon">${pkg.icon || (isFree ? '🔍' : '✨')}</div>
+        ${pkg.popular ? `<div class="pkg-popular-flag"><i class="fa-solid fa-star fxi fxi-amber"></i> ${pkg.badge_label || 'Popular'}</div>` : ''}
+        <div class="pkg-icon">${pkg.icon || (isFree ? '<i class="fa-solid fa-magnifying-glass fxi"></i>' : '<i class="fa-solid fa-sparkles fxi"></i>')}</div>
         <div class="pkg-name">${pkg.name}</div>
         <div class="pkg-price">${isFree ? '<span style="font-size:1.1rem;">Free</span>' : '₱' + pkg.price + '<span style="font-size:0.65rem;font-weight:500;color:var(--text-3);"> / ' + (pkg.period === 'month' ? 'mo' : pkg.period === 'year' ? 'yr' : pkg.period) + '</span>'}</div>
         <ul class="pkg-features">${(pkg.features || []).map(f => `<li class="pkg-feat">${f}</li>`).join('')}</ul>`;

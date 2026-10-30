@@ -429,7 +429,7 @@
     </div>
     <input type="hidden" id="editListingId"/>
   </div>
-  <div id="listingsContainer"><div class="empty"><div class="ei">📋</div><p>Loading your listings…</p></div></div>
+  <div id="listingsContainer"><div class="empty"><div class="ei"><i class="fa-solid fa-clipboard-list fxi"></i></div><p>Loading your listings…</p></div></div>
 </div>
 
 <!-- ── REVIEWS TAB (provider) ────────────────────────────────── -->
@@ -437,11 +437,11 @@
   <div class="sec-head">
     <div class="sec-title">Customer Reviews</div>
     <div style="text-align:right;line-height:1.4;">
-      <div id="avgRatingBig" style="font-size:0.95rem;font-weight:800;color:var(--gold);">⭐ —</div>
+      <div id="avgRatingBig" style="font-size:0.95rem;font-weight:800;color:var(--gold);"><i class="fa-solid fa-star fxi fxi-amber"></i> —</div>
       <div id="reviewCountLabel" style="font-size:0.68rem;color:var(--text-3);font-weight:600;">— reviews</div>
     </div>
   </div>
-  <div id="reviewsContainer"><div class="empty"><div class="ei">⭐</div><p>Loading reviews…</p></div></div>
+  <div id="reviewsContainer"><div class="empty"><div class="ei"><i class="fa-solid fa-star fxi fxi-amber"></i></div><p>Loading reviews…</p></div></div>
 </div>
 
 <!-- ── EDIT PROFILE TAB ───────────────────────────────────────── -->
@@ -638,19 +638,19 @@
       </thead>
       <tbody>
         <tr style="border-top:1px solid var(--border);">
-          <td style="padding:8px 10px;color:var(--text-2);">👤 Regular</td>
+          <td style="padding:8px 10px;color:var(--text-2);"><i class="fa-solid fa-user fxi"></i> Regular</td>
           <td style="padding:8px 10px;color:var(--text-2);">Free</td>
           <td style="padding:8px 10px;color:var(--text-2);">First booking</td>
           <td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--brand);">+1</td>
         </tr>
         <tr style="border-top:1px solid var(--border);background:var(--bg);">
-          <td style="padding:8px 10px;color:var(--text-2);">👤 Regular</td>
+          <td style="padding:8px 10px;color:var(--text-2);"><i class="fa-solid fa-user fxi"></i> Regular</td>
           <td style="padding:8px 10px;color:var(--text-2);">Paid</td>
           <td style="padding:8px 10px;color:var(--text-2);">On signup</td>
           <td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--brand);">+3</td>
         </tr>
         <tr style="border-top:1px solid var(--border);background:var(--bg);">
-          <td style="padding:8px 10px;color:var(--text-2);">🔧 Provider</td>
+          <td style="padding:8px 10px;color:var(--text-2);"><i class="fa-solid fa-wrench fxi"></i> Provider</td>
           <td style="padding:8px 10px;color:var(--text-2);">Paid</td>
           <td style="padding:8px 10px;color:var(--text-2);">On signup</td>
           <td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--brand);">+5</td>
@@ -703,7 +703,7 @@
     <div class="modal-handle"></div>
     <div class="modal-head">
       <h3><i class="fa-solid fa-xmark" style="color:#EF4444;"></i> Cancel Booking?</h3>
-      <button class="modal-x" onclick="closeProvCancel()">✕</button>
+      <button class="modal-x" onclick="closeProvCancel()"><i class="fa-solid fa-xmark fxi"></i></button>
     </div>
     <div class="modal-body">
       <p style="font-size:0.85rem;color:var(--text-2);line-height:1.6;">
@@ -726,7 +726,7 @@
     <div class="modal-handle"></div>
     <div class="modal-head">
       <h3><i class="fa-solid fa-flag-checkered" style="color:var(--brand);"></i> Mark Job as Done?</h3>
-      <button class="modal-x" onclick="closeMarkDone()">✕</button>
+      <button class="modal-x" onclick="closeMarkDone()"><i class="fa-solid fa-xmark fxi"></i></button>
     </div>
     <div class="modal-body">
       <p style="font-size:0.85rem;color:var(--text-2);line-height:1.6;">
@@ -845,7 +845,7 @@ function loadListingSubcats() {
       }
       if (providerData.status === 'pending' || providerData.status === 'needs_compliance') {
         const isPending = providerData.status === 'pending';
-        const icon      = isPending ? '⏳' : '⚠️';
+        const icon      = isPending ? '<i class="fa-solid fa-hourglass-half fxi"></i>' : '<i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i>';
         const title     = isPending ? 'Account Pending Approval' : 'Action Required';
         const message   = isPending
           ? "Your provider application is being reviewed. You'll receive an email once approved. This usually takes 24-48 hours."
@@ -949,11 +949,11 @@ function renderRegularHero() {
           <div class="ph-name">${userData.first_name} ${userData.last_name}</div>
           <div class="ph-service">@${userData.username}</div>
           <div class="ph-badges">
-            <span class="ph-badge ph-badge-brand">👤 User</span>
-            <span class="ph-badge ph-badge-green">✅ Active</span>
+            <span class="ph-badge ph-badge-brand"><i class="fa-solid fa-user fxi"></i> User</span>
+            <span class="ph-badge ph-badge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Active</span>
             ${isPlus
-              ? `<span class="ph-badge ph-badge-gold">✨ ${packageData?.name || 'Fixia Plus'}</span>`
-              : `<span class="ph-badge" style="background:rgba(255,90,31,0.15);color:#FF8C5A;">🔍 Free</span>`}
+              ? `<span class="ph-badge ph-badge-gold"><i class="fa-solid fa-sparkles fxi"></i> ${packageData?.name || 'Fixia Plus'}</span>`
+              : `<span class="ph-badge" style="background:rgba(255,90,31,0.15);color:#FF8C5A;"><i class="fa-solid fa-magnifying-glass fxi"></i> Free</span>`}
           </div>
         </div>
       </div>
@@ -1023,7 +1023,7 @@ function renderProviderHero() {
         <div class="ph-avatar ${userData?.avatar_url ? '' : 'ph-avatar-initials'}" 
              style="cursor:pointer;position:relative;" onclick="triggerAvatarUpload()" title="Change avatar">
           ${avatarHtml}
-          ${providerData.is_elite ? '<div class="ph-elite-crown">👑</div>' : ''}
+          ${providerData.is_elite ? '<div class="ph-elite-crown"><i class="fa-solid fa-crown fxi fxi-amber"></i></div>' : ''}
           <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;
                       background:var(--brand);border-radius:50%;border:2px solid #fff;
                       display:flex;align-items:center;justify-content:center;">
@@ -1034,10 +1034,10 @@ function renderProviderHero() {
           <div class="ph-name">${providerData.biz_name}</div>
           <div class="ph-service">${[providerData.city_name?.replace(/^City of (.+)/, '$1 City'), providerData.province_name].filter(Boolean).join(', ') || '—'}</div>
           <div class="ph-badges">
-            <span class="ph-badge ph-badge-brand">🔧 Provider</span>
-            ${providerData.status === 'approved' ? '<span class="ph-badge ph-badge-green">✅ Verified</span>' : '<span class="ph-badge" style="background:rgba(220,53,69,0.2);color:#FC8181;">⚠ Unverified</span>'}
-            ${packageData ? `<span class="ph-badge ph-badge-gold">✨ ${packageData.name}</span>` : ''}
-            ${providerData.is_elite ? '<span class="ph-badge ph-badge-gold">👑 Elite</span>' : ''}
+            <span class="ph-badge ph-badge-brand"><i class="fa-solid fa-wrench fxi"></i> Provider</span>
+            ${providerData.status === 'approved' ? '<span class="ph-badge ph-badge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span>' : '<span class="ph-badge" style="background:rgba(220,53,69,0.2);color:#FC8181;"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Unverified</span>'}
+            ${packageData ? `<span class="ph-badge ph-badge-gold"><i class="fa-solid fa-sparkles fxi"></i> ${packageData.name}</span>` : ''}
+            ${providerData.is_elite ? '<span class="ph-badge ph-badge-gold"><i class="fa-solid fa-crown fxi fxi-amber"></i> Elite</span>' : ''}
           </div>
         </div>
       </div>
@@ -1070,7 +1070,7 @@ async function saveRegularProfile() {
     userData.email = email; userData.phone = phone;
     renderRegularHero();
     renderOverview();
-    showToast('Profile updated ✅', 'success');
+    showToast('Profile updated', 'success');
   } catch(e) {
     showAlert('editAlert', 'Error: ' + (e.message || 'Please try again.'));
   }
@@ -1105,7 +1105,7 @@ async function saveProviderProfile() {
     providerData.biz_name = bizName;
     providerData.biz_desc = bizDesc;
     renderProviderHero();
-    showToast('Profile updated ✅', 'success');
+    showToast('Profile updated', 'success');
   } catch(e) { showAlert('profileAlert', 'Error: ' + e.message); }
 }
 
@@ -1118,7 +1118,7 @@ async function renderPlanTab() {
                     userData.package_id === 'regular-free' ||
                     userData.package_id === 'provider-free';
   const planName  = packageData?.name || 'Free';
-  const icon      = packageData?.icon || (isFree ? '🔍' : '✨');
+  const icon      = packageData?.icon || (isFree ? '<i class="fa-solid fa-magnifying-glass fxi"></i>' : '<i class="fa-solid fa-sparkles fxi"></i>');
   const subEnd    = userData?.subscription_end ? new Date(userData.subscription_end) : null;
   const subStart  = userData?.subscription_start ? new Date(userData.subscription_start) : null;
   const now       = new Date();
@@ -1161,7 +1161,7 @@ async function renderPlanTab() {
           ${daysLeft !== null ? `
           <div style="margin-top:6px;background:rgba(255,255,255,0.15);border-radius:8px;padding:6px 10px;
                       font-size:0.75rem;font-weight:700;color:#fff;">
-            ⏳ ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining
+            <i class="fa-solid fa-hourglass-half fxi"></i> ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining
           </div>` : ''}
         </div>`}
     </div>
@@ -1197,8 +1197,8 @@ async function renderPlanTab() {
 
       html += `
         <div class="upg-card" id="upgCard_${pkg.id}" onclick="selectUpgradePkg('${pkg.id}')">
-          ${pkg.popular ? `<div class="upg-popular">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
-          <div class="upg-icon">${pkg.icon || '✨'}</div>
+          ${pkg.popular ? `<div class="upg-popular"><i class="fa-solid fa-star fxi fxi-amber"></i> ${pkg.badge_label || 'Popular'}</div>` : ''}
+          <div class="upg-icon">${pkg.icon || '<i class="fa-solid fa-sparkles fxi"></i>'}</div>
           <div class="upg-name">${pkg.name}</div>
           <div class="upg-price">₱${pkg.price}</div>
           <div class="upg-period">${periodLabel[pkg.period] || pkg.period}</div>
@@ -1222,7 +1222,7 @@ async function renderPlanTab() {
   else if (!isFree) {
     html += `<div class="sec">
       <div style="text-align:center;padding:1rem;color:var(--text-3);font-size:0.82rem;">
-        <div style="font-size:2rem;margin-bottom:8px;">🏆</div>
+        <div style="font-size:2rem;margin-bottom:8px;"><i class="fa-solid fa-trophy fxi"></i></div>
         You're on the highest available plan!
       </div>
     </div>`;
@@ -1249,7 +1249,7 @@ async function changePassword() {
     document.getElementById('pwNew').value      = '';
     document.getElementById('pwConfirm').value  = '';
     document.getElementById('strengthFill').style.width = '0';
-    showToast('Password updated ✅', 'success');
+    showToast('Password updated', 'success');
   } catch(e) {
     showAlert('pwAlert', 'Error: ' + (e.message || 'Please try again.'));
   }
@@ -1276,20 +1276,20 @@ async function loadListings() {
 function renderListings() {
   const wrap = document.getElementById('listingsContainer');
   if (!myListings.length) {
-    wrap.innerHTML = '<div class="empty"><div class="ei">📋</div><p>No listings yet. Tap <strong>+ Add</strong> to create your first one.</p></div>';
+    wrap.innerHTML = '<div class="empty"><div class="ei"><i class="fa-solid fa-clipboard-list fxi"></i></div><p>No listings yet. Tap <strong>+ Add</strong> to create your first one.</p></div>';
     return;
   }
   wrap.innerHTML = myListings.map(l => `
     <div class="listing-card">
       <div class="lc-head">
-        <div class="lc-icon">🔧</div>
+        <div class="lc-icon"><i class="fa-solid fa-wrench fxi"></i></div>
         <div class="lc-info">
           <div class="lc-title">${esc(l.title)}</div>
           <div class="lc-sub">${CAT_LABELS[l.cat_main] || l.cat_main || '—'} &nbsp; • &nbsp; ${l.cat_sub || '—'}</div>
         </div>
-        <span class="badge ${l.is_active ? 'badge-green' : 'badge-grey'}">${l.is_active ? '✅ Active' : 'Inactive'}</span>
+        <span class="badge ${l.is_active ? 'badge-green' : 'badge-grey'}">${l.is_active ? '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Active' : 'Inactive'}</span>
       </div>
-      ${l.price_label ? `<div class="lc-price">💰 ${l.price_label}</div>` : ''}
+      ${l.price_label ? `<div class="lc-price"><i class="fa-solid fa-coins fxi"></i> ${l.price_label}</div>` : ''}
       <div class="lc-desc">${esc(l.description || '')}</div>
       <div class="lc-actions">
         <button class="btn-xs btn-edit-xs" onclick="editListing('${l.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
@@ -1373,7 +1373,7 @@ async function saveListing() {
       await FX.addListing({ providerId:providerData.id, title, description:desc, catMain:cat, catSub:sub, priceLabel:price, otherServiceDesc: cat === 'other' ? otherDesc : null });
     }
     toggleAddForm();
-    showToast(editId ? 'Listing updated ✅' : 'Listing added ✅', 'success');
+    showToast(editId ? 'Listing updated' : 'Listing added', 'success');
     await loadListings();
   } catch(e) {
     showAlert('addFormAlert', e.message || 'Failed to save listing.');
@@ -1440,7 +1440,7 @@ async function openReferralModal() {
         const periodLabel = { month:'1 Month', '3month':'3 Months', '6month':'6 Months', year:'1 Year', lifetime:'Lifetime' };
 		return `
           <div style="border:1.5px solid ${canRedeem ? 'var(--brand)' : 'var(--border)'};border-radius:10px;padding:12px;background:${canRedeem ? 'var(--brand-light)' : '#fff'};display:flex;flex-direction:column;gap:6px;">
-            <div style="font-size:1.4rem;text-align:center;">${pkg.icon || '📦'}</div>
+            <div style="font-size:1.4rem;text-align:center;">${pkg.icon || '<i class="fa-solid fa-box fxi"></i>'}</div>
             <div style="font-size:0.82rem;font-weight:800;color:var(--navy);text-align:center;">${pkg.name}</div>
             <div style="font-size:0.7rem;color:var(--text-3);text-align:center;">${periodLabel[pkg.period] || pkg.period}</div>
             <div style="font-size:0.85rem;font-weight:800;color:var(--brand);text-align:center;">${pkg.referral_points_required} pts</div>
@@ -1457,7 +1457,7 @@ async function openReferralModal() {
               ontouchstart="this.style.transform='scale(0.93)';this.style.boxShadow='0 1px 4px rgba(255,90,31,0.2)'"
               ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 3px 10px rgba(255,90,31,0.3)'"
               ` : ''}>
-              🎁 Redeem
+              <i class="fa-solid fa-gift fxi"></i> Redeem
             </button>
           </div>`;
       }).join('') + `</div>`;
@@ -1475,7 +1475,7 @@ async function openReferralModal() {
             <div style="font-size:0.7rem;color:var(--text-3);">${r.referred_role} · ${r.status}</div>
           </div>
           <div style="font-weight:800;color:${r.status === 'credited' ? 'var(--green)' : 'var(--text-3)'};">
-            ${r.status === 'credited' ? '+' + r.points_awarded + ' pts' : '⏳ Pending'}
+            ${r.status === 'credited' ? '+' + r.points_awarded + ' pts' : '<i class="fa-solid fa-hourglass-half fxi"></i> Pending'}
           </div>
         </div>`).join('');
     }
@@ -1506,7 +1506,7 @@ async function redeemPackage(pkgId) {
 
     const result = await FX.redeemReferralPackage(sess.userId, pkgId);
     closeReferralModal();
-    showToast(`🎉 ${result.pkg.name} activated! ${result.newPoints} pts remaining.`);
+    showToast(`${result.pkg.name} activated! ${result.newPoints} pts remaining.`);
     await renderPlanTab();
     const badge = document.getElementById('referralPointsBadge');
     if (badge && result.newPoints > 0) {
@@ -1534,7 +1534,7 @@ function copyReferralLink() {
     }, 1500);
   }
   navigator.clipboard?.writeText(link)
-    .then(() => showToast('Referral link copied! 🔗'))
+    .then(() => showToast('Referral link copied!'))
     .catch(() => showToast('Link: ' + link));
 }
 
@@ -1559,10 +1559,10 @@ async function loadReviews() {
 function renderReviews() {
   const wrap = document.getElementById('reviewsContainer');
   const avg  = providerData?.avg_rating || 0;
-  document.getElementById('avgRatingBig').textContent = `⭐ ${avg} (${myReviews.length} reviews)`;
+  document.getElementById('avgRatingBig').textContent = `${avg} (${myReviews.length} reviews)`;
   document.getElementById('reviewCountLabel').textContent = myReviews.length + (myReviews.length === 1 ? ' review' : ' reviews');
   if (!myReviews.length) {
-    wrap.innerHTML = '<div class="empty"><div class="ei">⭐</div><p>No reviews yet. Complete jobs and ask your customers to leave a rating!</p></div>';
+    wrap.innerHTML = '<div class="empty"><div class="ei"><i class="fa-solid fa-star fxi fxi-amber"></i></div><p>No reviews yet. Complete jobs and ask your customers to leave a rating!</p></div>';
     return;
   }
   wrap.innerHTML = myReviews.map(r => {
@@ -1604,7 +1604,7 @@ async function confirmMarkDone() {
   try {
     await FX.markDone(_markDoneId);
     closeMarkDone();
-    showToast('Job marked as done! ✅ Waiting for customer confirmation.', 'success');
+    showToast('Job marked as done! Waiting for customer confirmation.', 'success');
   } catch(e) {
     showToast(e.message, 'error');
   } finally {
@@ -1782,7 +1782,7 @@ async function submitChangeRequest() {
       file,
     });
     closeChangeRequestModal();
-    showToast('Request submitted ✅ Admin will review it shortly.', 'success');
+    showToast('Request submitted Admin will review it shortly.', 'success');
   } catch(e) {
     showAlert('crAlert', 'Error: ' + e.message);
   } finally {
@@ -1950,7 +1950,7 @@ function confirmLocationPicker() {
     confirmEl.style.cssText = 'font-size:0.82rem;color:var(--navy);font-weight:600;padding:10px 12px;background:var(--green-bg);border:1.5px solid var(--green);border-radius:8px;margin-bottom:4px;';
     document.getElementById('crRequestedValue').after(confirmEl);
   }
-  confirmEl.innerHTML = `<i class="fa-solid fa-location-dot" style="color:var(--green);"></i> ${display} <button onclick="clearLocationSelection()" style="float:right;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:0.9rem;">✕</button>`;
+  confirmEl.innerHTML = `<i class="fa-solid fa-location-dot" style="color:var(--green);"></i> ${display} <button onclick="clearLocationSelection()" style="float:right;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:0.9rem;"><i class="fa-solid fa-xmark fxi"></i></button>`;
   confirmEl.style.display = 'block';
 
   closeLocationPicker();
@@ -2065,7 +2065,7 @@ async function handleAvatarChange(input) {
 	FX.syncSaved();
 
     renderProviderHero();
-    showToast('Avatar updated ✅', 'success');
+    showToast('Avatar updated', 'success');
   } catch(e) {
     showToast('Failed to update avatar: ' + e.message, 'error');
   } finally {
@@ -2132,7 +2132,7 @@ async function openUpgradeModal(newPackageId) {
                   font-size:0.82rem;line-height:1.9;">
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--text-3);">New Plan</span>
-          <strong>${newPkg?.icon || '✨'} ${newPkg?.name}</strong>
+          <strong>${newPkg?.icon || '<i class="fa-solid fa-sparkles fxi"></i>'} ${newPkg?.name}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--text-3);">Duration</span>
@@ -2150,7 +2150,7 @@ async function openUpgradeModal(newPackageId) {
         <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);
                     padding-top:6px;margin-top:4px;">
           <span style="color:var(--text-3);">Total Subscription</span>
-          <strong>${calc.totalDays === null ? '♾️ Lifetime' : calc.totalDays + ' days'}</strong>
+          <strong>${calc.totalDays === null ? '<i class="fa-solid fa-infinity fxi"></i> Lifetime' : calc.totalDays + ' days'}</strong>
         </div>
       </div>
       ${!isFree ? `
@@ -2286,7 +2286,7 @@ async function confirmUpgQrPayment() {
     });
     closeUpgQrModal();
     closeUpgradeModal();
-    showToast('Upgrade request submitted! ✅', 'success');
+    showToast('Upgrade request submitted!', 'success');
     await renderPlanTab();
   } catch(e) {
     showToast('Error: ' + e.message, 'error');

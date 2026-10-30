@@ -189,7 +189,7 @@
 <div class="hero" id="heroSection" style="display:none;">
   <div class="hero-inner">
     <div class="hero-avatar" id="heroAvatar">?
-      <div class="elite-crown" id="heroEliteCrown" style="display:none;">👑</div>
+      <div class="elite-crown" id="heroEliteCrown" style="display:none;"><i class="fa-solid fa-crown fxi fxi-amber"></i></div>
     </div>
     <div class="hero-info">
       <div class="hero-name" id="heroName">—</div>
@@ -289,7 +289,7 @@
 
 <!-- Error state -->
 <div id="errorState" style="display:none;text-align:center;padding:3rem 1rem;">
-  <div style="font-size:2.5rem;margin-bottom:8px;">😕</div>
+  <div style="font-size:2.5rem;margin-bottom:8px;"><i class="fa-solid fa-face-frown fxi"></i></div>
   <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:4px;">Provider not found</div>
   <div style="font-size:0.8rem;color:var(--text-3);margin-bottom:1rem;">This provider may no longer be active on Fixia.</div>
   <button onclick="window.location.href='homepage.html'" style="background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 20px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
@@ -383,7 +383,7 @@ async function renderPage() {
     avatarEl.innerHTML = `
       <img src="${provider.avatar_url}" alt="Avatar"
            style="width:100%;height:100%;object-fit:cover;border-radius:18px;display:block;"/>
-      <div class="elite-crown" id="heroEliteCrown" style="display:none;">👑</div>`;
+      <div class="elite-crown" id="heroEliteCrown" style="display:none;"><i class="fa-solid fa-crown fxi fxi-amber"></i></div>`;
   } else {
     const initials = (providerUser?.first_name?.[0] || '') + (providerUser?.last_name?.[0] || '');
     avatarEl.childNodes[0].nodeValue = initials || '?';
@@ -410,18 +410,18 @@ async function renderPage() {
   if (provider.is_elite) {
     document.getElementById('heroEliteCrown').style.display = 'block';
     document.getElementById('heroBadges').innerHTML +=
-      '<span class="hbadge hbadge-gold">👑 Fixia Elite</span>';
+      '<span class="hbadge hbadge-gold"><i class="fa-solid fa-crown fxi fxi-amber"></i> Fixia Elite</span>';
   }
   if (provider.is_featured) {
     document.getElementById('heroBadges').innerHTML +=
-      '<span class="hbadge hbadge-brand">⭐ Featured</span>';
+      '<span class="hbadge hbadge-brand"><i class="fa-solid fa-star fxi fxi-amber"></i> Featured</span>';
   }
 if (provider.status === 'approved') {
   document.getElementById('heroBadges').innerHTML +=
-    '<span class="hbadge hbadge-green">✅ Verified</span>';
+    '<span class="hbadge hbadge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Verified</span>';
 } else {
   document.getElementById('heroBadges').innerHTML +=
-    '<span class="hbadge" style="background:var(--red);color:#fff;">⚠ Unverified</span>';
+    '<span class="hbadge" style="background:var(--red);color:#fff;"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Unverified</span>';
 }
 
   // Stats
@@ -607,7 +607,7 @@ async function submitRating() {
     });
 
     rateAlert.className = 'rate-alert show ok';
-    rateAlert.textContent = '✅ Thank you for your rating!';
+    rateAlert.textContent = 'Thank you for your rating!';
 
     // Refresh reviews
     reviews  = await FX.getRatingsByProvider(provider.id);
@@ -642,7 +642,7 @@ function shareProfile() {
     navigator.share({ title, url }).catch(() => {});
   } else {
     navigator.clipboard?.writeText(url)
-    .then(() => showToast('Link copied to clipboard! 🔗'))
+    .then(() => showToast('Link copied to clipboard!'))
     .catch(() => showToast('Share link: ' + url, '#92400e'));
   }
 }
@@ -685,7 +685,7 @@ function toggleSave() {
     FX.saveProvider(provider);
     btn.innerHTML = '<i class="fa-solid fa-bookmark" style="color:var(--gold);"></i>';
     btn.title = 'Saved!';
-    showSaveToast('Provider saved! ✅');
+    showSaveToast('Provider saved!');
   }
 }
 
@@ -824,7 +824,7 @@ async function submitBooking() {
     await FX.createBooking(sess.userId, provider.id, msg, sess.role);
     closeBooking();
     setTimeout(function() {
-      showToast('✅ Booking sent!');
+      showToast('Booking sent!');
     }, 300);
     setTimeout(function() { FX.adTrigger('booking_sent'); }, 4000);
   } catch(e) {
@@ -832,7 +832,7 @@ async function submitBooking() {
     if (errMsg.toLowerCase().includes('already have')) {
       closeBooking();
       setTimeout(function() {
-        showToast('⚠️ You already have an active booking with this provider.', '#92400e');
+        showToast('You already have an active booking with this provider.', '#92400e');
       }, 300);
     } else {
       alertEl.textContent = errMsg;
@@ -927,7 +927,7 @@ async function submitReport() {
     </div>
     <div style="padding:14px 18px;">
       <div style="font-size:0.78rem;color:var(--text-2);line-height:1.6;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:10px 12px;">
-        📋 Describe the job you agreed on. This creates a record so the provider can mark it done and receive your rating.
+        <i class="fa-solid fa-clipboard-list fxi"></i> Describe the job you agreed on. This creates a record so the provider can mark it done and receive your rating.
       </div>
       <div style="display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;">
         Job Description <span style="color:var(--red);">*</span>
@@ -998,5 +998,6 @@ async function submitReport() {
   }
 </script>
 
+<script src="js/page-booking.js"></script>
 </body>
 </html>

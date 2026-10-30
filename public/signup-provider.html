@@ -404,7 +404,7 @@
 
         <!-- Upload zone — hidden once file is chosen -->
         <div class="upload-zone" id="avatarZone" onclick="document.getElementById('avatarFile').click()">
-          <div class="upload-icon">🖼️</div>
+          <div class="upload-icon"><i class="fa-solid fa-image fxi"></i></div>
           <div class="upload-label">Tap to upload your photo or logo</div>
           <div class="upload-sub">JPG or PNG file type</div>
         </div>
@@ -448,7 +448,7 @@
 
         <!-- Upload zone — hidden once file is chosen -->
         <div class="upload-zone" id="idZone" onclick="document.getElementById('idFile').click()">
-          <div class="upload-icon">🪪</div>
+          <div class="upload-icon"><i class="fa-solid fa-id-card fxi"></i></div>
           <div class="upload-label">Tap to upload your ID</div>
           <div class="upload-sub">JPG or PNG · Will be compressed for clarity</div>
         </div>
@@ -1193,7 +1193,7 @@ async function loadProviderPackages() {
       pickPkg(pkg);
       list.innerHTML = `
         <div style="background:var(--brand-light);border:2px solid var(--brand);border-radius:12px;padding:16px;text-align:center;">
-          <div style="font-size:1.5rem;margin-bottom:6px;">${pkg.icon || '🎁'}</div>
+          <div style="font-size:1.5rem;margin-bottom:6px;">${pkg.icon || '<i class="fa-solid fa-gift fxi"></i>'}</div>
           <div style="font-size:0.9rem;font-weight:800;color:var(--brand);">Pre-Launch Special</div>
           <div style="font-size:0.85rem;font-weight:700;color:var(--text);margin-top:2px;">${pkg.name}</div>
           <div style="font-size:0.75rem;color:var(--text-3);margin-top:4px;">Complimentary package — no payment required.</div>
@@ -1210,10 +1210,10 @@ async function loadProviderPackages() {
     renderProviderPackages(pkgs);
   } catch(e) {
     renderProviderPackages([
-	  { id:'free',    name:'Free',    price:0,    period:'forever', listing_limit:0,   icon:'🔍', popular:false, features:['Browse & book other providers','Rate & review','❌ Cannot add listings','❌ Cannot accept bookings','❌ Not searchable by customers','Ads shown'] },
-      { id:'basic',   name:'Basic',   price:299,  period:'month', listing_limit:5,   icon:'🔵', popular:false, features:['5 service listings','Standard placement','Basic analytics'] },
-      { id:'pro',     name:'Pro',     price:799,  period:'month', listing_limit:10,  icon:'🟠', popular:true,  features:['10 service listings','Featured strip','Priority search','Portfolio showcase'] },
-      { id:'premium', name:'Premium', price:1499, period:'month', listing_limit:999, icon:'🟣', popular:false, features:['Unlimited listings','Top of featured','Ad boost slot','Full analytics','Verified badge'] },
+	  { id:'free',    name:'Free',    price:0,    period:'forever', listing_limit:0,   icon:'<i class="fa-solid fa-magnifying-glass fxi"></i>', popular:false, features:['Browse & book other providers','Rate & review','<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Cannot add listings','<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Cannot accept bookings','<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Not searchable by customers','Ads shown'] },
+      { id:'basic',   name:'Basic',   price:299,  period:'month', listing_limit:5,   icon:'<i class="fa-solid fa-circle fxi fxi-blue"></i>', popular:false, features:['5 service listings','Standard placement','Basic analytics'] },
+      { id:'pro',     name:'Pro',     price:799,  period:'month', listing_limit:10,  icon:'<i class="fa-solid fa-circle fxi fxi-orange"></i>', popular:true,  features:['10 service listings','Featured strip','Priority search','Portfolio showcase'] },
+      { id:'premium', name:'Premium', price:1499, period:'month', listing_limit:999, icon:'<i class="fa-solid fa-circle fxi fxi-purple"></i>', popular:false, features:['Unlimited listings','Top of featured','Ad boost slot','Full analytics','Verified badge'] },
     ]);
   }
 }
@@ -1228,8 +1228,8 @@ function renderProviderPackages(pkgs) {
     card.id = `pp_${pkg.id}`;
     card.onclick = () => pickPkg(pkg);
     card.innerHTML = `
-      ${pkg.popular ? `<div class="pkg-popular-flag">⭐ ${pkg.badge_label || 'Popular'}</div>` : ''}
-      <div class="pkg-icon">${pkg.icon || (isFree ? '🔍' : '✨')}</div>
+      ${pkg.popular ? `<div class="pkg-popular-flag"><i class="fa-solid fa-star fxi fxi-amber"></i> ${pkg.badge_label || 'Popular'}</div>` : ''}
+      <div class="pkg-icon">${pkg.icon || (isFree ? '<i class="fa-solid fa-magnifying-glass fxi"></i>' : '<i class="fa-solid fa-sparkles fxi"></i>')}</div>
       <div class="pkg-name">${pkg.name}</div>
       <div class="pkg-price">${isFree
         ? '<span style="font-size:1.1rem;">Free</span>'
@@ -1448,12 +1448,12 @@ async function doRegister() {
     }
     Promise.all(emailPromises).catch(() => {});
 
-    document.getElementById('doneIcon').textContent  = (isInstant || isFree) ? '🎉' : '⏳';
+    document.getElementById('doneIcon').innerHTML  = (isInstant || isFree) ? '<i class="fa-solid fa-party-horn fxi"></i>' : '<i class="fa-solid fa-hourglass-half fxi"></i>';
     document.getElementById('doneTitle').textContent = (isInstant || isFree) ? 'You\'re all set!' : (isPresignupMode ? 'Pre-Signup Successful!' : 'Application Submitted!');
     document.getElementById('doneMsg').innerHTML = (isInstant || isFree)
       ? `Welcome to Fixia, <strong>${formData.firstName}</strong>! Your account is now active. Our team will finalize your profile within 24 hours.`
       : isPresignupMode
-        ? `You're on the list, <strong>${formData.firstName}</strong>! 🎉 You'll be among the first providers to go live on Fixia when we launch. An update will be sent to <strong>${formData.email}</strong> on launch day.`
+        ? `You're on the list, <strong>${formData.firstName}</strong>! <i class="fa-solid fa-party-horn fxi"></i> You'll be among the first providers to go live on Fixia when we launch. An update will be sent to <strong>${formData.email}</strong> on launch day.`
         : `Thank you, <strong>${formData.firstName}</strong>! Your application is now under review.<br/><br/>You may log in and use the platform with limited access while our team verifies your account. You'll receive an email update at <strong>${formData.email}</strong> within 24–48 hours.`;
 
   if (isPresignupMode) {

@@ -114,7 +114,7 @@
     <!-- Mode OFF state -->
     <div id="stateModeOff" style="display:none;">
       <div class="mode-off">
-        <div class="mode-off-icon">🔒</div>
+        <div class="mode-off-icon"><i class="fa-solid fa-lock fxi"></i></div>
         <div class="mode-off-title">Pre-Signup is Closed</div>
         <div class="mode-off-sub">Pre-launch sign-ups are not currently available. Please check back soon or visit the main site to sign up normally.</div>
       </div>
@@ -146,7 +146,7 @@
 
       <!-- Type selection -->
       <div class="type-card" onclick="goToSignup('signup-regular.html')">
-        <div class="type-card-icon icon-regular">🔍</div>
+        <div class="type-card-icon icon-regular"><i class="fa-solid fa-magnifying-glass fxi"></i></div>
         <div class="type-card-body">
           <div class="type-card-title">Find Services</div>
           <div class="type-card-desc">Find trusted professionals near you when we launch.</div>
@@ -156,7 +156,7 @@
       </div>
 
       <div class="type-card" onclick="goToSignup('signup-provider.html')">
-        <div class="type-card-icon icon-provider">🔧</div>
+        <div class="type-card-icon icon-provider"><i class="fa-solid fa-wrench fxi"></i></div>
         <div class="type-card-body">
           <div class="type-card-title">Offer Services</div>
           <div class="type-card-desc">List your skills or business and get discovered on launch day.</div>
@@ -190,7 +190,7 @@
     document.getElementById('stateModeOn').style.display = 'block';
   } catch(e) {
     document.getElementById('stateLoading').innerHTML =
-      `<div style="color:#dc3545;font-size:0.82rem;">⚠️ Could not load page. Please try again.</div>`;
+      `<div style="color:#dc3545;font-size:0.82rem;"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Could not load page. Please try again.</div>`;
   }
 })();
 

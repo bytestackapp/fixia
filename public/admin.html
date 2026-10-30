@@ -258,20 +258,20 @@
 
 <!-- MOBILE TABS -->
 <div class="mobile-tabs">
-  <button class="mtab active" onclick="showSection('dashboard',this)">📊 Dashboard</button>
-  <button class="mtab" onclick="showSection('pending',this)">⏳ Pending</button>
-  <button class="mtab" onclick="showSection('providers',this)">🔧 Providers</button>
-  <button class="mtab" onclick="showSection('regulars',this)">👥 Regulars</button>
-  <button class="mtab" onclick="showSection('suspicious',this)">⚠️ Suspicious</button> 
-  <button class="mtab" onclick="showSection('packages',this)">📦 Packages</button>
-  <button class="mtab" onclick="showSection('elite',this)">👑 Elite</button>
-  <button class="mtab" onclick="showSection('ads',this)">📢 Ads</button>
+  <button class="mtab active" onclick="showSection('dashboard',this)"><i class="fa-solid fa-chart-bar fxi"></i> Dashboard</button>
+  <button class="mtab" onclick="showSection('pending',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</button>
+  <button class="mtab" onclick="showSection('providers',this)"><i class="fa-solid fa-wrench fxi"></i> Providers</button>
+  <button class="mtab" onclick="showSection('regulars',this)"><i class="fa-solid fa-users fxi"></i> Regulars</button>
+  <button class="mtab" onclick="showSection('suspicious',this)"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Suspicious</button> 
+  <button class="mtab" onclick="showSection('packages',this)"><i class="fa-solid fa-box fxi"></i> Packages</button>
+  <button class="mtab" onclick="showSection('elite',this)"><i class="fa-solid fa-crown fxi fxi-amber"></i> Elite</button>
+  <button class="mtab" onclick="showSection('ads',this)"><i class="fa-solid fa-bullhorn fxi"></i> Ads</button>
   <button class="mtab" onclick="showSection('settings',this)">⚙️ Settings</button>
-  <button class="mtab" onclick="showSection('messages',this)">📣 Messages</button>
-  <button class="mtab" onclick="showSection('requests',this)">📥 Requests</button>
+  <button class="mtab" onclick="showSection('messages',this)"><i class="fa-solid fa-bullhorn fxi"></i> Messages</button>
+  <button class="mtab" onclick="showSection('requests',this)"><i class="fa-solid fa-inbox fxi"></i> Requests</button>
   <button class="mtab" onclick="showSection('uncategorized',this)">🏷️ Uncategorized</button>
-  <button class="mtab" onclick="showSection('upgrades',this);loadUpgradeRequests();">⬆️ Upgrades</button>
-  <button class="mtab" onclick="showSection('reports',this)">🚩 Reports</button>
+  <button class="mtab" onclick="showSection('upgrades',this);loadUpgradeRequests();"><i class="fa-solid fa-arrow-up fxi"></i> Upgrades</button>
+  <button class="mtab" onclick="showSection('reports',this)"><i class="fa-solid fa-flag fxi"></i> Reports</button>
 </div>
 
 <div class="layout">
@@ -315,11 +315,11 @@
       <div class="page-sub">Overview of your Fixia marketplace.</div>
 
       <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="stat-icon" style="background:#EFF6FF;">👥</div><div class="stat-val" id="st-regulars">—</div><div class="stat-label">Regular Users</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#FFF0EB;">🔧</div><div class="stat-val" id="st-providers">—</div><div class="stat-label">Providers</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#FFFBEB;">⏳</div><div class="stat-val" id="st-pending">—</div><div class="stat-label">Pending Approval</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#F5F3FF;">👑</div><div class="stat-val" id="st-elite">—</div><div class="stat-label">Fixia Elite</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#ECFDF5;">📦</div><div class="stat-val" id="st-packages">—</div><div class="stat-label">Active Packages</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#EFF6FF;"><i class="fa-solid fa-users fxi"></i></div><div class="stat-val" id="st-regulars">—</div><div class="stat-label">Regular Users</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#FFF0EB;"><i class="fa-solid fa-wrench fxi"></i></div><div class="stat-val" id="st-providers">—</div><div class="stat-label">Providers</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#FFFBEB;"><i class="fa-solid fa-hourglass-half fxi"></i></div><div class="stat-val" id="st-pending">—</div><div class="stat-label">Pending Approval</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#F5F3FF;"><i class="fa-solid fa-crown fxi fxi-amber"></i></div><div class="stat-val" id="st-elite">—</div><div class="stat-label">Fixia Elite</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#ECFDF5;"><i class="fa-solid fa-box fxi"></i></div><div class="stat-val" id="st-packages">—</div><div class="stat-label">Active Packages</div></div>
       </div>
 
       <div class="sec-card">
@@ -335,8 +335,8 @@
       <div class="page-title">Pending Applications</div>
       <div class="page-sub">Review and approve provider applications.</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;">
-        <button class="ftab active" id="pendingTabReview" onclick="switchPendingTab('review',this)">⏳ Awaiting Review</button>
-        <button class="ftab" id="pendingTabCompliance" onclick="switchPendingTab('compliance',this)">⚠️ Need Compliance</button>
+        <button class="ftab active" id="pendingTabReview" onclick="switchPendingTab('review',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Awaiting Review</button>
+        <button class="ftab" id="pendingTabCompliance" onclick="switchPendingTab('compliance',this)"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Need Compliance</button>
       </div>
       <div class="sec-card">
 		<div class="sec-head"><div class="sec-title"><i class="fa-solid fa-clock"></i> Pending Applications</div></div>
@@ -357,10 +357,10 @@
         </div>
         <div class="filter-row">
           <button class="ftab active" onclick="setProvFilter('all',this)">All</button>
-          <button class="ftab" onclick="setProvFilter('approved',this)">✅ Approved</button>
-          <button class="ftab" onclick="setProvFilter('pending',this)">⏳ Pending</button>
-          <button class="ftab" onclick="setProvFilter('rejected',this)">❌ Rejected</button>
-          <button class="ftab" onclick="setProvFilter('elite',this)">👑 Elite</button>
+          <button class="ftab" onclick="setProvFilter('approved',this)"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Approved</button>
+          <button class="ftab" onclick="setProvFilter('pending',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</button>
+          <button class="ftab" onclick="setProvFilter('rejected',this)"><i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Rejected</button>
+          <button class="ftab" onclick="setProvFilter('elite',this)"><i class="fa-solid fa-crown fxi fxi-amber"></i> Elite</button>
         </div>
         <div class="tbl-wrap">
           <table id="provTable">
@@ -385,9 +385,9 @@
         </div>
         <div class="filter-row">
           <button class="ftab active" onclick="setRegFilter('all',this)">All</button>
-          <button class="ftab" onclick="setRegFilter('active',this)">✅ Active</button>
-          <button class="ftab" onclick="setRegFilter('pending',this)">⏳ Pending</button>
-          <button class="ftab" onclick="setRegFilter('suspended',this)">🚫 Suspended</button>
+          <button class="ftab" onclick="setRegFilter('active',this)"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Active</button>
+          <button class="ftab" onclick="setRegFilter('pending',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</button>
+          <button class="ftab" onclick="setRegFilter('suspended',this)"><i class="fa-solid fa-ban fxi fxi-red"></i> Suspended</button>
         </div>
         <div class="tbl-wrap">
           <table>
@@ -403,7 +403,7 @@
       <div class="page-title">Suspicious Activity</div>
       <div class="page-sub">Bookings and ratings where the user and provider share the same IP address — possible self-rating abuse.</div>
       <div style="margin-top:16px;" id="suspiciousContent">
-        <div class="empty-state"><div class="empty-icon">🔍</div><p>Loading…</p></div>
+        <div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-magnifying-glass fxi"></i></div><p>Loading…</p></div>
       </div>
     </div>
 
@@ -504,15 +504,15 @@
       <div class="page-sub">Grant or revoke the exclusive Fixia Elite tier to providers.</div>
 
       <div class="elite-banner">
-        <div style="font-size:2rem;">👑</div>
+        <div style="font-size:2rem;"><i class="fa-solid fa-crown fxi fxi-amber"></i></div>
         <div class="elite-banner-text">
           <div class="elite-banner-title">Fixia Elite</div>
           <div class="elite-banner-sub">An exclusive, admin-granted tier for top providers. Elite members enjoy the following perks:</div>
           <ul style="margin-top:8px;padding-left:16px;font-size:0.75rem;opacity:0.9;display:flex;flex-direction:column;gap:4px;">
-            <li><strong>👑 Crown Badge</strong> — Displayed next to the provider's name across the platform.</li>
-            <li><strong>🏠 Homepage Priority</strong> — Always pinned to the first slots, above all featured providers.</li>
+            <li><strong><i class="fa-solid fa-crown fxi fxi-amber"></i> Crown Badge</strong> — Displayed next to the provider's name across the platform.</li>
+            <li><strong><i class="fa-solid fa-house fxi"></i> Homepage Priority</strong> — Always pinned to the first slots, above all featured providers.</li>
             <li><strong>🔝 Top Search Ranking</strong> — Listed first in all search and browse results, regardless of subscription.</li>
-            <li><strong>🔍 Elite Filter</strong> — Discoverable exclusively via the Elite filter by clients looking for the best.</li>
+            <li><strong><i class="fa-solid fa-magnifying-glass fxi"></i> Elite Filter</strong> — Discoverable exclusively via the Elite filter by clients looking for the best.</li>
           </ul>
         </div>
       </div>
@@ -624,7 +624,7 @@
         </button>
       </div>
       <div id="testOtpStatus" style="font-size:0.72rem;margin-top:6px;color:var(--green);display:none;">
-        ✅ Test code active — all signups will use this code, no email sent.
+        <i class="fa-solid fa-circle-check fxi fxi-green"></i> Test code active — all signups will use this code, no email sent.
       </div>
     </div>
   </div>
@@ -861,7 +861,7 @@
               <div id="selectedUserEmail" style="font-size:0.7rem;color:var(--text-3);"></div>
             </div>
             <button onclick="clearSelectedUser()"
-                    style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:1rem;">✕</button>
+                    style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:1rem;"><i class="fa-solid fa-xmark fxi"></i></button>
           </div>
         </div>
 
@@ -897,10 +897,10 @@
         <div class="form-group">
           <label class="form-label">Type</label>
           <select class="form-select" id="tplType" onchange="updateTplPreview()">
-            <option value="announcement">📢 Announcement</option>
-            <option value="warning">⚠️ Warning</option>
-            <option value="maintenance">🔧 Maintenance</option>
-            <option value="welcome">👋 Welcome</option>
+            <option value="announcement">Announcement</option>
+            <option value="warning">Warning</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="welcome">Welcome</option>
           </select>
         </div>
         <div class="form-group">
@@ -950,7 +950,7 @@
         </div>
         <div class="modal-body" style="max-height:420px;overflow-y:auto;padding:12px 16px;">
           <div id="templateListModal">
-            <div class="empty-state"><div class="empty-icon">📝</div><p>No templates yet.</p></div>
+            <div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-note-sticky fxi"></i></div><p>No templates yet.</p></div>
           </div>
         </div>
         <div class="modal-foot">
@@ -966,7 +966,7 @@
   <div class="page-sub">Provider-submitted requests to change their business name, email, or location.</div>
 
   <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;">
-    <button class="ftab active" onclick="setReqFilter('pending',this)">⏳ Pending</button>
+    <button class="ftab active" onclick="setReqFilter('pending',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</button>
   </div>
 
   <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-top:4px;">
@@ -979,7 +979,7 @@
         <th>Action</th>
       </tr></thead>
       <tbody id="requestsTbody">
-        <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📥</div><p>No pending requests.</p></div></td></tr>
+        <tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-inbox fxi"></i></div><p>No pending requests.</p></div></td></tr>
       </tbody>
     </table>
   </div>
@@ -1038,7 +1038,7 @@
 <div id="complianceModal" class="modal">
   <div class="modal-box sm">
     <div class="modal-head">
-      <h3>⚠️ Set Compliance Required</h3>
+      <h3><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Set Compliance Required</h3>
       <button class="modal-x" onclick="closeModal('complianceModal')">×</button>
     </div>
     <div class="modal-body">
@@ -1090,10 +1090,10 @@
   <div class="page-sub">Reports submitted by users against providers. Review and take action.</div>
 
   <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;">
-    <button class="ftab active" onclick="setReportFilter('pending',this)">⏳ Pending</button>
-    <button class="ftab" onclick="setReportFilter('warned',this)">⚠️ Warned</button>
-    <button class="ftab" onclick="setReportFilter('suspended',this)">🚫 Suspended</button>
-    <button class="ftab" onclick="setReportFilter('dismissed',this)">✅ Dismissed</button>
+    <button class="ftab active" onclick="setReportFilter('pending',this)"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</button>
+    <button class="ftab" onclick="setReportFilter('warned',this)"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Warned</button>
+    <button class="ftab" onclick="setReportFilter('suspended',this)"><i class="fa-solid fa-ban fxi fxi-red"></i> Suspended</button>
+    <button class="ftab" onclick="setReportFilter('dismissed',this)"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Dismissed</button>
   </div>
 
   <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
@@ -1106,7 +1106,7 @@
         <th>Action</th>
       </tr></thead>
       <tbody id="reportsTbody">
-        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🚩</div><p>No reports.</p></div></td></tr>
+        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-flag fxi"></i></div><p>No reports.</p></div></td></tr>
       </tbody>
     </table>
   </div>
@@ -1133,11 +1133,11 @@
   <div style="display:flex;gap:8px;margin-bottom:16px;margin-top:4px;">
     <button id="upgradeTabPending" onclick="switchUpgradeTab('pending')"
       style="padding:6px 16px;border-radius:8px;border:none;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;">
-      ⏳ Pending
+      <i class="fa-solid fa-hourglass-half fxi"></i> Pending
     </button>
     <button id="upgradeTabHistory" onclick="switchUpgradeTab('history')"
       style="padding:6px 16px;border-radius:8px;border:none;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text-2);">
-      🗂 History
+      <i class="fa-solid fa-folder fxi"></i> History
     </button>
   </div>
 
@@ -1887,7 +1887,7 @@ async function loadPending() {
 	renderPendingList(awaitingReview.slice(0, 5), 'dashPendingList');
   } catch(e) {
     console.error('[Admin] loadPending error:', e);
-    const errMsg = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load: ${e.message}</p></div>`;
+    const errMsg = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i></div><p>Failed to load: ${e.message}</p></div>`;
     document.getElementById('pendingList').innerHTML = errMsg;
     document.getElementById('dashPendingList').innerHTML = errMsg;
   }
@@ -2022,7 +2022,7 @@ async function clearTestOtp() {
 async function savePresignupMode(checked) {
   try {
     await FX.setSetting('presignup_mode', checked ? 'true' : 'false');
-    showToast(checked ? '🚀 Pre-Signup Mode activated.' : 'Pre-Signup Mode deactivated.');
+    showToast(checked ? 'Pre-Signup Mode activated.' : 'Pre-Signup Mode deactivated.');
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -2030,7 +2030,7 @@ async function savePresignupPkg(key, selectId) {
   const val = document.getElementById(selectId).value;
   try {
     await FX.setSetting(key, val);
-    showToast('Package saved ✅');
+    showToast('Package saved');
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -2058,11 +2058,11 @@ async function saveAdSetting(key, inputId) {
         body: JSON.stringify({ featured_quota: newQuota }),
       });
     
-      showToast('Featured quota saved and applied to all featured providers ✅', 'success');
+      showToast('Featured quota saved and applied to all featured providers', 'success');
       return;
     }
 
-    showToast('Setting saved ✅', 'success');
+    showToast('Setting saved', 'success');
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -2204,7 +2204,7 @@ const allSuspicious = [
 
     const wrap = document.getElementById('suspiciousContent');
     if (!allSuspicious.length) {
-      wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No suspicious activity detected.</p></div>';
+      wrap.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-circle-check fxi fxi-green"></i></div><p>No suspicious activity detected.</p></div>';
       return;
     }
 
@@ -2223,17 +2223,17 @@ const allSuspicious = [
           ${allSuspicious.map(r => {
             const type = r._suspicionType;
             const styles = {
-              ip_match:     { bg: '#FFF5F5', badgeBg: '#fee2e2', badgeColor: '#991B1B', label: '🌐 IP Match' },
-              repeat_rating:{ bg: '#FFFBEB', badgeBg: '#FEF3C7', badgeColor: '#92400E', label: '🔁 Repeat Rating' },
-              burst_rating: { bg: '#FFF5F5', badgeBg: '#fce7f3', badgeColor: '#9d174d', label: '⚡ Burst Rating' },
-              perfect_flood:{ bg: '#F0FDF4', badgeBg: '#dcfce7', badgeColor: '#166534', label: '🌊 Score Flood' },
+              ip_match:     { bg: '#FFF5F5', badgeBg: '#fee2e2', badgeColor: '#991B1B', label: '<i class="fa-solid fa-globe fxi"></i> IP Match' },
+              repeat_rating:{ bg: '#FFFBEB', badgeBg: '#FEF3C7', badgeColor: '#92400E', label: '<i class="fa-solid fa-arrows-rotate fxi"></i> Repeat Rating' },
+              burst_rating: { bg: '#FFF5F5', badgeBg: '#fce7f3', badgeColor: '#9d174d', label: '<i class="fa-solid fa-bolt fxi"></i> Burst Rating' },
+              perfect_flood:{ bg: '#F0FDF4', badgeBg: '#dcfce7', badgeColor: '#166534', label: '<i class="fa-solid fa-water fxi"></i> Score Flood' },
             };
             const s = styles[type] || styles.ip_match;
             const detail = {
               ip_match:      `<code style="font-size:0.72rem;background:#fee2e2;padding:2px 6px;border-radius:4px;">${r.user_ip}</code>`,
               repeat_rating: `<span style="font-size:0.7rem;color:#92400E;">Rated again after <strong>${r._daysDiff} days</strong><br/><span style="color:var(--text-3);">Prev: ${r._prevDate?.toLocaleDateString('en-PH')}</span></span>`,
               burst_rating:  `<span style="font-size:0.7rem;color:#9d174d;">Rated <strong>${r._burstCount} providers</strong> in <strong>${r._burstHours}h</strong></span>`,
-              perfect_flood: `<span style="font-size:0.7rem;color:#166534;">5 consecutive ⭐⭐⭐⭐⭐ within <strong>${r._floodHours}h</strong></span>`,
+              perfect_flood: `<span style="font-size:0.7rem;color:#166534;">5 consecutive <i class="fa-solid fa-star fxi fxi-amber"></i><i class="fa-solid fa-star fxi fxi-amber"></i><i class="fa-solid fa-star fxi fxi-amber"></i><i class="fa-solid fa-star fxi fxi-amber"></i><i class="fa-solid fa-star fxi fxi-amber"></i> within <strong>${r._floodHours}h</strong></span>`,
             }[type] || '—';
             
             return `
@@ -2245,12 +2245,12 @@ const allSuspicious = [
               </td>
               <td style="font-size:0.7rem;color:var(--text-3);">${providerMap[r.provider_id] || r.provider_id.substring(0,8)+'…'}</td>
               <td style="font-size:0.7rem;color:var(--text-3);">${userMap[r.regular_user_id] || r.regular_user_id.substring(0,8)+'…'}</td>
-              <td>${'⭐'.repeat(r.stars)}</td>
+              <td>${'<i class="fa-solid fa-star fxi fxi-amber"></i>'.repeat(r.stars)}</td>
               <td>${detail}</td>
               <td style="font-size:0.72rem;">${new Date(r.created_at).toLocaleDateString('en-PH')}</td>
               <td>
                 <button onclick="deleteRating('${r.id}','${r.provider_id}')" style="padding:4px 10px;background:#fee2e2;color:#991B1B;border:none;border-radius:6px;font-size:0.72rem;font-weight:700;cursor:pointer;">
-                  🗑
+                  <i class="fa-solid fa-trash fxi"></i>
                 </button>
               </td>
             </tr>`;
@@ -2260,7 +2260,7 @@ const allSuspicious = [
 
   } catch(e) {
     document.getElementById('suspiciousContent').innerHTML =
-      `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${e.message}</p></div>`;
+      `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i></div><p>${e.message}</p></div>`;
   }
 }
 
@@ -2290,7 +2290,7 @@ async function deleteRating(id, providerId) {
 function renderPendingList(list, containerId) {
   const el = document.getElementById(containerId);
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No pending applications.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-circle-check fxi fxi-green"></i></div><p>No pending applications.</p></div>';
     return;
   }
   el.innerHTML = '';
@@ -2304,10 +2304,10 @@ function renderPendingList(list, containerId) {
           ${p.role === 'regular' ? (esc(p.first_name) + ' ' + esc(p.last_name)) : esc(p.biz_name || '—')}
         </div>
         <div style="font-size:0.73rem;color:var(--text-3);">
-          ${p.role === 'regular' ? '👤 Regular User · ' + esc(p.package_name || p.package_id || 'Free') : esc(p.cat_sub) + ' · ' + esc(p.city_name?.replace(/^City of (.+)/, '$1 City') || '') + (p.province_name ? ', '+esc(p.province_name) : '')}
+          ${p.role === 'regular' ? '<i class="fa-solid fa-user fxi"></i> Regular User · ' + esc(p.package_name || p.package_id || 'Free') : esc(p.cat_sub) + ' · ' + esc(p.city_name?.replace(/^City of (.+)/, '$1 City') || '') + (p.province_name ? ', '+esc(p.province_name) : '')}
         </div>
         <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px;">
-          ${p.role === 'regular' ? '💳 ' + (p.payment_method || '—') + ' · Ref: ' + (p.payment_reference || '—') : '📍 ' + [
+          ${p.role === 'regular' ? '<i class="fa-solid fa-credit-card fxi"></i> ' + (p.payment_method || '—') + ' · Ref: ' + (p.payment_reference || '—') : '<i class="fa-solid fa-location-dot fxi"></i> ' + [
             p.street_addr || null,
             p.barangay_name && p.barangay_name !== 'Select Barangay…' ? p.barangay_name : null,
             p.city_name?.replace(/^City of (.+)/, '$1 City'),
@@ -2370,7 +2370,7 @@ async function confirmApproveRegular() {
   try {
     await FX.approveRegularUser(userId);
 	closeModal('approveRegularModal');
-	showToast('User approved ✅', 'success');
+	showToast('User approved', 'success');
     await Promise.all([loadStats(), loadPending(), loadRegulars()]);
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
@@ -2504,10 +2504,10 @@ async function confirmApprove() {
       await FX.approveRegularUser(userId);
     }
     await FX.sendUserMessage(userId, {
-      title: '🎉 Account Approved!',
+      title: '<i class="fa-solid fa-party-horn fxi"></i> Account Approved!',
       body:  'Congratulations! Your application has been approved. You can now create listings and start receiving bookings. Welcome to Fixia!',
       type:  'success',
-      icon:  '✅',
+      icon:  '<i class="fa-solid fa-circle-check fxi fxi-green"></i>',
     });
     const provider = await FX.getProviderById(providerId);
     const user     = await FX.getUserById(userId);
@@ -2522,7 +2522,7 @@ async function confirmApprove() {
     }
     closeModal('approveModal');
     closeModal('provModal');
-    showToast('Provider approved & notified ✅', 'success');
+    showToast('Provider approved & notified', 'success');
     await Promise.all([loadStats(), loadPending(), loadProviders()]);
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
@@ -2607,7 +2607,7 @@ function renderProviders(search = '') {
     );
   }
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🔍</div><p>No providers found.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-magnifying-glass fxi"></i></div><p>No providers found.</p></div></td></tr>';
     return;
   }
 
@@ -2622,10 +2622,10 @@ function renderProviders(search = '') {
 
     return `<tr>
       <td>
-        <div style="font-weight:700;font-size:0.85rem;">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+        <div style="font-weight:700;font-size:0.85rem;">${p.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.biz_name)}</div>
       </td>
       <td>
-        <button class="btn-xs btn-view" onclick="openProviderDetails('${p.id}')">🔍 View</button>
+        <button class="btn-xs btn-view" onclick="openProviderDetails('${p.id}')"><i class="fa-solid fa-magnifying-glass fxi"></i> View</button>
       </td>
       <td><span class="badge badge-purple">${pkgLabel}</span></td>
       <td>${statusBadge(p.status, p.is_inactive)}</td>
@@ -2650,8 +2650,8 @@ function openProviderDetails(id) {
   document.getElementById('providerDetailsBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="width:40px;height:40px;border-radius:10px;background:var(--brand-light);
-                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔧</div>
-      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${p.is_elite ? '👑 ' : ''}${esc(p.biz_name)}</div>
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class='fa-solid fa-wrench fxi'></i></div>
+      <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${p.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : ''}${esc(p.biz_name)}</div>
     </div>
 
     <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
@@ -2664,7 +2664,7 @@ function openProviderDetails(id) {
       </div>
       <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:5px 0;">
         <span style="color:var(--text-3);">Rating</span>
-        <strong>⭐ ${p.avg_rating || 0} <span style="font-weight:400;color:var(--text-3);">(${p.total_ratings || 0} reviews)</span></strong>
+        <strong><i class="fa-solid fa-star fxi fxi-amber"></i> ${p.avg_rating || 0} <span style="font-weight:400;color:var(--text-3);">(${p.total_ratings || 0} reviews)</span></strong>
       </div>
     </div>
 
@@ -2722,7 +2722,7 @@ function renderRegulars(search = '') {
     );
   }
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><p>No users found.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-users fxi"></i></div><p>No users found.</p></div></td></tr>';
     return;
   }
 
@@ -2737,7 +2737,7 @@ function renderRegulars(search = '') {
         <div style="font-weight:700;font-size:0.85rem;">${esc(u.first_name)} ${esc(u.last_name)}</div>
       </td>
       <td>
-        <button class="btn-xs btn-view" onclick="openRegularDetails('${u.id}')">🔍 View</button>
+        <button class="btn-xs btn-view" onclick="openRegularDetails('${u.id}')"><i class="fa-solid fa-magnifying-glass fxi"></i> View</button>
       </td>
       <td><span class="badge badge-blue">${pkgLabel(u)}</span></td>
       <td>${statusBadge(u.status, u.is_inactive)}</td>
@@ -2760,7 +2760,7 @@ function openRegularDetails(id) {
   document.getElementById('regularDetailsBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="width:40px;height:40px;border-radius:10px;background:var(--blue-bg);
-                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class='fa-solid fa-user fxi'></i></div>
       <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${esc(u.first_name)} ${esc(u.last_name)}</div>
     </div>
 
@@ -2951,12 +2951,12 @@ async function saveProviderEdit() {
             prefer: 'return=minimal',
           });
         }
-        showToast(`Provider updated ✅ — ${toDelete.length} listing(s) deleted to match new plan limit.`, 'success');
+        showToast(`Provider updated — ${toDelete.length} listing(s) deleted to match new plan limit.`, 'success');
       } else {
-        showToast('Provider updated ✅', 'success');
+        showToast('Provider updated', 'success');
       }
     } else {
-      showToast('Provider updated ✅', 'success');
+      showToast('Provider updated', 'success');
     }
 
     closeModal('provModal');
@@ -3023,7 +3023,7 @@ async function saveUser() {
       await FX.updateUser(id, { forceLogout: true });
     }
     closeModal('editUserModal');
-    showToast('User updated ✅', 'success');
+    showToast('User updated', 'success');
     await loadRegulars();
   } catch(e) {
     showAlert('editUserAlert', 'Error: ' + e.message);
@@ -3056,7 +3056,7 @@ function renderPackages() {
 	const bookingLabel = pkg.booking_limit >= 999 ? 'Unlimited active bookings': `${pkg.booking_limit} active bookings`;
     card.innerHTML = `
       <div class="pkg-admin-head">
-        <div class="pkg-admin-icon">${pkg.icon || '📦'}</div>
+        <div class="pkg-admin-icon">${pkg.icon || '<i class="fa-solid fa-box fxi"></i>'}</div>
         <div>
           <div class="pkg-admin-name">${pkg.name} ${pkg.popular ? `<span style="font-size:0.65rem;background:var(--brand);color:#fff;border-radius:4px;padding:1px 6px;vertical-align:middle;">${pkg.badge_label || 'Popular'}</span>` : ''}</div>
           <div class="pkg-admin-type">${pkg.type}</div>
@@ -3064,9 +3064,9 @@ function renderPackages() {
       </div>
 	  <div class="pkg-admin-price">${pkg.price === 0 ? 'Free' : '₱' + pkg.price}<span style="font-size:0.7rem;font-weight:500;color:var(--text-3);">${pkg.price === 0 ? '' : '/' + ({ month: 'month', '6month': '6 months', year: 'year', lifetime: 'lifetime', forever: 'forever' }[pkg.period] || pkg.period)}</span></div>
       <div class="pkg-admin-meta">
-		📋 ${listLabel} · 📅 ${bookingLabel}<br/>
-        ${pkg.ads_free ? '✅ Ads-free' : '❌ Ads shown'}<br/>
-        ${pkg.is_featured ? '✅ Featured' : '❌ Not featured'}<br/>
+		<i class="fa-solid fa-clipboard-list fxi"></i> ${listLabel} · <i class="fa-solid fa-calendar-days fxi"></i> ${bookingLabel}<br/>
+        ${pkg.ads_free ? '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Ads-free' : '<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Ads shown'}<br/>
+        ${pkg.is_featured ? '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Featured' : '<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Not featured'}<br/>
         Sort: ${pkg.sort_order} · ${pkg.is_active ? '<span style="color:var(--green);">Active</span>' : '<span style="color:var(--red);">Hidden</span>'}
       </div>
       <div class="pkg-admin-actions">
@@ -3135,7 +3135,7 @@ async function savePackage() {
   const id   = document.getElementById('pkgId').value;
   const data = {
     type:         document.getElementById('pkgType').value,
-    icon:         document.getElementById('pkgIcon').value.trim() || '📦',
+    icon:         document.getElementById('pkgIcon').value.trim() || '<i class="fa-solid fa-box fxi"></i>',
     name:         document.getElementById('pkgName').value.trim(),
     price:        parseFloat(document.getElementById('pkgPrice').value) || 0,
     period:       document.getElementById('pkgPeriod').value,
@@ -3155,7 +3155,7 @@ async function savePackage() {
   try {
     if (id) { await FX.updatePackage(id, data); } else { await FX.createPackage(data); }
     closeModal('pkgModal');
-    showToast('Package saved ✅', 'success');
+    showToast('Package saved', 'success');
     await loadPackages();
   } catch(e) { showAlert('pkgAlert', 'Error: ' + e.message); }
 }
@@ -3186,12 +3186,12 @@ async function loadElite() {
 function renderEliteTable() {
   const tbody = document.getElementById('eliteTbody');
   if (!eliteProviders.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👑</div><p>No Fixia Elite providers yet.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-crown fxi fxi-amber"></i></div><p>No Fixia Elite providers yet.</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = eliteProviders.map(p => `
     <tr>
-      <td><div style="font-weight:700;">👑 ${esc(p.biz_name)}</div><div style="font-size:0.7rem;color:var(--text-3);">${esc(p.prov_type)}</div></td>
+      <td><div style="font-weight:700;"><i class="fa-solid fa-crown fxi fxi-amber"></i> ${esc(p.biz_name)}</div><div style="font-size:0.7rem;color:var(--text-3);">${esc(p.prov_type)}</div></td>
       <td style="font-size:0.8rem;">${esc(p.cat_sub)}</td>
       <td style="font-size:0.8rem;color:var(--text-3);">${p.elite_granted_at ? fmtDate(p.elite_granted_at) : '—'}</td>
       <td>${p.elite_expires_at ? `<span style="font-size:0.8rem;font-weight:700;color:var(--gold-text);">${fmtDate(p.elite_expires_at)}</span>` : '<span style="font-size:0.75rem;color:var(--green-text);">Permanent</span>'}</td>
@@ -3220,7 +3220,7 @@ async function grantElite() {
       });
     }
     closeModal('grantEliteModal');
-    showToast('👑 Fixia Elite granted!', 'success');
+    showToast('Fixia Elite granted!', 'success');
     await Promise.all([loadStats(), loadElite(), loadProviders()]);
   } catch(e) { showAlert('eliteAlert','Error: ' + e.message); }
 }
@@ -3322,7 +3322,7 @@ function renderAdGrid(type, containerId) {
   const el   = document.getElementById(containerId);
   const list = allAds.filter(a => a.type === type);
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📢</div><p>No ' + type + ' ads yet. Add one above.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-bullhorn fxi"></i></div><p>No ' + type + ' ads yet. Add one above.</p></div>';
     return;
   }
   el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">` +
@@ -3346,7 +3346,7 @@ function renderAdGrid(type, containerId) {
       return `
         <div style="background:${cardBg};border:1.5px solid ${cardBorder};border-radius:var(--radius-md);padding:12px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div style="width:36px;height:36px;border-radius:10px;background:${ad.bg_color || '#0f2027'};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${ad.icon || '📢'}</div>
+            <div style="width:36px;height:36px;border-radius:10px;background:${ad.bg_color || '#0f2027'};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${ad.icon || '<i class="fa-solid fa-bullhorn fxi"></i>'}</div>
             <div style="flex:1;min-width:0;">
               <div style="font-size:0.82rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ad.title)}</div>
               <div style="font-size:0.68rem;color:var(--text-3);">${esc(ad.advertiser)}</div>
@@ -3354,7 +3354,7 @@ function renderAdGrid(type, containerId) {
           </div>
           <div style="font-size:0.72rem;color:var(--text-2);margin-bottom:10px;line-height:1.5;">${esc(ad.description || '—')}</div>
           <div style="font-size:0.65rem;color:var(--text-3);margin-bottom:10px;">
-            👁 ${ad.impression_count || 0} / ${ad.impression_quota || 5000} impressions &nbsp;&nbsp;●&nbsp;&nbsp; 🖱 ${ad.click_count || 0} clicks
+            <i class="fa-solid fa-eye fxi"></i> ${ad.impression_count || 0} / ${ad.impression_quota || 5000} impressions &nbsp;&nbsp;●&nbsp;&nbsp; <i class="fa-solid fa-arrow-pointer fxi"></i> ${ad.click_count || 0} clicks
             <div style="margin-top:4px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;">
               <div style="height:100%;border-radius:2px;background:${pct >= 100 ? 'var(--red-text)' : 'var(--brand)'};width:${pct}%;transition:width 0.3s;"></div>
             </div>
@@ -3408,7 +3408,7 @@ async function reactivateCompleted() {
       })
     ));
 
-    showToast(`✅ ${completed.length} provider(s) reactivated with quota ${quota}.`, 'success');
+    showToast(`${completed.length} provider(s) reactivated with quota ${quota}.`, 'success');
     await loadRotationStats(); // refresh table immediately
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
@@ -3440,10 +3440,10 @@ async function loadRotationStats() {
           ${stats.map(s => `
             <tr>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:600;color:var(--navy);">
-                ${s.is_elite ? '👑 ' : '⭐ '}${esc(s.biz_name)}
+                ${s.is_elite ? '<i class="fa-solid fa-crown fxi fxi-amber"></i> ' : '<i class="fa-solid fa-star fxi fxi-amber"></i> '}${esc(s.biz_name)}
               </td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">${s.package_id || '—'}</td>
-              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);">⭐ ${s.avg_rating || 0}</td>
+              <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-2);"><i class="fa-solid fa-star fxi fxi-amber"></i> ${s.avg_rating || 0}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--navy);">${s.show_count}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-3);">${s.featured_quota || '—'}</td>
               <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
@@ -3479,7 +3479,7 @@ async function refreshAdDetails() {
     const type  = title.toLowerCase().includes('pop') ? 'popup' : 'inline';
     await openAdDetails(type);
 
-    showToast('Ad details refreshed ✅', 'success');
+    showToast('Ad details refreshed', 'success');
   } catch(e) {
     showToast('Refresh failed: ' + e.message, 'error');
   } finally {
@@ -3552,11 +3552,11 @@ async function openAdDetails(type) {
             const liveCount = b.status === 'active' ? (ad.impression_count || 0) : (b.impression_count || 0);
             const pct = Math.min(100, Math.round((liveCount / (b.impression_quota||5000)) * 100));
             const statusHtml =
-              b.status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;">▶ Running</span>'  :
-              b.status === 'completed' ? '<span style="color:var(--blue);font-weight:700;">✔ Completed</span>'      : '—';
+              b.status === 'active'    ? '<span style="color:var(--green-text);font-weight:700;"><i class="fa-solid fa-play fxi"></i> Running</span>'  :
+              b.status === 'completed' ? '<span style="color:var(--blue);font-weight:700;"><i class="fa-solid fa-check fxi fxi-green"></i> Completed</span>'      : '—';
             return `
               <tr>
-                <td style="${tdStyle}font-weight:600;color:var(--navy);white-space:nowrap;">${ad.icon || '📢'} ${ad.title || '—'}</td>
+                <td style="${tdStyle}font-weight:600;color:var(--navy);white-space:nowrap;">${ad.icon || '<i class="fa-solid fa-bullhorn fxi"></i>'} ${ad.title || '—'}</td>
                 <td style="${tdStyle}color:var(--text-2);white-space:nowrap;">${ad.advertiser || '—'}</td>
                 <td style="${tdStyle}font-weight:700;color:var(--navy);">#${b.batch_number}</td>
                 <td style="${tdStyle}white-space:nowrap;">${statusHtml}</td>
@@ -3567,7 +3567,7 @@ async function openAdDetails(type) {
                   </div>
                 </td>
 				<td style="${tdStyle}font-weight:700;color:var(--navy);">
-                  🖱 ${b._isLive ? (ad.click_count || 0) : (b.click_count || 0)}
+                  <i class="fa-solid fa-arrow-pointer fxi"></i> ${b._isLive ? (ad.click_count || 0) : (b.click_count || 0)}
                 </td>
                 <td style="${tdStyle}color:var(--text-3);white-space:nowrap;">${b.started_at ? fmtDate(b.started_at) : '—'}</td>
                 <td style="${tdStyle}color:var(--text-3);white-space:nowrap;">${b.completed_at ? fmtDate(b.completed_at) : '<span style="color:var(--green-text);font-weight:600;">Still running</span>'}</td>
@@ -3595,7 +3595,7 @@ function exportAdDetailsExcel(type) {
   );
 
   downloadCSV([headers, ...rows], `Fixia_${label}_BatchHistory_${fmtDateFile()}.csv`);
-  showToast('Export downloaded ✅', 'success');
+  showToast('Export downloaded', 'success');
 }
 
 function exportRotationStatsExcel() {
@@ -3612,7 +3612,7 @@ function exportRotationStatsExcel() {
 
   if (rows.length <= 1) { showToast('No data to export.', 'error'); return; }
   downloadCSV(rows, `Fixia_Featured_Rotation_${fmtDateFile()}.csv`);
-  showToast('Export downloaded ✅', 'success');
+  showToast('Export downloaded', 'success');
 }
 
 function downloadCSV(rows, filename) {
@@ -3639,7 +3639,7 @@ async function promoteAdNow(adId) {
     await FX.updateAd(adId, {
       isActive: true,
     });
-    showToast('Ad promoted and now running ✅', 'success');
+    showToast('Ad promoted and now running', 'success');
     await loadAds();
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
@@ -3714,7 +3714,7 @@ async function saveAd() {
 
   const data = {
     type:             document.getElementById('adType').value,
-    icon:             document.getElementById('adIcon').value.trim() || '📢',
+    icon:             document.getElementById('adIcon').value.trim() || '<i class="fa-solid fa-bullhorn fxi"></i>',
     advertiser,
     title,
     description:      document.getElementById('adDescription').value.trim(),
@@ -3734,7 +3734,7 @@ async function saveAd() {
       await FX.createAd(data);
     }
     closeModal('adModal');
-    showToast('Ad saved ✅', 'success');
+    showToast('Ad saved', 'success');
     await loadAds();
   } catch(e) {
     showAlert('adAlert', 'Error: ' + e.message);
@@ -3800,7 +3800,7 @@ async function confirmReRunAd() {
     });
 
     closeModal('adModal');
-    showToast(`✅ Batch #${nextBatch} started — ${quota.toLocaleString()} impressions`, 'success');
+    showToast(`Batch #${nextBatch} started — ${quota.toLocaleString()} impressions`, 'success');
     await loadAds();
   } catch(e) {
     showToast('Re-run failed: ' + e.message, 'error');
@@ -3816,7 +3816,7 @@ async function toggleAd(id, active) {
         const impressions = ad.impression_count || 0;
         const quota       = ad.impression_quota || 5000;
         if (impressions >= quota) {
-          showToast('⛔ Quota exhausted.', 'error');
+          showToast('Quota exhausted.', 'error');
           return;
         }
       }
@@ -3824,7 +3824,7 @@ async function toggleAd(id, active) {
     await FX.updateAd(id, {
       isActive: active,
     });
-    showToast(active ? 'Ad activated ✅' : 'Ad paused ⏸', '');
+    showToast(active ? 'Ad activated' : 'Ad paused', '');
     await loadAds();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
@@ -3883,7 +3883,7 @@ async function loadTemplates() {
 
 function renderTemplateList() {
   const html = !allTemplates.length
-    ? '<div class="empty-state"><div class="empty-icon">📝</div><p>No templates yet.</p></div>'
+    ? '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-note-sticky fxi"></i></div><p>No templates yet.</p></div>'
     : allTemplates.map(t => {
         const s = TPL_STYLES[t.type] || TPL_STYLES.announcement;
         return `
@@ -3924,7 +3924,7 @@ function populateSendDropdown() {
 async function saveTemplate() {
   const id    = document.getElementById('tplId').value;
   const type  = document.getElementById('tplType').value;
-  const icon  = document.getElementById('tplIcon').value.trim() || '📢';
+  const icon  = document.getElementById('tplIcon').value.trim() || '<i class="fa-solid fa-bullhorn fxi"></i>';
   const title = document.getElementById('tplTitle').value.trim();
   const body  = document.getElementById('tplBody').value.trim();
 
@@ -3934,10 +3934,10 @@ async function saveTemplate() {
   try {
     if (id) {
       await FX.updateTemplate(id, { type, icon, title, body });
-      showToast('Template updated ✅');
+      showToast('Template updated');
     } else {
       await FX.createTemplate({ type, icon, title, body });
-      showToast('Template created ✅');
+      showToast('Template created');
     }
     resetTemplateForm();
     await loadTemplates();
@@ -3986,7 +3986,7 @@ function confirmDeleteTemplate(id, title) {
 
 function updateTplPreview() {
   const type  = document.getElementById('tplType').value;
-  const icon  = document.getElementById('tplIcon').value || '📢';
+  const icon  = document.getElementById('tplIcon').value || '<i class="fa-solid fa-bullhorn fxi"></i>';
   const title = document.getElementById('tplTitle').value;
   const body  = document.getElementById('tplBody').value;
   const s     = TPL_STYLES[type] || TPL_STYLES.announcement;
@@ -4096,7 +4096,7 @@ async function doSendMessage() {
     hideAlert('sendAlert');
     const count = await FX.sendMessage(templateId, recipients);
     const t = allTemplates.find(t => t.id === templateId);
-    showToast(`✅ Message sent to ${count} user${count !== 1 ? 's' : ''}.`);
+    showToast(`Message sent to ${count} user${count !== 1 ? 's' : ''}.`);
 
     // Log the send in the Recent Sends section
     const log = document.getElementById('sendLog');
@@ -4144,7 +4144,7 @@ async function loadChangeRequests() {
 function renderRequestsTable() {
   const tbody = document.getElementById('requestsTbody');
   if (!allRequests.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📥</div><p>No pending requests.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-inbox fxi"></i></div><p>No pending requests.</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = allRequests.map(r => `
@@ -4232,7 +4232,7 @@ async function doApproveRequest() {
   try {
     await FX.approveChangeRequest(currentReviewReq);
     closeModal('reviewModal');
-    showToast('Request approved ✅ Provider has been notified.', 'success');
+    showToast('Request approved Provider has been notified.', 'success');
     await loadChangeRequests();
     await loadProviders(); // refresh provider table
     await loadStats();
@@ -4287,16 +4287,16 @@ function setReportFilter(status, el) {
 }
 
 const REPORT_STATUS_BADGE = {
-  pending:   '<span class="badge badge-gold">⏳ Pending</span>',
-  warned:    '<span class="badge badge-red">⚠️ Warned</span>',
-  suspended: '<span class="badge" style="background:#F3E8FF;color:#6B21A8;">🚫 Suspended</span>',
-  dismissed: '<span class="badge badge-green">✅ Dismissed</span>',
+  pending:   '<span class="badge badge-gold"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</span>',
+  warned:    '<span class="badge badge-red"><i class="fa-solid fa-triangle-exclamation fxi fxi-amber"></i> Warned</span>',
+  suspended: '<span class="badge" style="background:#F3E8FF;color:#6B21A8;"><i class="fa-solid fa-ban fxi fxi-red"></i> Suspended</span>',
+  dismissed: '<span class="badge badge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Dismissed</span>',
 };
 
 function renderReportsTable() {
   const tbody = document.getElementById('reportsTbody');
   if (!allReports.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🚩</div><p>No ${currentReportFilter} reports.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-flag fxi"></i></div><p>No ${currentReportFilter} reports.</p></div></td></tr>`;
     return;
   }
   tbody.innerHTML = allReports.map(r => `
@@ -4379,7 +4379,7 @@ async function doDismissReport() {
   try {
     await FX.dismissReport(currentReport.id);
     closeModal('reviewReportModal');
-    showToast('Report dismissed ✅');
+    showToast('Report dismissed');
     await loadReports();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
@@ -4392,7 +4392,7 @@ async function doWarnProvider() {
   try {
     await FX.warnProvider(currentReport);
     closeModal('reviewReportModal');
-    showToast('Warning sent to provider ⚠️');
+    showToast('Warning sent to provider');
     await loadReports();
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
@@ -4405,7 +4405,7 @@ async function doSuspendProvider() {
   try {
     await FX.suspendProvider(currentReport);
     closeModal('reviewReportModal');
-    showToast('Provider suspended 🚫');
+    showToast('Provider suspended');
     await loadReports();
     await loadProviders();
     await loadStats();
@@ -4441,7 +4441,7 @@ async function loadUncategorized() {
     if (!listings.length) {
       badge.style.display = 'none';
       count.style.display = 'none';
-      container.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:var(--text-3);font-size:0.85rem;">✅ No uncategorized listings — all clear!</div>';
+      container.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:var(--text-3);font-size:0.85rem;"><i class="fa-solid fa-circle-check fxi fxi-green"></i> No uncategorized listings — all clear!</div>';
       return;
     }
 
@@ -4531,7 +4531,7 @@ async function doReassign() {
   try {
     await FX.reassignListing(id, cat, sub);
     closeModal('reassignModal');
-    showToast('Listing reassigned ✅', 'success');
+    showToast('Listing reassigned', 'success');
     await loadUncategorized();
   } catch(e) {
     alertEl.className = 'alert alert-error show';
@@ -4545,12 +4545,12 @@ async function doReassign() {
 function statusBadge(status, isInactive) {
   if (isInactive) return '<span class="badge badge-grey">💤 Inactive</span>';
   const map = {
-    active:              '<span class="badge badge-green">✅ Active</span>',
-    approved:            '<span class="badge badge-green">✅ Active</span>',
-    pending:             '<span class="badge badge-gold">⏳ Pending</span>',
-    rejected:            '<span class="badge badge-red">❌ Rejected</span>',
-    suspended:           '<span class="badge badge-red">🚫 Suspended</span>',
-    suspension_pending:  '<span class="badge" style="background:#FFF5F5;color:#991B1B;">⏳ Suspension Pending</span>',
+    active:              '<span class="badge badge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Active</span>',
+    approved:            '<span class="badge badge-green"><i class="fa-solid fa-circle-check fxi fxi-green"></i> Active</span>',
+    pending:             '<span class="badge badge-gold"><i class="fa-solid fa-hourglass-half fxi"></i> Pending</span>',
+    rejected:            '<span class="badge badge-red"><i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Rejected</span>',
+    suspended:           '<span class="badge badge-red"><i class="fa-solid fa-ban fxi fxi-red"></i> Suspended</span>',
+    suspension_pending:  '<span class="badge" style="background:#FFF5F5;color:#991B1B;"><i class="fa-solid fa-hourglass-half fxi"></i> Suspension Pending</span>',
   };
   return map[status] || `<span class="badge badge-grey">${status}</span>`;
 }
@@ -4605,7 +4605,7 @@ async function loadUpgradeHistory() {
               <td style="font-size:0.8rem;font-weight:700;color:var(--green);">₱${esc(String(r.payment_amount || '—'))}</td>
               <td>
                 <span class="badge ${r.status === 'approved' ? 'badge-green' : 'badge-red'}" style="font-size:0.72rem;">
-                  ${r.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                  ${r.status === 'approved' ? '<i class="fa-solid fa-circle-check fxi fxi-green"></i> Approved' : '<i class="fa-solid fa-circle-xmark fxi fxi-red"></i> Rejected'}
                 </span>
               </td>
               <td style="font-size:0.75rem;color:var(--text-3);">
@@ -4637,7 +4637,7 @@ async function loadUpgradeRequests() {
 
     if (!requests.length) {
       wrap.innerHTML = `<div class="empty-state">
-        <div class="empty-icon">📭</div>
+        <div class="empty-icon"><i class="fa-solid fa-inbox fxi"></i></div>
         <p>No pending upgrade requests.</p>
       </div>`;
       return;
@@ -4689,16 +4689,16 @@ async function loadUpgradeRequests() {
                 { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}
             </td>
             <td>
-              <button class="btn-xs btn-view" onclick="openUpgradeDetails('${req.id}')">🔍 View</button>
+              <button class="btn-xs btn-view" onclick="openUpgradeDetails('${req.id}')"><i class="fa-solid fa-magnifying-glass fxi"></i> View</button>
             </td>
             <td>
               <div class="btn-row">
                 <button class="btn-xs btn-approve" title="Approve"
                   onclick="openApproveUpgrade('${req.id}','${(newPkg?.name || req.new_package_id).replace(/'/g,"\\'")}',
                            ${req.carryover_days},'${(req.payment_reference||'').replace(/'/g,"\\'")}',
-                           ${parseFloat(req.payment_amount || 0).toFixed(2)})">✅</button>
+                           ${parseFloat(req.payment_amount || 0).toFixed(2)})"><i class='fa-solid fa-circle-check fxi fxi-green'></i></button>
                 <button class="btn-xs btn-reject" title="Reject"
-                  onclick="openRejectUpgrade('${req.id}')">❌</button>
+                  onclick="openRejectUpgrade('${req.id}')"><i class="fa-solid fa-circle-xmark fxi fxi-red"></i></button>
               </div>
             </td>
           </tr>`;
@@ -4719,7 +4719,7 @@ function openUpgradeDetails(reqId) {
   document.getElementById('upgradeDetailsBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="width:40px;height:40px;border-radius:10px;background:var(--brand-light);
-                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🔧</div>
+                  display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class='fa-solid fa-wrench fxi'></i></div>
       <div>
         <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">${prov?.biz_name || '—'}</div>
         <div style="font-size:0.72rem;color:var(--text-3);">${prov?.cat_sub || ''}</div>
@@ -4810,7 +4810,7 @@ async function confirmApproveUpgrade() {
   try {
     await FX.approveUpgrade(_currentUpgradeReq);
     closeModal('approveUpgradeModal');
-    showToast('Upgrade approved ✅', 'success');
+    showToast('Upgrade approved', 'success');
     await loadUpgradeRequests();
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
