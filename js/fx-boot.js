@@ -78,5 +78,3 @@ new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{
   else if(n.nodeType===1)scan(n);
 }))).observe(document.documentElement,{childList:true,subtree:true});
 })();
-
-;(function(){var s=document.createElement('script');s.src='/js/fx-messages.js';s.async=false;document.head.appendChild(s);})();

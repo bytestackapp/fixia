@@ -1803,8 +1803,8 @@ document.addEventListener('DOMContentLoaded', () => FX.initAds());
 const FX_BOOKING = {
 
   /* ── Create inquiry (user → provider) ───────────────────────── */
-  async createBooking(regularUserId, providerId, jobDescription) {
-    return await apiFetch('createBooking', { regularUserId, providerId, jobDescription });
+  async createBooking(regularUserId, providerId, jobDescription, listingId) {
+    return await apiFetch('createBooking', { regularUserId, providerId, jobDescription, listingId });
   },
 
 /* ── User books (confirms after reply) ──────────────────────── */

@@ -1068,8 +1068,11 @@ const actions = {
      Payload:  { regularUserId, providerId, jobDescription }
   ─────────────────────────────────────────────────────────── */
   async createBooking(payload, callerUser) {
-    const { regularUserId, providerId, jobDescription } = payload;
+    const { regularUserId, providerId, jobDescription, listingId } = payload;
     if (!regularUserId || !providerId) throw { status: 400, message: 'Missing booking fields.' };
+    if (!listingId) throw { status: 400, message: 'Please choose a service.' };
+    const listing = (await sb(`listings?id=eq.${encodeURIComponent(listingId)}&provider_id=eq.${providerId}&is_active=eq.true&select=id,title&limit=1`))?.[0];
+    if (!listing) throw { status: 400, message: 'That service is no longer available.' };
     if (callerUser.role !== 'admin' && callerUser.id !== regularUserId) {
       throw { status: 403, message: 'You can only create bookings for yourself.' };
     }
@@ -1080,6 +1083,7 @@ const actions = {
     const row = {
       regular_user_id: regularUserId, provider_id: providerId,
       user_message: jobDescription, status: 'pending',
+      listing_id: listing.id, listing_title: listing.title,
       user_has_unread: false, provider_has_unread: true,
     };
     const rows = await sb('inquiries', { method: 'POST', body: JSON.stringify(row) });

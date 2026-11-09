@@ -791,6 +791,10 @@ function openBooking() {
   const sess = FX.getSession();
   if (!sess) { window.location.href = 'login.html'; return; }
   document.getElementById('bookProvName').textContent = provider.biz_name;
+  const activeSvc = listings.filter(l => l.is_active);
+  if (!activeSvc.length) { showToast('This provider has no active services yet.', '#92400e'); return; }
+  document.getElementById('bookService').innerHTML = '<option value="">— Select a service —</option>' +
+    activeSvc.map(l => `<option value="${l.id}">${esc(l.title)}${l.price_label ? ' · ' + esc(l.price_label) : ''}</option>`).join('');
   document.getElementById('bookMsg').value = '';
   document.getElementById('bookAlert').style.display = 'none';
   document.getElementById('bookModal').classList.add('active');
@@ -809,6 +813,12 @@ async function submitBooking() {
   const alertEl = document.getElementById('bookAlert');
   alertEl.style.display = 'none';
 
+  const listingId = document.getElementById('bookService').value;
+  if (!listingId) {
+    alertEl.textContent = 'Please choose the service you are booking.';
+    alertEl.style.display = 'block';
+    return;
+  }
   if (!msg || msg.length < 10) {
     alertEl.textContent = 'Please describe the job in at least 10 characters.';
     alertEl.style.display = 'block';
@@ -821,7 +831,7 @@ async function submitBooking() {
 
   try {
     const sess = FX.getSession();
-    await FX.createBooking(sess.userId, provider.id, msg, sess.role);
+    await FX.createBooking(sess.userId, provider.id, msg, listingId);
     closeBooking();
     setTimeout(function() {
       showToast('Booking sent!');
@@ -930,6 +940,10 @@ async function submitReport() {
         <i class="fa-solid fa-clipboard-list fxi"></i> Describe the job you agreed on. This creates a record so the provider can mark it done and receive your rating.
       </div>
       <div style="display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;">
+        Service <span style="color:var(--red);">*</span>
+      </div>
+      <select id="bookService" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;color:var(--text);background:#fff;margin-bottom:12px;"></select>
+      <div style="display:block;margin-bottom:4px;font-size:0.72rem;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;">
         Job Description <span style="color:var(--red);">*</span>
       </div>
       <textarea id="bookMsg" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;resize:vertical;min-height:100px;color:var(--text);transition:all 0.2s;outline:none;" placeholder="e.g. Aircon cleaning, 1 unit 1.5HP, agreed price ₱500, Quezon City…" onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'"></textarea>
@@ -997,7 +1011,5 @@ async function submitReport() {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 </script>
-
-<script src="js/page-booking.js"></script>
 </body>
 </html>
