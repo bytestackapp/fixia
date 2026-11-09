@@ -210,7 +210,14 @@ const actions = {
   async getThread({ id }, user) {
     const { b, prov, isClient } = await load(id, user);
     await patch('inquiries', id, isClient ? { user_has_unread: false } : { provider_has_unread: false });
-    const evs = await sb(`booking_events?booking_id=eq.${q(id)}&order=created_at.asc`) || [];
+    let evs = await sb(`booking_events?booking_id=eq.${q(id)}&order=created_at.asc`) || [];
+    if (!evs.length) {   // old bookings made before the message system: rebuild the first message
+      evs = [{ id: 'init', type: 'sent', text: b.user_message, meta: { listing_title: b.listing_title }, created_at: b.created_at, actor_user_id: b.regular_user_id }];
+      if (b.status === 'active') evs.push({ id: 'st', type: 'accepted', created_at: b.updated_at, actor_user_id: prov.user_id });
+      if (b.status === 'done') evs.push({ id: 'st', type: 'done', created_at: b.updated_at, actor_user_id: prov.user_id });
+      if (b.status === 'completed') evs.push({ id: 'st', type: 'confirmed', created_at: b.updated_at, actor_user_id: b.regular_user_id });
+      if (b.status === 'cancelled') evs.push({ id: 'st', type: 'cancelled', created_at: b.updated_at, actor_user_id: b.regular_user_id });
+    }
     let counterpart;
     if (isClient) {
       const pu = (await sb(`users?id=eq.${prov.user_id}&select=phone&limit=1`))?.[0];

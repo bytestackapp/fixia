@@ -13,8 +13,8 @@
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-h) + 16px);-webkit-font-smoothing:antialiased;}
     .topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:calc(var(--nav-h) + env(safe-area-inset-top));display:flex;align-items:center;padding:env(safe-area-inset-top) 16px 0;gap:10px;}
     .nav-back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-    .nav-title{flex:1;min-width:0;color:#fff;font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .nav-title small{display:block;font-weight:600;font-size:.68rem;color:rgba(255,255,255,.6);}
+    .nav-title{flex:1;min-width:0;color:var(--navy)!important;font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .nav-title small{display:block;font-weight:600;font-size:.68rem;color:var(--text-3)!important;}
     .page-header{background:#1E3048;padding:8px 16px;font-size:.78rem;color:rgba(255,255,255,.75);}
 
     /* inbox */
@@ -124,6 +124,7 @@
 <script src="js/env-config.js"></script>
 <script src="js/fixia-data.js"></script>
 <script src="js/fx-boot.js"></script>
+<script src="js/fx-messages.js"></script>
 <script>
 const session = FX.requireAuth(['regular', 'provider']);
 const openId = new URLSearchParams(location.search).get('id');
@@ -246,6 +247,7 @@ async function submitRate() {
 /* ── boot ── */
 (function init() {
   if (!session) return;
+  if (!FX.getThread) { setTimeout(init, 100); return; }
   if (openId) {
     document.getElementById('listView').style.display = 'none';
     document.getElementById('threadView').style.display = 'block';

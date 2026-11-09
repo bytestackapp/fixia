@@ -1,17 +1,18 @@
-/* Loaded on every page by fx-boot.js.
-   1) Points all booking actions at /api/booking (old pages keep working)
-   2) Adds the 💬 icon (with red dot) next to the bell
-   3) Bell = new booking requests only (providers); hidden for clients */
+/* Booking messages: status updates shown as message threads (no typing/replying).
+   Loaded by messages.html directly and by fx-boot.js on every other page. */
 (function () {
   'use strict';
-  if (!window.FX) return;
+  if (typeof FX === 'undefined') return;
+  if (FX.__msgLoaded) return;
+  FX.__msgLoaded = true;
 
   const hdr = () => { const s = FX.getSession() || {};
     return { 'Content-Type': 'application/json', 'x-session-token': s.sessionToken || '', 'x-user-id': s.userId || '' }; };
+
   FX.bk = async (action, payload = {}) => {
     const r = await fetch('/api/booking', { method: 'POST', headers: hdr(), body: JSON.stringify({ action, payload }) });
     const t = await r.text(); let d;
-    try { d = JSON.parse(t); } catch { throw new Error('Server error (' + r.status + ')'); }
+    try { d = JSON.parse(t); } catch (e) { throw new Error('Server error (' + r.status + ')'); }
     if (!r.ok) throw new Error(d.error || 'Request failed');
     return d;
   };
@@ -26,7 +27,7 @@
     createBooking:         (uid, pid, desc, role, listingId) => FX.bk('createBooking', { providerId: pid, listingId, jobDescription: desc }),
     acceptBooking:         id => FX.bk('acceptBooking', { id }),
     declineBooking:        (id, reason) => FX.bk('declineBooking', { id, reason }),
-    activateBooking:       id => FX.bk('acceptBooking', { id }),          // legacy name
+    activateBooking:       id => FX.bk('acceptBooking', { id }),
     cancelInquiry:         id => FX.bk('cancelBooking', { id }),
     cancelBooking:         id => FX.bk('cancelBooking', { id }),
     providerCancelBooking: id => FX.bk('cancelBooking', { id }),
@@ -35,8 +36,7 @@
     acceptCompletion:      (id, stars, comment, anonymous) => FX.bk('confirmBooking', { id, stars, comment, anonymous }),
     getInbox:              () => FX.bk('getInbox'),
     getThread:             id => FX.bk('getThread', { id }),
-    /* bell: providers see pending requests, clients see nothing */
-    getUnreadCount:        async role => role === 'provider' ? (await summary()).pending : 0,
+    getUnreadCount:        async () => 0,
   });
 
   function mount() {

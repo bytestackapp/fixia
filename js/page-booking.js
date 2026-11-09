@@ -96,8 +96,7 @@
   /* ═══ notifications.html — bell = new booking requests only, tap → thread ═══ */
   if (/notifications\.html/.test(page)) {
     Object.keys(STATUS_CONFIG).forEach(k => delete STATUS_CONFIG[k]);
-    Object.keys(PROV_CONFIG).forEach(k => { if (k !== 'pending') delete PROV_CONFIG[k]; });
-    PROV_CONFIG.pending.sub = 'A client sent you a booking request. Open it to accept or decline.';
+    Object.keys(PROV_CONFIG).forEach(k => delete PROV_CONFIG[k]);
     tapNotif = function (inquiryId) { window.location.href = 'messages.html?id=' + encodeURIComponent(inquiryId); };
   }
 })();
