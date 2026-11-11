@@ -1,0 +1,37 @@
+/* ───────── Fixia design tokens — change a value here and the whole app follows ───────── */
+:root {
+  /* colour */
+  --ground: #F4F5F6;      /* page */
+  --surface: #FFFFFF;     /* sheets, forms, rows */
+  --ink: #12161C;         /* text, strong lines */
+  --ink-2: #444C58;       /* secondary text (7.6:1 on ground) */
+  --ink-3: #5F6772;       /* tertiary text (5.3:1 on ground) */
+  --line: #D9DCE1;        /* hairlines */
+  --line-strong: #AEB4BD; /* input borders (3:1 on white) */
+  --signal: #C93F08;      /* primary action only (5.2:1 with white text) */
+  --signal-hover: #A83305;
+  --signal-tint: #FBEBE3;
+  --deep: #0F1A27;        /* dark panels */
+  --ok: #17703F;   --ok-tint: #E4F3EA;
+  --warn: #7A4F00; --warn-tint: #FBF0D6;
+  --danger: #B02318; --danger-tint: #FBE6E4;
+
+  /* type */
+  --font-display: 'Bricolage Grotesque Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
+  --t-xs: 0.75rem;  --t-sm: 0.875rem; --t-md: 1rem; --t-lg: 1.25rem;
+  --t-xl: 1.625rem; --t-2xl: 2.25rem; --t-3xl: clamp(2.5rem, 5vw, 3.75rem);
+
+  /* space (4px base) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+
+  /* shape: small radii on controls, none on lists */
+  --r-sm: 4px; --r-md: 8px;
+
+  /* layout */
+  --rail: 232px;
+  --bar: 60px;
+  --content: 960px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

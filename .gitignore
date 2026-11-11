@@ -23,3 +23,4 @@ fixia-backup.sql
 .references
 .DS_Store
 Thumbs.db
+.backup
