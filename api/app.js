@@ -4,7 +4,7 @@ import * as providers from './_lib/actions/providers.js';
 import * as saved from './_lib/actions/saved.js';
 
 const actions = {
-  'home': providers.home,
+  'home': providers.homes,
   'providers.list': providers.list,
   'providers.get': providers.get,
   'providers.contact': providers.contact,
