@@ -1,30 +1,50 @@
-node_modules
-dist
-www
+# dependencies
+node_modules/
+
+# build output
+dist/
+www/
+
+# secrets
 .env
 .env.*
+.env*.local
 *.keystore
+*.jks
+android/app/google-services.json
+*firebase-adminsdk*.json
+
+# vercel
+.vercel
+
+# android build output
 android/.gradle
 android/build
 android/app/build
+android/app/release
 android/local.properties
-.DS_Store
-node_modules/
-js/env-config.js
-android/app/google-services.json
-www/
-*firebase-adminsdk*.json
-supabase/.temp/
+android/captures
+android/.idea
+*.apk
+*.aab
+
+# capacitor generated files (rebuilt by "npx cap sync")
+android/app/src/main/assets/public
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/app/src/main/res/xml/config.xml
+android/capacitor-cordova-android-plugins
+
+# local-only helper scripts (never push)
 *.bat
-temp.b64
+
+# editors, logs, backups, misc
+.idea/
+*.iml
+*.log
+fixia-backup.sql
+*.sql.bak
 .references
-.backup
-.vercel
-.env*.local
-android/app/onecore-debug.keystore
-releases/
-*.keystore
-*.jks
-.env
-.env.*
-dist/
+.backup/
+.DS_Store
+Thumbs.db
