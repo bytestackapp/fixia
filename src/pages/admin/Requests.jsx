@@ -1,0 +1,25 @@
+import { useState } from 'react';
+import { useAdm, useDo, Load, Head, Table, Btn, Prompt, Detail } from './kit.jsx';
+import Dialog from '../../components/ui/Dialog.jsx';
+import { fdate } from '../../lib/format.js';
+
+function value(r) {
+  if (r.subject !== 'Location Change') return r.requested_value;
+  try { const l = JSON.parse(r.requested_value); return [l.street_addr, l.barangay_name, l.city_name, l.province_name, l.region_name].filter(Boolean).join(', '); } catch { return r.requested_value; }
+}
+export default function Requests() {
+  const q = useAdm('changes.list'); const [v, setV] = useState(null), [no, setNo] = useState(false);
+  const ok = useDo('change.approve', 'Request approved'), rej = useDo('change.reject', 'Request rejected');
+  return (
+    <>
+      <Head title="Change requests" sub="Business name, email and location changes from providers." />
+      <Load q={q}>{(d) => <Table empty="No pending requests." rows={d.items} cols={[['Provider', (r) => <b>{r.provider_name}</b>], ['Change', (r) => r.subject], ['Sent', (r) => fdate(r.created_at)], ['', (r) => <Btn variant="secondary" onClick={() => setV(r)}>Review</Btn>]]} />}</Load>
+      <Dialog open={!!v && !no} onClose={() => setV(null)} title={v?.subject} wide>
+        {v && <><Detail rows={[['Provider', v.provider_name], ['Requested', value(v)], ['Reason', v.explanation]]} />
+          {v.file_url && <a href={v.file_url} target="_blank" rel="noreferrer">View attached document</a>}
+          <div className="dlg__actions"><Btn loading={ok.isPending} onClick={() => ok.mutate({ id: v.id }, { onSuccess: () => setV(null) })}>Approve</Btn><Btn variant="danger" onClick={() => setNo(true)}>Reject</Btn><Btn variant="quiet" onClick={() => setV(null)}>Close</Btn></div></>}
+      </Dialog>
+      <Prompt open={no} title="Reject request" label="Reason (sent to the provider)" required danger confirmLabel="Reject" busy={rej.isPending} onClose={() => setNo(false)} onSubmit={(r) => rej.mutate({ id: v.id, reason: r }, { onSuccess: () => { setNo(false); setV(null); } })} />
+    </>
+  );
+}

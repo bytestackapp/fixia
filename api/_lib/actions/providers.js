@@ -86,16 +86,18 @@ export async function get(user, { id }) {
   if (!id) throw httpError(400, 'Missing provider.');
   const prov = (await sb(`providers?id=eq.${q(id)}&status=eq.approved&select=${FIELDS}&limit=1`))?.[0];
   if (!prov) throw httpError(404, 'This provider is not available.');
-  const [listings, reviews, saved] = await Promise.all([
+  const [listings, reviews, saved, reported] = await Promise.all([
     sb(`listings?provider_id=eq.${q(id)}&is_active=eq.true&order=created_at.asc&select=id,title,description,price_label,cat_main,cat_sub`),
     sb(`ratings?provider_id=eq.${q(id)}&order=created_at.desc&limit=50&select=stars,comment,created_at,display_name`),
     sb(`saved_providers?user_id=eq.${q(user.id)}&provider_id=eq.${q(id)}&select=provider_id&limit=1`),
+    sb(`provider_reports?user_id=eq.${q(user.id)}&provider_id=eq.${q(id)}&select=id&limit=1`),
   ]);
   return {
     provider: { ...shape(prov, listings || []), bio: prov.biz_desc || '', street: prov.street_addr || '', memberSince: prov.created_at },
     listings: (listings || []).map((l) => ({ id: l.id, title: l.title, description: l.description || '', priceLabel: l.price_label || '', category: l.cat_main, sub: l.cat_sub })),
     reviews: (reviews || []).map((r) => ({ stars: r.stars, comment: r.comment || '', createdAt: r.created_at, name: r.display_name || 'Customer' })),
     saved: !!saved?.length,
+    reported: !!reported?.length,
     isOwn: prov.user_id === user.id,
   };
 }

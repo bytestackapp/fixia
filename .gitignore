@@ -1,26 +1,30 @@
-# dependencies
 node_modules
-
-# build output
+dist
 www
+.env
+.env.*
+*.keystore
 android/.gradle
 android/build
 android/app/build
 android/local.properties
-
-# secrets
+.DS_Store
+node_modules/
+js/env-config.js
+android/app/google-services.json
+www/
+*firebase-adminsdk*.json
+supabase/.temp/
+*.bat
+temp.b64
+.references
+.backup
+.vercel
+.env*.local
+android/app/onecore-debug.keystore
+releases/
+*.keystore
+*.jks
 .env
 .env.*
-fixia.keystore
-android/app/fixia.keystore
-
-# local-only helper scripts (never push)
-*.bat
-
-# backups / misc
-fixia-backup.sql
-*.sql.bak
-.references
-.DS_Store
-Thumbs.db
-.backup
+dist/

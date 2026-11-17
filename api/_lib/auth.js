@@ -31,7 +31,7 @@ export async function requireUser(req, roles) {
   const token = (req.headers.authorization || '').replace(/^Bearer /, '');
   const data = readToken(token);
   if (!data) throw httpError(401, 'Please sign in again.');
-  const rows = await sb(`users?id=eq.${q(data.sub)}&select=id,role,status,session_token,first_name,last_name,username,email,avatar_url,package_id,ads_free&limit=1`);
+  const rows = await sb(`users?id=eq.${q(data.sub)}&select=id,role,status,session_token,first_name,last_name,username,email,phone,avatar_url,package_id,package_name,ads_free,subscription_start,subscription_end,payment_status,payment_method,created_at,force_logout&limit=1`);
   const user = rows?.[0];
   if (!user) throw httpError(401, 'Please sign in again.');
   if (user.session_token !== data.sid) throw httpError(401, 'You were signed out because this account was opened on another device.');
@@ -43,5 +43,18 @@ export async function requireUser(req, roles) {
 export const publicUser = (u) => ({
   id: u.id, role: u.role, status: u.status, firstName: u.first_name, lastName: u.last_name,
   username: u.username, email: u.email, avatarUrl: u.avatar_url || null,
-  packageId: u.package_id || null, adsFree: !!u.ads_free,
+  packageId: u.package_id || null, packageName: u.package_name || 'Free', adsFree: !!u.ads_free,
+  subscriptionEnd: u.subscription_end || null, paymentStatus: u.payment_status || null,
 });
+
+// Short-lived signed proof that an email address was verified (used by sign-up).
+export function sealProof(email) {
+  const body = b64(JSON.stringify({ e: String(email).toLowerCase(), x: Math.floor(Date.now() / 1000) + 1800 }));
+  return `${body}.${sign(body)}`;
+}
+export function checkProof(proof, email) {
+  const [body, s] = String(proof || '').split('.');
+  if (!body || !s || s !== sign(body)) return false;
+  const d = JSON.parse(Buffer.from(body, 'base64url').toString());
+  return d.e === String(email).toLowerCase() && d.x > Date.now() / 1000;
+}

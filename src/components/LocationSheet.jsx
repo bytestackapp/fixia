@@ -4,7 +4,6 @@ import * as psgc from '../lib/psgc.js';
 import Button from './ui/Button.jsx';
 import './LocationSheet.css';
 
-const None = { code: '', name: '' };
 
 export default function LocationSheet({ open, onClose }) {
   const ref = useRef(null);

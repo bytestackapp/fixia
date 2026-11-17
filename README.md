@@ -1,24 +1,31 @@
 # Fixia 2.0
 
-## Folder map
 ```
-api/            Server functions (Vercel). Only place that talks to the database.
-  _lib/         Shared server helpers (db.js, auth.js)
-  auth.js       Sign in / who am I / sign out
-sql/            One-time database scripts
+api/                 Server (Vercel functions). The ONLY code that talks to the database.
+  auth.js            Sign in/out, sign-up, email codes, password reset (works without login)
+  app.js             Every signed-in action (one line per action)
+  admin.js           Every admin action (admin accounts only)
+  cron.js            Daily job: reminders, expiry, suspensions
+  _lib/              Helpers: db, auth, http, mail, push, storage, packages, referral, settings
+  _lib/actions/      The actual logic, one file per area
 src/
-  styles/       tokens.css (colours, fonts, spacing), base.css, ui.css
-  components/   Shell (navigation) and ui/ (Button, Field ...)
-  pages/        One file per screen (+ its .css)
-  lib/          api.js (server calls), auth.jsx (sign-in state)
-public/         images/, manifest.json
+  styles/            tokens.css (colours/fonts/spacing), base.css, ui.css
+  components/        Shell (navigation), ui/ (Button, Field, Dialog, Kit), shared pieces
+  pages/             One file per screen · profile/ · admin/
+  lib/               api.js, auth, queries, ads, push, psgc, categories, format, image
+public/              images/, manifest.json, sw.js (push notifications)
+sql/01-lockdown.sql  Run ONCE at cutover
+.github/workflows/   Android APK build
 ```
 
-## Run it
-1. `npm install`
-2. Vercel > Project > Environment Variables, add: `JWT_SECRET` (any 40+ random characters), plus your existing
-   `SUPA_URL`, `SUPA_SERVICE_KEY`, `APP_URL`, `GMAIL_USER`, `GMAIL_PASS`, `PAYPAL_*`, `PAYMONGO_SECRET_KEY`, `VAPID_*`, `CRON_SECRET`.
-3. Copy your existing `images/` folder into `public/images/` and `manifest.json` into `public/`.
-4. Copy these old files, unchanged for now, into `api/`: `send-email.js`, `send-push.js`, `otp.js`, `payments.js`, `password-reset.js`, `subscription-cron.js`, `delete-storage-file.js`. They are rewritten in later phases.
-5. Do NOT delete `api/db.js` from the old project until the new screens replace it. Do NOT run `sql/01-lockdown.sql` until cutover.
-6. Deploy to a NEW Vercel project (so the live app keeps working while we build).
+## Vercel environment variables
+SUPA_URL, SUPA_SERVICE_KEY, APP_URL, JWT_SECRET (new), CRON_SECRET (new), GMAIL_USER, GMAIL_PASS,
+PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENV, PAYMONGO_SECRET_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY.
+(SUPA_KEY is no longer used.)
+
+## Delete these old files from api/
+send-email.js, send-push.js, otp.js, payments.js, password-reset.js, subscription-cron.js, delete-storage-file.js, db.js
+(their work now lives in api/_lib and api/auth.js / app.js / cron.js)
+
+## Android (GitHub secrets)
+API_BASE (your Vercel address), FIXIA_KEYSTORE_B64, FIXIA_KEYSTORE_PASSWORD.

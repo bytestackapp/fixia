@@ -21,9 +21,12 @@ export async function api(path, body = {}) {
     throw new ApiError('No connection. Check your internet and try again.', 0);
   }
   const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && getToken() && body.action !== 'login') window.dispatchEvent(new CustomEvent('fixia:signed-out', { detail: data.error }));
   if (!res.ok) throw new ApiError(data.error || 'Something went wrong. Please try again.', res.status);
   return data;
 }
 
 // Signed-in actions: call('providers.list', { q: 'plumber' })
 export const call = (action, payload = {}) => api('app', { action, ...payload });
+
+export const admin = (action, payload = {}) => api('admin', { action, ...payload });

@@ -1,28 +1,26 @@
-/* /api/app — every signed-in action goes through here. Add new screens' actions to the table below. */
+/* /api/app — every signed-in action. To add a feature: write the function, add one line below. */
 import { requireUser } from './_lib/auth.js';
-import * as providers from './_lib/actions/providers.js';
-import * as saved from './_lib/actions/saved.js';
+import { route } from './_lib/http.js';
+import * as P from './_lib/actions/providers.js';
+import * as S from './_lib/actions/saved.js';
+import * as B from './_lib/actions/bookings.js';
+import * as A from './_lib/actions/account.js';
+import * as Pay from './_lib/actions/payments.js';
+import * as R from './_lib/referral.js';
 
-const actions = {
-  'home': providers.homes,
-  'providers.list': providers.list,
-  'providers.get': providers.get,
-  'providers.contact': providers.contact,
-  'saved.list': saved.list,
-  'saved.set': saved.set,
-};
-
-export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { action, ...payload } = req.body || {};
-  try {
-    const run = actions[action];
-    if (!run) return res.status(400).json({ error: 'Unknown action.' });
-    const user = await requireUser(req);
-    return res.status(200).json(await run(user, payload));
-  } catch (e) {
-    if (!e.status) console.error(`[app:${action}]`, e);
-    return res.status(e.status || 500).json({ error: e.status ? e.message : 'Something went wrong. Please try again.' });
-  }
-}
+export default route({
+  'home': P.home, 'providers.list': P.list, 'providers.get': P.get, 'providers.contact': P.contact,
+  'saved.list': S.list, 'saved.set': S.set,
+  'bookings.list': B.list, 'bookings.create': B.create, 'bookings.cancel': B.cancel, 'bookings.dispute': B.dispute,
+  'bookings.providerCancel': B.providerCancel, 'bookings.done': B.markDone, 'bookings.complete': B.complete,
+  'notifications.list': B.notifications, 'notifications.read': B.markRead, 'notifications.clear': B.clearRead, 'counts': B.counts,
+  'profile.get': A.profile, 'profile.update': A.updateProfile, 'password.change': A.changePassword, 'avatar.set': A.setAvatar,
+  'plans.list': A.plans, 'upgrade.calc': A.upgradeCalc, 'upgrade.manual': A.upgradeManual,
+  'pay.checkout': Pay.checkout, 'pay.verify': Pay.verify,
+  'referral.redeem': R.redeem,
+  'listings.mine': A.listingsMine, 'listings.save': A.listingSave, 'listings.toggle': A.listingToggle, 'listings.delete': A.listingDelete, 'reviews.mine': A.reviewsMine,
+  'change.cooldown': A.changeCooldown, 'change.submit': A.changeSubmit, 'report.submit': A.reportSubmit,
+  'push.key': A.pushKey, 'push.subscribe': A.pushSubscribe,
+  'messages.pending': A.messagesPending, 'messages.ack': A.messageAck,
+  'ads.list': A.adsList, 'ads.track': A.adsTrack,
+}, { guard: (req) => requireUser(req) });

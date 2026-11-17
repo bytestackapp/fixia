@@ -3,6 +3,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth.jsx';
 import Field from '../components/ui/Field.jsx';
 import Button from '../components/ui/Button.jsx';
+import InfoLinks from './Info.jsx';
 import './Login.css';
 
 const SERVICES = ['Plumbing', 'Aircon service', 'Electrical', 'Painting', 'Home cleaning', 'Auto repair', 'Tutoring', 'Pet grooming', 'Photography'];
@@ -14,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/'} replace />;
 
   async function submit(e) {
     e.preventDefault();
@@ -45,6 +46,7 @@ export default function Login() {
             <span>New here? <Link to="/signup">Create an account</Link></span>
           </div>
         </form>
+        <InfoLinks />
       </main>
     </div>
   );

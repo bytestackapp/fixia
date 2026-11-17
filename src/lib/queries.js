@@ -15,3 +15,16 @@ export function useToggleSave(id) {
     onSettled: () => qc.invalidateQueries({ queryKey: ['saved'] }),
   });
 }
+
+export const useBookings = () => useQuery({ queryKey: ['bookings'], queryFn: () => call('bookings.list') });
+export const useCounts = () => useQuery({ queryKey: ['counts'], queryFn: () => call('counts'), refetchInterval: 30_000, staleTime: 15_000 });
+export const useProfile = () => useQuery({ queryKey: ['profile'], queryFn: () => call('profile.get') });
+
+// run an action, then refresh whatever it changed
+export function useAct(action, { invalidate = [], onSuccess } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => call(action, payload),
+    onSuccess: (d, v) => { invalidate.forEach((k) => qc.invalidateQueries({ queryKey: [k] })); onSuccess?.(d, v); },
+  });
+}

@@ -4,7 +4,8 @@ import { MapPin } from 'lucide-react';
 import { useLocation } from '../lib/location.jsx';
 import { useProviders } from '../lib/queries.js';
 import { CATEGORIES, catLabel } from '../lib/categories.js';
-import ProviderRow from '../components/ProviderRow.jsx';
+import ProviderList from '../components/ProviderList.jsx';
+import { bumpAd } from '../lib/ads.jsx';
 import LocationSheet from '../components/LocationSheet.jsx';
 import { RowsSkeleton, ErrorState, Empty } from '../components/States.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -28,6 +29,7 @@ export default function Search() {
   }
 
   const { data, error, isLoading, isFetching, refetch } = useProviders({ ...p, ...loc });
+  useEffect(() => { if (data?.items.length) bumpAd(); }, [data?.total, p.q, p.cat]);   // eslint-disable-line
   const subs = CATEGORIES.find((c) => c.key === p.cat)?.subs || [];
   const noFilters = !p.q && !p.cat && !p.filter;
 
@@ -75,7 +77,7 @@ export default function Search() {
         {isLoading ? <RowsSkeleton /> : error ? <ErrorState error={error} retry={refetch} /> :
           data.items.length ? (
             <>
-              <ul className="rows">{data.items.map((x) => <ProviderRow key={x.id} p={x} />)}</ul>
+              <ProviderList items={data.items} />
               {data.total > data.items.length && (
                 <div style={{ marginTop: 'var(--s5)' }}><Button variant="secondary" onClick={() => set({ n: String(p.limit + PAGE) })}>Show more</Button></div>
               )}
