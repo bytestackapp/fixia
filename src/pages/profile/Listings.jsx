@@ -13,10 +13,10 @@ const blank = { title: '', category: '', sub: '', priceLabel: '', description: '
 
 export default function Listings() {
   const { data, error, isLoading, refetch } = useQuery({ queryKey: ['listings'], queryFn: () => call('listings.mine') });
-  const [form, setForm] = useState(null), [del, setDel] = useState(null), [err, setErr] = useState('');
+  const [form, setForm] = useState(null), [del, setDel] = useState(null);
   const inv = { invalidate: ['listings', 'profile'] };
-  const save = useAct('listings.save', { ...inv, onSuccess: () => setForm(null) });
-  const toggle = useAct('listings.toggle', inv), remove = useAct('listings.delete', { ...inv, onSuccess: () => setDel(null) });
+  const save = useAct('listings.save', { ...inv, ok: 'Service saved.', onSuccess: () => setForm(null) });
+  const toggle = useAct('listings.toggle', inv), remove = useAct('listings.delete', { ...inv, ok: 'Service deleted.', onSuccess: () => setDel(null) });
   if (isLoading) return <RowsSkeleton rows={2} />;
   if (error) return <ErrorState error={error} retry={refetch} />;
   const used = data.items.length, full = data.limit < 999 && used >= data.limit;
@@ -25,23 +25,21 @@ export default function Listings() {
   return (
     <div className="stack">
       {!data.approved && <div className="banner banner--warn"><h3>Listings unlock after approval</h3><p>You can add services once our team approves your account.</p></div>}
-      {err && <div className="notice notice--error" role="alert">{err}</div>}
       <div className="cluster" style={{ justifyContent: 'space-between' }}>
         <span className="muted small">{used} of {data.limit >= 999 ? 'unlimited' : data.limit} listings used</span>
-        <Button disabled={!data.approved || full} onClick={() => { setErr(''); setForm(blank); }}>Add a service</Button>
+        <Button disabled={!data.approved || full} onClick={() => setForm(blank)}>Add a service</Button>
       </div>
       {!data.items.length ? <Empty title="No services yet">Customers find you through your listings. Add your first one.</Empty> : (
         <ul className="rows">{data.items.map((l) => (
           <li key={l.id} className="row">
-            <div className="listing__top"><h3 className="listing__title" style={{ fontSize: 'var(--t-md)' }}>{l.title}</h3><Switch checked={l.active} label={`${l.title} is ${l.active ? 'visible' : 'hidden'}`} onChange={(v) => { setErr(''); toggle.mutate({ id: l.id, active: v }, { onError: (e) => setErr(e.message) }); }} /></div>
+            <div className="listing__top"><h3 className="listing__title" style={{ fontSize: 'var(--t-md)' }}>{l.title}</h3><Switch checked={l.active} label={`${l.title} is ${l.active ? 'visible' : 'hidden'}`} onChange={(v) => toggle.mutate({ id: l.id, active: v })} /></div>
             <span className="prow__where">{catLabel(l.category)}{l.sub && ` · ${l.sub}`}{l.priceLabel && ` · ${l.priceLabel}`}</span>
             <p className="small muted">{l.description}</p>
-            <div className="cluster"><Button size="sm" variant="secondary" onClick={() => { setErr(''); setForm(l); }}>Edit</Button><Button size="sm" variant="quiet" onClick={() => setDel(l)}>Delete</Button></div>
+            <div className="cluster"><Button size="sm" variant="secondary" onClick={() => setForm(l)}>Edit</Button><Button size="sm" variant="quiet" onClick={() => setDel(l)}>Delete</Button></div>
           </li>))}</ul>
       )}
       <Dialog open={!!form} onClose={() => setForm(null)} title={form?.id ? 'Edit service' : 'New service'}>
-        {form && <form className="stack" noValidate onSubmit={(e) => { e.preventDefault(); save.mutate(form, { onError: (er) => setErr(er.message) }); }}>
-          {(err || save.error) && <div className="notice notice--error" role="alert">{err || save.error.message}</div>}
+        {form && <form className="stack" noValidate onSubmit={(e) => { e.preventDefault(); save.mutate(form); }}>
           <Field label="Title" placeholder="e.g. Aircon cleaning" maxLength={100} value={form.title} onChange={set('title')} />
           <div className="two">
             <Field as="select" label="Category" value={form.category} onChange={set('category')}><option value="">Select…</option>{CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}<option value="other">Others</option></Field>

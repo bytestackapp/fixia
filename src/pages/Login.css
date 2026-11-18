@@ -1,18 +1,32 @@
-.login { min-height: 100dvh; display: grid; }
-.login__aside { display: none; }
-.login__main { display: grid; align-content: center; justify-items: center; padding: var(--s6) var(--s5); gap: var(--s6); }
-.login__brand { font: 700 2rem/1 var(--font-display); letter-spacing: -0.04em; }
-.login__form { width: 100%; max-width: 380px; display: grid; gap: var(--s5); }
-.login__links { display: grid; gap: var(--s3); font-size: var(--t-sm); color: var(--ink-2); }
-.login__links a { font-weight: 650; color: var(--ink); text-underline-offset: 3px; }
-
-@media (min-width: 900px) {
-  .login { grid-template-columns: minmax(380px, 5fr) 6fr; }
-  .login__aside { display: flex; flex-direction: column; justify-content: space-between; background: var(--deep); color: #fff; padding: var(--s8) var(--s7); }
-  .login__aside .login__brand { font-size: 2.5rem; }
-  .login__tag { font: 650 var(--t-3xl)/1.02 var(--font-display); letter-spacing: -0.03em; max-width: 9ch; margin: var(--s7) 0; }
-  .login__index { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: var(--s6); font-size: var(--t-sm); color: #C6CCD4; }
-  .login__index li { padding: var(--s2) 0; border-top: 1px solid rgba(255,255,255,.18); break-inside: avoid; }
-  .login__brand--mobile { display: none; }
-  .login__main { padding: var(--s8); }
+/* Sign-in, sign-up, forgot and reset pages: one centred white card on a soft background */
+.login {
+  position: relative; min-height: 100dvh; display: grid; place-items: center; overflow: hidden;
+  padding: var(--s6) var(--s4); background: linear-gradient(160deg, #F9F3EE, #EEF2F7);
 }
+.login::before, .login::after { content: ''; position: absolute; border-radius: 50%; background: rgba(242, 98, 43, .07); pointer-events: none; animation: float 9s ease-in-out infinite; }
+.login::before { width: 220px; height: 220px; top: 5%; left: -5%; }
+.login::after { width: 160px; height: 160px; bottom: 8%; right: -4%; animation-delay: 2.5s; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-22px); } }
+
+.login__aside { display: none; }
+.login__main {
+  position: relative; z-index: 1; width: 100%; max-width: 460px; display: grid; gap: var(--s5); justify-items: center; align-content: center;
+  padding: 2.25rem 1.75rem; background: rgba(255, 255, 255, .98); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg); animation: rise .45s ease;
+}
+.login__main > * { min-width: 0; }
+
+/* the "fixia" brand text is replaced by the app icon */
+.login__brand {
+  width: 64px; height: 64px; border-radius: 18px; font-size: 0; color: transparent; justify-self: center;
+  background: url('/images/fixia-icon-192.png') center / cover, var(--brand);
+  box-shadow: 0 8px 24px rgba(27, 42, 63, .25);
+}
+.login__form { width: 100%; display: grid; gap: var(--s4); }
+.login__form h1, .login__main h1 { text-align: center; font-size: var(--t-xl); }
+.login__links { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s2) var(--s5); font-size: .82rem; color: var(--text-3); }
+.login__links a { font-weight: 700; color: var(--brand); text-decoration: none; }
+.login__links a:hover { text-decoration: underline; }
+.login__links .btn--quiet { color: var(--text-3); font-weight: 600; }
+.login__main .small a { color: var(--brand); font-weight: 700; text-decoration: none; }
+.login__main .small a:hover { text-decoration: underline; }

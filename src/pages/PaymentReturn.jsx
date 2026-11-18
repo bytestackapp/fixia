@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { CircleCheck, CircleAlert } from 'lucide-react';
 import { call } from '../lib/api.js';
 import { useAuth } from '../lib/auth.jsx';
+import { toast } from '../lib/toast.jsx';
 import { peso } from '../lib/format.js';
 
 export default function PaymentReturn() {
@@ -12,17 +14,27 @@ export default function PaymentReturn() {
     const saved = JSON.parse(localStorage.getItem('fixia.pay') || '{}');
     const method = sp.get('method'), pkg = sp.get('pkg');
     const ref = method === 'paypal' ? sp.get('token') : saved.ref;
-    if (!ref) return setState({ s: 'err', m: 'We could not find this payment. If you were charged, contact support with your receipt.' });
+    const fail = (m) => { toast(m, 'error'); setState({ s: 'err' }); };
+    if (!ref) return fail('We could not find this payment. If you were charged, contact support with your receipt.');
     call('pay.verify', { method, ref, packageId: pkg })
-      .then(async (r) => { localStorage.removeItem('fixia.pay'); await refresh(); setState({ s: 'ok', r }); })
-      .catch((e) => setState({ s: 'err', m: e.message }));
+      .then(async (r) => { localStorage.removeItem('fixia.pay'); await refresh(); toast('Payment received. Your plan is active.'); setState({ s: 'ok', r }); })
+      .catch((e) => fail(e.message));
   }, []);   // eslint-disable-line
   return (
-    <div className="stack" style={{ maxWidth: 520 }}>
-      <header className="page-head"><h1>{state.s === 'ok' ? 'Payment received' : state.s === 'err' ? 'Payment problem' : 'Confirming payment…'}</h1></header>
-      {state.s === 'wait' && <><div className="skeleton" style={{ height: 24, width: 260 }} /><p className="muted">Please keep this page open.</p></>}
-      {state.s === 'ok' && <><div className="notice notice--ok" role="status">Your <b>{state.r.plan}</b> plan is active{state.r.amount ? ` (${peso(state.r.amount)} paid)` : ''}.</div><Link className="btn btn--primary" to="/profile?tab=plan">See my plan</Link></>}
-      {state.s === 'err' && <><div className="notice notice--error" role="alert">{state.m}</div><Link className="btn btn--secondary" to="/profile?tab=plan">Back to plans</Link></>}
+    <div className="result">
+      {state.s === 'wait' && <><div className="ring" aria-hidden="true" /><h1>Confirming payment…</h1><p className="muted">Please keep this page open.</p></>}
+      {state.s === 'ok' && <>
+        <span className="result__icon tone--ok"><CircleCheck size={34} aria-hidden="true" /></span>
+        <h1>Payment received</h1>
+        <div className="info-box"><div className="info-row"><span>Plan</span><b>{state.r.plan}</b></div>{state.r.amount ? <div className="info-row"><span>Paid</span><b className="num">{peso(state.r.amount)}</b></div> : null}</div>
+        <Link className="btn btn--primary btn--block" to="/profile?tab=plan">See my plan</Link>
+      </>}
+      {state.s === 'err' && <>
+        <span className="result__icon tone--danger"><CircleAlert size={34} aria-hidden="true" /></span>
+        <h1>Payment problem</h1>
+        <p className="muted">We could not confirm this payment.</p>
+        <Link className="btn btn--secondary btn--block" to="/profile?tab=plan">Back to plans</Link>
+      </>}
     </div>
   );
 }

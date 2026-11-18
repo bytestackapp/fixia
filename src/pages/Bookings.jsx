@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Star } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useBookings, useCounts, useAct } from '../lib/queries.js';
 import { ago } from '../lib/format.js';
@@ -17,11 +18,12 @@ export default function Bookings() {
   const { user } = useAuth(); const isPro = user.role === 'provider';
   const { data, error, isLoading, refetch } = useBookings();
   const counts = useCounts().data?.unread || 0;
-  const [tab, setTab] = useState('all'), [ask, setAsk] = useState(null), [rate, setRate] = useState(null), [err, setErr] = useState('');
-  const inv = { invalidate: ['bookings', 'counts', 'notifications'], onSuccess: () => { setAsk(null); setRate(null); setErr(''); } };
-  const cancel = useAct(isPro ? 'bookings.providerCancel' : 'bookings.cancel', inv);
-  const done = useAct('bookings.done', inv), dispute = useAct('bookings.dispute', inv), complete = useAct('bookings.complete', { ...inv, onSuccess: () => { inv.onSuccess(); bumpAd(); } });
-  const run = (m, payload) => m.mutate(payload, { onError: (e) => setErr(e.message) });
+  const [tab, setTab] = useState('all'), [ask, setAsk] = useState(null), [rate, setRate] = useState(null);
+  const base = { invalidate: ['bookings', 'counts', 'notifications'], onSuccess: () => { setAsk(null); setRate(null); } };
+  const cancel = useAct(isPro ? 'bookings.providerCancel' : 'bookings.cancel', { ...base, ok: 'Booking cancelled.' });
+  const done = useAct('bookings.done', { ...base, ok: 'Job marked as done. The customer was asked to confirm.' });
+  const dispute = useAct('bookings.dispute', { ...base, ok: 'Job disputed.' });
+  const complete = useAct('bookings.complete', { ...base, ok: 'Thank you! Booking completed.', onSuccess: () => { base.onSuccess(); bumpAd(); } });
 
   const list = (data?.items || []).filter((b) => tab === 'all' || b.status === tab);
   return (
@@ -29,13 +31,12 @@ export default function Bookings() {
       <header className="page-head"><h1>{isPro ? 'Jobs' : 'Bookings'}</h1>
         <p>{isPro ? 'Requests from customers and work in progress.' : 'Track your service requests.'} <Link to="/notifications">Updates{counts ? ` (${counts} new)` : ''}</Link></p></header>
       <Tabs items={TABS} value={tab} onChange={setTab} label="Filter by status" />
-      {err && <div className="notice notice--error" role="alert" style={{ marginBottom: 'var(--s4)' }}>{err}</div>}
       {isLoading ? <RowsSkeleton rows={3} /> : error ? <ErrorState error={error} retry={refetch} /> : !list.length ? (
         <Empty title={tab === 'all' ? 'No bookings yet' : 'Nothing here'} action={!isPro && tab === 'all' && <Link className="btn btn--secondary btn--sm" to="/browse">Find a provider</Link>}>
           {isPro ? 'New requests from customers appear here.' : 'Open a provider and tap Book to start.'}
         </Empty>
       ) : (
-        <ul className="rows">
+        <ul className="rows rows--even">
           {list.map((b) => {
             const [text, kind] = LABEL[b.status] || [b.status, 'neutral'];
             const open = ['pending', 'active'].includes(b.status);
@@ -48,10 +49,14 @@ export default function Bookings() {
                     {b.service && <span className="prow__services">{b.service}</span>}
                     {b.with.location && <span className="prow__where">{b.with.location}</span>}
                   </div>
-                  <div className="booking__state"><Status kind={kind}>{text}</Status>{b.unread && <span className="tag" style={{ marginLeft: 0 }}>New</span>}<span className="prow__where">{ago(b.updatedAt)}</span></div>
+                  <div className="booking__state">
+                    <Status kind={kind}>{text}</Status>
+                    {b.rating && <span className="stars-chip" aria-label={`Rated ${b.rating.stars} out of 5`}>{b.rating.stars}<Star size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" /></span>}
+                    {b.unread && <span className="tag" style={{ marginLeft: 0 }}>New</span>}
+                    <span className="prow__where">{ago(b.updatedAt)}</span>
+                  </div>
                 </div>
-                {b.message && <p className="small muted" style={{ borderLeft: '3px solid var(--line-strong)', paddingLeft: 'var(--s3)' }}>{b.message}</p>}
-                {b.rating && <p className="small"><b>{b.rating.stars}/5</b>{b.rating.comment && ` — “${b.rating.comment}”`}</p>}
+                <p className="booking__note">{b.message || 'No job details.'}</p>
                 <div className="cluster">
                   {b.with.phone && <><a className="btn btn--secondary btn--sm" href={`tel:${b.with.phone}`}>Call</a><a className="btn btn--secondary btn--sm" href={`sms:${b.with.phone}`}>SMS</a></>}
                   {isPro && open && <Button size="sm" onClick={() => setAsk({ kind: 'done', b })}>Mark job done</Button>}
@@ -66,10 +71,10 @@ export default function Bookings() {
         </ul>
       )}
 
-      <Confirm open={ask?.kind === 'cancel'} title="Cancel this booking?" confirmLabel="Yes, cancel" danger busy={cancel.isPending} onClose={() => setAsk(null)} onConfirm={() => run(cancel, { id: ask.b.id })}>The other person will be notified.</Confirm>
-      <Confirm open={ask?.kind === 'done'} title="Mark this job as done?" confirmLabel="Mark done" busy={done.isPending} onClose={() => setAsk(null)} onConfirm={() => run(done, { id: ask.b.id })}>The customer is asked to confirm and rate. Only do this when the work is finished.</Confirm>
-      <Confirm open={ask?.kind === 'dispute'} title="Dispute this job?" confirmLabel="Dispute" danger busy={dispute.isPending} onClose={() => setAsk(null)} onConfirm={() => run(dispute, { id: ask.b.id })}>This closes the booking as disputed. Talk to the provider to sort it out, then book again if needed.</Confirm>
-      <RateDialog b={rate} user={user} busy={complete.isPending} onClose={() => setRate(null)} onSubmit={(p) => run(complete, { id: rate.id, ...p })} />
+      <Confirm open={ask?.kind === 'cancel'} title="Cancel this booking?" confirmLabel="Yes, cancel" danger busy={cancel.isPending} onClose={() => setAsk(null)} onConfirm={() => cancel.mutate({ id: ask.b.id })}>The other person will be notified.</Confirm>
+      <Confirm open={ask?.kind === 'done'} title="Mark this job as done?" confirmLabel="Mark done" busy={done.isPending} onClose={() => setAsk(null)} onConfirm={() => done.mutate({ id: ask.b.id })}>The customer is asked to confirm and rate. Only do this when the work is finished.</Confirm>
+      <Confirm open={ask?.kind === 'dispute'} title="Dispute this job?" confirmLabel="Dispute" danger busy={dispute.isPending} onClose={() => setAsk(null)} onConfirm={() => dispute.mutate({ id: ask.b.id })}>This closes the booking as disputed. Talk to the provider to sort it out, then book again if needed.</Confirm>
+      <RateDialog b={rate} user={user} busy={complete.isPending} onClose={() => setRate(null)} onSubmit={(p) => complete.mutate({ id: rate.id, ...p })} />
     </>
   );
 }

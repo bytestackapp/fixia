@@ -1,6 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../lib/auth.jsx';
-import { Toaster } from '../../lib/toast.jsx';
 import { useAdm } from './kit.jsx';
 
 const NAV = [['', 'Overview'], ['pending', 'Applications', 'pending'], ['providers', 'Providers'], ['customers', 'Customers'], ['upgrades', 'Upgrades', 'upgrades'], ['requests', 'Change requests', 'requests'], ['reports', 'Reports', 'reports'], ['uncategorized', 'Uncategorized', 'uncategorized'], ['suspicious', 'Suspicious ratings'], ['packages', 'Plans'], ['ads', 'Ads & featured'], ['messages', 'Messages'], ['settings', 'Settings']];
@@ -17,7 +16,6 @@ export default function AdminShell() {
         <button className="btn btn--quiet btn--sm anav__out" onClick={logout}>Sign out</button>
       </nav>
       <main id="main" className="amain"><Outlet /></main>
-      <Toaster />
     </div>
   );
 }

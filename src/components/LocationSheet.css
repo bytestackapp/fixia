@@ -1,9 +1,14 @@
-.sheet { border: 0; padding: 0; background: var(--surface); color: var(--ink); width: 100%; max-width: 100%; margin: auto 0 0; border-top: 2px solid var(--ink); max-height: 90dvh; }
-.sheet::backdrop { background: rgba(15, 26, 39, .55); }
-.sheet__body { display: grid; gap: var(--s4); padding: var(--s5) var(--s5) calc(var(--s5) + var(--safe-bottom)); }
-.sheet__current { color: var(--ink-2); font-size: var(--t-sm); }
+.sheet { border: 0; padding: 0; background: var(--card); color: var(--text); width: 100%; max-width: 100%; margin: auto 0 0; border-radius: var(--r-lg) var(--r-lg) 0 0; max-height: 90dvh; box-shadow: var(--shadow-lg); }
+.sheet[open] { animation: slideUp .3s ease; }
+.sheet::backdrop { background: rgba(17, 24, 39, .45); backdrop-filter: blur(3px); }
+.sheet__body { display: grid; gap: var(--s4); padding: var(--s3) var(--s5) calc(var(--s5) + var(--safe-bottom)); }
+.sheet__body::before { content: ''; justify-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--line-strong); }
+.sheet__current { color: var(--text-2); font-size: var(--t-sm); }
 .sheet__actions { display: grid; gap: var(--s2); margin-top: var(--s2); }
 @media (min-width: 900px) {
-  .sheet { margin: auto; max-width: 460px; border: 2px solid var(--ink); border-radius: var(--r-sm); }
+  .sheet { margin: auto; max-width: 460px; border-radius: var(--r-lg); }
+  .sheet[open] { animation: fadeIn .2s; }
+  .sheet__body { padding-top: var(--s5); }
+  .sheet__body::before { display: none; }
   .sheet__actions { grid-template-columns: auto 1fr auto; align-items: center; }
 }
