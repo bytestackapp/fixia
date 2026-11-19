@@ -50,10 +50,17 @@ export default function PullToRefresh() {
   }, [qc, refresh]);
 
   const show = pull > 0 || busy;
+  const dragging = pull > 0 && !busy;
+  const level = Math.min(1, pull / TRIGGER);
+  const ease = dragging ? 'none' : 'opacity .3s ease, height .3s ease, transform .3s ease';
   return (
-    <div className={`ptr${busy ? ' is-busy' : ''}`} aria-hidden="true"
-      style={{ opacity: show ? Math.min(1, pull / 30 + (busy ? 1 : 0)) : 0, transform: `translateY(${pull}px)` }}>
-      <RefreshCw size={18} style={busy ? undefined : { transform: `rotate(${pull * 4}deg)` }} />
-    </div>
+    <>
+      <div className="ptr-glow" aria-hidden="true"
+        style={{ height: `calc(var(--safe-top) + ${20 + pull * 1.8}px)`, opacity: show ? 0.25 + level * 0.75 : 0, transition: ease }} />
+      <div className={`ptr${busy ? ' is-busy' : ''}`} aria-hidden="true"
+        style={{ opacity: show ? Math.min(1, pull / 30 + (busy ? 1 : 0)) : 0, transform: `translateY(${pull}px)`, transition: ease }}>
+        <RefreshCw size={18} style={busy ? undefined : { transform: `rotate(${pull * 4}deg)` }} />
+      </div>
+    </>
   );
 }
