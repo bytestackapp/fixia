@@ -1,1 +1,1 @@
-{ "appId": "ph.fixia.app", "appName": "Fixia", "webDir": "dist", "server": { "androidScheme": "https" } }
+{ "appId": "ph.fixia.app", "appName": "Fixia PH", "webDir": "dist", "server": { "androidScheme": "https" } }
