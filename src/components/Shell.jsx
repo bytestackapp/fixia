@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useNavigate, useLocation as useRoute } from 'react-router-dom';
-import { House, Bookmark, LayoutGrid, ClipboardList, User, Bell, Search, LogOut } from 'lucide-react';
+import { House, Bookmark, LayoutGrid, ClipboardList, User, Bell, Search, LogOut, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { useCounts } from '../lib/queries.js';
 import { enablePush } from '../lib/push.js';
@@ -30,6 +30,8 @@ export default function Shell() {
   // if this device already allowed notifications, keep its subscription fresh
   useEffect(() => { enablePush().catch(() => {}); }, []);
 
+  function backToAdmin() { sessionStorage.removeItem('fixia.adminView'); go('/admin'); }
+
   function search(e) {
     e.preventDefault();
     go(`/search?q=${encodeURIComponent(text.trim())}`);
@@ -49,6 +51,7 @@ export default function Shell() {
             <input id="top-q" type="search" placeholder="Search services, providers…" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} />
           </form>
         )}
+        {user.role === 'admin' && <button type="button" className="topbar__btn" onClick={backToAdmin} aria-label="Back to admin console" title="Back to admin console"><ShieldCheck size={18} aria-hidden="true" /></button>}
         <Link to="/notifications" className="topbar__btn" aria-label={unread ? `Updates, ${unread} new` : 'Updates'} title="Updates">
           <Bell size={18} aria-hidden="true" />
           {unread > 0 && <b className="nav__badge">{unread > 9 ? '9+' : unread}</b>}

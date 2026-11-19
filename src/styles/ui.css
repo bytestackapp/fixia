@@ -295,8 +295,10 @@ button.sub-card { width: 100%; text-align: left; cursor: pointer; }
 .anav__link.active { color: var(--brand); border-bottom-color: var(--brand); }
 .anav__link b { background: var(--red); color: #fff; font-size: .62rem; padding: 1px 6px; border-radius: 99px; }
 .anav__out { display: none; }
-.anav__iconout { position: absolute; top: calc(var(--safe-top) + 10px); right: var(--s4); display: grid; place-items: center; width: 38px; height: 38px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); cursor: pointer; }
-.anav__iconout:hover { background: var(--danger-tint); color: var(--red); border-color: rgba(217, 69, 59, .3); }
+.anav__tools { position: absolute; top: calc(var(--safe-top) + 10px); right: var(--s4); display: flex; gap: 8px; }
+.anav__iconout { display: grid; place-items: center; width: 38px; height: 38px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); cursor: pointer; }
+.anav__iconout:hover { background: var(--brand-light); color: var(--brand); border-color: rgba(242, 98, 43, .3); }
+.anav__iconout--danger:hover { background: var(--danger-tint); color: var(--red); border-color: rgba(217, 69, 59, .3); }
 .amain { padding: var(--s5) var(--s4) var(--s8); max-width: 1200px; }
 @media (min-width: 900px) {
   .anav { position: fixed; inset: 0 auto 0 0; width: var(--rail); padding: var(--s5) 0; overflow-y: auto; display: flex; flex-direction: column; border-bottom: 0; border-right: 1px solid var(--line); }
@@ -305,7 +307,7 @@ button.sub-card { width: 100%; text-align: left; cursor: pointer; }
   .anav__link { border-bottom: 0; border-left: 3px solid transparent; justify-content: space-between; padding: 9px var(--s5); }
   .anav__link.active { border-left-color: var(--brand); background: var(--brand-light); }
   .anav__out { display: block; align-self: flex-start; margin: 0 var(--s4); }
-  .anav__iconout { display: none; }
+  .anav__tools { display: none; }
   .amain { margin-left: var(--rail); padding: var(--s6) var(--s7) var(--s8); }
 }
 .todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }

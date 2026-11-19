@@ -37,7 +37,7 @@ function Gate({ role, children }) {
   if (!ready) return <Splash />;
   if (!user) return <Navigate to="/login" replace />;
   if (role === 'admin' && user.role !== 'admin') return <Navigate to="/" replace />;
-  if (role === 'member' && user.role === 'admin') return <Navigate to="/admin" replace />;
+  if (role === 'member' && user.role === 'admin' && !sessionStorage.getItem('fixia.adminView')) return <Navigate to="/admin" replace />;
   return children;
 }
 
