@@ -34,6 +34,11 @@ export default function Splash() {
     return () => clearTimeout(t);
   }, [show, ready, waited, forced]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('splash-lock', show);
+    return () => document.documentElement.classList.remove('splash-lock');
+  }, [show]);
+
   if (!show) return null;
   return (
     <div className={`splash${fade ? ' is-hiding' : ''}`} role="status" aria-live="polite" aria-label="Loading Fixia">
