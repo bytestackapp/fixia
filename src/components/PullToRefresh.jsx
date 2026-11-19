@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { RefreshCw } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 
 const TRIGGER = 55, MAX = 100;
@@ -59,7 +58,7 @@ export default function PullToRefresh() {
         style={{ height: `calc(var(--safe-top) + ${20 + pull * 1.8}px)`, opacity: show ? 0.25 + level * 0.75 : 0, transition: ease }} />
       <div className={`ptr${busy ? ' is-busy' : ''}`} aria-hidden="true"
         style={{ opacity: show ? Math.min(1, pull / 30 + (busy ? 1 : 0)) : 0, transform: `translateY(${pull}px)`, transition: ease }}>
-        <RefreshCw size={18} style={busy ? undefined : { transform: `rotate(${pull * 4}deg)` }} />
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={busy ? undefined : { transform: `rotate(${pull * 4}deg)` }}><path class="ptr-arrow" d="M22 15v10M17.5 21l4.5 4.5 4.5-4.5"/></svg>
       </div>
     </>
   );
