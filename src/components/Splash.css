@@ -1,6 +1,6 @@
 .splash {
   position: fixed; inset: 0; z-index: 10000;
-  width: 100%; height: 100vh; height: 100dvh; min-height: -webkit-fill-available;
+  width: 100%;
   touch-action: none; overscroll-behavior: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s3);
   padding: var(--safe-top) var(--s5) 150px;
@@ -23,7 +23,7 @@
 
 .splash__wave { position: absolute; left: 0; bottom: 0; width: 100%; line-height: 0; }
 .splash__foot {
-  position: absolute; left: 0; bottom: calc(4px + var(--safe-bottom)); width: 100%;
+  position: absolute; left: 0; bottom: max(4px, calc(var(--safe-bottom) - 22px)); width: 100%;
   text-align: center; font-size: .72rem; line-height: 1.6; letter-spacing: .04em; font-weight: 600; color: #111827;
 }
 
@@ -31,3 +31,8 @@
 @keyframes splashDot { 0%, 80%, 100% { transform: translateY(0); opacity: .45; } 40% { transform: translateY(-9px); opacity: 1; } }
 
 html.splash-lock, html.splash-lock body { overflow: hidden; height: 100%; overscroll-behavior: none; }
+
+/* Apple devices only (iPhone home-screen app): the page behind the splash uses the wave's colours, so no white strip can show */
+@supports (-webkit-touch-callout: none) {
+  html.splash-lock { background: linear-gradient(90deg, #F2622B, #D94F1C) fixed; }
+}
