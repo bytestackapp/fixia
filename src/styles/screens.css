@@ -186,6 +186,7 @@ body { overflow-x: hidden; }
 .info-row span { color: var(--text-3); }
 
 /* ── pull-down refresh ── */
-.ptr { position: fixed; left: 50%; top: calc(var(--safe-top) + 24px); z-index: 35; display: grid; place-items: center; width: 38px; height: 38px; margin-left: -19px; border-radius: 50%; background: var(--card); color: var(--brand); box-shadow: var(--shadow-md); pointer-events: none; transition: opacity .15s; }
+.ptr { position: fixed; left: 50%; top: calc(var(--safe-top) + 24px); z-index: 35; display: grid; place-items: center; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: linear-gradient(135deg, #F2622B, #D94F1C); color: #fff; box-shadow: 0 6px 18px rgba(242, 98, 43, .45); pointer-events: none; transition: opacity .15s; }
+.ptr::before { content: ''; position: absolute; left: 50%; top: calc(-1 * (var(--safe-top) + 24px) - 40px); width: 100vw; height: calc(var(--safe-top) + 130px); margin-left: -50vw; background: linear-gradient(180deg, rgba(242, 98, 43, .22), rgba(242, 98, 43, 0)); z-index: -1; pointer-events: none; }
 .ptr.is-busy svg { animation: spin .8s linear infinite; }
 @media (min-width: 900px) { .ptr { display: none; } }
