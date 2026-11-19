@@ -26,7 +26,7 @@ export default function Forgot() {
           <div className="state-box"><span className="state-icon tone--ok"><MailCheck size={28} aria-hidden="true" /></span><p className="muted">Check your inbox. The link works for 1 hour.</p></div>
         ) : (
           <>
-            <p className="muted" style={{ textAlign: 'center' }}>Enter your email and we will send you a link to choose a new password.</p>
+            <p className="muted" style={{ textAlign: 'center' }}>Enter your registered email and we'll send a reset link.</p>
             <Field label="Email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             <Button type="submit" block loading={busy}>Send reset link</Button>
           </>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn } from './kit.jsx';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, IconBtn } from './kit.jsx';
 import Dialog, { Confirm } from '../../components/ui/Dialog.jsx';
 import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -17,11 +18,11 @@ export default function Packages() {
   const lim = (n) => (n >= 999 ? 'unlimited' : n);
   return (
     <>
-      <Head title="Plans" sub="Changes apply immediately. Hidden plans cannot be chosen by new users."><Button onClick={() => open()}>Add a plan</Button></Head>
+      <Head title="Plans" sub="Changes apply immediately. Hidden plans cannot be chosen by new users."><IconBtn icon={Plus} label="Add a plan" variant="primary" size="md" onClick={() => open()} /></Head>
       <Load q={q}>{(d) => ['regular', 'provider'].map((t) => (
         <section key={t} className="section" style={{ marginTop: 'var(--s6)' }}><div className="section-head"><h2>{t === 'regular' ? 'Customer plans' : 'Provider plans'}</h2></div>
-          <Table rows={d.items.filter((p) => p.type === t)} cols={[['Plan', (p) => <b>{p.name}</b>], ['Price', (p) => <span className="num">{p.price ? `${peso(p.price)} / ${PERIOD[p.period]}` : 'Free'}</span>], ['Limits', (p) => t === 'provider' ? `${lim(p.listing_limit)} listings · ${lim(p.booking_limit)} bookings` : '—'], ['Perks', (p) => [p.ads_free && 'No ads', p.is_featured && 'Featured', p.referral_points_required > 0 && `${p.referral_points_required} pts`].filter(Boolean).join(' · ') || '—'], ['Status', (p) => <Status kind={p.is_active ? 'ok' : 'neutral'}>{p.is_active ? 'Visible' : 'Hidden'}</Status>],
-            ['', (p) => <div className="actions-cell"><Btn variant="secondary" onClick={() => open(p)}>Edit</Btn>{!d.permanent.includes(p.id) && <Btn variant="quiet" onClick={() => setDel(p)}>Delete</Btn>}</div>]]} /></section>
+          <Table rows={d.items.filter((p) => p.type === t)} cols={[['Plan', (p) => <b>{p.name}{p.referral_points_required > 0 && ` (${p.referral_points_required} points)`}</b>], ['Price', (p) => <span className="num">{p.price ? `${peso(p.price)} / ${PERIOD[p.period]}` : 'Free'}</span>], ['Limits', (p) => t === 'provider' ? `${lim(p.listing_limit)} listings · ${lim(p.booking_limit)} bookings` : '—'], ['Perks', (p) => [p.ads_free && 'No ads', p.is_featured && 'Featured'].filter(Boolean).join(' · ') || '—'], ['Status', (p) => <Status kind={p.is_active ? 'ok' : 'neutral'}>{p.is_active ? 'Visible' : 'Hidden'}</Status>],
+            ['', (p) => <div className="actions-cell"><IconBtn icon={Pencil} label="Edit" onClick={() => open(p)} />{!d.permanent.includes(p.id) && <IconBtn icon={Trash2} label="Delete" variant="danger" onClick={() => setDel(p)} />}</div>]]} /></section>
       ))}</Load>
       <Dialog open={!!f} onClose={() => setF(null)} title={f?.id ? 'Edit plan' : 'New plan'} wide>
         {f && <div className="stack">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn, Prompt, Detail } from './kit.jsx';
+import { Eye } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, Btn, IconBtn, Prompt, Detail } from './kit.jsx';
 import Dialog from '../../components/ui/Dialog.jsx';
 import { fdate } from '../../lib/format.js';
 
@@ -13,7 +14,7 @@ export default function Requests() {
   return (
     <>
       <Head title="Change requests" sub="Business name, email and location changes from providers." />
-      <Load q={q}>{(d) => <Table empty="No pending requests." rows={d.items} cols={[['Provider', (r) => <b>{r.provider_name}</b>], ['Change', (r) => r.subject], ['Sent', (r) => fdate(r.created_at)], ['', (r) => <Btn variant="secondary" onClick={() => setV(r)}>Review</Btn>]]} />}</Load>
+      <Load q={q}>{(d) => <Table empty="No pending requests." rows={d.items} cols={[['Provider', (r) => <b>{r.provider_name}</b>], ['Change', (r) => r.subject], ['Sent', (r) => fdate(r.created_at)], ['', (r) => <div className="actions-cell"><IconBtn icon={Eye} label="Review" onClick={() => setV(r)} /></div>]]} />}</Load>
       <Dialog open={!!v && !no} onClose={() => setV(null)} title={v?.subject} wide>
         {v && <><Detail rows={[['Provider', v.provider_name], ['Requested', value(v)], ['Reason', v.explanation]]} />
           {v.file_url && <a href={v.file_url} target="_blank" rel="noreferrer">View attached document</a>}

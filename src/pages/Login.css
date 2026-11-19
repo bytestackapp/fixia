@@ -30,3 +30,52 @@
 .login__links .btn--quiet { color: var(--text-3); font-weight: 600; }
 .login__main .small a { color: var(--brand); font-weight: 700; text-decoration: none; }
 .login__main .small a:hover { text-decoration: underline; }
+
+/* ═══ Classic sign-in look (Login page only) ═══ */
+.login.login--classic { background: linear-gradient(160deg, #F9F3EE, #EEF2F7); }
+.login--classic::before, .login--classic::after { display: none; }
+
+.login--classic .bg-shapes { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.login--classic .bg-shapes span { position: absolute; border-radius: 50%; background: rgba(255, 90, 31, .06); animation: float 9s ease-in-out infinite; }
+.login--classic .bg-shapes span:nth-child(1) { width: 220px; height: 220px; top: 5%; left: -5%; }
+.login--classic .bg-shapes span:nth-child(2) { width: 140px; height: 140px; top: 60%; right: -4%; animation-delay: 2.5s; }
+.login--classic .bg-shapes span:nth-child(3) { width: 80px; height: 80px; top: 35%; right: 12%; animation-delay: 5s; }
+.login--classic .bg-shapes span:nth-child(4) { width: 160px; height: 160px; bottom: 8%; left: 18%; animation-delay: 1s; }
+
+.login.login--classic .login__main { max-width: 420px; gap: 0; padding: 2.25rem 1.75rem; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, .15); }
+
+.lc-logo { width: 100%; display: grid; justify-items: center; text-align: center; margin-bottom: 1.75rem; }
+.lc-icon { width: 64px; height: 64px; margin-bottom: .7rem; border-radius: 18px; box-shadow: 0 8px 24px rgba(15, 27, 45, .45); }
+.lc-logo .wordmark, .lc-logo img + img { margin-bottom: 4px; }
+.lc-sub { font-size: .82rem; color: #8896A5; margin-top: 2px; }
+
+.lc-form { width: 100%; display: block; }
+.lc-group { margin-bottom: 1rem; }
+.lc-label { display: block; margin-bottom: .4rem; font-size: .8rem; font-weight: 700; color: #4A5568; text-transform: uppercase; letter-spacing: .05em; }
+.lc-input { width: 100%; padding: .78rem 1rem; border: 1.5px solid #E8ECF0; border-radius: 8px; font-size: .93rem; background: #fff; color: #1A2332; transition: all .2s; }
+.lc-input::placeholder { color: #8896A5; }
+.lc-input:focus { outline: none; border-color: #FF5A1F; box-shadow: 0 0 0 3px rgba(255, 90, 31, .12); }
+.lc-pw { position: relative; }
+.lc-pw .lc-input { padding-right: 44px; }
+.lc-eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; padding: 6px; background: none; border: 0; color: #8896A5; cursor: pointer; }
+.lc-eye:hover { color: #FF5A1F; }
+
+.lc-forgot { text-align: right; margin-bottom: 1.5rem; }
+.lc-forgot a { color: #FF5A1F; font-size: .92rem; font-weight: 700; text-decoration: none; }
+.lc-forgot a:hover { text-decoration: underline; }
+
+.lc-btn { width: 100%; padding: .9rem; border: 0; border-radius: 8px; font-size: .95rem; font-weight: 700; line-height: 1.2; display: flex; align-items: center; justify-content: center; gap: .5rem; text-decoration: none; cursor: pointer; transition: all .2s; }
+.lc-btn--brand { background: linear-gradient(135deg, #FF5A1F, #D94200); color: #fff; box-shadow: 0 4px 14px rgba(255, 90, 31, .35); }
+.lc-btn--brand:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 90, 31, .4); }
+.lc-btn--brand:disabled { opacity: .65; cursor: not-allowed; }
+.lc-btn--outline { background: #fff; color: #0F1B2D; border: 1.5px solid #E8ECF0; margin-top: .6rem; }
+.lc-btn--outline:hover { border-color: #FF5A1F; color: #FF5A1F; }
+
+.lc-divider { display: flex; align-items: center; gap: 10px; margin: 1.1rem 0; }
+.lc-divider::before, .lc-divider::after { content: ''; flex: 1; height: 1px; background: #E8ECF0; }
+.lc-divider span { font-size: .75rem; color: #8896A5; font-weight: 600; }
+
+/* About / Support / Privacy links under the card */
+.login.login--classic .lc-footer { justify-content: center; gap: 1.25rem !important; margin-top: 1.5rem; }
+.login.login--classic .lc-footer .btn.btn--quiet { min-height: 0; padding: 0; background: none; font-size: .75rem; font-weight: 600; color: #8896A5; }
+.login.login--classic .lc-footer .btn.btn--quiet:hover:not(:disabled) { background: none; color: #FF5A1F; }

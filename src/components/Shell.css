@@ -64,6 +64,8 @@
 @media (min-width: 900px) {
   .topbar { margin-left: var(--rail); padding-inline: max(var(--s7), calc((100vw - var(--rail) - var(--content)) / 2)); }
   .topbar__logo { display: none; }
+  .topbar__search { max-width: none; height: 42px; }
+  .topbar__search input { font-size: .92rem; }
   .main {
     margin: 0; margin-left: var(--rail); max-width: none;
     padding: var(--s6) max(var(--s7), calc((100vw - var(--rail) - var(--content)) / 2)) var(--s8);

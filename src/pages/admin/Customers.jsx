@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn } from './kit.jsx';
+import { Pencil, LogOut, Trash2 } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, Menu } from './kit.jsx';
 import Dialog, { Confirm } from '../../components/ui/Dialog.jsx';
 import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -12,14 +13,19 @@ export default function Customers() {
   const set = (k) => (e) => setEdit({ ...edit, [k]: e.target.value });
   return (
     <>
-      <Head title="Customers" />
+      <Head title="Customers" sub="View customer accounts, change their plan or status, and sign them out." />
       <div style={{ maxWidth: 360, marginBottom: 'var(--s4)' }}><Field label="Search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Name, email or username" /></div>
       <Load q={q}>{(d) => (
         <Table rows={d.items.filter((u) => !text || [u.first_name, u.last_name, u.email, u.username].join(' ').toLowerCase().includes(text.toLowerCase()))} cols={[
-          ['Customer', (u) => <><b>{u.first_name} {u.last_name}</b><br /><span className="muted">@{u.username} · {u.email}</span></>],
+          ['Customer', (u) => <><b>{u.first_name} {u.last_name}</b><br /><span className="muted">@{u.username}</span><br /><span className="muted">{u.email}</span></>],
           ['Plan', (u) => u.package_name || 'Free'], ['Joined', (u) => fdate(u.created_at)],
           ['Status', (u) => <Status kind={u.status === 'active' ? 'ok' : 'danger'}>{u.status}</Status>],
-          ['', (u) => <div className="actions-cell"><Btn variant="secondary" onClick={() => setEdit({ id: u.id, fn: u.first_name, ln: u.last_name, email: u.email, phone: u.phone || '', status: u.status, pkg: u.package_id || 'regular-free' })}>Edit</Btn><Btn variant="quiet" onClick={() => setKick(u)}>Sign out</Btn><Btn variant="quiet" onClick={() => setDel(u)}>Delete</Btn></div>],
+          ['Phone', (u) => u.phone || '—'],
+          ['', (u) => <Menu items={[
+            { icon: Pencil, label: 'Edit', onClick: () => setEdit({ id: u.id, fn: u.first_name, ln: u.last_name, email: u.email, phone: u.phone || '', status: u.status, pkg: u.package_id || 'regular-free' }) },
+            { icon: LogOut, label: 'Sign out', onClick: () => setKick(u) },
+            { icon: Trash2, label: 'Delete', danger: true, onClick: () => setDel(u) },
+          ]} />],
         ]} />
       )}</Load>
       <Dialog open={!!edit} onClose={() => setEdit(null)} title="Edit customer">

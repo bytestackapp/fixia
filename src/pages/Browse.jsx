@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { House, Car, Trees, Zap, Sparkles, GraduationCap, HeartPulse, Laptop, HardHat, SprayCan, PawPrint, PartyPopper } from 'lucide-react';
+import { House, Car, Trees, Zap, Sparkles, GraduationCap, HeartPulse, Laptop, HardHat, SprayCan, PawPrint, PartyPopper, ChevronRight } from 'lucide-react';
 import { CATEGORIES } from '../lib/categories.js';
 import Dialog from '../components/ui/Dialog.jsx';
 
@@ -33,9 +33,9 @@ export default function Browse() {
       {/* sub-list: slide-up sheet on phones, pop-up on desktop */}
       <Dialog open={!!cat} onClose={close} title={cat?.label}>
         {cat && (
-          <ul className="link-list">
-            <li><Link to={`/search?cat=${cat.key}`} onClick={close}><b>All {cat.label.toLowerCase()}</b></Link></li>
-            {cat.subs.map((s) => <li key={s}><Link to={`/search?cat=${cat.key}&sub=${encodeURIComponent(s)}`} onClick={close}>{s}</Link></li>)}
+          <ul className="sub-list">
+            <li><Link className="sub-card sub-card--all" to={`/search?cat=${cat.key}`} onClick={close}>All {cat.label.toLowerCase()}<ChevronRight size={16} aria-hidden="true" /></Link></li>
+            {cat.subs.map((s) => <li key={s}><Link className="sub-card" to={`/search?cat=${cat.key}&sub=${encodeURIComponent(s)}`} onClick={close}>{s}<ChevronRight size={16} aria-hidden="true" /></Link></li>)}
           </ul>
         )}
       </Dialog>

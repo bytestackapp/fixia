@@ -24,7 +24,7 @@ export default function Profile() {
     <>
       <header className="page-head"><h1>Profile</h1></header>
       <Tabs items={tabs} value={tab} onChange={(k) => setSp({ tab: k }, { replace: true })} />
-      <P data={data} />
+      <div className="ptab"><P data={data} /></div>
     </>
   );
 }

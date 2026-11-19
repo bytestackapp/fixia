@@ -2,8 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from '../lib/location.jsx';
 import * as psgc from '../lib/psgc.js';
 import Button from './ui/Button.jsx';
+import Field from './ui/Field.jsx';
 import './LocationSheet.css';
 
+
+const Select = ({ label, value, onChange, items, disabled, fmt = (s) => s }) => (
+  <Field as="select" label={label} value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}>
+    <option value="">Select…</option>
+    {items.map((i) => <option key={i.code} value={i.code}>{fmt(i.name)}</option>)}
+  </Field>
+);
 
 export default function LocationSheet({ open, onClose }) {
   const ref = useRef(null);
@@ -47,16 +55,6 @@ export default function LocationSheet({ open, onClose }) {
     setLoc({ province, city: cityName, barangay: pick.barangay ? name(lists.barangays, pick.barangay) : '' });
     onClose();
   }
-
-  const Select = ({ id, label, value, onChange, items, disabled, fmt = (s) => s }) => (
-    <div className="field">
-      <label className="field__label" htmlFor={id}>{label}</label>
-      <select id={id} className="input" value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Select…</option>
-        {items.map((i) => <option key={i.code} value={i.code}>{fmt(i.name)}</option>)}
-      </select>
-    </div>
-  );
 
   return (
     <dialog ref={ref} className="sheet" onClose={onClose} onClick={(e) => e.target === ref.current && onClose()} aria-labelledby="loc-title">

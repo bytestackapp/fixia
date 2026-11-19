@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn } from './kit.jsx';
+import { Tag } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, IconBtn } from './kit.jsx';
 import Dialog from '../../components/ui/Dialog.jsx';
 import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -14,7 +15,7 @@ export default function Uncategorized() {
   return (
     <>
       <Head title="Uncategorized" sub="Listings where the provider picked “Others”. Give each one a proper category." />
-      <Load q={q}>{(d) => <Table empty="All listings are categorised." rows={d.items} cols={[['Listing', (l) => <b>{l.title}</b>], ['Provider', (l) => l.provider], ['Their description', (l) => <i>{l.other_service_desc || '—'}</i>], ['Added', (l) => fdate(l.created_at)], ['', (l) => <Btn variant="secondary" onClick={() => setV(l)}>Assign</Btn>]]} />}</Load>
+      <Load q={q}>{(d) => <Table empty="All listings are categorised." rows={d.items} cols={[['Listing', (l) => <b>{l.title}</b>], ['Provider', (l) => l.provider], ['Their description', (l) => <i>{l.other_service_desc || '—'}</i>], ['Added', (l) => fdate(l.created_at)], ['', (l) => <div className="actions-cell"><IconBtn icon={Tag} label="Assign category" onClick={() => setV(l)} /></div>]]} />}</Load>
       <Dialog open={!!v} onClose={close} title="Assign category">
         <p className="muted small"><b>{v?.title}</b> — “{v?.other_service_desc}”</p>
         <Field as="select" label="Category" value={cat} onChange={(e) => { setCat(e.target.value); setSub(''); }}><option value="">Select…</option>{CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</Field>

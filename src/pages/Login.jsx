@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
+import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { toast } from '../lib/toast.jsx';
 import Logo from '../components/Logo.jsx';
-import Field from '../components/ui/Field.jsx';
-import Button from '../components/ui/Button.jsx';
 import InfoLinks from './Info.jsx';
 import './Login.css';
 
@@ -12,6 +11,7 @@ export default function Login() {
   const { user, login, notice } = useAuth();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
 
   // e.g. "You were signed out because this account was opened on another device."
@@ -28,18 +28,42 @@ export default function Login() {
   }
 
   return (
-    <div className="login">
+    <div className="login login--classic">
+      <div className="bg-shapes" aria-hidden="true"><span /><span /><span /><span /></div>
       <main className="login__main">
-        <div className="logo-wrap"><Logo /><p className="logo-sub">Find any service near you</p></div>
-        <form className="login__form" onSubmit={submit} noValidate>
-          <Field label="Email or username" autoComplete="username" autoCapitalize="none" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
-          <Field label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <Button type="submit" block loading={busy}>{busy ? 'Signing in' : 'Sign in'}</Button>
-          <div className="login__links"><Link to="/forgot">Forgot your password?</Link></div>
-          <div className="divider"><span>New to Fixia?</span></div>
-          <Link className="btn btn--secondary btn--block" to="/signup">Create an account</Link>
+        <div className="lc-logo">
+          <Logo width={140} />
+          <p className="lc-sub">Find any service near you</p>
+        </div>
+
+        <form className="lc-form" onSubmit={submit} noValidate>
+          <div className="lc-group">
+            <label className="lc-label" htmlFor="lc-id">Email or username</label>
+            <input id="lc-id" className="lc-input" placeholder="Enter email or username" autoComplete="username" autoCapitalize="none" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
+          </div>
+
+          <div className="lc-group">
+            <label className="lc-label" htmlFor="lc-pw">Password</label>
+            <div className="lc-pw">
+              <input id="lc-pw" className="lc-input" type={show ? 'text' : 'password'} placeholder="Enter your password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button type="button" className="lc-eye" onClick={() => setShow(!show)} aria-label={show ? 'Hide password' : 'Show password'} aria-pressed={show}>
+                {show ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="lc-forgot"><Link to="/forgot">Forgot password?</Link></div>
+
+          <button type="submit" className="lc-btn lc-btn--brand" disabled={busy} aria-busy={busy || undefined}>
+            {busy ? <span className="spinner" aria-hidden="true" /> : <><LogIn size={18} aria-hidden="true" /> Sign In</>}
+          </button>
+
+          <div className="lc-divider"><span>New to Fixia?</span></div>
+
+          <Link to="/signup" className="lc-btn lc-btn--outline"><UserPlus size={18} aria-hidden="true" /> Create an Account</Link>
         </form>
-        <InfoLinks />
+
+        <InfoLinks className="lc-footer" />
       </main>
     </div>
   );

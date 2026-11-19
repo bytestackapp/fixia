@@ -38,7 +38,8 @@
 .input:disabled { background: var(--bg); color: var(--text-3); cursor: not-allowed; }
 .input[aria-invalid='true'] { border-color: var(--red); }
 .field__error { color: var(--danger); font-size: var(--t-sm); font-weight: 600; }
-.field__toggle { position: absolute; right: 0; top: 0; height: 100%; padding: 0 var(--s4); background: none; border: 0; font-size: var(--t-sm); font-weight: 700; color: var(--text-3); }
+.field__toggle { position: absolute; right: 0; top: 0; height: 100%; padding: 0 var(--s4); display: grid; place-items: center; background: none; border: 0; color: var(--text-3); }
+input::-ms-reveal, input::-ms-clear { display: none; }
 .field__toggle:hover { color: var(--brand); }
 .input--area { min-height: 104px; padding: var(--s3) var(--s4); resize: vertical; line-height: 1.5; }
 select.input { padding-right: var(--s3); }
@@ -128,6 +129,21 @@ a.row, button.row { text-decoration: none; text-align: left; width: 100%; color:
 .link-list { display: flex; flex-wrap: wrap; gap: var(--s2); list-style: none; margin: 0; padding: 0; }
 .link-list a { display: inline-block; padding: 7px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; font-size: .8rem; font-weight: 700; color: var(--text-2); text-decoration: none; }
 .link-list a:hover { border-color: var(--brand); color: var(--brand); }
+
+/* Browse: sub-service cards */
+.sub-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-height: 62dvh; overflow-y: auto; }
+.sub-card { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-sm); text-decoration: none; font-weight: 700; font-size: .9rem; color: var(--text); transition: box-shadow .15s, border-color .15s; }
+.sub-card svg { flex: none; color: var(--text-3); }
+@media (hover: hover) { .sub-card:hover { box-shadow: var(--shadow-md); border-color: var(--brand); } }
+.sub-card--all { background: var(--brand-light); border-color: transparent; color: var(--brand-dark); }
+.sub-card--all svg { color: var(--brand-dark); }
+button.sub-card { width: 100%; text-align: left; cursor: pointer; }
+.sub-card.is-on { border-color: var(--brand); background: var(--brand-light); }
+.sub-card__main { display: flex; align-items: center; gap: var(--s3); min-width: 0; }
+.sub-card__icon { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 12px; background: var(--brand-light); color: var(--brand); }
+.sub-card.is-on .sub-card__icon { background: #fff; }
+.crumb { padding: 0; background: none; border: 0; font: inherit; font-weight: 700; color: var(--brand); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; cursor: pointer; }
+.crumb:hover { color: var(--brand-dark); }
 
 .controls { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: end; margin: var(--s4) 0; }
 .controls .field { min-width: 160px; flex: 1 1 160px; }
@@ -296,3 +312,60 @@ a.row, button.row { text-decoration: none; text-align: left; width: 100%; color:
 .todo .zero { background: #F1F3F6; color: var(--text-3); font-weight: 600; }
 .idphoto { max-width: 100%; max-height: 260px; border: 1px solid var(--line); border-radius: var(--r-sm); object-fit: contain; }
 .meter { height: 4px; background: var(--line); border-radius: 2px; min-width: 80px; } .meter i { display: block; height: 100%; background: var(--brand); border-radius: 2px; }
+
+/* Plan badge */
+.plan-badge { display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--brand); color: #fff; font: 800 .85rem/1.2 var(--font-display); letter-spacing: .02em; }
+.plan-badge--free { background: #F1F3F6; color: var(--text-2); }
+
+/* Quick actions list */
+.menu-item { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: inherit; cursor: pointer; }
+.menu-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.menu-item:hover .menu-label { color: var(--brand); }
+.menu-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; flex: none; }
+.menu-label { flex: 1; font-size: .85rem; font-weight: 600; color: var(--text); }
+.menu-arrow { color: var(--text-3); flex: none; }
+.menu-badge { background: var(--brand); color: #fff; font-size: .65rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+
+/* Profile tabs: smaller sub-headers */
+.ptab h2:not(.sec__title) { font-size: 1.05rem; }
+.ptab .stack > h3 { font-size: 1rem; }
+.ptab .profile-head h2 { font-size: var(--t-xl); }
+
+/* Profile tabs: orange sub-titles */
+.ptab h2:not(.profile-head h2), .ptab .sec__title, .ptab .stack > h3 { color: var(--brand); }
+.ptab p { max-width: none; }
+
+/* Profile tabs: same size for every description under a sub-title */
+.ptab h2 + p { font-size: var(--t-sm); color: var(--text-2); }
+
+/* ── Admin cards ── */
+.acards { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.acard { align-content: start; }
+.acard__top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3); }
+.acard__title { min-width: 0; overflow-wrap: anywhere; }
+.acard__actions, .acard .actions-cell { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex: none; }
+.acard__info { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--s3); margin: 0; padding-top: var(--s3); border-top: 1px solid var(--line); }
+.acard__info dt { font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
+.acard__info dd { margin: 2px 0 0; font-size: .85rem; font-weight: 600; overflow-wrap: anywhere; }
+
+/* ── Icon buttons ── */
+.iconbtn:disabled { opacity: .5; cursor: not-allowed; }
+.iconbtn.ibtn--primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.iconbtn.ibtn--primary:hover:not(:disabled) { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; }
+.iconbtn.ibtn--danger { color: var(--red); }
+.iconbtn.ibtn--danger:hover:not(:disabled) { background: var(--danger-tint); border-color: var(--red); color: var(--red); }
+
+/* ── Three-dot menu ── */
+.kebab { position: relative; }
+.kebab__menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 180px; list-style: none; margin: 0; padding: 6px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-lg); }
+.kebab__item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: none; border: 0; border-radius: 8px; font-size: .85rem; font-weight: 600; color: var(--text); text-align: left; cursor: pointer; }
+.kebab__item:hover { background: var(--bg); }
+.kebab__item svg { color: var(--text-3); flex: none; }
+.kebab__item.is-danger, .kebab__item.is-danger svg { color: var(--red); }
+.kebab__item.is-danger:hover { background: var(--danger-tint); }
+.kebab [aria-expanded='true'][data-tip]::after { display: none; }
+
+/* ── Pop-up dropdowns (all selects) ── */
+.select-btn { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); text-align: left; cursor: pointer; }
+.select-btn svg { flex: none; color: var(--text-3); }
+.select-btn__ph { color: var(--text-3); }

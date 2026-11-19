@@ -19,6 +19,8 @@ export default function Edit({ data }) {
   return (
     <div className="stack stack--lg">
       <form className="form" onSubmit={submit} noValidate>
+        <h2>Information</h2>
+        <p className="muted small">Keep your contact details up to date.</p>
         <div className="two"><Field label="First name" value={a.firstName} disabled /><Field label="Last name" value={a.lastName} disabled /></div>
         <Field label="Username" value={a.username} disabled />
         {isPro ? <Field label="Business name" value={p.bizName} disabled hint="To change this, send a change request below." /> : <Field label="Email" type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />}

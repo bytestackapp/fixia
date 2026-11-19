@@ -7,6 +7,7 @@ import { useAct } from '../../lib/queries.js';
 import { toast } from '../../lib/toast.jsx';
 import { PERIOD } from '../../lib/format.js';
 import Button from '../../components/ui/Button.jsx';
+import { Empty } from '../../components/States.jsx';
 
 export default function Referral({ data }) {
   const { refresh } = useAuth(); const r = data.referral, free = !data.plan?.price;
@@ -21,8 +22,8 @@ export default function Referral({ data }) {
   }
   return (
     <div className="stack stack--lg">
-      <div className="score"><b className="num">{r.points}</b><span>referral points</span></div>
       <section className="stack"><h2>Your link</h2>
+        <p className="muted small">Share this link with friends so they sign up under you.</p>
         <div className="linkbox">
           <code title={link}>{link}</code>
           <button type="button" className="iconbtn iconbtn--sm" data-tip={copied ? 'Copied' : 'Copy link'} aria-label="Copy link" onClick={copy}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>
@@ -32,7 +33,8 @@ export default function Referral({ data }) {
         <p className="muted small">Share your link. You earn points when the people you invite do one of these:</p>
         <dl className="defs"><dt>Customer, free plan</dt><dd>+1 after their first finished job</dd><dt>Customer, paid plan</dt><dd>+3 when they pay</dd><dt>Provider, paid plan</dt><dd>+5 when approved</dd></dl>
       </section>
-      <section className="stack"><h2>Redeem points</h2>
+      <section className="stack"><h2>Redeem points ({r.points} point{r.points === 1 ? '' : 's'})</h2>
+        <p className="muted small">Swap your points for a free plan.</p>
         {!free && <p className="muted small">You have an active plan. Points can be redeemed once it ends.</p>}
         {prizes.length ? <ul className="rows">{prizes.map((p) => (
           <li key={p.id} className="row" style={{ gridTemplateColumns: '1fr auto', alignItems: 'center' }}>
@@ -41,7 +43,8 @@ export default function Referral({ data }) {
           </li>))}</ul> : <p className="muted">No plans can be redeemed with points right now.</p>}
       </section>
       <section className="stack"><h2>Recent referrals</h2>
-        {r.history.length ? <ul className="rows">{r.history.map((h, i) => <li key={i} className="row" style={{ gridTemplateColumns: '1fr auto' }}><span><b>{h.name}</b><br /><span className="small muted">{h.role}</span></span><span className="num small">{h.status === 'credited' ? `+${h.points} pts` : 'Pending'}</span></li>)}</ul> : <p className="muted">No referrals yet. Share your link to get started.</p>}
+        <p className="muted small">People who signed up with your link and what you earned from them.</p>
+        {r.history.length ? <ul className="rows">{r.history.map((h, i) => <li key={i} className="row" style={{ gridTemplateColumns: '1fr auto' }}><span><b>{h.name}</b><br /><span className="small muted">{h.role}</span></span><span className="num small">{h.status === 'credited' ? `+${h.points} pts` : 'Pending'}</span></li>)}</ul> : <Empty title="No referrals yet">Share your link to get started.</Empty>}
       </section>
     </div>
   );

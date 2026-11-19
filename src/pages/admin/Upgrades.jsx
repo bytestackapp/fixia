@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn, Prompt } from './kit.jsx';
+import { Check, X } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, IconBtn, Prompt } from './kit.jsx';
 import { Confirm } from '../../components/ui/Dialog.jsx';
 import { Tabs, Status } from '../../components/ui/Kit.jsx';
 import { fdate, peso } from '../../lib/format.js';
@@ -18,7 +19,7 @@ export default function Upgrades() {
           ['Change', (r) => <>{r.oldPlan?.name || r.current_package_id} → <b>{r.newPlan?.name || r.new_package_id}</b><br /><span className="muted">+{r.carryover_days} credit days</span></>],
           ['Payment', (r) => <>{r.payment_method}<br /><span className="muted">ref {r.payment_reference || '—'}</span><br /><b className="num">{peso(r.payment_amount)}</b></>],
           [tab === 'history' ? 'Result' : 'Submitted', (r) => tab === 'history' ? <><Status kind={r.status === 'approved' ? 'ok' : 'danger'}>{r.status}</Status><br /><span className="muted">{fdate(r.archived_at)}</span></> : fdate(r.created_at)],
-          ...(tab === 'pending' ? [['', (r) => <div className="actions-cell"><Btn onClick={() => setOk(r)}>Approve</Btn><Btn variant="quiet" onClick={() => setNo(r)}>Reject</Btn></div>]] : []),
+          ...(tab === 'pending' ? [['', (r) => <div className="actions-cell"><IconBtn icon={Check} label="Approve" variant="primary" onClick={() => setOk(r)} /><IconBtn icon={X} label="Reject" variant="danger" onClick={() => setNo(r)} /></div>]] : []),
         ]} />
       )}</Load>
       <Confirm open={!!ok} title="Approve this upgrade?" confirmLabel="Approve" busy={approve.isPending} onClose={() => setOk(null)} onConfirm={() => approve.mutate({ id: ok.id }, { onSuccess: () => setOk(null) })}>The new plan starts now, with {ok?.carryover_days} bonus days, and the customer is notified.</Confirm>

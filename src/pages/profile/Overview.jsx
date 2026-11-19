@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Gift, House, Search, LayoutGrid, Crown, ChevronRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { call } from '../../lib/api.js';
 import { useAuth } from '../../lib/auth.jsx';
@@ -29,14 +30,42 @@ export default function Overview({ data }) {
         <div><h2>{p ? p.bizName : `${a.firstName} ${a.lastName}`}{p?.isElite && <span className="tag">Elite</span>}</h2>
           <div className="meta"><span>@{a.username} · {p ? 'Provider' : 'Customer'}</span><span><label className="btn btn--quiet btn--sm" style={{ padding: 0 }}>{busy ? 'Uploading…' : 'Change photo'}<input ref={file} type="file" accept="image/*" className="sr-only" disabled={busy} onChange={avatar} /></label></span></div></div>
       </div>
-      <dl className="defs">
+      <section className="sec" style={{ marginBottom: 0 }}><h2 className="sec__title">Basic Info</h2>
+      <dl className="defs" style={{ margin: 0 }}>
         {p && <><dt>Name</dt><dd>{a.firstName} {a.lastName}</dd><dt>Location</dt><dd>{[p.street, p.barangay, p.city, p.province].filter(Boolean).join(', ') || '—'}</dd></>}
         <dt>Email</dt><dd>{a.email}</dd><dt>Phone</dt><dd>{a.phone || '—'}</dd><dt>Member since</dt><dd>{fdate(a.createdAt)}</dd>
         <dt>Plan</dt><dd>{plan?.name || 'Free'}{a.subscriptionEnd ? ` · ${left} day${left === 1 ? '' : 's'} left` : plan?.period === 'lifetime' ? ' · lifetime' : ''}</dd>
-      </dl>
-      <div className="cluster">
-        <Link className="btn btn--secondary" to="/profile?tab=plan">{plan?.price ? 'Manage plan' : 'See plans'}</Link>
-      </div>
+      </dl></section>
+      <section className="sec" style={{ marginBottom: 0 }}>
+        <h2 className="sec__title">Quick Actions</h2>
+        <Link className="menu-item" to="/profile?tab=referral">
+          <span className="menu-icon" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}><Gift size={18} aria-hidden="true" /></span>
+          <span className="menu-label">Referral Program</span>
+          {data.referral?.points > 0 && <span className="menu-badge">{data.referral.points} pts</span>}
+          <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
+        </Link>
+        <Link className="menu-item" to="/">
+          <span className="menu-icon" style={{ background: '#EFF6FF', color: '#3B82F6' }}><House size={18} aria-hidden="true" /></span>
+          <span className="menu-label">Browse Services</span>
+          <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
+        </Link>
+        <Link className="menu-item" to="/search">
+          <span className="menu-icon" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}><Search size={18} aria-hidden="true" /></span>
+          <span className="menu-label">Search Providers</span>
+          <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
+        </Link>
+        <Link className="menu-item" to="/browse">
+          <span className="menu-icon" style={{ background: '#ECFDF5', color: 'var(--green)' }}><LayoutGrid size={18} aria-hidden="true" /></span>
+          <span className="menu-label">Browse Categories</span>
+          <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
+        </Link>
+        <Link className="menu-item" to="/profile?tab=plan">
+          <span className="menu-icon" style={{ background: '#FFF6DD', color: 'var(--gold)' }}><Crown size={18} aria-hidden="true" /></span>
+          <span className="menu-label">My Plan</span>
+          <span className="menu-badge">{plan?.name || 'Free'}</span>
+          <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
+        </Link>
+      </section>
     </div>
   );
 }

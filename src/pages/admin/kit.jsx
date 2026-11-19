@@ -1,11 +1,12 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { MoreVertical } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { admin } from '../../lib/api.js';
 import { toast } from '../../lib/toast.jsx';
 import Dialog from '../../components/ui/Dialog.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Field from '../../components/ui/Field.jsx';
-import { RowsSkeleton, ErrorState } from '../../components/States.jsx';
+import { RowsSkeleton, ErrorState, Empty } from '../../components/States.jsx';
 
 export const useAdm = (action, payload = {}) => useQuery({ queryKey: ['adm', action, payload], queryFn: () => admin(action, payload), staleTime: 0 });
 
@@ -27,13 +28,24 @@ export function Load({ q, children, rows = 4 }) {
 
 export const Head = ({ title, sub, children }) => <header className="page-head"><div className="cluster" style={{ justifyContent: 'space-between' }}><h1 style={{ fontSize: 'var(--t-xl)' }}>{title}</h1>{children}</div>{sub && <p>{sub}</p>}</header>;
 
+/* Every row is a card: first column = title, column with an empty label = action icons, the rest = small label/value pairs */
 export function Table({ cols, rows, empty = 'Nothing here.' }) {
-  if (!rows.length) return <p className="muted" style={{ padding: 'var(--s5) 0' }}>{empty}</p>;
+  if (!rows.length) return <Empty title={empty} />;
+  const [head, ...rest] = cols;
+  const act = rest.find((c) => c[0] === '');
+  const info = rest.filter((c) => c[0] !== '');
   return (
-    <div className="table-wrap"><table className="table">
-      <thead><tr>{cols.map((c) => <th key={c[0]}>{c[0]}</th>)}</tr></thead>
-      <tbody>{rows.map((r, i) => <tr key={r.id || i}>{cols.map((c) => <td key={c[0]}>{c[1](r)}</td>)}</tr>)}</tbody>
-    </table></div>
+    <ul className="rows acards">
+      {rows.map((r, i) => (
+        <li key={r.id || i} className="row acard">
+          <div className="acard__top">
+            <div className="acard__title">{head[1](r)}</div>
+            {act && <div className="acard__actions">{act[1](r)}</div>}
+          </div>
+          {info.length > 0 && <dl className="acard__info">{info.map((c) => <div key={c[0]}><dt>{c[0]}</dt><dd>{c[1](r)}</dd></div>)}</dl>}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -49,4 +61,37 @@ export function Prompt({ open, title, label, required, confirmLabel = 'Confirm',
   );
 }
 export const Btn = (p) => <Button size="sm" {...p} />;
+
+/* icon-only button with a tooltip. variant: secondary | primary | danger.  size: sm | md */
+export function IconBtn({ icon: Icon, label, variant = 'secondary', size = 'sm', loading, disabled, ...rest }) {
+  return (
+    <button type="button" className={`iconbtn${size === 'sm' ? ' iconbtn--sm' : ''} ibtn--${variant}`} data-tip={label} aria-label={label} aria-busy={loading || undefined} disabled={loading || disabled} {...rest}>
+      {loading ? <span className="spinner" aria-hidden="true" /> : <Icon size={16} aria-hidden="true" />}
+    </button>
+  );
+}
+/* three-dot menu: items = [{ icon, label, onClick, danger }]  (falsy items are skipped) */
+export function Menu({ items }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const off = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', off); document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  return (
+    <div className="kebab" ref={ref}>
+      <IconBtn icon={MoreVertical} label="Actions" aria-expanded={open} onClick={() => setOpen(!open)} />
+      {open && (
+        <ul className="kebab__menu" role="menu">
+          {items.filter(Boolean).map(({ icon: Icon, label, onClick, danger }) => (
+            <li key={label}><button type="button" role="menuitem" className={`kebab__item${danger ? ' is-danger' : ''}`} onClick={() => { setOpen(false); onClick(); }}><Icon size={16} aria-hidden="true" />{label}</button></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 export const Detail = ({ rows }) => <dl className="defs">{rows.filter(Boolean).map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd style={{ wordBreak: 'break-word' }}>{v || '—'}</dd></Fragment>)}</dl>;

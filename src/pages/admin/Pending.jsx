@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn, Prompt, Detail } from './kit.jsx';
+import { Eye, Check, Pause, X } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, IconBtn, Prompt, Detail } from './kit.jsx';
 import Dialog, { Confirm } from '../../components/ui/Dialog.jsx';
 import { Tabs, Status } from '../../components/ui/Kit.jsx';
 import { fdate } from '../../lib/format.js';
@@ -18,7 +19,7 @@ export default function Pending() {
           ['Location', (p) => [p.city_name, p.province_name].filter(Boolean).join(', ')],
           ['Plan / payment', (p) => <>{p.user?.package_name}<br /><Status kind={p.user?.payment_status === 'verified' ? 'ok' : p.user?.payment_status === 'free' ? 'neutral' : 'warn'}>{p.user?.payment_status || 'none'}</Status></>],
           ['Applied', (p) => fdate(p.created_at)],
-          ['', (p) => <div className="actions-cell"><Btn variant="secondary" onClick={() => setView(p)}>Review</Btn><Btn onClick={() => setAsk({ k: 'approve', p })}>Approve</Btn><Btn variant="secondary" onClick={() => setAsk({ k: 'hold', p })}>Hold</Btn><Btn variant="quiet" onClick={() => setAsk({ k: 'reject', p })}>Reject</Btn></div>],
+          ['', (p) => <div className="actions-cell"><IconBtn icon={Eye} label="Review" onClick={() => setView(p)} /><IconBtn icon={Check} label="Approve" variant="primary" onClick={() => setAsk({ k: 'approve', p })} /><IconBtn icon={Pause} label="Hold" onClick={() => setAsk({ k: 'hold', p })} /><IconBtn icon={X} label="Reject" variant="danger" onClick={() => setAsk({ k: 'reject', p })} /></div>],
         ]} />
       )}</Load>
       <Dialog open={!!view} onClose={() => setView(null)} title={view?.biz_name} wide>

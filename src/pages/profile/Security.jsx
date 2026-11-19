@@ -16,6 +16,7 @@ export default function Security() {
   return (
     <form className="form" onSubmit={submit} noValidate>
       <h2>Change password</h2>
+      <p className="muted small">Use at least 8 characters. Pick something you don't use anywhere else.</p>
       <Field label="Current password" type="password" autoComplete="current-password" value={f.current} onChange={(e) => setF({ ...f, current: e.target.value })} />
       <Field label="New password" type="password" autoComplete="new-password" value={f.next} onChange={(e) => setF({ ...f, next: e.target.value })} />
       <Field label="Repeat new password" type="password" autoComplete="new-password" value={f.again} onChange={(e) => setF({ ...f, again: e.target.value })} />

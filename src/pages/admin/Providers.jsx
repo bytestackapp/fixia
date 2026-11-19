@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useAdm, useDo, Load, Head, Table, Btn, Prompt } from './kit.jsx';
+import { Pencil, Crown, Ban, Trash2 } from 'lucide-react';
+import { useAdm, useDo, Load, Head, Table, Menu, Prompt } from './kit.jsx';
 import Dialog, { Confirm } from '../../components/ui/Dialog.jsx';
 import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -19,19 +20,21 @@ export default function Providers() {
   const save = () => upd.mutate({ id: edit.id, firstName: edit.fn, lastName: edit.ln, email: edit.email, phone: edit.phone, status: edit.status, packageId: edit.pkg, paymentStatus: edit.pay, bizName: edit.biz, ...(move && place.regionName ? { regionName: place.regionName, provinceName: place.provName, cityName: place.cityName, barangayName: place.brgyName } : {}) }, { onSuccess: done });
   return (
     <>
-      <Head title="Providers" />
+      <Head title="Providers" sub="Review, edit and manage provider accounts and Elite status." />
       <Tabs items={[['all', 'All'], ['approved', 'Approved'], ['pending', 'Pending'], ['suspended', 'Suspended'], ['elite', 'Elite']]} value={filter} onChange={setFilter} />
       <div style={{ maxWidth: 360, marginBottom: 'var(--s4)' }}><Field label="Search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Business, name or city" /></div>
       <Load q={q}>{(d) => (
         <Table rows={d.items.filter((p) => !text || [p.biz_name, p.city_name, p.user?.first_name, p.user?.last_name].join(' ').toLowerCase().includes(text.toLowerCase()))} cols={[
-          ['Business', (p) => <><b>{p.biz_name}</b>{p.is_elite && <span className="tag">Elite</span>}<br /><span className="muted">{p.user?.first_name} {p.user?.last_name} · {p.user?.email}</span></>],
-          ['Location', (p) => [p.city_name, p.province_name].filter(Boolean).join(', ')],
+          ['Business', (p) => <><b>{p.biz_name}</b><br /><span className="muted">{p.user?.first_name} {p.user?.last_name}</span><br /><span className="muted">{p.user?.email}</span></>],
+          ['Location', (p) => [p.city_name, p.province_name].filter(Boolean).join(', ') || '—'],
           ['Plan', (p) => p.user?.package_name || p.package_id],
           ['Status', (p) => <Status kind={KIND[p.status] || 'neutral'}>{p.status.replace('_', ' ')}</Status>],
-          ['', (p) => <div className="actions-cell">
-            <Btn variant="secondary" onClick={() => setEdit({ id: p.id, fn: p.user?.first_name, ln: p.user?.last_name, email: p.user?.email, phone: p.user?.phone, status: p.status, pkg: p.package_id, pay: p.user?.payment_status || '', biz: p.biz_name, loc: [p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ') })}>Edit</Btn>
-            {p.status === 'approved' && (p.is_elite ? <Btn variant="quiet" onClick={() => revoke.mutate({ id: p.id })}>Revoke Elite</Btn> : <Btn variant="quiet" onClick={() => setElite(p)}>Make Elite</Btn>)}
-            <Btn variant="quiet" onClick={() => setDel(p)}>Delete</Btn></div>],
+          ['Elite', (p) => <Status kind={p.is_elite ? 'ok' : 'neutral'}>{p.is_elite ? 'Yes' : 'No'}</Status>],
+          ['', (p) => <Menu items={[
+            { icon: Pencil, label: 'Edit', onClick: () => setEdit({ id: p.id, fn: p.user?.first_name, ln: p.user?.last_name, email: p.user?.email, phone: p.user?.phone, status: p.status, pkg: p.package_id, pay: p.user?.payment_status || '', biz: p.biz_name, loc: [p.barangay_name, p.city_name, p.province_name].filter(Boolean).join(', ') }) },
+            p.status === 'approved' && (p.is_elite ? { icon: Ban, label: 'Revoke Elite', onClick: () => revoke.mutate({ id: p.id }) } : { icon: Crown, label: 'Make Elite', onClick: () => setElite(p) }),
+            { icon: Trash2, label: 'Delete', danger: true, onClick: () => setDel(p) },
+          ]} />],
         ]} />
       )}</Load>
       <Dialog open={!!edit} onClose={done} title={edit?.biz} wide>
@@ -44,7 +47,7 @@ export default function Providers() {
             <Field as="select" label="Plan" value={edit.pkg || ''} onChange={set('pkg')}>{(pk.data?.items || []).filter((x) => x.type === 'provider').map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</Field>
           </div>
           <Field as="select" label="Payment status" value={edit.pay} onChange={set('pay')}>{['', 'free', 'awaiting', 'pending', 'verified', 'rejected', 'expired'].map((s) => <option key={s} value={s}>{s || '—'}</option>)}</Field>
-          <p className="small muted">Location: {edit.loc || '—'} · <button className="btn btn--quiet btn--sm" style={{ padding: 0 }} onClick={() => setMove(!move)}>{move ? 'Keep current' : 'Change location'}</button></p>
+          <p className="small muted">Location: {edit.loc || '—'} · <button type="button" className="btn btn--quiet btn--sm" style={{ padding: 0 }} onClick={() => setMove(!move)}>{move ? 'Keep current' : 'Change location'}</button></p>
           {move && <PlaceFields onChange={setPlace} />}
           <p className="small muted">Moving to a plan with fewer listings deletes the extra ones.</p>
           <div className="dlg__actions"><Button loading={upd.isPending} onClick={save}>Save</Button><Button variant="quiet" onClick={done}>Cancel</Button></div>

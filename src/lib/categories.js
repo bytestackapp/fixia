@@ -1,3 +1,5 @@
+import { House, Car, Trees, Zap, Sparkles, GraduationCap, HeartPulse, Laptop, HardHat, SprayCan, PawPrint, PartyPopper } from 'lucide-react';
+
 // The single list of service categories used by Browse, Search, listings and admin.
 export const CATEGORIES = [
   { key: 'home', label: 'Home services', subs: ['Plumbing', 'Aircon Service', 'Electrical', 'Painting', 'Carpentry', 'Waterproofing', 'Door & Window Repair', 'Gas & LPG', 'Deep Cleaning', 'Pest Control'] },
@@ -14,3 +16,4 @@ export const CATEGORIES = [
   { key: 'event', label: 'Events', subs: ['Photography', 'DJ / Live Band', 'Catering', 'Event Host / MC', 'Tent & Tables Rental', 'Decorations'] },
 ];
 export const catLabel = (key) => CATEGORIES.find((c) => c.key === key)?.label || key;
+export const CAT_ICONS = { home: House, auto: Car, garden: Trees, elec: Zap, beauty: Sparkles, edu: GraduationCap, health: HeartPulse, tech: Laptop, build: HardHat, clean: SprayCan, pet: PawPrint, event: PartyPopper };

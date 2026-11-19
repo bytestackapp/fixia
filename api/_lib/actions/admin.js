@@ -154,11 +154,11 @@ A['ad.rerun'] = async (_a, { id, quota }) => {
   await sb('ads_batches', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id, batch_number: n, impression_quota: qta, impression_count: 0, status: 'active', started_at: new Date().toISOString() } });
   await patch(`ads?id=eq.${q(id)}`, { impression_count: 0, click_count: 0, impression_quota: qta, is_active: true });
 };
-A['ad.batches'] = async (_a, { type }) => ({ items: (await sb(`ads_batches?order=started_at.desc&limit=200`)) || [], ads: (await sb(`ads?type=eq.${q(type)}&select=id,title,advertiser`)) || [] });
-A['rotation.stats'] = async () => ({ items: (await sb('providers?is_featured=eq.true&select=id,biz_name,is_elite,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc')) || [] });
-A['rotation.reactivate'] = async () => {
+A['ad.batches'] = async (_a, { type }) => ({ items: (await sb(`ads_batches?order=started_at.desc&limit=200`)) || [], ads: (await sb(`ads?${type ? `type=eq.${q(type)}&` : ''}select=id,title,advertiser,type`)) || [] });
+A['rotation.stats'] = async () => ({ items: (await sb('providers?or=(is_featured.eq.true,featured_quota.gt.0)&select=id,biz_name,is_elite,is_featured,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc')) || [] });
+A['rotation.reactivate'] = async (_a, { id } = {}) => {
   const quota = parseInt((await settings()).featured_impression_quota) || 200;
-  const done = (await sb('providers?is_featured=eq.false&featured_quota=gt.0&select=id')) || [];
+  const done = id ? [{ id }] : (await sb('providers?is_featured=eq.false&featured_quota=gt.0&select=id')) || [];
   for (const p of done) await patch(`providers?id=eq.${q(p.id)}`, { is_featured: true, featured_impressions: 0, featured_quota: quota });
   return { count: done.length };
 };
