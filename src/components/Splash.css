@@ -1,7 +1,7 @@
 .splash {
   position: fixed; inset: 0; z-index: 10000;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s3);
-  padding: var(--safe-top) var(--s5) 200px;
+  padding: var(--safe-top) var(--s5) 230px;
   background: #fff; overflow: hidden;
   transition: opacity .4s ease;
 }
@@ -19,12 +19,10 @@
 .splash__dots span:nth-child(2) { animation-delay: .15s; }
 .splash__dots span:nth-child(3) { animation-delay: .3s; }
 
-.splash__wave { position: absolute; left: 0; bottom: 52px; width: 100%; line-height: 0; }
+.splash__wave { position: absolute; left: 0; bottom: 0; width: 100%; line-height: 0; }
 .splash__foot {
-  position: absolute; left: 0; bottom: 0; width: 100%; z-index: 2;
-  padding: 10px var(--s4) calc(12px + var(--safe-bottom));
-  background: #fff; border-top: 1px solid var(--line);
-  text-align: center; font-size: .72rem; line-height: 1.6; letter-spacing: .04em; color: var(--text-2);
+  position: absolute; left: 0; bottom: calc(14px + var(--safe-bottom)); width: 100%; z-index: 2;
+  text-align: center; font-size: .72rem; line-height: 1.6; letter-spacing: .04em; color: rgba(255, 255, 255, .95);
 }
 
 @keyframes splashPop { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
