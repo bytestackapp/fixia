@@ -1,0 +1,29 @@
+.splash {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s3);
+  padding: var(--safe-top) var(--s5) 150px;
+  background: #fff; overflow: hidden;
+  transition: opacity .4s ease;
+}
+.splash.is-hiding { opacity: 0; pointer-events: none; }
+
+.splash__blob { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #FFD9C7, var(--brand-light)); }
+.splash__blob--a { width: 360px; height: 360px; top: -140px; left: -120px; }
+.splash__blob--b { width: 220px; height: 220px; top: 20%; right: -100px; opacity: .7; }
+
+.splash__logo { position: relative; z-index: 1; animation: splashPop .7s ease both; }
+.splash__tag { position: relative; z-index: 1; font-size: .95rem; font-weight: 600; color: var(--text-2); text-align: center; animation: splashPop .7s .15s ease both; }
+
+.splash__dots { position: relative; z-index: 1; display: flex; gap: 8px; margin-top: var(--s4); }
+.splash__dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--brand); animation: splashDot 1s ease-in-out infinite; }
+.splash__dots span:nth-child(2) { animation-delay: .15s; }
+.splash__dots span:nth-child(3) { animation-delay: .3s; }
+
+.splash__wave { position: absolute; left: 0; bottom: 0; width: 100%; line-height: 0; }
+.splash__foot {
+  position: absolute; left: 0; bottom: calc(14px + var(--safe-bottom)); width: 100%;
+  text-align: center; font-size: .72rem; line-height: 1.6; letter-spacing: .04em; color: rgba(255, 255, 255, .95);
+}
+
+@keyframes splashPop { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes splashDot { 0%, 80%, 100% { transform: translateY(0); opacity: .45; } 40% { transform: translateY(-9px); opacity: 1; } }
