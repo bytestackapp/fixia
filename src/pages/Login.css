@@ -79,3 +79,9 @@
 .login.login--classic .lc-footer { justify-content: center; gap: 1.25rem !important; margin-top: 1.5rem; }
 .login.login--classic .lc-footer .btn.btn--quiet { min-height: 0; padding: 0; background: none; font-size: .75rem; font-weight: 600; color: #8896A5; }
 .login.login--classic .lc-footer .btn.btn--quiet:hover:not(:disabled) { background: none; color: #FF5A1F; }
+
+.lc-row { display: flex; gap: .6rem; }
+.lc-row .lc-btn--brand { flex: 1; width: auto; }
+.lc-bio { flex: none; width: 52px; display: grid; place-items: center; border: 1.5px solid #E8ECF0; border-radius: 8px; background: #fff; color: #FF5A1F; cursor: pointer; transition: all .2s; }
+.lc-bio:hover:not(:disabled) { border-color: #FF5A1F; background: #FFF1EA; }
+.lc-bio:disabled { opacity: .6; cursor: not-allowed; }

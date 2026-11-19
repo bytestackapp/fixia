@@ -38,12 +38,12 @@ export default function Overview({ data }) {
       </dl></section>
       <section className="sec" style={{ marginBottom: 0 }}>
         <h2 className="sec__title">Quick Actions</h2>
-        <Link className="menu-item" to="/profile?tab=referral">
+        {data.referral && <Link className="menu-item" to="/profile?tab=referral">
           <span className="menu-icon" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}><Gift size={18} aria-hidden="true" /></span>
           <span className="menu-label">Referral Program</span>
           {data.referral?.points > 0 && <span className="menu-badge">{data.referral.points} pts</span>}
           <ChevronRight size={16} className="menu-arrow" aria-hidden="true" />
-        </Link>
+        </Link>}
         <Link className="menu-item" to="/">
           <span className="menu-icon" style={{ background: '#EFF6FF', color: '#3B82F6' }}><House size={18} aria-hidden="true" /></span>
           <span className="menu-label">Browse Services</span>

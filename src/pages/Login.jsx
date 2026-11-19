@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, LogIn, UserPlus, Fingerprint } from 'lucide-react';
+import { biometricSupported, savedLogin, saveLogin, clearLogin, unlockLogin } from '../lib/biometric.js';
 import { useAuth } from '../lib/auth.jsx';
 import { toast } from '../lib/toast.jsx';
 import Logo from '../components/Logo.jsx';
@@ -13,17 +14,36 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [bio, setBio] = useState(false);
+  useEffect(() => { (async () => { if (await biometricSupported() && await savedLogin()) setBio(true); })(); }, []);
 
   // e.g. "You were signed out because this account was opened on another device."
   useEffect(() => { if (notice) toast(notice, 'error'); }, [notice]);
 
   if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/'} replace />;
 
+  async function offer(id, pw) {
+    try {
+      if (!(await biometricSupported())) return;
+      const saved = await savedLogin();
+      if (saved && saved.username === id) { await saveLogin(id, pw); return; }
+      if (window.confirm('Use fingerprint or face unlock to sign in next time?')) await saveLogin(id, pw);
+    } catch { /* skip */ }
+  }
+  async function bioLogin() {
+    setBusy(true);
+    try { const c = await unlockLogin(); await login(c.username, c.password); }
+    catch (err) {
+      if (err.status === 401) { await clearLogin(); setBio(false); toast('Your saved details are out of date. Sign in with your password.', 'error'); }
+      else if (err.status) toast(err.message, 'error');
+      setBusy(false);
+    }
+  }
   async function submit(e) {
     e.preventDefault();
     if (!identifier.trim() || !password) return toast('Enter your email or username and your password.', 'error');
     setBusy(true);
-    try { await login(identifier, password); }
+    try { await login(identifier, password); offer(identifier.trim().toLowerCase(), password); }
     catch (err) { toast(err.message, 'error'); setBusy(false); }
   }
 
@@ -54,9 +74,12 @@ export default function Login() {
 
           <div className="lc-forgot"><Link to="/forgot">Forgot password?</Link></div>
 
-          <button type="submit" className="lc-btn lc-btn--brand" disabled={busy} aria-busy={busy || undefined}>
-            {busy ? <span className="spinner" aria-hidden="true" /> : <><LogIn size={18} aria-hidden="true" /> Sign In</>}
-          </button>
+          <div className="lc-row">
+            <button type="submit" className="lc-btn lc-btn--brand" disabled={busy} aria-busy={busy || undefined}>
+              {busy ? <span className="spinner" aria-hidden="true" /> : <><LogIn size={18} aria-hidden="true" /> Sign In</>}
+            </button>
+            {bio && <button type="button" className="lc-bio" onClick={bioLogin} disabled={busy} aria-label="Sign in with fingerprint or face" title="Fingerprint / face"><Fingerprint size={24} aria-hidden="true" /></button>}
+          </div>
 
           <div className="lc-divider"><span>New to Fixia?</span></div>
 

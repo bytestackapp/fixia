@@ -12,10 +12,10 @@ import Listings from './profile/Listings.jsx';
 import Reviews from './profile/Reviews.jsx';
 
 export default function Profile() {
-  const { user } = useAuth(); const isPro = user.role === 'provider';
+  const { user } = useAuth(); const isPro = user.role === 'provider'; const isAdmin = user.role === 'admin';
   const [sp, setSp] = useSearchParams();
   const { data, error, refetch } = useProfile();
-  const tabs = [['overview', 'Overview'], ...(isPro ? [['services', 'Services'], ['reviews', 'Reviews']] : []), ['edit', 'Edit'], ['security', 'Security'], ['plan', 'Plan'], ['referral', 'Referrals']];
+  const tabs = [['overview', 'Overview'], ...(isPro ? [['services', 'Services'], ['reviews', 'Reviews']] : []), ['edit', 'Edit'], ['security', 'Security'], ['plan', 'Plan'], ...(isAdmin ? [] : [['referral', 'Referrals']])];
   const tab = tabs.some(([k]) => k === sp.get('tab')) ? sp.get('tab') : 'overview';
   if (error) return <ErrorState error={error} retry={refetch} />;
   if (!data) return <><header className="page-head"><h1>Profile</h1></header><div className="skeleton" style={{ height: 160 }} /></>;

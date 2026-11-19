@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!getToken()) return;
-    api('auth', { action: 'me' }).then((d) => setUser(d.user)).catch((e) => clear(e.status === 401 ? e.message : '')).finally(() => setReady(true));
+    api('auth', { action: 'me' }).then((d) => setUser(d.user)).catch((e) => { if (e.status === 401) clear(e.message); }).finally(() => setReady(true));
   }, [clear]);
 
   // any request answered "401" (signed in elsewhere, suspended…) ends the session everywhere in the app
