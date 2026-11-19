@@ -21,7 +21,7 @@
 
 .splash__wave { position: absolute; left: 0; bottom: 0; width: 100%; line-height: 0; }
 .splash__foot {
-  position: absolute; left: 0; bottom: 4px; width: 100%;
+  position: absolute; left: 0; bottom: calc(0px + var(--safe-bottom)); width: 100%;
   text-align: center; font-size: .72rem; line-height: 1.6; letter-spacing: .04em; font-weight: 600; color: #111827;
 }
 
