@@ -7,6 +7,7 @@ import { enablePush } from '../lib/push.js';
 import { PopupHost } from '../lib/ads.jsx';
 import Logo from './Logo.jsx';
 import MessageGate from './MessageGate.jsx';
+import PullToRefresh from './PullToRefresh.jsx';
 import { Confirm } from './ui/Dialog.jsx';
 import './Shell.css';
 
@@ -76,6 +77,7 @@ export default function Shell() {
 
       <main id="main" className="main"><Outlet /></main>
       <MessageGate />
+      <PullToRefresh />
       <PopupHost />
       <Confirm open={out} title="Sign out?" confirmLabel="Sign out" danger onClose={() => setOut(false)} onConfirm={logout}>You will need to sign in again to use Fixia.</Confirm>
     </div>
