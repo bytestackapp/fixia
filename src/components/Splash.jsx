@@ -45,7 +45,7 @@ export default function Splash() {
       <div className="splash__dots" aria-hidden="true"><span /><span /><span /></div>
 
       <div className="splash__wave" aria-hidden="true">
-        <svg viewBox="0 0 1440 260" preserveAspectRatio="none" width="100%" height="230" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 1440 260" preserveAspectRatio="none" width="100%" height="150" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="splashGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#F2622B" />
