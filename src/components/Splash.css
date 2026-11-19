@@ -32,7 +32,9 @@
 
 html.splash-lock, html.splash-lock body { overflow: hidden; height: 100%; overscroll-behavior: none; }
 
-/* Apple devices only (iPhone home-screen app): the page behind the splash uses the wave's colours, so no white strip can show */
+/* Apple devices only (iPhone home-screen app): extend the wave's orange below the layer so no gap shows */
 @supports (-webkit-touch-callout: none) {
   html.splash-lock { background: linear-gradient(90deg, #F2622B, #D94F1C) fixed; }
+  .splash { overflow: visible; clip-path: inset(0 0 -400px 0); }
+  .splash__wave::after { content: ''; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 400px; background: linear-gradient(90deg, #F2622B, #D94F1C); }
 }
