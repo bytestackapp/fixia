@@ -85,3 +85,12 @@
 .lc-bio { flex: none; width: 52px; display: grid; place-items: center; border: 1.5px solid #E8ECF0; border-radius: 8px; background: #fff; color: #FF5A1F; cursor: pointer; transition: all .2s; }
 .lc-bio:hover:not(:disabled) { border-color: #FF5A1F; background: #FFF1EA; }
 .lc-bio:disabled { opacity: .6; cursor: not-allowed; }
+
+
+/* Sign-up verify step: "Resend code" styled like "Forgot password?", Verify + Back fill the line */
+.vf-resend { text-align: right; }
+.vf-resend button { background: none; border: 0; padding: 0; color: #FF5A1F; font-size: .92rem; font-weight: 700; cursor: pointer; }
+.vf-resend button:hover { text-decoration: underline; }
+.vf-actions { display: flex; gap: var(--s3); }
+.vf-actions .btn { flex: 1; }
+.vf-actions .btn--primary { flex: 2; }

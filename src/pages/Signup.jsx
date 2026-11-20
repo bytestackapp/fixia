@@ -94,7 +94,8 @@ function VerifyForm({ s, onBack, onNext }) {
     <form className="stack" onSubmit={submit} noValidate>
       <p className="muted">We sent a 6-digit code to <b>{s.d.email}</b>.</p>
       <Field label="Verification code" inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={s.code} onChange={(e) => s.setCode(e.target.value.replace(/\D/g, ''))} style={{ fontSize: '1.5rem', letterSpacing: '.3em', textAlign: 'center', fontWeight: 700 }} />
-      <div className="cluster"><Button type="submit" loading={s.busy}>Verify</Button><Button type="button" variant="secondary" onClick={onBack}>Back</Button><Button type="button" variant="quiet" onClick={resend}>Resend code</Button></div>
+      <div className="vf-resend"><button type="button" onClick={resend}>Resend code</button></div>
+      <div className="vf-actions"><Button type="submit" loading={s.busy}>Verify</Button><Button type="button" variant="secondary" onClick={onBack}>Back</Button></div>
     </form>
   );
 }
