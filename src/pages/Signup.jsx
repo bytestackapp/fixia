@@ -120,7 +120,8 @@ function usePlans(type) {
 /* ── payment choices ── */
 const isManual = (k) => MANUAL.some((m) => m[0] === k);
 
-function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
+/* The Payment step (a page, not a pop-up). onBack goes back to the Plan step. */
+function PayStep({ plan, busy, actionLabel, onBack, onPay }) {
   const { data } = useFees(); const fees = data?.items;
   const [method, setMethod] = useState(''), [step, setStep] = useState(0), [ref, setRef] = useState(''), [amt, setAmt] = useState('');
   const price = plan?.price || 0;
@@ -128,7 +129,6 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
   const row = fees?.find((f) => f.key === method);
   const { fee, vat, total } = calcFee(price, manual ? null : row);
   const vatPct = row ? row.vat : 12;
-  const close = () => { if (busy) return; setMethod(''); setStep(0); setRef(''); setAmt(''); onClose(); };
   function pick(k) { setMethod(k); if (isManual(k) && !amt) setAmt(String(price)); }
   function next() {
     if (!method) return toast('Choose how you want to pay.', 'error');
@@ -141,9 +141,9 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
     onPay({ method, reference: ref.trim(), amount: amt });
   }
   return (
-    <Dialog card open={open} onClose={close} title={step === 1 && manual ? `${manual[1]} payment` : 'Payment'}>
+    <div className="stack">
       {plan && (
-        <div className="paycard">
+        <div className="paycard" style={{ position: 'static' }}>
           <span className="paycard__label">Your plan</span>
           <b className="paycard__name">{plan.name}</b>
           <span className="paycard__price num">{peso(plan.price)}<small> / {PERIOD[plan.period] || plan.period}</small></span>
@@ -162,7 +162,7 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
               ? <>Manual payments have no processing fee.<br />Your account is created now, and your plan starts once our team approves your payment.</>
               : <>Online payments include a processing fee and VAT. These charges are required by the payment provider and are not collected by Fixia.<br />Your account is created after your payment is confirmed.</>}
           </p>
-          <div className="vf-actions"><Button onClick={next} loading={busy} disabled={!method}>Pay now</Button><Button variant="secondary" disabled={busy} onClick={close}>Not now</Button></div>
+          <div className="vf-actions"><Button onClick={next} loading={busy} disabled={!method}>Pay now</Button><Button variant="secondary" disabled={busy} onClick={onBack}>Back</Button></div>
         </>
       )}
       {step === 1 && manual && (
@@ -174,7 +174,7 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
           <div className="vf-actions"><Button onClick={submit} loading={busy}>{actionLabel}</Button><Button variant="secondary" disabled={busy} onClick={() => setStep(0)}>Back</Button></div>
         </>
       )}
-    </Dialog>
+    </div>
   );
 }
 
@@ -205,13 +205,14 @@ export function SignupCustomer() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
   const s = useAccountSteps('regular'); const [step, setStep] = useState(0); const [needsCode, setNeedsCode] = useState(true);
   const { plans } = usePlans('regular'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
-  const [payOpen, setPayOpen] = useState(false), [done, setDone] = useState(null);
+  const [done, setDone] = useState(null);
   useEffect(() => { if (plans && !plan) setPlan(plans.find((p) => p.price === 0)?.id || plans[0]?.id); }, [plans, plan]);
   if (user) return <Navigate to="/" replace />;
-  const steps = needsCode ? ['Details', 'Verify email', 'Plan'] : ['Details', 'Plan'];
-  const planStep = steps.length - 1;
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
+  const base = needsCode ? ['Details', 'Verify email', 'Plan'] : ['Details', 'Plan'];
+  const steps = paid ? [...base, 'Payment'] : base;
+  const name = steps[step];
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
@@ -224,7 +225,7 @@ export function SignupCustomer() {
     try {
       const { token, user: u } = await api('auth', { action: 'register.regular', ...s.d, proof: s.proof, referredBy: refCode(), ...(payment ? { packageId: plan, payment } : {}) });
       localStorage.removeItem('fixia.ref');
-      if (payment) { setPayOpen(false); setDone({ token, u }); }      // he reads the notice first, then enters the app
+      if (payment) setDone({ token, u });      // he reads the notice first, then enters the app
       else { adopt(token, u); toast('Welcome to Fixia!'); nav('/', { replace: true }); }
     } catch (e) { toast(e.message, 'error'); }
     s.setBusy(false);
@@ -244,17 +245,17 @@ export function SignupCustomer() {
     <Page>
       <div className="logo-wrap"><Logo /></div><h1 style={{ textAlign: 'center' }}>Create your account</h1>
       <Stepper steps={steps} current={step} />
-      {step === 0 && <DetailsForm s={s} onNext={next} />}
-      {needsCode && step === 1 && <VerifyForm s={s} onBack={() => setStep(0)} onNext={() => setStep(2)} />}
-      {step === planStep && (
+      {name === 'Details' && <DetailsForm s={s} onNext={next} />}
+      {name === 'Verify email' && <VerifyForm s={s} onBack={() => setStep(0)} onNext={() => setStep(2)} />}
+      {name === 'Plan' && (
         <div className="stack">
           <p className="muted">Start free. You can upgrade any time.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
           <AgreeNote checked={agree} onChange={setAgree} />
-          <div className="vf-actions"><Button onClick={paid ? () => setPayOpen(true) : () => create()} loading={s.busy && !payOpen} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Create account'}</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
-          <PayModal open={payOpen} plan={picked} busy={s.busy} actionLabel="Create account" onClose={() => setPayOpen(false)} onPay={onPay} />
+          <div className="vf-actions"><Button onClick={paid ? () => setStep(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Create account'}</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
         </div>
       )}
+      {name === 'Payment' && <PayStep plan={picked} busy={s.busy} actionLabel="Create account" onBack={() => setStep(step - 1)} onPay={onPay} />}
       <ReviewNotice open={!!done} onDone={finish} text="We received your payment details and your account is ready. Our team will check your payment and activate your plan once it is approved. Until then, you can use Fixia on the Free plan." />
       <p className="small muted" style={{ textAlign: 'center' }}>Already registered? <Link to="/login">Sign in</Link></p>
     </Page>
@@ -267,14 +268,15 @@ export function SignupProvider() {
   const { plans } = usePlans('provider'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
   const [biz, setBiz] = useState(''), [street, setStreet] = useState(''), [place, setPlace] = useState({});
   const [avatar, setAvatar] = useState(''), [idType, setIdType] = useState(''), [idFile, setIdFile] = useState('');
-  const [payOpen, setPayOpen] = useState(false), [done, setDone] = useState(null);
+  const [done, setDone] = useState(null);
   if (user) return <Navigate to="/" replace />;
-  const all = ['Details', 'Verify email', 'Business', 'Photos & ID', 'Plan'];
-  const steps = needsCode ? all : all.filter((x) => x !== 'Verify email');
-  const name = steps[step];
-  const bad = (m) => toast(m, 'error');
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
+  const all = ['Details', 'Verify email', 'Business', 'Photos & ID', 'Plan'];
+  const base = needsCode ? all : all.filter((x) => x !== 'Verify email');
+  const steps = paid ? [...base, 'Payment'] : base;
+  const name = steps[step];
+  const bad = (m) => toast(m, 'error');
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
@@ -293,7 +295,7 @@ export function SignupProvider() {
     try {
       const out = await api('auth', { action: 'register.provider', ...body(), ...(payment ? { payment } : {}) });
       localStorage.removeItem('fixia.ref');
-      if (payment) { setPayOpen(false); setDone(out); }
+      if (payment) setDone(out);
       else { adopt(out.token, out.user); toast('Application sent. We will review it within 24–48 hours.'); nav('/profile', { replace: true }); }
     } catch (e) { bad(e.message); }
     s.setBusy(false);
@@ -343,10 +345,10 @@ export function SignupProvider() {
           <p className="muted">Choose a plan. Our team reviews every application within 24–48 hours.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
           <AgreeNote checked={agree} onChange={setAgree} />
-          <div className="vf-actions"><Button onClick={paid ? () => setPayOpen(true) : () => create()} loading={s.busy && !payOpen} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Submit application'}</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
-          <PayModal open={payOpen} plan={picked} busy={s.busy} actionLabel="Submit application" onClose={() => setPayOpen(false)} onPay={onPay} />
+          <div className="vf-actions"><Button onClick={paid ? () => go(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Submit application'}</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
         </div>
       )}
+      {name === 'Payment' && <PayStep plan={picked} busy={s.busy} actionLabel="Submit application" onBack={() => go(step - 1)} onPay={onPay} />}
       <ReviewNotice open={!!done} onDone={finish} text="We received your application and payment details. Our team will check them within 24–48 hours and email you the result." />
       <p className="small muted" style={{ textAlign: 'center' }}>Already registered? <Link to="/login">Sign in</Link></p>
     </Page>
