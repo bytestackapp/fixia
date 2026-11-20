@@ -10,7 +10,13 @@ import Field from '../components/ui/Field.jsx';
 import Dialog from '../components/ui/Dialog.jsx';
 import { ErrorState } from '../components/States.jsx';
 
-const ONLINE = [['paypal', 'PayPal', 'Card or PayPal balance', 0.044, 15], ['paymongo', 'PayMongo', 'Card, GCash, Maya, GrabPay', 0.029, 0]];
+const ONLINE = [
+  ['paypal', 'PayPal', 'Card or PayPal balance', 0.044, 15],
+  ['paymongo_card', 'Card', 'Visa or Mastercard', 0.035, 15],
+  ['paymongo_gcash', 'GCash (online)', 'Pay in the GCash app', 0.025, 0],
+  ['paymongo_maya', 'Maya (online)', 'Pay in the Maya app', 0.02, 0],
+  ['paymongo_grab', 'GrabPay', 'Pay in the Grab app', 0.022, 0],
+];
 const MANUAL = [['gcash', 'GCash'], ['maya', 'Maya'], ['bank', 'Bank transfer']];
 
 export default function Checkout() {

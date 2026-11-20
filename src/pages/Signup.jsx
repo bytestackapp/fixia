@@ -116,18 +116,25 @@ function usePlans(type) {
 }
 
 /* ── payment choices (logos are in public/images) ── */
-const LOGO = { paypal: 'paypal', paymongo: 'paymongo', tbc: 'tbc', gcash: 'gcash', maya: 'maya', bank: 'bpi' };
+const LOGO = { paypal: 'paypal', paymongo_gcash: 'gcash', paymongo_maya: 'maya', tbc: 'tbc', gcash: 'gcash', maya: 'maya', bank: 'bpi' };
 // key, name, fee percent, fixed fee, switched off?  (TBC has no payment service behind it yet)
-const ONLINE = [['paypal', 'PayPal', 0.044, 15], ['paymongo', 'PayMongo', 0.029, 0], ['tbc', 'TBC', 0, 0, true]];
+const ONLINE = [
+  ['paypal', 'PayPal', 0.044, 15, false, 'Online · 4.4% + ₱15'],
+  ['paymongo_card', 'Card', 0.035, 15, false, 'Online · 3.5% + ₱15'],
+  ['paymongo_gcash', 'GCash', 0.025, 0, false, 'Online · 2.5% fee'],
+  ['paymongo_maya', 'Maya', 0.02, 0, false, 'Online · 2% fee'],
+  ['paymongo_grab', 'GrabPay', 0.022, 0, false, 'Online · 2.2% fee'],
+  ['tbc', 'TBC', 0, 0, true],
+];
 const MANUAL = [['gcash', 'GCash'], ['maya', 'Maya'], ['bank', 'Bank']];
 const isManual = (k) => MANUAL.some((m) => m[0] === k);
 
-function PayOpt({ k, label, on, disabled, onPick }) {
+function PayOpt({ k, label, note, on, disabled, onPick }) {
   return (
     <label className={`plan pm${on ? ' is-on' : ''}${disabled ? ' is-off' : ''}`}>
       <input className="sr-only" type="radio" name="pm" checked={on} disabled={disabled} onChange={() => onPick(k)} />
-      <img className="pm__logo" src={`/images/${LOGO[k]}.png`} alt={label} />
-      {disabled && <span className="small muted">Coming soon</span>}
+      {LOGO[k] ? <img className="pm__logo" src={`/images/${LOGO[k]}.png`} alt={label} /> : <b>{label}</b>}
+      {disabled ? <span className="small muted">Coming soon</span> : note && <span className="small muted">{note}</span>}
     </label>
   );
 }
@@ -157,7 +164,7 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
       )}
       <fieldset className="plans plans--methods">
         <legend className="plans__legend">Pay online <span className="muted small" style={{ fontWeight: 400 }}>— activated right away</span></legend>
-        {ONLINE.map(([k, n, , , off]) => <PayOpt key={k} k={k} label={n} on={method === k} disabled={!!off} onPick={pick} />)}
+        {ONLINE.map(([k, n, , , off, note]) => <PayOpt key={k} k={k} label={n} note={note} on={method === k} disabled={!!off} onPick={pick} />)}
       </fieldset>
       <fieldset className="plans plans--methods">
         <legend className="plans__legend">Pay manually <span className="muted small" style={{ fontWeight: 400 }}>— no fee, checked by our team</span></legend>

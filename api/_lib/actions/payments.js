@@ -11,7 +11,14 @@ import * as reg from './registration.js';
 const APP = () => process.env.APP_URL || 'https://gofixia.vercel.app';
 const PAYPAL = () => (process.env.PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
 const PM = 'https://api.paymongo.com/v1';
-const FEES = { paypal: [0.044, 15], paymongo: [0.029, 0] };      // percent, fixed pesos
+const FEES = {                                                   // percent, fixed pesos
+  paypal: [0.044, 15],
+  paymongo_card: [0.035, 15],
+  paymongo_gcash: [0.025, 0],
+  paymongo_maya: [0.02, 0],
+  paymongo_grab: [0.022, 0],
+};
+const PM_TYPE = { paymongo_card: 'card', paymongo_gcash: 'gcash', paymongo_maya: 'paymaya', paymongo_grab: 'grab_pay' };
 const fee = (m, price) => Math.ceil(price * FEES[m][0] + FEES[m][1]);
 const basic = (user, pass = '') => `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`;
 const typeOf = (user) => (user.role === 'provider' ? 'provider' : 'regular');
@@ -35,7 +42,7 @@ async function startOnline(method, owner, pkg, total, back, cancel) {
   }
   const s = await (await fetch(`${PM}/checkout_sessions`, {
     method: 'POST', headers: { Authorization: basic(process.env.PAYMONGO_SECRET_KEY), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: ['card', 'gcash', 'paymaya', 'grab_pay'], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
+    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: [PM_TYPE[method]], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
   })).json();
   const url = s.data?.attributes?.checkout_url;
   if (!url) { console.error('[paymongo]', JSON.stringify(s.errors || s)); throw httpError(502, 'Could not start PayMongo checkout.'); }
