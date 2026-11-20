@@ -66,7 +66,7 @@ async function confirmed(method, ref, user, pkg) {
     if (order.status !== 'COMPLETED') order = await (await fetch(`${PAYPAL()}/v2/checkout/orders/${id}`, { headers: h })).json();   // refresh: already captured
     if (order.status !== 'COMPLETED') throw httpError(400, 'PayPal has not completed this payment.');
     const unit = order.purchase_units?.[0], cap = unit?.payments?.captures?.[0];
-    if (unit?.custom_id !== `${user.id}|${pkg.id}`) throw httpError(403, 'This payment belongs to a different account or plan.');
+    if ((unit?.custom_id || cap?.custom_id) !== `${user.id}|${pkg.id}`) throw httpError(403, 'This payment belongs to a different account or plan.');
     return { txn: cap?.id || ref, amount: Number(cap?.amount?.value || 0) };
   }
   const s = await (await fetch(`${PM}/checkout_sessions/${encodeURIComponent(ref)}`, { headers: { Authorization: basic(process.env.PAYMONGO_SECRET_KEY) } })).json();
