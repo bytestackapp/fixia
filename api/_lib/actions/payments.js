@@ -6,20 +6,12 @@ import { httpError } from '../auth.js';
 import { getPackage, calcUpgrade, applyPackage, PERIOD_DAYS } from '../packages.js';
 import { credit } from '../referral.js';
 import { mail } from '../mail.js';
+import { feeFor, calcFee, PM_TYPE } from '../fees.js';
 import * as reg from './registration.js';
 
 const APP = () => process.env.APP_URL || 'https://gofixia.vercel.app';
 const PAYPAL = () => (process.env.PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
 const PM = 'https://api.paymongo.com/v1';
-const FEES = {                                                   // percent, fixed pesos
-  paypal: [0.044, 15],
-  paymongo_card: [0.035, 15],
-  paymongo_gcash: [0.025, 0],
-  paymongo_maya: [0.02, 0],
-  paymongo_grab: [0.022, 0],
-};
-const PM_TYPE = { paymongo_card: 'card', paymongo_gcash: 'gcash', paymongo_maya: 'paymaya', paymongo_grab: 'grab_pay' };
-const fee = (m, price) => Math.ceil(price * FEES[m][0] + FEES[m][1]);
 const basic = (user, pass = '') => `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`;
 const typeOf = (user) => (user.role === 'provider' ? 'provider' : 'regular');
 
@@ -40,17 +32,19 @@ async function startOnline(method, owner, pkg, total, back, cancel) {
     if (!url) { console.error('[paypal]', JSON.stringify(order)); throw httpError(502, 'Could not start PayPal checkout.'); }
     return { url, ref: order.id };
   }
+  const kind = PM_TYPE[method.replace(/^paymongo_/, '')];
+  if (!kind) throw httpError(400, 'Unknown payment method.');
   const s = await (await fetch(`${PM}/checkout_sessions`, {
     method: 'POST', headers: { Authorization: basic(process.env.PAYMONGO_SECRET_KEY), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: [PM_TYPE[method]], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
+    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: [kind], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
   })).json();
   const url = s.data?.attributes?.checkout_url;
-  if (!url) { console.error('[paymongo]', JSON.stringify(s.errors || s)); throw httpError(502, 'Could not start PayMongo checkout.'); }
+  if (!url) { console.error('[paymongo]', JSON.stringify(s.errors || s)); throw httpError(502, 'Could not start PayMongo checkout. Make sure this payment method is activated in your PayMongo account.'); }
   return { url, ref: s.data.id };
 }
 
 export async function checkout(user, { packageId, method }) {
-  if (!FEES[method]) throw httpError(400, 'Unknown payment method.');
+  const row = await feeFor(method);
   const pkg = await getPackage(packageId);
   if (!pkg || !pkg.is_active || pkg.price <= 0 || pkg.type !== typeOf(user)) throw httpError(400, 'Choose a paid plan for your account type.');
   const u = (await sb(`users?id=eq.${q(user.id)}&select=package_id,payment_status&limit=1`))?.[0];
@@ -58,7 +52,7 @@ export async function checkout(user, { packageId, method }) {
   const finishing = user.role === 'provider' && u.payment_status === 'awaiting' && u.package_id === pkg.id;
   if (!finishing && pkg.price <= (cur?.price || 0)) throw httpError(400, 'Choose a plan higher than your current one.');
 
-  const total = pkg.price + fee(method, pkg.price);
+  const { total } = calcFee(pkg.price, row);
   const back = `${APP()}/payment/return?method=${method}&pkg=${encodeURIComponent(pkg.id)}`;
   const cancel = `${APP()}/checkout/${encodeURIComponent(pkg.id)}?cancelled=1`;
   return startOnline(method, user.id, pkg, total, back, cancel);
@@ -85,7 +79,7 @@ async function confirmed(method, ref, user, pkg) {
 }
 
 export async function verify(user, { method, ref, packageId }) {
-  if (!FEES[method] || !ref) throw httpError(400, 'Missing payment details.');
+  if (!method || !ref) throw httpError(400, 'Missing payment details.');
   const pkg = await getPackage(packageId);
   if (!pkg || pkg.type !== typeOf(user)) throw httpError(400, 'Plan not found.');
   const { txn, amount } = await confirmed(method, ref, user, pkg);
@@ -108,23 +102,23 @@ export async function verify(user, { method, ref, packageId }) {
 /* ── sign-up with online payment: nothing is created until the money is confirmed ── */
 export async function signupCheckout(_u, d) {
   const method = d.method;
-  if (!FEES[method]) throw httpError(400, 'Unknown payment method.');
+  const row = await feeFor(method);
   const role = d.role === 'provider' ? 'provider' : 'regular';
   const pkg = await reg.checkSignup(d, role);
   if (pkg.price <= 0) throw httpError(400, 'Choose a paid plan.');
 
   const payload = { ...d, passwordHash: await bcrypt.hash(d.password, 12) };
   ['password', 'confirm', 'proof', 'method'].forEach((k) => delete payload[k]);
-  const row = (await sb('pending_signups', { method: 'POST', body: { role, package_id: pkg.id, method, payload, status: 'pending' } }))?.[0];
+  const saved = (await sb('pending_signups', { method: 'POST', body: { role, package_id: pkg.id, method, payload, status: 'pending' } }))?.[0];
 
-  const total = pkg.price + fee(method, pkg.price);
-  const back = `${APP()}/signup/return?pid=${row.id}`;
+  const { total } = calcFee(pkg.price, row);
+  const back = `${APP()}/signup/return?pid=${saved.id}`;
   try {
-    const out = await startOnline(method, `pending:${row.id}`, pkg, total, back, `${back}&cancelled=1`);
-    await sb(`pending_signups?id=eq.${q(row.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { ref: out.ref || null } });
+    const out = await startOnline(method, `pending:${saved.id}`, pkg, total, back, `${back}&cancelled=1`);
+    await sb(`pending_signups?id=eq.${q(saved.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { ref: out.ref || null } });
     return { url: out.url };
   } catch (e) {
-    await sb(`pending_signups?id=eq.${q(row.id)}`, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+    await sb(`pending_signups?id=eq.${q(saved.id)}`, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
     throw e;
   }
 }

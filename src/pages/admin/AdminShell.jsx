@@ -6,7 +6,7 @@ import { useAdm } from './kit.jsx';
 import PullToRefresh from '../../components/PullToRefresh.jsx';
 import { Confirm } from '../../components/ui/Dialog.jsx';
 
-const NAV = [['', 'Overview'], ['pending', 'Applications', 'pending'], ['providers', 'Providers'], ['customers', 'Customers'], ['upgrades', 'Upgrades', 'upgrades'], ['requests', 'Change requests', 'requests'], ['reports', 'Reports', 'reports'], ['uncategorized', 'Uncategorized', 'uncategorized'], ['suspicious', 'Suspicious ratings'], ['packages', 'Plans'], ['ads', 'Ads & featured'], ['messages', 'Messages'], ['settings', 'Settings']];
+const NAV = [['', 'Overview'], ['pending', 'Applications', 'pending'], ['providers', 'Providers'], ['customers', 'Customers'], ['upgrades', 'Upgrades', 'upgrades'], ['requests', 'Change requests', 'requests'], ['reports', 'Reports', 'reports'], ['uncategorized', 'Uncategorized', 'uncategorized'], ['suspicious', 'Suspicious ratings'], ['packages', 'Plans'], ['fees', 'Processing fees'], ['ads', 'Ads & featured'], ['messages', 'Messages'], ['settings', 'Settings']];
 
 export default function AdminShell() {
   const { logout } = useAuth(); const nav = useNavigate();

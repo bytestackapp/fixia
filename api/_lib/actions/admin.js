@@ -6,6 +6,7 @@ import { mail } from '../mail.js';
 import { pushTo } from '../push.js';
 import { credit } from '../referral.js';
 import { settings, setSetting } from '../settings.js';
+import { resetFees } from '../fees.js';
 import { getPackage, applyPackage, notify, PERIOD_DAYS } from '../packages.js';
 
 const patch = (path, body) => sb(path, { method: 'PATCH', prefer: 'return=minimal', body });
@@ -171,6 +172,25 @@ A['settings.set'] = async (_a, { key, value }) => {
   await setSetting(key, value);
   if (key === 'featured_impression_quota' && parseInt(value)) { await patch('providers?is_featured=eq.true', { featured_quota: parseInt(value) }); await patch('providers?is_featured=eq.false&featured_quota=gt.0', { featured_quota: parseInt(value) }); }
 };
+
+/* ── processing fees ── */
+const FEE_PROVIDERS = { paypal: ['paypal'], paymongo: ['gcash', 'maya', 'qrph', 'card', 'grab'] };
+A['fees.list'] = async () => ({ items: (await sb('processing_fees?order=medium.asc,provider.asc')) || [] });
+A['fee.save'] = async (_a, d) => {
+  need(FEE_PROVIDERS[d.medium]?.includes(d.provider), 'Choose a payment medium and a provider.');
+  const rate = Number(d.rate), fixed = Number(d.fixed) || 0, vat = Number(d.vat) || 0;
+  if (!(rate >= 0 && rate < 50)) throw httpError(400, 'Rate must be between 0 and 50 percent.');
+  if (fixed < 0 || vat < 0 || vat > 50) throw httpError(400, 'Fixed fee and VAT must be valid numbers.');
+  const row = { medium: d.medium, provider: d.provider, rate, fixed, vat, is_active: !!d.isActive };
+  if (d.id) await patch(`processing_fees?id=eq.${q(d.id)}`, row);
+  else {
+    const dupe = await sb(`processing_fees?medium=eq.${q(d.medium)}&provider=eq.${q(d.provider)}&select=id&limit=1`);
+    if (dupe?.length) throw httpError(409, 'This medium and provider already has a fee. Edit it instead.');
+    await sb('processing_fees', { method: 'POST', prefer: 'return=minimal', body: row });
+  }
+  resetFees();
+};
+A['fee.delete'] = async (_a, { id }) => { await del(`processing_fees?id=eq.${q(id)}`); resetFees(); };
 
 /* ── messages ── */
 A['templates.list'] = async () => ({ items: (await sb('message_templates?order=created_at.desc')) || [] });

@@ -27,6 +27,7 @@ import Reports from './pages/admin/Reports.jsx';
 import Uncategorized from './pages/admin/Uncategorized.jsx';
 import Suspicious from './pages/admin/Suspicious.jsx';
 import Packages from './pages/admin/Packages.jsx';
+import Fees from './pages/admin/Fees.jsx';
 import Ads from './pages/admin/Ads.jsx';
 import Messages from './pages/admin/Messages.jsx';
 import Settings from './pages/admin/Settings.jsx';
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="uncategorized" element={<Uncategorized />} />
         <Route path="suspicious" element={<Suspicious />} />
         <Route path="packages" element={<Packages />} />
+        <Route path="fees" element={<Fees />} />
         <Route path="ads" element={<Ads />} />
         <Route path="messages" element={<Messages />} />
         <Route path="settings" element={<Settings />} />

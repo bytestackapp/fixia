@@ -12,6 +12,8 @@ import { Stepper } from '../components/ui/Kit.jsx';
 import PlanPicker from '../components/PlanPicker.jsx';
 import PlaceFields from '../components/PlaceFields.jsx';
 import OtpInput from '../components/ui/OtpInput.jsx';
+import PayPicker from '../components/PayPicker.jsx';
+import { useFees, calcFee, money, MANUAL } from '../lib/fees.js';
 import { DocDialog } from './Info.jsx';
 import Dialog from '../components/ui/Dialog.jsx';
 import { peso, PERIOD } from '../lib/format.js';
@@ -115,75 +117,63 @@ function usePlans(type) {
   return { plans };
 }
 
-/* ── payment choices (logos are in public/images) ── */
-const LOGO = { paypal: 'paypal', paymongo_gcash: 'gcash', paymongo_maya: 'maya', tbc: 'tbc', gcash: 'gcash', maya: 'maya', bank: 'bpi' };
-// key, name, fee percent, fixed fee, switched off?  (TBC has no payment service behind it yet)
-const ONLINE = [
-  ['paypal', 'PayPal', 0.044, 15, false, 'Online · 4.4% + ₱15'],
-  ['paymongo_card', 'Card', 0.035, 15, false, 'Online · 3.5% + ₱15'],
-  ['paymongo_gcash', 'GCash', 0.025, 0, false, 'Online · 2.5% fee'],
-  ['paymongo_maya', 'Maya', 0.02, 0, false, 'Online · 2% fee'],
-  ['paymongo_grab', 'GrabPay', 0.022, 0, false, 'Online · 2.2% fee'],
-  ['tbc', 'TBC', 0, 0, true],
-];
-const MANUAL = [['gcash', 'GCash'], ['maya', 'Maya'], ['bank', 'Bank']];
+/* ── payment choices ── */
 const isManual = (k) => MANUAL.some((m) => m[0] === k);
 
-function PayOpt({ k, label, note, on, disabled, onPick }) {
-  return (
-    <label className={`plan pm${on ? ' is-on' : ''}${disabled ? ' is-off' : ''}`}>
-      <input className="sr-only" type="radio" name="pm" checked={on} disabled={disabled} onChange={() => onPick(k)} />
-      {LOGO[k] ? <img className="pm__logo" src={`/images/${LOGO[k]}.png`} alt={label} /> : <b>{label}</b>}
-      {disabled ? <span className="small muted">Coming soon</span> : note && <span className="small muted">{note}</span>}
-    </label>
-  );
-}
-
 function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
-  const [method, setMethod] = useState(''), [ref, setRef] = useState(''), [amt, setAmt] = useState('');
+  const { data } = useFees(); const fees = data?.items;
+  const [method, setMethod] = useState(''), [step, setStep] = useState(0), [ref, setRef] = useState(''), [amt, setAmt] = useState('');
   const price = plan?.price || 0;
-  const online = ONLINE.find((m) => m[0] === method), manual = MANUAL.find((m) => m[0] === method);
-  const fee = online ? Math.ceil(price * online[2] + online[3]) : 0;
-  const close = () => { if (busy) return; setMethod(''); setRef(''); setAmt(''); onClose(); };
+  const manual = MANUAL.find((m) => m[0] === method);
+  const row = fees?.find((f) => f.key === method);
+  const { fee, vat, total } = calcFee(price, manual ? null : row);
+  const vatPct = row ? row.vat : 12;
+  const close = () => { if (busy) return; setMethod(''); setStep(0); setRef(''); setAmt(''); onClose(); };
   function pick(k) { setMethod(k); if (isManual(k) && !amt) setAmt(String(price)); }
-  function submit() {
+  function next() {
     if (!method) return toast('Choose how you want to pay.', 'error');
-    if (manual && !ref.trim()) return toast('Enter your reference number.', 'error');
-    if (manual && !(Number(amt) > 0)) return toast('Enter the amount you sent.', 'error');
+    if (manual) return setStep(1);
+    onPay({ method });
+  }
+  function submit() {
+    if (!ref.trim()) return toast('Enter your reference number.', 'error');
+    if (!(Number(amt) > 0)) return toast('Enter the amount you sent.', 'error');
     onPay({ method, reference: ref.trim(), amount: amt });
   }
   return (
-    <Dialog open={open} onClose={close} title="Choose how to pay">
+    <Dialog open={open} onClose={close} title={step === 1 && manual ? `${manual[1]} payment` : 'Payment'}>
       {plan && (
         <div className="paycard">
           <span className="paycard__label">Your plan</span>
           <b className="paycard__name">{plan.name}</b>
           <span className="paycard__price num">{peso(plan.price)}<small> / {PERIOD[plan.period] || plan.period}</small></span>
-          {online && <dl className="paycard__rows"><div><dt>Processing fee</dt><dd className="num">{peso(fee)}</dd></div><div className="total"><dt>Total to pay</dt><dd className="num">{peso(plan.price + fee)}</dd></div></dl>}
+          <dl className="paycard__rows">
+            <div><dt>Processing fee</dt><dd className="num">{money(fee)}</dd></div>
+            <div><dt>VAT on fee ({vatPct}%)</dt><dd className="num">{money(vat)}</dd></div>
+            <div className="total"><dt>Total to pay</dt><dd className="num">{money(total)}</dd></div>
+          </dl>
         </div>
       )}
-      <fieldset className="plans plans--methods">
-        <legend className="plans__legend">Pay online <span className="muted small" style={{ fontWeight: 400 }}>— activated right away</span></legend>
-        {ONLINE.map(([k, n, , , off, note]) => <PayOpt key={k} k={k} label={n} note={note} on={method === k} disabled={!!off} onPick={pick} />)}
-      </fieldset>
-      <fieldset className="plans plans--methods">
-        <legend className="plans__legend">Pay manually <span className="muted small" style={{ fontWeight: 400 }}>— no fee, checked by our team</span></legend>
-        {MANUAL.map(([k, n]) => <PayOpt key={k} k={k} label={n} on={method === k} onPick={pick} />)}
-      </fieldset>
-      {manual && (
-        <div className="stack">
+      {step === 0 && (
+        <>
+          {fees ? <PayPicker fees={fees} method={method} onPick={pick} /> : <div className="skeleton" style={{ height: 120 }} />}
+          <p className="small muted">
+            {manual
+              ? <>Manual payments have no processing fee.<br />Your account is created now, and your plan starts once our team approves your payment.</>
+              : <>Online payments include a processing fee and VAT. These charges are required by the payment provider and are not collected by Fixia.<br />Your account is created after your payment is confirmed.</>}
+          </p>
+          <div className="vf-actions"><Button onClick={next} loading={busy} disabled={!method}>Pay now</Button><Button variant="secondary" disabled={busy} onClick={close}>Not now</Button></div>
+        </>
+      )}
+      {step === 1 && manual && (
+        <>
           <p className="muted small">Scan the code and send exactly <b>{peso(price)}</b> using {manual[1]}. Then enter the reference number from your receipt.</p>
           <img src={`/images/${method}-qr.png`} alt={`${manual[1]} QR code`} width="180" height="180" style={{ objectFit: 'contain', border: '1px solid var(--line)', borderRadius: 10, justifySelf: 'center' }} onError={(e) => (e.currentTarget.style.display = 'none')} />
           <Field label="Reference number" value={ref} onChange={(e) => setRef(e.target.value)} />
           <Field label="Amount sent (₱)" type="number" inputMode="decimal" value={amt} onChange={(e) => setAmt(e.target.value)} />
-        </div>
+          <div className="vf-actions"><Button onClick={submit} loading={busy}>{actionLabel}</Button><Button variant="secondary" disabled={busy} onClick={() => setStep(0)}>Back</Button></div>
+        </>
       )}
-      <p className="small muted">
-        {manual
-          ? <>Manual payments have no fee.<br />Your account is created now, and your plan starts once our team approves your payment.</>
-          : <>Online payments add a small processing fee, shown above.<br />Your account is created after your payment is confirmed.</>}
-      </p>
-      <div className="vf-actions"><Button onClick={submit} loading={busy} disabled={!method}>{manual ? actionLabel : 'Pay now'}</Button><Button variant="secondary" disabled={busy} onClick={close}>Not now</Button></div>
     </Dialog>
   );
 }

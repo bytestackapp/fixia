@@ -7,6 +7,11 @@ import { route } from './_lib/http.js';
 import { downgradeIfExpired } from './_lib/packages.js';
 import * as reg from './_lib/actions/registration.js';
 import * as Pay from './_lib/actions/payments.js';
+import { feeRows, methodKey } from './_lib/fees.js';
+
+const publicFees = async () => ({
+  items: (await feeRows()).filter((r) => r.is_active).map((r) => ({ key: methodKey(r), medium: r.medium, provider: r.provider, rate: Number(r.rate), fixed: Number(r.fixed), vat: Number(r.vat) })),
+});
 
 const BAD = 'Email, username or password is not correct.';
 const DUMMY = '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi';
@@ -43,6 +48,6 @@ export default route({
   'register.regular': reg.registerRegular, 'register.provider': reg.registerProvider,
   'otp.send': reg.otpSend, 'otp.verify': reg.otpVerify,
   'reset.request': reg.resetRequest, 'reset.validate': reg.resetValidate, 'reset.confirm': reg.resetConfirm,
-  'packages.public': reg.publicPackages,
+  'packages.public': reg.publicPackages, 'fees.public': publicFees,
   'signup.pay': Pay.signupCheckout, 'signup.finish': Pay.signupFinish,
 });
