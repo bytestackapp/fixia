@@ -220,11 +220,29 @@ body { overflow-x: hidden; }
 .paycard__rows dd { margin: 0; font-weight: 700; }
 .paycard__rows .total { font-size: .95rem; color: #fff; }
 
-/* payment options: the image carries its own padding */
-.plan.pm { padding: 0; gap: 0; min-height: 72px; align-content: center; overflow: hidden; }
-.pm__logo { display: block; width: 100%; height: 64px; object-fit: contain; }
-.pm__name { padding: 4px 6px 8px; font-size: .72rem; font-weight: 700; color: var(--text-2); }
+/* payment options: no box, the image is the button */
+.plan.pm { padding: 0; gap: 6px; min-height: 0; border: 0; background: none; box-shadow: none; overflow: visible; align-content: start; justify-items: center; }
+.plan.pm:hover { border: 0; }
+.plan.pm.is-on { background: none; }
+.pm__logo { display: block; width: auto; max-width: 100%; height: 72px; object-fit: contain; border-radius: 14px; outline: 2.5px solid transparent; outline-offset: 2px; transition: outline-color .15s; }
+.plan.pm.is-on .pm__logo { outline-color: var(--brand); }
+.pm__name { padding: 0; font-size: .72rem; font-weight: 700; color: var(--text-2); text-align: center; }
 .plan.pm.is-on .pm__name { color: var(--brand-dark); }
+/* options that have no image yet (Cards, GrabPay, QR Ph) show their name in a box */
+.pm__fallback { display: grid; place-items: center; width: 100%; height: 72px; background: #fff; border: 1.5px solid var(--line); border-radius: 14px; font-weight: 800; font-size: .85rem; color: var(--navy); }
+.plan.pm.is-on .pm__fallback { border-color: var(--brand); background: var(--brand-light); color: var(--brand-dark); }
 
 /* "Your plan" block stays at the top while the modal scrolls */
 .paycard { position: sticky; top: 0; z-index: 2; }
+
+/* ── payment pop-up: same card as the login screen, centred on every screen size ── */
+.dlg.dlg--card { width: calc(100% - 2rem); max-width: 420px; margin: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, .15); max-height: 92dvh; }
+.dlg.dlg--card[open] { animation: fadeIn .2s; }
+.dlg--card .dlg__body { padding: 2.25rem 1.75rem; }
+.dlg--card .dlg__body::before { display: none; }
+.dlg--card h2 { text-align: center; font-size: var(--t-xl); }
+
+/* always 3 icons per row, so nothing moves when the screen changes */
+.dlg--card .plans--methods { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; }
+.dlg--card .pm__logo { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 84px; }
+.dlg--card .pm__fallback { height: auto; aspect-ratio: 1 / 1; max-width: 84px; font-size: .78rem; text-align: center; padding: 4px; }

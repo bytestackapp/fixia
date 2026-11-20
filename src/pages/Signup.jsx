@@ -141,7 +141,7 @@ function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
     onPay({ method, reference: ref.trim(), amount: amt });
   }
   return (
-    <Dialog open={open} onClose={close} title={step === 1 && manual ? `${manual[1]} payment` : 'Payment'}>
+    <Dialog card open={open} onClose={close} title={step === 1 && manual ? `${manual[1]} payment` : 'Payment'}>
       {plan && (
         <div className="paycard">
           <span className="paycard__label">Your plan</span>

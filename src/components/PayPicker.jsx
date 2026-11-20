@@ -9,8 +9,8 @@ function Opt({ id, logo, name, on, onPick }) {
   return (
     <label className={`plan pm${on ? ' is-on' : ''}`}>
       <input className="sr-only" type="radio" name="pm" checked={on} onChange={() => onPick(id)} />
-      {!bad && <img className="pm__logo" src={`/images/${LOGO[logo]}.png`} alt="" onError={() => setBad(true)} />}
-      <span className="pm__name">{name}</span>
+      {bad ? <span className="pm__fallback">{name}</span> : <img className="pm__logo" src={`/images/${LOGO[logo]}.png`} alt="" onError={() => setBad(true)} />}
+      {!bad && <span className="pm__name">{name}</span>}
     </label>
   );
 }

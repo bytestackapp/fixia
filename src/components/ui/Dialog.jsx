@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 
 /* Native <dialog>: the browser handles focus trapping, Esc to close, and screen-reader roles. */
-export default function Dialog({ open, onClose, title, label, children, wide }) {
+export default function Dialog({ open, onClose, title, label, children, wide, card }) {
   const ref = useRef(null);
   useEffect(() => { const d = ref.current; if (open && !d.open) d.showModal(); if (!open && d.open) d.close(); }, [open]);
   return (
-    <dialog ref={ref} className={`dlg${wide ? ' dlg--wide' : ''}`} aria-label={label || title} onClose={onClose} onClick={(e) => e.target === ref.current && onClose()}>
+    <dialog ref={ref} className={`dlg${wide ? ' dlg--wide' : ''}${card ? ' dlg--card' : ''}`} aria-label={label || title} onClose={onClose} onClick={(e) => e.target === ref.current && onClose()}>
       {open && (
         <div className="dlg__body">
           {title && <h2>{title}</h2>}
