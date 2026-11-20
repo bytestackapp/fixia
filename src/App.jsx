@@ -15,6 +15,7 @@ import Notifications from './pages/Notifications.jsx';
 import Profile from './pages/Profile.jsx';
 import Checkout from './pages/Checkout.jsx';
 import PaymentReturn from './pages/PaymentReturn.jsx';
+import SignupReturn from './pages/SignupReturn.jsx';
 import AdminShell from './pages/admin/AdminShell.jsx';
 import Overview from './pages/admin/Overview.jsx';
 import Pending from './pages/admin/Pending.jsx';
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/signup" element={<SignupChoice />} />
       <Route path="/signup/customer" element={<SignupCustomer />} />
       <Route path="/signup/provider" element={<SignupProvider />} />
+      <Route path="/signup/return" element={<SignupReturn />} />
 
       <Route element={<Gate role="member"><Shell /></Gate>}>
         <Route index element={<Home />} />

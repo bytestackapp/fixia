@@ -6,6 +6,7 @@ import { issueToken, requireUser, publicUser, httpError } from './_lib/auth.js';
 import { route } from './_lib/http.js';
 import { downgradeIfExpired } from './_lib/packages.js';
 import * as reg from './_lib/actions/registration.js';
+import * as Pay from './_lib/actions/payments.js';
 
 const BAD = 'Email, username or password is not correct.';
 const DUMMY = '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi';
@@ -43,4 +44,5 @@ export default route({
   'otp.send': reg.otpSend, 'otp.verify': reg.otpVerify,
   'reset.request': reg.resetRequest, 'reset.validate': reg.resetValidate, 'reset.confirm': reg.resetConfirm,
   'packages.public': reg.publicPackages,
+  'signup.pay': Pay.signupCheckout, 'signup.finish': Pay.signupFinish,
 });

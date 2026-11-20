@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { call } from '../lib/api.js';
@@ -15,11 +15,16 @@ const MANUAL = [['gcash', 'GCash'], ['maya', 'Maya'], ['bank', 'Bank transfer']]
 
 export default function Checkout() {
   const { id } = useParams(); const nav = useNavigate(); const { refresh } = useAuth();
-  const cancelled = useSearchParams()[0].get('cancelled');
+  const sp = useSearchParams()[0];
+  const cancelled = sp.get('cancelled');
+  const preset = sp.get('m');
+  const auto = useRef(false);
   const { data, error, refetch } = useQuery({ queryKey: ['calc', id], queryFn: () => call('upgrade.calc', { packageId: id }) });
-  const [method, setMethod] = useState(''), [busy, setBusy] = useState(false);
+  const [method, setMethod] = useState(preset || ''), [busy, setBusy] = useState(false);
   const [qr, setQr] = useState(false), [ref, setRef] = useState(''), [amt, setAmt] = useState('');
   useEffect(() => { if (cancelled) toast('Payment was cancelled. You have not been charged.', 'info'); }, [cancelled]);
+  // arriving from sign-up with a chosen method: start that payment straight away
+  useEffect(() => { if (data && preset && !cancelled && !auto.current) { auto.current = true; go(preset); } }, [data]);   // eslint-disable-line
   if (error) return <ErrorState error={error} retry={refetch} />;
   if (!data) return <div className="skeleton" style={{ height: 200 }} />;
   const { plan } = data;
@@ -27,13 +32,13 @@ export default function Checkout() {
   const fee = online ? Math.ceil(plan.price * online[3] + online[4]) : 0;
   const manual = MANUAL.find((m) => m[0] === method);
 
-  async function go() {
-    if (!method) return toast('Choose how you want to pay.', 'error');
-    if (manual) return setQr(true);
+  async function go(m = method) {
+    if (!m) return toast('Choose how you want to pay.', 'error');
+    if (MANUAL.some((x) => x[0] === m)) return setQr(true);
     setBusy(true);
     try {
-      const r = await call('pay.checkout', { packageId: id, method });
-      localStorage.setItem('fixia.pay', JSON.stringify({ method, pkg: id, ref: r.ref || null }));
+      const r = await call('pay.checkout', { packageId: id, method: m });
+      localStorage.setItem('fixia.pay', JSON.stringify({ method: m, pkg: id, ref: r.ref || null }));
       window.location.href = r.url;
     } catch (e) { toast(e.message, 'error'); setBusy(false); }
   }
@@ -62,7 +67,7 @@ export default function Checkout() {
           <legend className="plans__legend">Pay manually <span className="muted small" style={{ fontWeight: 400 }}>— no fee, checked by our team</span></legend>
           {MANUAL.map(([k, n]) => <label key={k} className={`plan${method === k ? ' is-on' : ''}`}><input className="sr-only" type="radio" name="m" checked={method === k} onChange={() => setMethod(k)} /><span className="plan__head"><span className="plan__name">{n}</span></span></label>)}
         </fieldset>
-        <div className="cluster"><Button onClick={go} loading={busy && !qr}>{manual ? 'Continue' : 'Pay now'}</Button><Link className="btn btn--quiet" to="/profile?tab=plan">Not now</Link></div>
+        <div className="cluster"><Button onClick={() => go()} loading={busy && !qr}>{manual ? 'Continue' : 'Pay now'}</Button><Link className="btn btn--quiet" to="/profile?tab=plan">Not now</Link></div>
       </div>
 
       <Dialog open={qr} onClose={() => setQr(false)} title={`${manual?.[1] || ''} payment`}>

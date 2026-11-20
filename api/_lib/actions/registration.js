@@ -6,11 +6,13 @@ import { httpError, issueToken, publicUser, sealProof, checkProof } from '../aut
 import { settings } from '../settings.js';
 import { mail } from '../mail.js';
 import { upload } from '../storage.js';
-import { genCode } from '../referral.js';
-import { getPackage, FREE } from '../packages.js';
+import { genCode, credit } from '../referral.js';
+import { getPackage, applyPackage, FREE, PERIOD_DAYS } from '../packages.js';
+import { upgradeManual } from './account.js';
 
 const sha = (t) => crypto.createHash('sha256').update(t).digest('hex');
 const EMAIL = /^\S+@\S+\.\S+$/, PHONE = /^(09\d{9}|\+639\d{9})$/, USER = /^[a-z0-9._]{3,30}$/;
+const MANUAL = ['gcash', 'maya', 'bank'];
 
 function checkAccount(d) {
   const v = (c, m) => { if (!c) throw httpError(400, m); };
@@ -38,7 +40,7 @@ async function requireProof(d) {
 }
 const baseUser = async (d, role) => ({
   email: d.email.trim().toLowerCase(), username: d.username.trim().toLowerCase(),
-  password_hash: await bcrypt.hash(d.password, 12), first_name: d.firstName.trim(), last_name: d.lastName.trim(),
+  password_hash: d.passwordHash || await bcrypt.hash(d.password, 12), first_name: d.firstName.trim(), last_name: d.lastName.trim(),
   phone: d.phone.trim(), role, is_inactive: false, referral_code: genCode(), referred_by: d.referredBy || null,
 });
 async function linkReferral(newUser, code) {
@@ -52,22 +54,37 @@ const session = async (user) => {
   return { token: issueToken(user, sid), user: publicUser(user) };
 };
 
-export const registerRegular = async (_u, d) => {
+/* ── checks shared with the online-payment sign-up ── */
+async function planFor(d, type) {
+  const pkg = await getPackage(d.packageId);
+  if (!pkg || pkg.type !== type || !pkg.is_active) throw httpError(400, 'Please choose a plan.');
+  return pkg;
+}
+async function checkProvider(d) {
+  if (!d.bizName?.trim() || !d.cityName || !d.regionName) throw httpError(400, 'Business name and location are required.');
+  if (!d.avatar || !d.idFile || !d.idType) throw httpError(400, 'Avatar and a government ID are required.');
+  return planFor(d, 'provider');
+}
+function checkManual(d, pkg) {
+  if (pkg.price <= 0) throw httpError(400, 'Choose a paid plan.');
+  if (!MANUAL.includes(d.payment?.method) || !String(d.payment?.reference || '').trim()) throw httpError(400, 'Enter your payment reference number.');
+}
+// Validates a whole sign-up (used before taking an online payment). Returns the chosen plan.
+export async function checkSignup(d, role) {
   checkAccount(d); await checkUnique(d); await requireProof(d);
+  return role === 'provider' ? checkProvider(d) : planFor(d, 'regular');
+}
+
+/* ── creating accounts ── */
+async function insertRegular(d) {
   const free = await getPackage(FREE.regular);
   const row = { ...(await baseUser(d, 'regular')), status: 'active', package_id: FREE.regular, package_name: free?.name || 'Free', ads_free: false, payment_status: 'free' };
   const user = (await sb('users', { method: 'POST', body: row }))?.[0];
   await linkReferral(user, d.referredBy);
   mail('regular_welcome', { email: user.email, fullName: `${user.first_name} ${user.last_name}`, username: user.username, package: 'Free' });
-  return session(user);
-};
-
-export const registerProvider = async (_u, d) => {
-  checkAccount(d); await checkUnique(d); await requireProof(d);
-  if (!d.bizName?.trim() || !d.cityName || !d.regionName) throw httpError(400, 'Business name and location are required.');
-  if (!d.avatar || !d.idFile || !d.idType) throw httpError(400, 'Avatar and a government ID are required.');
-  const pkg = await getPackage(d.packageId);
-  if (!pkg || pkg.type !== 'provider' || !pkg.is_active) throw httpError(400, 'Please choose a plan.');
+  return user;
+}
+async function insertProvider(d, pkg, pay = null) {
   const stamp = `${d.username.trim().toLowerCase()}_${Date.now()}`;
   const [av, id] = await Promise.all([upload('fixia-avatars', `${stamp}_avatar`, d.avatar), upload('fixia-ids', `${stamp}_id`, d.idFile)]);
   const free = pkg.price === 0;
@@ -81,12 +98,48 @@ export const registerProvider = async (_u, d) => {
   };
   const out = await sb('rpc/register_provider', { method: 'POST', body: { user_data: userRow, prov_data: provRow } });
   const user = out?.user;
+  if (pay) await sb(`users?id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { payment_method: pay.method, payment_reference: pay.reference, payment_amount: String(pay.amount), payment_status: pay.status } });
   await linkReferral(user, d.referredBy);
   const fullName = `${user.first_name} ${user.last_name}`;
   mail('provider_signup_confirm', { email: user.email, fullName, bizName: d.bizName });
   mail('provider_signup_notify', { fullName, email: user.email, bizName: d.bizName, location: [d.cityName, d.provName].filter(Boolean).join(', '), package: pkg.name });
-  return { ...(await session(user)), packageId: pkg.id, free };
+  return user;
+}
+
+export const registerRegular = async (_u, d) => {
+  checkAccount(d); await checkUnique(d); await requireProof(d);
+  let pkg = null;
+  if (d.payment) { pkg = await planFor(d, 'regular'); checkManual(d, pkg); }
+  const user = await insertRegular(d);
+  // manual payment: the account starts on Free and an upgrade request waits for admin approval
+  if (pkg) await upgradeManual(user, { packageId: pkg.id, method: d.payment.method, reference: d.payment.reference, amount: d.payment.amount });
+  return session(user);
 };
+
+export const registerProvider = async (_u, d) => {
+  checkAccount(d); await checkUnique(d); await requireProof(d);
+  const pkg = await checkProvider(d);
+  if (d.payment) checkManual(d, pkg);
+  const pay = d.payment ? { method: d.payment.method, reference: String(d.payment.reference).trim().slice(0, 60), amount: Number(d.payment.amount) || pkg.price, status: 'pending' } : null;
+  const user = await insertProvider(d, pkg, pay);
+  if (pay) mail('payment_notify', { fullName: `${user.first_name} ${user.last_name}`, email: user.email, package: pkg.name, method: pay.method, reference: pay.reference, amount: `₱${pay.amount}`, verified: false });
+  return { ...(await session(user)), packageId: pkg.id, free: pkg.price === 0 };
+};
+
+// Called after an online payment is confirmed. Creates the account with the paid plan already active.
+export async function createPaidAccount(d, role, pkg, pay) {
+  const days = PERIOD_DAYS[pkg.period] ?? null;
+  const extra = { payment_method: pay.method, payment_reference: pay.txn, payment_amount: String(pay.amount), payment_status: 'verified' };
+  if (role === 'provider') {
+    const user = await insertProvider(d, pkg, { method: pay.method, reference: pay.txn, amount: pay.amount, status: 'verified' });
+    await applyPackage(user, pkg, days, extra);
+    return user;
+  }
+  const user = await insertRegular(d);
+  await applyPackage(user, pkg, days, extra);
+  await credit(user.id, 3).catch(() => {});
+  return user;
+}
 
 /* ── email codes ── */
 export async function otpSend(_u, { email }) {
@@ -99,7 +152,7 @@ export async function otpSend(_u, { email }) {
   const otp = test || String(100000 + (crypto.randomBytes(4).readUInt32BE() % 900000));
   await sb(`otp_codes?email=eq.${encodeURIComponent(mailAddr)}&used=eq.false`, { method: 'DELETE', prefer: 'return=minimal' });
   await sb('otp_codes', { method: 'POST', prefer: 'return=minimal', body: { email: mailAddr, otp_hash: sha(otp), expires_at: new Date(Date.now() + 600000).toISOString(), used: false } });
-  if (!test) await mail('email_otp', { email: mailAddr, otp });
+  if (!test && !(await mail('email_otp', { email: mailAddr, otp }))) throw httpError(502, 'We could not send the email. Please try again in a moment.');
   return { required: true };
 }
 export async function otpVerify(_u, { email, code }) {

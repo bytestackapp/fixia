@@ -11,6 +11,10 @@ import Button from '../components/ui/Button.jsx';
 import { Stepper } from '../components/ui/Kit.jsx';
 import PlanPicker from '../components/PlanPicker.jsx';
 import PlaceFields from '../components/PlaceFields.jsx';
+import OtpInput from '../components/ui/OtpInput.jsx';
+import { DocDialog } from './Info.jsx';
+import Dialog from '../components/ui/Dialog.jsx';
+import { peso, PERIOD } from '../lib/format.js';
 import './Login.css';
 
 const refCode = () => localStorage.getItem('fixia.ref') || null;
@@ -88,13 +92,19 @@ function DetailsForm({ s, onNext }) {
   );
 }
 function VerifyForm({ s, onBack, onNext }) {
+  const [wait, setWait] = useState(60);
+  useEffect(() => { if (wait <= 0) return; const t = setTimeout(() => setWait((w) => w - 1), 1000); return () => clearTimeout(t); }, [wait]);
   async function submit(e) { e.preventDefault(); if (s.code.length !== 6) return toast('Enter the 6-digit code.', 'error'); s.setBusy(true); try { await s.verify(); onNext(); } catch (err) { toast(err.message, 'error'); } s.setBusy(false); }
-  async function resend() { try { await s.sendCode(); toast('A new code was sent.'); } catch (err) { toast(err.message, 'error'); } }
+  async function resend() {
+    if (wait > 0) return;
+    try { await s.sendCode(); s.setCode(''); setWait(60); toast('Code resent. Check your email.'); }
+    catch (err) { toast(err.message, 'error'); }
+  }
   return (
     <form className="stack" onSubmit={submit} noValidate>
       <p className="muted">We sent a 6-digit code to <b>{s.d.email}</b>.</p>
-      <Field label="Verification code" inputMode="numeric" maxLength={6} autoComplete="one-time-code" value={s.code} onChange={(e) => s.setCode(e.target.value.replace(/\D/g, ''))} style={{ fontSize: '1.5rem', letterSpacing: '.3em', textAlign: 'center', fontWeight: 700 }} />
-      <div className="vf-resend"><button type="button" onClick={resend}>Resend code</button></div>
+      <div className="field"><span className="field__label">Verification code</span><OtpInput value={s.code} onChange={s.setCode} /></div>
+      <div className="vf-resend"><button type="button" onClick={resend} disabled={wait > 0}>{wait > 0 ? `Resend code in ${wait}s` : 'Resend code'}</button></div>
       <div className="vf-actions"><Button type="submit" loading={s.busy}>Verify</Button><Button type="button" variant="secondary" onClick={onBack}>Back</Button></div>
     </form>
   );
@@ -105,30 +115,134 @@ function usePlans(type) {
   return { plans };
 }
 
+/* ── payment choices (logos are in public/images) ── */
+const LOGO = { paypal: 'paypal', paymongo: 'paymongo', tbc: 'tbc', gcash: 'gcash', maya: 'maya', bank: 'bpi' };
+// key, name, fee percent, fixed fee, switched off?  (TBC has no payment service behind it yet)
+const ONLINE = [['paypal', 'PayPal', 0.044, 15], ['paymongo', 'PayMongo', 0.029, 0], ['tbc', 'TBC', 0, 0, true]];
+const MANUAL = [['gcash', 'GCash'], ['maya', 'Maya'], ['bank', 'Bank']];
+const isManual = (k) => MANUAL.some((m) => m[0] === k);
+
+function PayOpt({ k, label, on, disabled, onPick }) {
+  return (
+    <label className={`plan pm${on ? ' is-on' : ''}${disabled ? ' is-off' : ''}`}>
+      <input className="sr-only" type="radio" name="pm" checked={on} disabled={disabled} onChange={() => onPick(k)} />
+      <img className="pm__logo" src={`/images/${LOGO[k]}.png`} alt={label} />
+      {disabled && <span className="small muted">Coming soon</span>}
+    </label>
+  );
+}
+
+function PayModal({ open, plan, busy, actionLabel, onClose, onPay }) {
+  const [method, setMethod] = useState(''), [ref, setRef] = useState(''), [amt, setAmt] = useState('');
+  const price = plan?.price || 0;
+  const online = ONLINE.find((m) => m[0] === method), manual = MANUAL.find((m) => m[0] === method);
+  const fee = online ? Math.ceil(price * online[2] + online[3]) : 0;
+  const close = () => { if (busy) return; setMethod(''); setRef(''); setAmt(''); onClose(); };
+  function pick(k) { setMethod(k); if (isManual(k) && !amt) setAmt(String(price)); }
+  function submit() {
+    if (!method) return toast('Choose how you want to pay.', 'error');
+    if (manual && !ref.trim()) return toast('Enter your reference number.', 'error');
+    if (manual && !(Number(amt) > 0)) return toast('Enter the amount you sent.', 'error');
+    onPay({ method, reference: ref.trim(), amount: amt });
+  }
+  return (
+    <Dialog open={open} onClose={close} title="Choose how to pay">
+      {plan && (
+        <div className="paycard">
+          <span className="paycard__label">Your plan</span>
+          <b className="paycard__name">{plan.name}</b>
+          <span className="paycard__price num">{peso(plan.price)}<small> / {PERIOD[plan.period] || plan.period}</small></span>
+          {online && <dl className="paycard__rows"><div><dt>Processing fee</dt><dd className="num">{peso(fee)}</dd></div><div className="total"><dt>Total to pay</dt><dd className="num">{peso(plan.price + fee)}</dd></div></dl>}
+        </div>
+      )}
+      <fieldset className="plans plans--methods">
+        <legend className="plans__legend">Pay online <span className="muted small" style={{ fontWeight: 400 }}>— activated right away</span></legend>
+        {ONLINE.map(([k, n, , , off]) => <PayOpt key={k} k={k} label={n} on={method === k} disabled={!!off} onPick={pick} />)}
+      </fieldset>
+      <fieldset className="plans plans--methods">
+        <legend className="plans__legend">Pay manually <span className="muted small" style={{ fontWeight: 400 }}>— no fee, checked by our team</span></legend>
+        {MANUAL.map(([k, n]) => <PayOpt key={k} k={k} label={n} on={method === k} onPick={pick} />)}
+      </fieldset>
+      {manual && (
+        <div className="stack">
+          <p className="muted small">Scan the code and send exactly <b>{peso(price)}</b> using {manual[1]}. Then enter the reference number from your receipt.</p>
+          <img src={`/images/${method}-qr.png`} alt={`${manual[1]} QR code`} width="180" height="180" style={{ objectFit: 'contain', border: '1px solid var(--line)', borderRadius: 10, justifySelf: 'center' }} onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <Field label="Reference number" value={ref} onChange={(e) => setRef(e.target.value)} />
+          <Field label="Amount sent (₱)" type="number" inputMode="decimal" value={amt} onChange={(e) => setAmt(e.target.value)} />
+        </div>
+      )}
+      <p className="small muted">
+        {manual
+          ? <>Manual payments have no fee.<br />Your account is created now, and your plan starts once our team approves your payment.</>
+          : <>Online payments add a small processing fee, shown above.<br />Your account is created after your payment is confirmed.</>}
+      </p>
+      <div className="vf-actions"><Button onClick={submit} loading={busy} disabled={!method}>{manual ? actionLabel : 'Pay now'}</Button><Button variant="secondary" disabled={busy} onClick={close}>Not now</Button></div>
+    </Dialog>
+  );
+}
+
+function ReviewNotice({ open, text, onDone }) {
+  return (
+    <Dialog open={open} onClose={onDone} title="Payment under review">
+      <p>{text}</p>
+      <div className="dlg__actions"><Button onClick={onDone}>Continue</Button></div>
+    </Dialog>
+  );
+}
+
+function AgreeNote({ checked, onChange }) {
+  const [doc, setDoc] = useState(null);
+  const link = (k, t) => <button type="button" className="linkbtn" onClick={() => setDoc(k)}>{t}</button>;
+  return (
+    <>
+      <label className="check check--top">
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <span className="small">I agree to the {link('terms', 'Terms of service')} and {link('privacy', 'Privacy policy')}.</span>
+      </label>
+      <DocDialog doc={doc} onClose={() => setDoc(null)} />
+    </>
+  );
+}
+
 export function SignupCustomer() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
   const s = useAccountSteps('regular'); const [step, setStep] = useState(0); const [needsCode, setNeedsCode] = useState(true);
-  const { plans } = usePlans('regular'); const [plan, setPlan] = useState('');
+  const { plans } = usePlans('regular'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
+  const [payOpen, setPayOpen] = useState(false), [done, setDone] = useState(null);
   useEffect(() => { if (plans && !plan) setPlan(plans.find((p) => p.price === 0)?.id || plans[0]?.id); }, [plans, plan]);
   if (user) return <Navigate to="/" replace />;
   const steps = needsCode ? ['Details', 'Verify email', 'Plan'] : ['Details', 'Plan'];
   const planStep = steps.length - 1;
+  const picked = plans?.find((p) => p.id === plan);
+  const paid = !!picked && picked.price > 0;
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
     try { const req = await s.sendCode(); setNeedsCode(req); setStep(1); } catch (e) { toast(e.message, 'error'); setStep(0); }
     s.setBusy(false);
   }
-  async function create() {
+  // free plan: no payment. manual payment: account starts on Free, upgrade waits for approval.
+  async function create(payment) {
     s.setBusy(true);
     try {
-      const { token, user: u } = await api('auth', { action: 'register.regular', ...s.d, proof: s.proof, referredBy: refCode() });
-      localStorage.removeItem('fixia.ref'); adopt(token, u);
-      toast('Welcome to Fixia!');
-      const chosen = plans.find((p) => p.id === plan);
-      nav(chosen && chosen.price > 0 ? `/checkout/${chosen.id}` : '/', { replace: true });
+      const { token, user: u } = await api('auth', { action: 'register.regular', ...s.d, proof: s.proof, referredBy: refCode(), ...(payment ? { packageId: plan, payment } : {}) });
+      localStorage.removeItem('fixia.ref');
+      if (payment) { setPayOpen(false); setDone({ token, u }); }      // he reads the notice first, then enters the app
+      else { adopt(token, u); toast('Welcome to Fixia!'); nav('/', { replace: true }); }
+    } catch (e) { toast(e.message, 'error'); }
+    s.setBusy(false);
+  }
+  // online payment: nothing is created yet. The server saves the details and opens the payment page.
+  async function payOnline(method) {
+    s.setBusy(true);
+    try {
+      const { url } = await api('auth', { action: 'signup.pay', ...s.d, role: 'regular', proof: s.proof, referredBy: refCode(), packageId: plan, method });
+      window.location.href = url;
     } catch (e) { toast(e.message, 'error'); s.setBusy(false); }
   }
+  const onPay = (p) => (isManual(p.method) ? create(p) : payOnline(p.method));
+  const finish = () => { if (!done) return; adopt(done.token, done.u); nav('/', { replace: true }); };
+
   return (
     <Page>
       <div className="logo-wrap"><Logo /></div><h1 style={{ textAlign: 'center' }}>Create your account</h1>
@@ -139,10 +253,12 @@ export function SignupCustomer() {
         <div className="stack">
           <p className="muted">Start free. You can upgrade any time.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
-          <div className="cluster"><Button onClick={create} loading={s.busy} disabled={!plan}>Create account</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
-          <p className="small muted">By continuing you agree to the Terms of service and Privacy policy.</p>
+          <AgreeNote checked={agree} onChange={setAgree} />
+          <div className="vf-actions"><Button onClick={paid ? () => setPayOpen(true) : () => create()} loading={s.busy && !payOpen} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Create account'}</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
+          <PayModal open={payOpen} plan={picked} busy={s.busy} actionLabel="Create account" onClose={() => setPayOpen(false)} onPay={onPay} />
         </div>
       )}
+      <ReviewNotice open={!!done} onDone={finish} text="We received your payment details and your account is ready. Our team will check your payment and activate your plan once it is approved. Until then, you can use Fixia on the Free plan." />
       <p className="small muted" style={{ textAlign: 'center' }}>Already registered? <Link to="/login">Sign in</Link></p>
     </Page>
   );
@@ -151,14 +267,17 @@ export function SignupCustomer() {
 export function SignupProvider() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
   const s = useAccountSteps('provider'); const [step, setStep] = useState(0); const [needsCode, setNeedsCode] = useState(true);
-  const { plans } = usePlans('provider'); const [plan, setPlan] = useState('');
+  const { plans } = usePlans('provider'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
   const [biz, setBiz] = useState(''), [street, setStreet] = useState(''), [place, setPlace] = useState({});
   const [avatar, setAvatar] = useState(''), [idType, setIdType] = useState(''), [idFile, setIdFile] = useState('');
+  const [payOpen, setPayOpen] = useState(false), [done, setDone] = useState(null);
   if (user) return <Navigate to="/" replace />;
   const all = ['Details', 'Verify email', 'Business', 'Photos & ID', 'Plan'];
   const steps = needsCode ? all : all.filter((x) => x !== 'Verify email');
   const name = steps[step];
   const bad = (m) => toast(m, 'error');
+  const picked = plans?.find((p) => p.id === plan);
+  const paid = !!picked && picked.price > 0;
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
@@ -169,16 +288,29 @@ export function SignupProvider() {
   const bizNext = () => { if (!biz.trim()) return bad('Enter your business or shop name.'); if (!place.regionName || !place.cityName) return bad('Choose your region and city.'); go(step + 1); };
   const photoNext = () => { if (!avatar) return bad('Add a profile photo or logo.'); if (!idType) return bad('Choose your ID type.'); if (!idFile) return bad('Upload your government ID.'); go(step + 1); };
   async function pick(setter, opts, e) { try { setter(await shrink(e.target.files[0], opts)); } catch (err) { bad(err.message); } e.target.value = ''; }
+  const body = () => ({ ...s.d, proof: s.proof, referredBy: refCode(), bizName: biz, streetAddr: street, ...place, idType, idFile, avatar, packageId: plan });
 
-  async function create() {
+  // free plan: no payment. manual payment: application is sent with the payment details for review.
+  async function create(payment) {
     s.setBusy(true);
     try {
-      const out = await api('auth', { action: 'register.provider', ...s.d, proof: s.proof, referredBy: refCode(), bizName: biz, streetAddr: street, ...place, idType, idFile, avatar, packageId: plan });
-      localStorage.removeItem('fixia.ref'); adopt(out.token, out.user);
-      toast('Application sent. We will review it within 24–48 hours.');
-      nav(out.free ? '/profile' : `/checkout/${plan}`, { replace: true });
+      const out = await api('auth', { action: 'register.provider', ...body(), ...(payment ? { payment } : {}) });
+      localStorage.removeItem('fixia.ref');
+      if (payment) { setPayOpen(false); setDone(out); }
+      else { adopt(out.token, out.user); toast('Application sent. We will review it within 24–48 hours.'); nav('/profile', { replace: true }); }
+    } catch (e) { bad(e.message); }
+    s.setBusy(false);
+  }
+  // online payment: nothing is created yet. The server saves the details and opens the payment page.
+  async function payOnline(method) {
+    s.setBusy(true);
+    try {
+      const { url } = await api('auth', { action: 'signup.pay', ...body(), role: 'provider', method });
+      window.location.href = url;
     } catch (e) { bad(e.message); s.setBusy(false); }
   }
+  const onPay = (p) => (isManual(p.method) ? create(p) : payOnline(p.method));
+  const finish = () => { if (!done) return; adopt(done.token, done.user); nav('/profile', { replace: true }); };
 
   return (
     <Page wide>
@@ -211,11 +343,14 @@ export function SignupProvider() {
       )}
       {name === 'Plan' && (
         <div className="stack">
-          <p className="muted">Choose a plan. Paid plans are paid on the next screen; our team reviews every application within 24–48 hours.</p>
+          <p className="muted">Choose a plan. Our team reviews every application within 24–48 hours.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
-          <div className="cluster"><Button onClick={create} loading={s.busy} disabled={!plan}>Submit application</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
+          <AgreeNote checked={agree} onChange={setAgree} />
+          <div className="vf-actions"><Button onClick={paid ? () => setPayOpen(true) : () => create()} loading={s.busy && !payOpen} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Submit application'}</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
+          <PayModal open={payOpen} plan={picked} busy={s.busy} actionLabel="Submit application" onClose={() => setPayOpen(false)} onPay={onPay} />
         </div>
       )}
+      <ReviewNotice open={!!done} onDone={finish} text="We received your application and payment details. Our team will check them within 24–48 hours and email you the result." />
       <p className="small muted" style={{ textAlign: 'center' }}>Already registered? <Link to="/login">Sign in</Link></p>
     </Page>
   );

@@ -90,7 +90,8 @@
 /* Sign-up verify step: "Resend code" styled like "Forgot password?", Verify + Back fill the line */
 .vf-resend { text-align: right; }
 .vf-resend button { background: none; border: 0; padding: 0; color: #FF5A1F; font-size: .92rem; font-weight: 700; cursor: pointer; }
-.vf-resend button:hover { text-decoration: underline; }
+.vf-resend button:hover:not(:disabled) { text-decoration: underline; }
+.vf-resend button:disabled { color: var(--text-3); cursor: not-allowed; }
 .vf-actions { display: flex; gap: var(--s3); }
 .vf-actions .btn { flex: 1; }
 .vf-actions .btn--primary { flex: 2; }

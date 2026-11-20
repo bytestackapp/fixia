@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { toast } from '../lib/toast.jsx';
 import Logo from '../components/Logo.jsx';
 import InfoLinks from './Info.jsx';
+import PaidNotice from '../components/PaidNotice.jsx';
 import './Login.css';
 
 export default function Login() {
@@ -87,6 +88,7 @@ export default function Login() {
         </form>
 
         <InfoLinks className="lc-footer" />
+        <PaidNotice />
       </main>
     </div>
   );

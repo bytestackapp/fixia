@@ -24,8 +24,8 @@ export default function Settings() {
       <Head title="Settings" sub="Each setting is saved on its own and applies right away." />
       <Load q={q}>{(s) => (
         <div className="stack stack--lg">
-          <section className="stack"><div className="section-head"><h2>Phone (SMS) verification at sign-up</h2></div>
-            <div className="cluster"><Switch checked={s.otp_enabled === 'true'} label="Require SMS verification" onChange={(v) => otp.mutate({ key: 'otp_enabled', value: v ? 'true' : 'false' })} /><span>Require a code sent by SMS</span></div>
+          <section className="stack"><div className="section-head"><h2>Email verification at sign-up</h2></div>
+            <div className="cluster"><Switch checked={s.otp_enabled === 'true'} label="Require email verification" onChange={(v) => otp.mutate({ key: 'otp_enabled', value: v ? 'true' : 'false' })} /><span>Require a code sent by email</span></div>
             <Setting k="otp_test_code" label="Fixed test code" type="text" maxLength={6} hint="6 digits. While set, every sign-up uses this code and no email is sent. Leave empty for real codes." v={s.otp_test_code} /></section>
           <section className="stack"><div className="section-head"><h2>Ads</h2></div>
             <Setting k="inline_ad_interval" label="Rows between inline ads" v={s.inline_ad_interval} min="1" max="20" />

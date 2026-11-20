@@ -190,3 +190,34 @@ body { overflow-x: hidden; }
 .ptr.is-busy svg { animation: spin .8s linear infinite; }
 .ptr-glow { position: fixed; left: 0; right: 0; top: 0; z-index: 34; pointer-events: none; background: linear-gradient(180deg, rgba(242, 98, 43, .5) 0%, rgba(242, 98, 43, .22) 45%, rgba(242, 98, 43, 0) 100%); }
 @media (min-width: 900px) { .ptr, .ptr-glow { display: none; } }
+
+/* ── 6-box verification code ── */
+.otp { display: flex; gap: 8px; justify-content: space-between; }
+.otp__box { flex: 1 1 0; min-width: 0; max-width: 56px; height: 56px; padding: 0; text-align: center; font: 800 1.4rem var(--font-display); color: var(--navy); background: #fff; border: 1.5px solid var(--line); border-radius: var(--r-sm); transition: border-color .15s, box-shadow .15s; caret-color: var(--brand); }
+.otp__box:hover { border-color: var(--line-strong); }
+.otp__box:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(242, 98, 43, .14); }
+
+/* inline link-style button (Terms / Privacy) */
+.linkbtn { padding: 0; background: none; border: 0; font: inherit; font-weight: 700; color: var(--brand); text-decoration: underline; cursor: pointer; }
+.linkbtn:hover { color: var(--brand-dark); }
+
+/* agreement checkbox: aligned to the top line of the text */
+.check--top { align-items: flex-start; min-height: 0; }
+.check--top input { flex: none; margin-top: 2px; }
+
+/* ── payment logos ── */
+.pm { align-content: center; min-height: 72px; }
+.pm__logo { height: 30px; width: auto; max-width: 100%; object-fit: contain; }
+.pm.is-off { opacity: .45; cursor: not-allowed; }
+
+/* ── plan and price card at the top of the pay modal ── */
+.paycard { display: grid; gap: 2px; padding: 16px; border-radius: var(--r-md); background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: #fff; box-shadow: var(--shadow-md); }
+.paycard__label { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+.paycard__name { font: 800 1.1rem var(--font-display); color: #fff; }
+.paycard__price { font-size: 1.6rem; font-weight: 800; line-height: 1.2; color: #fff; }
+.paycard__price small { font-size: .8rem; font-weight: 500; color: rgba(255, 255, 255, .6); }
+.paycard__rows { display: grid; gap: 4px; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .15); font-size: .8rem; }
+.paycard__rows div { display: flex; justify-content: space-between; }
+.paycard__rows dt { color: rgba(255, 255, 255, .6); }
+.paycard__rows dd { margin: 0; font-weight: 700; }
+.paycard__rows .total { font-size: .95rem; color: #fff; }

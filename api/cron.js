@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     for (const p of hidden) if ((Date.now() - new Date(p.subscription_end)) / DAY >= 7) { await mark(p, { status: 'suspended' }); await mail('suspended', who(p)); out.suspended++; }
     const old = (await sb(`users?status=eq.rejected&created_at=lt.${new Date(Date.now() - 30 * DAY).toISOString()}&select=id`)) || [];
     for (const u of old) { await sb(`providers?user_id=eq.${q(u.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); await sb(`users?id=eq.${q(u.id)}`, { method: 'DELETE', prefer: 'return=minimal' }); out.deleted++; }
+    await sb(`pending_signups?created_at=lt.${new Date(Date.now() - 3 * DAY).toISOString()}`, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});   // unfinished online sign-ups
     return res.status(200).json({ ok: true, ...out });
   } catch (e) { console.error('[cron]', e); return res.status(500).json({ error: e.message }); }
 }
