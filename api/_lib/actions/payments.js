@@ -35,7 +35,7 @@ async function startOnline(method, owner, pkg, total, back, cancel) {
   }
   const s = await (await fetch(`${PM}/checkout_sessions`, {
     method: 'POST', headers: { Authorization: basic(process.env.PAYMONGO_SECRET_KEY), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: ['card', 'gcash', 'maya', 'grab_pay'], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
+    body: JSON.stringify({ data: { attributes: { send_email_receipt: true, show_line_items: true, payment_method_types: ['card', 'gcash', 'paymaya', 'grab_pay'], line_items: [{ currency: 'PHP', amount: Math.round(total * 100), name: `Fixia ${pkg.name}`, quantity: 1 }], success_url: back, cancel_url: cancel, description: `Fixia ${pkg.name}`, metadata: { userId: owner, packageId: pkg.id } } } }),
   })).json();
   const url = s.data?.attributes?.checkout_url;
   if (!url) { console.error('[paymongo]', JSON.stringify(s.errors || s)); throw httpError(502, 'Could not start PayMongo checkout.'); }
