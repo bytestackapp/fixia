@@ -131,12 +131,12 @@ export async function changeSubmit(user, d) {
   const prov = await providerRow(user);
   if (!prov) throw httpError(403, 'Provider account required.');
   if ((await changeCooldown(user)).daysLeft > 0) throw httpError(429, 'You can send one request every 30 days.');
-  if (!['Business Name Change', 'Email Change', 'Location Change', 'Other'].includes(d.subject)) throw httpError(400, 'Choose what to change.');
+  if (!['Business Name Change', 'Email Change', 'Location Change', 'Multiple Changes', 'Other'].includes(d.subject)) throw httpError(400, 'Choose what to change.');
   if (!d.explanation?.trim()) throw httpError(400, 'Please explain the change.');
   if (d.subject !== 'Other' && !d.requestedValue?.trim()) throw httpError(400, 'Enter the new value.');
   let file = {};
-  if (d.file) { const up = await upload('fixia-requests', `requests/${prov.id}_${Date.now()}`, d.file, { pdf: true }); file = { file_url: up.url, file_path: up.path }; }
-  await sb('change_requests', { method: 'POST', prefer: 'return=minimal', body: { user_id: user.id, provider_id: prov.id, provider_name: prov.biz_name, subject: d.subject, requested_value: (d.requestedValue || '—').slice(0, 600), explanation: d.explanation.trim().slice(0, 600), status: 'pending', ...file } });
+  if (d.file) { const up = await upload('fixia-requests', `${prov.id}_${Date.now()}`, d.file, { pdf: true }); file = { file_url: up.url, file_path: up.path }; }
+  await sb('change_requests', { method: 'POST', prefer: 'return=minimal', body: { user_id: user.id, provider_id: prov.id, provider_name: prov.biz_name, subject: d.subject, requested_value: (d.requestedValue || '—').slice(0, 1200), explanation: d.explanation.trim().slice(0, 600), status: 'pending', ...file } });
 }
 
 /* ── reports ── */

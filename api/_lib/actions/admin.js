@@ -218,7 +218,10 @@ A['message.send'] = async (_a, { templateId, to }) => {
 };
 
 /* ── change requests ── */
-A['changes.list'] = async () => ({ items: (await sb('change_requests?status=eq.pending&order=created_at.asc')) || [] });
+A['changes.list'] = async () => {
+  const rows = (await sb('change_requests?status=eq.pending&order=created_at.asc')) || [];
+  return { items: await Promise.all(rows.map(async (r) => ({ ...r, file_url: r.file_url ? await signedUrl(r.file_url) : null }))) };
+};
 async function closeChange(r) { await remove(r.file_url); await del(`change_requests?id=eq.${q(r.id)}`); }
 A['change.approve'] = async (_a, { id }) => {
   const r = need((await sb(`change_requests?id=eq.${q(id)}&limit=1`))?.[0], 'Request not found.');
