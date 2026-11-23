@@ -123,8 +123,8 @@ export async function reviewsMine(user) {
 /* ── change requests (business name / email / location) ── */
 export async function changeCooldown(user) {
   const prov = await providerRow(user);
-  const last = prov && (await sb(`change_requests?provider_id=eq.${q(prov.id)}&order=created_at.desc&limit=1&select=created_at`))?.[0];
-  const left = last ? Math.ceil(30 - (Date.now() - new Date(last.created_at)) / 86400000) : 0;
+  const last = prov?.last_change_at;
+  const left = last ? Math.ceil(30 - (Date.now() - new Date(last)) / 86400000) : 0;
   return { daysLeft: Math.max(0, left) };
 }
 export async function changeSubmit(user, d) {
@@ -137,6 +137,7 @@ export async function changeSubmit(user, d) {
   let file = {};
   if (d.file) { const up = await upload('fixia-requests', `${prov.id}_${Date.now()}`, d.file, { pdf: true }); file = { file_url: up.url, file_path: up.path }; }
   await sb('change_requests', { method: 'POST', prefer: 'return=minimal', body: { user_id: user.id, provider_id: prov.id, provider_name: prov.biz_name, subject: d.subject, requested_value: (d.requestedValue || '—').slice(0, 1200), explanation: d.explanation.trim().slice(0, 600), status: 'pending', ...file } });
+  await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { last_change_at: new Date().toISOString() } });
 }
 
 /* ── reports ── */

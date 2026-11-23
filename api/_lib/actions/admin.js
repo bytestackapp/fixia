@@ -229,12 +229,15 @@ A['change.approve'] = async (_a, { id }) => {
   if (r.subject === 'Business Name Change') { await patch(`providers?id=eq.${q(r.provider_id)}`, { biz_name: r.requested_value }); msg = `Your business name is now "${r.requested_value}".`; }
   else if (r.subject === 'Email Change') { await patch(`users?id=eq.${q(r.user_id)}`, { email: r.requested_value.toLowerCase() }); msg = `Your account email is now ${r.requested_value}.`; }
   else if (r.subject === 'Location Change') { try { const l = JSON.parse(r.requested_value); await patch(`providers?id=eq.${q(r.provider_id)}`, { region_name: l.region_name || '', province_name: l.province_name || '', city_name: l.city_name || '', barangay_name: l.barangay_name || '', street_addr: l.street_addr || '' }); msg = 'Your location was updated.'; } catch { /* free-text request: apply by hand */ } }
-  await notify(r.user_id, 'Request approved', msg, 'announcement'); await closeChange(r);
+  await notify(r.user_id, 'Request approved', `${msg}\n\nYou can send another change request 30 days after your last request was submitted.`, 'announcement'); await closeChange(r);
+  pushTo(r.user_id, { title: 'Change request approved', body: msg, url: '/profile?tab=edit' });
 };
 A['change.reject'] = async (_a, { id, reason }) => {
   const r = need((await sb(`change_requests?id=eq.${q(id)}&limit=1`))?.[0], 'Request not found.');
   need(reason?.trim(), 'Give the provider a reason.');
-  await notify(r.user_id, 'Request not approved', `Your ${r.subject} request was not approved.\n\nReason: ${reason}`, 'warning'); await closeChange(r);
+  await notify(r.user_id, 'Request not approved', `Your ${r.subject} request was not approved.\n\nReason: ${reason}\n\nYou can send a new change request right away. The 30-day wait does not apply to rejected requests. Please check the details and try again from Profile > Edit > Request a change.`, 'warning'); await closeChange(r);
+  await patch(`providers?id=eq.${q(r.provider_id)}`, { last_change_at: null });
+  pushTo(r.user_id, { title: 'Change request not approved', body: 'You can send a new request right away. Open Fixia to read why.', url: '/profile?tab=edit' });
 };
 
 /* ── reports ── */
