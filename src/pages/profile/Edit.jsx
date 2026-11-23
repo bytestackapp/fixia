@@ -9,6 +9,7 @@ import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Dialog from '../../components/ui/Dialog.jsx';
 import PlaceFields from '../../components/PlaceFields.jsx';
+import OtpInput from '../../components/ui/OtpInput.jsx';
 
 export default function Edit({ data }) {
   const { user, refresh } = useAuth(); const isPro = user.role === 'provider';
@@ -33,6 +34,7 @@ export default function Edit({ data }) {
         {isPro && <Field as="textarea" label="About your business" maxLength={300} value={f.bizDesc} onChange={(e) => setF({ ...f, bizDesc: e.target.value })} />}
         <div><Button type="submit" loading={save.isPending}>Save changes</Button></div>
       </form>
+      {isPro && <VerifyEmail />}
       {isPro && <div className="stack"><h3>Business details</h3><p className="muted small">Business name, email and location changes are reviewed by our team. One request every 30 days. Need to change more than one thing? Choose “Multiple changes” so everything goes in one request.</p><div><Button variant="secondary" disabled={left > 0} onClick={() => setReq(true)}>{left > 0 ? `Available in ${left} day${left === 1 ? '' : 's'}` : 'Request a change'}</Button></div></div>}
       {isPro && <ChangeDialog open={req} onClose={() => setReq(false)} current={{ biz: p.bizName, email: a.email, loc: where }} />}
     </div>
@@ -48,6 +50,7 @@ function ChangeDialog({ open, onClose, current }) {
   const [place, setPlace] = useState({}), [street, setStreet] = useState(''), [busy, setBusy] = useState(false);
   const [conf, setConf] = useState(null);       // { value, rows } while the confirmation pop-up is open
   const multi = s.subject === 'Multiple Changes';
+  const needsProof = ['Business Name Change', 'Location Change'].includes(s.subject) || (multi && (pick.biz || pick.loc));
   const loc = () => ({ region_name: place.regionName, province_name: place.provName, city_name: place.cityName, barangay_name: place.brgyName, street_addr: street });
   const locText = () => [street.trim(), place.brgyName, place.cityName, place.provName].filter(Boolean).join(', ');
   const reset = () => { setS({ subject: '', value: '', why: '', file: '' }); setPick({ biz: false, email: false, loc: false }); setVals({ biz: '', email: '' }); setPlace({}); setStreet(''); setConf(null); };
@@ -79,6 +82,7 @@ function ChangeDialog({ open, onClose, current }) {
       if (pick.email) rows.push(['Email', current.email, vals.email.trim()]);
       if (pick.loc) rows.push(['Location', current.loc, locText()]);
     }
+    if (needsProof && !s.file) return toast('Attach a proof document for this change.', 'error');
     if (!s.why.trim()) return toast('Please explain why you need this change.', 'error');
     setConf({ value, rows });
   }
@@ -89,6 +93,7 @@ function ChangeDialog({ open, onClose, current }) {
       await call('change.submit', { subject: s.subject, requestedValue: conf.value, explanation: s.why, file: s.file || undefined });
       toast('Request sent. We will message you with the result.');
       await qc.invalidateQueries({ queryKey: ['cooldown'] });
+      await qc.invalidateQueries({ queryKey: ['emailcheck'] });
       reset(); onClose();
     } catch (e) { toast(e.message, 'error'); setConf(null); }
     setBusy(false);
@@ -112,7 +117,7 @@ function ChangeDialog({ open, onClose, current }) {
             </>
           )}
           <Field as="textarea" label="Why do you need this change?" value={s.why} onChange={(e) => setS({ ...s, why: e.target.value })} />
-          <label className="field"><span className="field__label">Supporting document (optional, image or PDF)</span><input type="file" accept="image/jpeg,image/png,application/pdf" onChange={async (e) => { const f = e.target.files[0]; if (f && f.size > 2_000_000) { toast('File must be under 2 MB.', 'error'); e.target.value = ''; return; } setS({ ...s, file: f ? await fileToDataUrl(f) : '' }); }} /></label>
+          <label className="field"><span className="field__label">{needsProof ? 'Proof of the change (required, image or PDF)' : 'Supporting document (optional, image or PDF)'}</span><input type="file" accept="image/jpeg,image/png,application/pdf" onChange={async (e) => { const f = e.target.files[0]; if (f && f.size > 2_000_000) { toast('File must be under 2 MB.', 'error'); e.target.value = ''; return; } setS({ ...s, file: f ? await fileToDataUrl(f) : '' }); }} /></label>
           <div className="dlg__actions"><Button disabled={!s.subject} onClick={review}>Send request</Button><Button variant="quiet" onClick={onClose}>Cancel</Button></div>
         </div>
       </Dialog>
@@ -143,3 +148,35 @@ function ChangeDialog({ open, onClose, current }) {
     </>
   );
 }
+
+function VerifyEmail() {
+  const qc = useQueryClient();
+  const { data } = useQuery({ queryKey: ['emailcheck'], queryFn: () => call('change.pending'), refetchInterval: 60000 });
+  const [code, setCode] = useState(''), [busy, setBusy] = useState(false);
+  const r = data?.request;
+  if (!r) return null;
+  async function submit() {
+    if (code.length !== 8) return toast('Enter the 8-digit code.', 'error');
+    setBusy(true);
+    try {
+      const out = await call('change.verify', { code });
+      if (out.ok) toast('Email confirmed. Our team will finish your request.');
+      else if (out.failed) toast('Wrong code 3 times. Your request was cancelled. You can try again in 30 days.', 'error');
+      else toast(`Wrong code. ${out.left} ${out.left === 1 ? 'try' : 'tries'} left.`, 'error');
+      setCode('');
+      await Promise.all([qc.invalidateQueries({ queryKey: ['emailcheck'] }), qc.invalidateQueries({ queryKey: ['cooldown'] })]);
+    } catch (e) { toast(e.message, 'error'); }
+    setBusy(false);
+  }
+  if (r.verified) return <div className="banner banner--ok"><h3>New email confirmed</h3><p>Thank you. Our team will finish your request soon.</p></div>;
+  if (!r.codeSent) return <div className="banner banner--warn"><h3>Confirm your new email</h3><p>Our team will send a code to <b>{r.email}</b>. You will get a message here when it is sent.</p></div>;
+  return (
+    <div className="banner banner--warn">
+      <h3>Enter the code sent to {r.email}</h3>
+      <p className="small">You have {r.left} {r.left === 1 ? 'try' : 'tries'} left. After 3 wrong tries your request is cancelled and you must wait 30 days.</p>
+      <OtpInput value={code} onChange={setCode} length={8} />
+      <div><Button loading={busy} onClick={submit}>Confirm code</Button></div>
+    </div>
+  );
+}
+

@@ -1,14 +1,18 @@
 /* Profile, password, avatar, plans, listings, change requests, reports, push, admin messages. */
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { sb, q } from '../db.js';
 import { httpError } from '../auth.js';
 import { upload, remove } from '../storage.js';
-import { getPackage, calcUpgrade } from '../packages.js';
+import { getPackage, calcUpgrade, notify } from '../packages.js';
 import { stats as refStats } from '../referral.js';
 import { settings } from '../settings.js';
 import { mail } from '../mail.js';
 
 const providerRow = async (user) => (await sb(`providers?user_id=eq.${q(user.id)}&limit=1`))?.[0] || null;
+const parsed = (s) => { try { return JSON.parse(s) || {}; } catch { return {}; } };
+// The new email inside a change request (single email change, or one ticked inside "Multiple Changes"), or null.
+export const emailOfRequest = (subject, value) => (subject === 'Email Change' ? String(value || '').trim().toLowerCase() : subject === 'Multiple Changes' ? String(parsed(value).email || '').trim().toLowerCase() || null : null);
 
 export async function profile(user) {
   const u = (await sb(`users?id=eq.${q(user.id)}&select=*&limit=1`))?.[0];
@@ -134,10 +138,51 @@ export async function changeSubmit(user, d) {
   if (!['Business Name Change', 'Email Change', 'Location Change', 'Multiple Changes', 'Other'].includes(d.subject)) throw httpError(400, 'Choose what to change.');
   if (!d.explanation?.trim()) throw httpError(400, 'Please explain the change.');
   if (d.subject !== 'Other' && !d.requestedValue?.trim()) throw httpError(400, 'Enter the new value.');
+  const newMail = emailOfRequest(d.subject, d.requestedValue);
+  if (newMail) {
+    if (!/^\S+@\S+\.\S+$/.test(newMail)) throw httpError(400, 'Enter a valid email address.');
+    if ((await sb(`users?email=eq.${encodeURIComponent(newMail)}&select=id&limit=1`))?.length) throw httpError(409, 'That email is already registered.');
+  }
+  const multi = d.subject === 'Multiple Changes' ? parsed(d.requestedValue) : {};
+  const needsProof = ['Business Name Change', 'Location Change'].includes(d.subject) || !!multi.business_name || !!multi.location;
+  if (needsProof && !d.file) throw httpError(400, 'Attach a proof document for this change.');
   let file = {};
   if (d.file) { const up = await upload('fixia-requests', `${prov.id}_${Date.now()}`, d.file, { pdf: true }); file = { file_url: up.url, file_path: up.path }; }
   await sb('change_requests', { method: 'POST', prefer: 'return=minimal', body: { user_id: user.id, provider_id: prov.id, provider_name: prov.biz_name, subject: d.subject, requested_value: (d.requestedValue || '—').slice(0, 1200), explanation: d.explanation.trim().slice(0, 600), status: 'pending', ...file } });
   await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { last_change_at: new Date().toISOString() } });
+}
+
+/* ── new email check: the provider enters the code the admin sent to the new address ── */
+export async function changePending(user) {
+  const prov = await providerRow(user);
+  if (!prov) return { request: null };
+  const rows = (await sb(`change_requests?provider_id=eq.${q(prov.id)}&status=eq.pending&select=subject,requested_value,verify_hash,verify_attempts,email_verified`)) || [];
+  for (const r of rows) {
+    const email = emailOfRequest(r.subject, r.requested_value);
+    if (email) return { request: { email, codeSent: !!r.verify_hash, verified: !!r.email_verified, left: 3 - (r.verify_attempts || 0) } };
+  }
+  return { request: null };
+}
+export async function changeVerify(user, { code }) {
+  const prov = await providerRow(user);
+  if (!prov) throw httpError(403, 'Provider account required.');
+  const r = (await sb(`change_requests?provider_id=eq.${q(prov.id)}&status=eq.pending&verify_hash=not.is.null&email_verified=is.false&limit=1`))?.[0];
+  if (!r) throw httpError(404, 'There is no code to enter right now.');
+  const hash = crypto.createHash('sha256').update(String(code || '').trim()).digest('hex');
+  if (hash === r.verify_hash) {
+    await sb(`change_requests?id=eq.${q(r.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { email_verified: true } });
+    return { ok: true };
+  }
+  const tries = (r.verify_attempts || 0) + 1;
+  if (tries >= 3) {
+    await remove(r.file_url);
+    await sb(`change_requests?id=eq.${q(r.id)}`, { method: 'DELETE', prefer: 'return=minimal' });
+    await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { last_change_at: new Date().toISOString() } });
+    await notify(user.id, 'Change request cancelled', 'You entered the wrong email code 3 times, so your change request was cancelled. You can send a new request after 30 days.', 'warning');
+    return { ok: false, failed: true };
+  }
+  await sb(`change_requests?id=eq.${q(r.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { verify_attempts: tries } });
+  return { ok: false, left: 3 - tries };
 }
 
 /* ── reports ── */

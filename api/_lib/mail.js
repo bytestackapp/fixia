@@ -33,11 +33,14 @@ const T = {
   suspended: (d) => [d.email, 'Account suspended (plan expired)', wrap('Account suspended', `<p>Your provider account was suspended after the grace period. Renew your plan or contact ${esc(OWNER)}.</p>`)],
 };
 
+T.email_change_code = (d) => [d.email, `${d.code} is your Fixia email change code`, wrap('Confirm your new email', `<p>A change of email was requested for <b>${esc(d.bizName)}</b> on Fixia. Your code is:</p><p style="font:700 30px monospace;letter-spacing:5px;margin:8px 0;color:#12161C">${esc(d.code)}</p><p>Enter it in the Fixia app under Profile &gt; Edit. If you were not expecting this, ignore this email.</p>`)];
+
 // Never throws: mail trouble must not break sign-up or payments.
 export async function mail(type, data) {
   try {
     const [to, subject, html] = T[type](data);
     await transport().sendMail({ from: `"Fixia" <${OWNER}>`, to, subject, html });
-  } catch (e) { console.error(`[mail:${type}]`, e.message); }
+    return true;
+  } catch (e) { console.error(`[mail:${type}]`, e.message); return false; }
 }
 export const ownerEmail = OWNER;

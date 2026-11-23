@@ -1,5 +1,7 @@
 /* Admin-only actions. Guarded in api/admin.js: nobody without role "admin" reaches any of this. */
+import crypto from 'node:crypto';
 import { sb, q } from '../db.js';
+import { emailOfRequest } from './account.js';
 import { httpError } from '../auth.js';
 import { remove, signedUrl } from '../storage.js';
 import { mail } from '../mail.js';
@@ -220,11 +222,21 @@ A['message.send'] = async (_a, { templateId, to }) => {
 /* ── change requests ── */
 A['changes.list'] = async () => {
   const rows = (await sb('change_requests?status=eq.pending&order=created_at.asc')) || [];
-  return { items: await Promise.all(rows.map(async (r) => ({ ...r, file_url: r.file_url ? await signedUrl(r.file_url) : null }))) };
+  return { items: await Promise.all(rows.map(async (r) => ({ ...r, verify_hash: undefined, codeSent: !!r.verify_hash, newEmail: emailOfRequest(r.subject, r.requested_value), file_url: r.file_url ? await signedUrl(r.file_url) : null }))) };
+};
+A['change.sendCode'] = async (_a, { id }) => {
+  const r = need((await sb(`change_requests?id=eq.${q(id)}&status=eq.pending&limit=1`))?.[0], 'Request not found.');
+  const email = need(emailOfRequest(r.subject, r.requested_value), 'This request has no email change.');
+  const code = String(crypto.randomInt(10000000, 100000000));
+  if (!(await mail('email_change_code', { email, code, bizName: r.provider_name }))) throw httpError(502, 'Could not send the email. Check the address and try again.');
+  await patch(`change_requests?id=eq.${q(id)}`, { verify_hash: crypto.createHash('sha256').update(code).digest('hex'), verify_attempts: 0, verify_sent_at: new Date().toISOString(), email_verified: false });
+  await notify(r.user_id, 'Verify your new email', `We sent an 8-digit code to ${email}.\n\nOpen Profile > Edit and enter the code. You have 3 tries. After 3 wrong tries your request is cancelled and you must wait 30 days.`, 'announcement');
+  pushTo(r.user_id, { title: 'Verify your new email', body: 'Enter the code we sent to your new email.', url: '/profile?tab=edit' });
 };
 async function closeChange(r) { await remove(r.file_url); await del(`change_requests?id=eq.${q(r.id)}`); }
 A['change.approve'] = async (_a, { id }) => {
   const r = need((await sb(`change_requests?id=eq.${q(id)}&limit=1`))?.[0], 'Request not found.');
+  if (emailOfRequest(r.subject, r.requested_value) && !r.email_verified) throw httpError(409, 'The provider has not verified the new email yet.');
   let msg = 'Your request was approved. Our team will apply the change shortly.';
   if (r.subject === 'Business Name Change') { await patch(`providers?id=eq.${q(r.provider_id)}`, { biz_name: r.requested_value }); msg = `Your business name is now "${r.requested_value}".`; }
   else if (r.subject === 'Email Change') { await patch(`users?id=eq.${q(r.user_id)}`, { email: r.requested_value.toLowerCase() }); msg = `Your account email is now ${r.requested_value}.`; }
@@ -235,9 +247,9 @@ A['change.approve'] = async (_a, { id }) => {
 A['change.reject'] = async (_a, { id, reason }) => {
   const r = need((await sb(`change_requests?id=eq.${q(id)}&limit=1`))?.[0], 'Request not found.');
   need(reason?.trim(), 'Give the provider a reason.');
-  await notify(r.user_id, 'Request not approved', `Your ${r.subject} request was not approved.\n\nReason: ${reason}\n\nYou can send a new change request right away. The 30-day wait does not apply to rejected requests. Please check the details and try again from Profile > Edit > Request a change.`, 'warning'); await closeChange(r);
+  await notify(r.user_id, 'Request not approved', `Your ${r.subject} request was not approved.\n\nReason: ${reason}\n\nYou can submit a new change request immediately. The 30-day waiting period does not apply to rejected requests.`, 'warning'); await closeChange(r);
   await patch(`providers?id=eq.${q(r.provider_id)}`, { last_change_at: null });
-  pushTo(r.user_id, { title: 'Change request not approved', body: 'You can send a new request right away. Open Fixia to read why.', url: '/profile?tab=edit' });
+  pushTo(r.user_id, { title: 'Change request not approved', body: 'You can send a new request immediately. Open Fixia to read why.', url: '/profile?tab=edit' });
 };
 
 /* ── reports ── */

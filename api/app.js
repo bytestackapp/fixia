@@ -19,7 +19,7 @@ export default route({
   'pay.checkout': Pay.checkout, 'pay.verify': Pay.verify,
   'referral.redeem': R.redeem,
   'listings.mine': A.listingsMine, 'listings.save': A.listingSave, 'listings.toggle': A.listingToggle, 'listings.delete': A.listingDelete, 'reviews.mine': A.reviewsMine,
-  'change.cooldown': A.changeCooldown, 'change.submit': A.changeSubmit, 'report.submit': A.reportSubmit,
+  'change.cooldown': A.changeCooldown, 'change.submit': A.changeSubmit, 'change.pending': A.changePending, 'change.verify': A.changeVerify, 'report.submit': A.reportSubmit,
   'push.key': A.pushKey, 'push.subscribe': A.pushSubscribe,
   'messages.pending': A.messagesPending, 'messages.ack': A.messageAck,
   'ads.list': A.adsList, 'ads.track': A.adsTrack,
