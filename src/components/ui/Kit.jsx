@@ -8,9 +8,9 @@ export const Tabs = ({ items, value, onChange, label = 'Sections' }) => (
   </div>
 );
 
-export const Stepper = ({ steps, current }) => (
+export const Stepper = ({ steps, current, muted = [] }) => (
   <ol className="steps" aria-label="Progress">
-    {steps.map((s, i) => <li key={s} aria-current={i === current ? 'step' : undefined} className={i < current ? 'is-done' : ''}><span className="num">{i + 1}</span> {s}</li>)}
+    {steps.map((s, i) => <li key={s} aria-current={i === current ? 'step' : undefined} aria-disabled={muted.includes(s) || undefined} className={[i < current ? 'is-done' : '', muted.includes(s) ? 'is-muted' : ''].filter(Boolean).join(' ')}><span className="num">{i + 1}</span> {s}</li>)}
   </ol>
 );
 

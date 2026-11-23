@@ -64,10 +64,12 @@ body { overflow-x: hidden; }
 .steps [aria-current='step'] .num { background: linear-gradient(135deg, #F2622B, #D94F1C); border-color: transparent; color: #fff; box-shadow: 0 4px 12px rgba(242, 98, 43, .35); }
 .steps .is-done { color: var(--green); }
 .steps .is-done .num { background: var(--green); border-color: transparent; color: #fff; }
+.steps li.is-muted { opacity: .45; color: var(--text-3); }
+.steps li.is-muted .num { background: var(--bg); border-color: var(--line); color: var(--text-3); box-shadow: none; }
 
 /* plan cards: 2 across, centred */
 .plans { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-.plans--methods { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.plans--methods { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; }
 .plans__legend { grid-column: 1 / -1; font: 800 var(--t-md) var(--font-display); color: var(--navy); padding: 0 0 var(--s3); }
 .plan { text-align: center; justify-items: center; align-content: start; padding: var(--s4) var(--s3); gap: 4px; }
 .plan__head { display: grid; gap: 2px; justify-items: center; }
@@ -219,6 +221,7 @@ body { overflow-x: hidden; }
 .paycard__rows dt { color: rgba(255, 255, 255, .6); }
 .paycard__rows dd { margin: 0; font-weight: 700; }
 .paycard__rows .total { font-size: .95rem; color: #fff; }
+.paycard__rows .total dd { color: var(--brand); }
 
 /* payment options: no box, the image is the button */
 .plan.pm { padding: 0; gap: 6px; min-height: 0; border: 0; background: none; box-shadow: none; overflow: visible; align-content: start; justify-items: center; }
@@ -246,3 +249,6 @@ body { overflow-x: hidden; }
 .dlg--card .plans--methods { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; }
 .dlg--card .pm__logo { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 84px; }
 .dlg--card .pm__fallback { height: auto; aspect-ratio: 1 / 1; max-width: 84px; font-size: .78rem; text-align: center; padding: 4px; }
+
+.plans--methods .pm__logo { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 82px; }
+.plans--methods .pm__fallback { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 86px; font-size: .78rem; text-align: center; padding: 4px; }

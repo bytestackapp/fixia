@@ -144,9 +144,8 @@ function PayStep({ plan, busy, actionLabel, onBack, onPay }) {
     <div className="stack">
       {plan && (
         <div className="paycard" style={{ position: 'static' }}>
-          <span className="paycard__label">Your plan</span>
-          <b className="paycard__name">{plan.name}</b>
-          <span className="paycard__price num">{peso(plan.price)}<small> / {PERIOD[plan.period] || plan.period}</small></span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}><span className="paycard__label">Plan:</span><b className="paycard__name">{plan.name}</b></div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}><span className="paycard__label">Price:</span><span className="paycard__price num">{peso(plan.price)}<small> / {PERIOD[plan.period] || plan.period}</small></span></div>
           <dl className="paycard__rows">
             <div><dt>Processing fee</dt><dd className="num">{money(fee)}</dd></div>
             <div><dt>VAT on fee ({vatPct}%)</dt><dd className="num">{money(vat)}</dd></div>
@@ -159,8 +158,8 @@ function PayStep({ plan, busy, actionLabel, onBack, onPay }) {
           {fees ? <PayPicker fees={fees} method={method} onPick={pick} /> : <div className="skeleton" style={{ height: 120 }} />}
           <p className="small muted">
             {manual
-              ? <>Manual payments have no processing fee.<br />Your account is created now, and your plan starts once our team approves your payment.</>
-              : <>Online payments include a processing fee and VAT. These charges are required by the payment provider and are not collected by Fixia.<br />Your account is created after your payment is confirmed.</>}
+              ? <>Manual payments have no processing fee.<br />Your account will be created. Your plan will activate once our team approves your payment.</>
+              : <>Online payments are subject to processing fees and VAT charged by the payment provider. These charges are not collected by Fixia.<br />Your account is created after your payment is confirmed.</>}
           </p>
           <div className="vf-actions"><Button onClick={next} loading={busy} disabled={!method}>Pay now</Button><Button variant="secondary" disabled={busy} onClick={onBack}>Back</Button></div>
         </>
@@ -211,7 +210,8 @@ export function SignupCustomer() {
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
   const base = needsCode ? ['Details', 'Verify email', 'Plan'] : ['Details', 'Plan'];
-  const steps = paid ? [...base, 'Payment'] : base;
+  const steps = [...base, 'Payment'];
+  const muted = paid ? [] : ['Payment'];
   const name = steps[step];
 
   async function next() {
@@ -244,7 +244,7 @@ export function SignupCustomer() {
   return (
     <Page>
       <div className="logo-wrap"><Logo /></div><h1 style={{ textAlign: 'center' }}>Create your account</h1>
-      <Stepper steps={steps} current={step} />
+      <Stepper steps={steps} current={step} muted={muted} />
       {name === 'Details' && <DetailsForm s={s} onNext={next} />}
       {name === 'Verify email' && <VerifyForm s={s} onBack={() => setStep(0)} onNext={() => setStep(2)} />}
       {name === 'Plan' && (
@@ -274,7 +274,8 @@ export function SignupProvider() {
   const paid = !!picked && picked.price > 0;
   const all = ['Details', 'Verify email', 'Business', 'Photos & ID', 'Plan'];
   const base = needsCode ? all : all.filter((x) => x !== 'Verify email');
-  const steps = paid ? [...base, 'Payment'] : base;
+  const steps = [...base, 'Payment'];
+  const muted = paid ? [] : ['Payment'];
   const name = steps[step];
   const bad = (m) => toast(m, 'error');
 
@@ -314,7 +315,7 @@ export function SignupProvider() {
   return (
     <Page wide>
       <div className="logo-wrap"><Logo /></div><h1 style={{ textAlign: 'center' }}>Offer your services</h1>
-      <Stepper steps={steps} current={step} />
+      <Stepper steps={steps} current={step} muted={muted} />
       {name === 'Details' && <DetailsForm s={s} onNext={next} />}
       {name === 'Verify email' && <VerifyForm s={s} onBack={() => go(0)} onNext={() => go(2)} />}
       {name === 'Business' && (
