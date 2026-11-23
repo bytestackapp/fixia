@@ -34,6 +34,7 @@ export default function Settings() {
             <Setting k="ad_skip_seconds" label="Seconds before a pop-up can be skipped" v={s.ad_skip_seconds} min="3" max="30" /></section>
           <section className="stack"><div className="section-head"><h2>Providers</h2></div>
             <Setting k="suspension_days" label="Suspension length (days)" v={s.suspension_days} min="1" max="365" />
+            <Setting k="fraud_point_limit" label="Fraud warnings before suspension" hint="Each removed fraudulent rating gives the guilty account 1 point. At this number the Suspend button activates. Leave empty for 3." v={s.fraud_point_limit} min="1" max="20" />
             <Setting k="featured_impression_quota" label="Featured appearances per cycle" hint="Applies to every featured provider immediately. Elite providers are not limited." v={s.featured_impression_quota} min="100" /></section>
         </div>
       )}</Load>

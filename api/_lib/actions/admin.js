@@ -168,7 +168,7 @@ A['rotation.reactivate'] = async (_a, { id } = {}) => {
 };
 
 /* ── settings ── */
-const KEYS = ['otp_enabled', 'otp_test_code', 'ad_actions_per_popup', 'ad_min_minutes', 'ad_skip_seconds', 'inline_ad_interval', 'suspension_days', 'featured_impression_quota'];
+const KEYS = ['otp_enabled', 'otp_test_code', 'ad_actions_per_popup', 'ad_min_minutes', 'ad_skip_seconds', 'inline_ad_interval', 'suspension_days', 'featured_impression_quota', 'fraud_point_limit'];
 A['settings.get'] = async () => { const s = await settings(); return Object.fromEntries(KEYS.map((k) => [k, s[k] ?? ''])); };
 A['settings.set'] = async (_a, { key, value }) => {
   if (!KEYS.includes(key)) throw httpError(400, 'Unknown setting.');
@@ -305,24 +305,103 @@ A['upgrade.reject'] = async (_a, { id, reason }) => {
 
 /* ── suspicious ratings ── */
 A['suspicious.list'] = async () => {
-  const [ratings, inqs, users, provs] = await Promise.all([sb('ratings?select=*&order=created_at.desc&limit=2000'), sb('inquiries?select=provider_id,user_ip&user_ip=not.is.null&limit=5000'), sb('users?select=id,first_name,last_name'), sb('providers?select=id,biz_name')]);
-  const un = Object.fromEntries(users.map((u) => [u.id, `${u.first_name} ${u.last_name}`])), pn = Object.fromEntries(provs.map((p) => [p.id, p.biz_name]));
-  const flags = new Map(); const add = (r, type, detail) => { if (!flags.has(r.id)) flags.set(r.id, { id: r.id, providerId: r.provider_id, provider: pn[r.provider_id], user: un[r.regular_user_id], stars: r.stars, date: r.created_at, type, detail }); };
-  const ips = {}; inqs.forEach((i) => (ips[i.provider_id] ||= new Set()).add(i.user_ip));
-  ratings.forEach((r) => r.user_ip && ips[r.provider_id]?.has(r.user_ip) && add(r, 'Same IP as provider', r.user_ip));
-  const byPair = {}, byUser = {}, byProv = {};
-  [...ratings].reverse().forEach((r) => { (byPair[`${r.regular_user_id}_${r.provider_id}`] ||= []).push(r); (byUser[r.regular_user_id] ||= []).push(r); (byProv[r.provider_id] ||= []).push(r); });
+  const [ratings, inqs, users, provs] = await Promise.all([
+    sb('ratings?select=*&order=created_at.desc&limit=2000'),
+    sb('inquiries?select=id,provider_id,regular_user_id,user_ip,created_at&limit=5000'),
+    sb('users?select=id,first_name,last_name,created_at,last_ip'),
+    sb('providers?select=id,biz_name,user_id'),
+  ]);
+  const un = Object.fromEntries(users.map((u) => [u.id, `${u.first_name} ${u.last_name}`]));
+  const joined = Object.fromEntries(users.map((u) => [u.id, +new Date(u.created_at)]));
+  const lastIp = Object.fromEntries(users.map((u) => [u.id, u.last_ip]));
+  const pn = Object.fromEntries(provs.map((p) => [p.id, p.biz_name]));
+  const pUser = Object.fromEntries(provs.map((p) => [p.id, p.user_id]));
+  const inq = Object.fromEntries(inqs.map((i) => [i.id, i]));
   const H = 3600000, t = (r) => +new Date(r.created_at);
-  Object.values(byPair).forEach((a) => a.forEach((r, i) => i && t(r) - t(a[i - 1]) < 3 * 24 * H && add(r, 'Rated again within 3 days', `${((t(r) - t(a[i - 1])) / (24 * H)).toFixed(1)} days apart`)));
-  Object.values(byUser).forEach((a) => a.forEach((r, i) => i >= 2 && t(r) - t(a[i - 2]) <= 24 * H && [a[i - 2], a[i - 1], r].forEach((x) => add(x, 'Rated 3+ providers in a day', `${((t(r) - t(a[i - 2])) / H).toFixed(1)} hours`))));
-  Object.values(byProv).forEach((a) => a.forEach((r, i) => { if (i < 4) return; const w = a.slice(i - 4, i + 1); if (w.every((x) => x.stars === 5) && t(r) - t(w[0]) <= 48 * H) w.forEach((x) => add(x, 'Five 5-star ratings in 48h', '')); }));
-  return { items: [...flags.values()] };
+
+  const flags = new Map();
+  const add = (r, points, reason) => {
+    if (r.admin_cleared) return;
+    const f = flags.get(r.id) || { id: r.id, provider: pn[r.provider_id], user: un[r.regular_user_id], stars: r.stars, date: r.created_at, score: 0, reasons: [] };
+    if (!f.reasons.includes(reason)) { f.reasons.push(reason); f.score += points; }
+    flags.set(r.id, f);
+  };
+
+  // 1. the rater uses the same IP as the provider's own login (provider rating themselves)
+  ratings.forEach((r) => {
+    const pip = lastIp[pUser[r.provider_id]];
+    if (pip && (r.user_ip === pip || lastIp[r.regular_user_id] === pip)) add(r, 2, 'Rater uses the same IP as the provider');
+  });
+
+  // 2. same IP used by different customers of the same provider
+  const ipUsers = {};
+  const seen = (pid, ip, uid) => { if (ip) ((ipUsers[pid] ||= {})[ip] ||= new Set()).add(uid); };
+  inqs.forEach((i) => seen(i.provider_id, i.user_ip, i.regular_user_id));
+  ratings.forEach((r) => seen(r.provider_id, r.user_ip, r.regular_user_id));
+  ratings.forEach((r) => { const s = r.user_ip && ipUsers[r.provider_id]?.[r.user_ip]; if (s && s.size > 1) add(r, 2, `Same IP used by ${s.size} different customers of this provider`); });
+
+  // 3. rated minutes after the booking was created (real jobs take longer)
+  ratings.forEach((r) => {
+    const b = inq[r.inquiry_id]; if (!b?.created_at) return;
+    const m = (t(r) - +new Date(b.created_at)) / 60000;
+    if (m < 30) add(r, m < 10 ? 3 : 2, `Rated ${Math.max(0, Math.round(m))} minutes after booking`);
+  });
+
+  // 4. brand-new account
+  ratings.forEach((r) => { const j = joined[r.regular_user_id]; if (j && t(r) - j < 24 * H) add(r, 1, 'Customer account is less than 24 hours old'); });
+
+  const asc = [...ratings].reverse();
+  const byPair = {}, byUser = {}, byProv = {};
+  asc.forEach((r) => { (byPair[`${r.regular_user_id}_${r.provider_id}`] ||= []).push(r); (byUser[r.regular_user_id] ||= []).push(r); (byProv[r.provider_id] ||= []).push(r); });
+
+  // 5. same customer rates the same provider again within 3 days
+  Object.values(byPair).forEach((a) => a.forEach((r, i) => i && t(r) - t(a[i - 1]) < 3 * 24 * H && add(r, 2, 'Same customer rated this provider again within 3 days')));
+  // 6. one customer rates 3+ providers in a day
+  Object.values(byUser).forEach((a) => a.forEach((r, i) => i >= 2 && t(r) - t(a[i - 2]) <= 24 * H && [a[i - 2], a[i - 1], r].forEach((x) => add(x, 2, 'Customer rated 3+ providers within 24 hours'))));
+  // 7. burst of 5-star ratings / burst of low ratings for one provider
+  Object.values(byProv).forEach((a) => a.forEach((r, i) => {
+    if (i >= 4) { const w = a.slice(i - 4, i + 1); if (w.every((x) => x.stars === 5) && t(r) - t(w[0]) <= 48 * H) w.forEach((x) => add(x, 2, 'Provider got five 5-star ratings within 48 hours')); }
+    if (i >= 2) { const w = a.slice(i - 2, i + 1); if (w.every((x) => x.stars <= 2) && t(r) - t(w[0]) <= 48 * H) w.forEach((x) => add(x, 2, 'Provider got three low ratings (1–2 stars) within 48 hours')); }
+  }));
+
+  const items = [...flags.values()].filter((f) => f.score >= 2).map((f) => ({ ...f, level: f.score >= 4 ? 'high' : 'medium' })).sort((a, b) => b.score - a.score);
+  return { items };
 };
-A['rating.delete'] = async (_a, { id }) => {
-  const r = need((await sb(`ratings?id=eq.${q(id)}&select=provider_id&limit=1`))?.[0], 'Rating not found.');
+A['rating.clear'] = async (_a, { id }) => patch(`ratings?id=eq.${q(id)}`, { admin_cleared: true });
+A['rating.delete'] = async (_a, { id, fault }) => {
+  const r = need((await sb(`ratings?id=eq.${q(id)}&select=provider_id,regular_user_id&limit=1`))?.[0], 'Rating not found.');
   await del(`ratings?id=eq.${q(id)}`);
   const all = (await sb(`ratings?provider_id=eq.${q(r.provider_id)}&select=stars`)) || [];
   await patch(`providers?id=eq.${q(r.provider_id)}`, { avg_rating: all.length ? Math.round((all.reduce((s, x) => s + x.stars, 0) / all.length) * 10) / 10 : 0, total_ratings: all.length });
+
+  // automatic warning + 1 point for whoever is at fault
+  const prov = (await sb(`providers?id=eq.${q(r.provider_id)}&select=user_id&limit=1`))?.[0];
+  const targets = fault === 'provider' ? [prov?.user_id] : fault === 'both' ? [r.regular_user_id, prov?.user_id] : [r.regular_user_id];
+  const limit = parseInt((await settings()).fraud_point_limit) || 3;
+  for (const uid of targets.filter(Boolean)) {
+    const u = (await sb(`users?id=eq.${q(uid)}&select=fraud_points&limit=1`))?.[0];
+    if (!u) continue;
+    const pts = (u.fraud_points || 0) + 1;
+    await patch(`users?id=eq.${q(uid)}`, { fraud_points: pts });
+    await notify(uid, 'Warning: fraudulent rating activity', `A rating linked to your account was reviewed and removed because it broke our fair-rating rules. Fake, self-given or abusive ratings are not allowed on Fixia.\n\nThis is warning ${pts} of ${limit}. If you reach ${limit}, your account may be suspended.`, 'warning');
+    pushTo(uid, { title: 'Warning from Fixia', body: 'A rating linked to your account was removed for breaking our rules.', url: '/' });
+  }
 };
+
+/* ── fraud points ── */
+A['fraud.list'] = async () => {
+  const limit = parseInt((await settings()).fraud_point_limit) || 3;
+  const items = (await sb('users?fraud_points=gt.0&order=fraud_points.desc&select=id,first_name,last_name,email,role,status,fraud_points')) || [];
+  return { items, limit };
+};
+A['fraud.suspend'] = async (_a, { id }) => {
+  const limit = parseInt((await settings()).fraud_point_limit) || 3;
+  const u = need((await sb(`users?id=eq.${q(id)}&select=id,first_name,last_name,email,role,fraud_points&limit=1`))?.[0], 'Account not found.');
+  if ((u.fraud_points || 0) < limit) throw httpError(400, `This account needs ${limit} warning points before it can be suspended.`);
+  await patch(`users?id=eq.${q(id)}`, { status: 'suspended', session_token: null });
+  if (u.role === 'provider') await patch(`providers?user_id=eq.${q(id)}`, { status: 'suspended' });
+  mail('account_suspended', { email: u.email, fullName: `${u.first_name} ${u.last_name}`, reason: 'Repeated fraudulent rating activity.' });
+};
+A['fraud.reset'] = async (_a, { id }) => patch(`users?id=eq.${q(id)}`, { fraud_points: 0 });
 
 export default A;

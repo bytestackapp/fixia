@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { sb, q } from './_lib/db.js';
 import { issueToken, requireUser, publicUser, httpError } from './_lib/auth.js';
-import { route } from './_lib/http.js';
+import { route, clientIp } from './_lib/http.js';
 import { downgradeIfExpired } from './_lib/packages.js';
 import * as reg from './_lib/actions/registration.js';
 import * as Pay from './_lib/actions/payments.js';
@@ -16,7 +16,7 @@ const publicFees = async () => ({
 const BAD = 'Email, username or password is not correct.';
 const DUMMY = '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi';
 
-async function login(_u, { identifier, password }) {
+async function login(_u, { identifier, password }, req) {
   if (!identifier || !password || String(password).length > 128) throw httpError(400, BAD);
   const id = String(identifier).trim().toLowerCase();
   const user = (await sb(`users?${id.includes('@') ? 'email' : 'username'}=eq.${q(id)}&limit=1`))?.[0];
@@ -29,7 +29,7 @@ async function login(_u, { identifier, password }) {
     if (prov?.status === 'suspended') throw httpError(403, 'This account is suspended. Contact support if you think this is a mistake.');
   }
   const sid = crypto.randomUUID();       // a new value signs out any other device
-  await sb(`users?id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { session_token: sid, last_login_at: new Date().toISOString(), is_inactive: false, force_logout: false } });
+  await sb(`users?id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { session_token: sid, last_login_at: new Date().toISOString(), is_inactive: false, force_logout: false, last_ip: clientIp(req) } });
   return { token: issueToken(user, sid), user: publicUser(await downgradeIfExpired(user)) };
 }
 
