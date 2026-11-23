@@ -170,6 +170,15 @@ export async function changeVerify(user, { code }) {
   if (!r) throw httpError(404, 'There is no code to enter right now.');
   const hash = crypto.createHash('sha256').update(String(code || '').trim()).digest('hex');
   if (hash === r.verify_hash) {
+    if (r.subject === 'Email Change') {
+      const newMail = emailOfRequest(r.subject, r.requested_value);
+      if ((await sb(`users?email=eq.${encodeURIComponent(newMail)}&id=neq.${q(user.id)}&select=id&limit=1`))?.length) throw httpError(409, 'That email is already registered.');
+      await sb(`users?id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { email: newMail } });
+      await remove(r.file_url);
+      await sb(`change_requests?id=eq.${q(r.id)}`, { method: 'DELETE', prefer: 'return=minimal' });
+      await notify(user.id, 'Email updated', `Your account email is now ${newMail}. You can send another change request 30 days after your last request was submitted.`, 'announcement');
+      return { ok: true, applied: true };
+    }
     await sb(`change_requests?id=eq.${q(r.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { email_verified: true } });
     return { ok: true };
   }

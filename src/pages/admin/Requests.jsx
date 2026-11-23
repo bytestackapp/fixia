@@ -22,21 +22,20 @@ export default function Requests() {
   const ok = useDo('change.approve', 'Request approved'), rej = useDo('change.reject', 'Request rejected'), send = useDo('change.sendCode', 'Code sent to the new email');
   const cur = v && ((q.data?.items || []).find((x) => x.id === v.id) || v);
   const needsMail = !!cur?.newEmail;
-  const mailState = !cur?.codeSent ? <Status kind="warn">Code not sent</Status> : cur.email_verified ? <Status kind="ok">Verified</Status> : <Status kind="neutral">Code sent, waiting ({cur.verify_attempts || 0}/3 wrong tries)</Status>;
   return (
     <>
       <Head title="Change requests" sub="Business name, email and location changes from providers." />
       <Load q={q}>{(d) => <Table empty="No pending requests." rows={d.items} cols={[['Provider', (r) => <b>{r.provider_name}</b>], ['Change', (r) => r.subject], ['Sent', (r) => fdate(r.created_at)], ['', (r) => <div className="actions-cell"><IconBtn icon={Eye} label="Review" onClick={() => setV(r)} /></div>]]} />}</Load>
       <Dialog open={!!v && !no} onClose={() => { if (!no) setV(null); }} title={cur?.subject} wide>
-        {cur && <><Detail rows={[['Provider', cur.provider_name], ['Requested', value(cur)], needsMail && ['New email check', mailState], ['Reason', cur.explanation]]} />
-          {needsMail && !cur.email_verified && <p className="small muted">Send a code to the new email. The provider must enter it in the app. You can approve only after it shows Verified.</p>}
+        {cur && <><Detail rows={[['Provider', cur.provider_name], ['Requested', value(cur)], ['Reason', cur.explanation]]} />
+          {cur.subject === 'Email Change' && <p className="small muted">Send a code to the new email. When the provider enters it correctly, the email is updated automatically. No approval is needed.</p>}
           {cur.subject === 'Multiple Changes' && <p className="small muted">Multiple changes are not applied automatically. Update them in Admin &gt; Providers first, then press Approve to notify the provider.</p>}
           {cur.file_url ? <a href={cur.file_url} target="_blank" rel="noreferrer">View attached document</a> : <p className="small muted">No document attached.</p>}
           <div className="dlg__actions">
-            {needsMail && !cur.email_verified && <Btn variant="secondary" loading={send.isPending} onClick={() => send.mutate({ id: cur.id })}>{cur.codeSent ? 'Resend code' : 'Send code to new email'}</Btn>}
-            <Btn loading={ok.isPending} disabled={needsMail && !cur.email_verified} onClick={() => ok.mutate({ id: cur.id }, { onSuccess: () => setV(null) })}>Approve</Btn>
+            {needsMail && !cur.email_verified && <Btn variant="secondary" loading={send.isPending} onClick={() => send.mutate({ id: cur.id })}>{cur.codeSent ? 'Resend code' : 'Send code'}</Btn>}
+            {cur.subject !== 'Email Change' && <Btn loading={ok.isPending} disabled={needsMail && !cur.email_verified} onClick={() => ok.mutate({ id: cur.id }, { onSuccess: () => setV(null) })}>Approve</Btn>}
             <Btn variant="danger" onClick={() => setNo(true)}>Reject</Btn>
-            <Btn variant="quiet" onClick={() => setV(null)}>Close</Btn>
+            <Btn variant="secondary" onClick={() => setV(null)}>Close</Btn>
           </div></>}
       </Dialog>
       <Prompt open={no} title="Reject request" label="Reason (sent to the provider)" required danger confirmLabel="Reject" busy={rej.isPending} onClose={() => setNo(false)} onSubmit={(r) => rej.mutate({ id: cur.id, reason: r }, { onSuccess: () => { setNo(false); setV(null); } })} />

@@ -51,9 +51,11 @@ function ChangeDialog({ open, onClose, current }) {
   const [conf, setConf] = useState(null);       // { value, rows } while the confirmation pop-up is open
   const multi = s.subject === 'Multiple Changes';
   const needsProof = ['Business Name Change', 'Location Change'].includes(s.subject) || (multi && (pick.biz || pick.loc));
+  const [fileKey, setFileKey] = useState(0), [formKey, setFormKey] = useState(0);
+  const noDoc = s.subject === 'Email Change' || (multi && !needsProof);
   const loc = () => ({ region_name: place.regionName, province_name: place.provName, city_name: place.cityName, barangay_name: place.brgyName, street_addr: street });
   const locText = () => [street.trim(), place.brgyName, place.cityName, place.provName].filter(Boolean).join(', ');
-  const reset = () => { setS({ subject: '', value: '', why: '', file: '' }); setPick({ biz: false, email: false, loc: false }); setVals({ biz: '', email: '' }); setPlace({}); setStreet(''); setConf(null); };
+  const reset = () => { setS({ subject: '', value: '', why: '', file: '' }); setPick({ biz: false, email: false, loc: false }); setVals({ biz: '', email: '' }); setPlace({}); setStreet(''); setConf(null); setFileKey((k) => k + 1); setFormKey((k) => k + 1); };
 
   // checks the form, then opens the confirmation pop-up (nothing is sent yet)
   function review() {
@@ -101,8 +103,8 @@ function ChangeDialog({ open, onClose, current }) {
   return (
     <>
       <Dialog open={open} onClose={onClose} title="Request a change" wide>
-        <div className="stack">
-          <Field as="select" label="What would you like to change?" value={s.subject} onChange={(e) => setS({ ...s, subject: e.target.value })}><option value="">Select…</option>{SUBJECTS.map((x) => <option key={x}>{x}</option>)}</Field>
+        <div className="stack" key={formKey}>
+          <Field as="select" label="What would you like to change?" value={s.subject} onChange={(e) => { const sub = e.target.value; setS({ ...s, subject: sub, ...(sub === 'Email Change' ? { file: '' } : {}) }); if (sub === 'Email Change') setFileKey((k) => k + 1); }}><option value="">Select…</option>{SUBJECTS.map((x) => <option key={x}>{x}</option>)}</Field>
           {['Business Name Change', 'Email Change'].includes(s.subject) && <Field label={s.subject === 'Email Change' ? 'New email' : 'New business name'} value={s.value} onChange={(e) => setS({ ...s, value: e.target.value })} />}
           {s.subject === 'Location Change' && <><PlaceFields onChange={setPlace} /><Field label="Street address (optional)" value={street} onChange={(e) => setStreet(e.target.value)} /></>}
           {multi && (
@@ -117,8 +119,8 @@ function ChangeDialog({ open, onClose, current }) {
             </>
           )}
           <Field as="textarea" label="Why do you need this change?" value={s.why} onChange={(e) => setS({ ...s, why: e.target.value })} />
-          <label className="field"><span className="field__label">{needsProof ? 'Proof of the change (required, image or PDF)' : 'Supporting document (optional, image or PDF)'}</span><input type="file" accept="image/jpeg,image/png,application/pdf" onChange={async (e) => { const f = e.target.files[0]; if (f && f.size > 2_000_000) { toast('File must be under 2 MB.', 'error'); e.target.value = ''; return; } setS({ ...s, file: f ? await fileToDataUrl(f) : '' }); }} /></label>
-          <div className="dlg__actions"><Button disabled={!s.subject} onClick={review}>Send request</Button><Button variant="quiet" onClick={onClose}>Cancel</Button></div>
+          <label className="field" style={noDoc ? { opacity: .5 } : undefined}><span className="field__label">{needsProof ? 'Proof of the change (required, image or PDF)' : noDoc ? 'Supporting document (not needed for an email change)' : 'Supporting document (optional, image or PDF)'}</span><input key={fileKey} type="file" disabled={noDoc} accept="image/jpeg,image/png,application/pdf" onChange={async (e) => { const f = e.target.files[0]; if (f && f.size > 2_000_000) { toast('File must be under 2 MB.', 'error'); e.target.value = ''; return; } setS({ ...s, file: f ? await fileToDataUrl(f) : '' }); }} /></label>
+          <div className="dlg__actions"><Button disabled={!s.subject} onClick={review}>Send request</Button><Button variant="secondary" onClick={reset}>Clear form</Button><Button variant="secondary" onClick={onClose}>Cancel</Button></div>
         </div>
       </Dialog>
 
@@ -150,7 +152,7 @@ function ChangeDialog({ open, onClose, current }) {
 }
 
 function VerifyEmail() {
-  const qc = useQueryClient();
+  const qc = useQueryClient(); const { refresh } = useAuth();
   const { data } = useQuery({ queryKey: ['emailcheck'], queryFn: () => call('change.pending'), refetchInterval: 60000 });
   const [code, setCode] = useState(''), [busy, setBusy] = useState(false);
   const r = data?.request;
@@ -160,7 +162,8 @@ function VerifyEmail() {
     setBusy(true);
     try {
       const out = await call('change.verify', { code });
-      if (out.ok) toast('Email confirmed. Our team will finish your request.');
+      if (out.applied) { toast('Email confirmed and updated.'); refresh(); qc.invalidateQueries({ queryKey: ['profile'] }); }
+      else if (out.ok) toast('Email confirmed. Our team will finish your request.');
       else if (out.failed) toast('Wrong code 3 times. Your request was cancelled. You can try again in 30 days.', 'error');
       else toast(`Wrong code. ${out.left} ${out.left === 1 ? 'try' : 'tries'} left.`, 'error');
       setCode('');
