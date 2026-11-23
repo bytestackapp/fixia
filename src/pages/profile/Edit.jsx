@@ -174,11 +174,11 @@ function VerifyEmail() {
   if (r.verified) return <div className="banner banner--ok"><h3>New email confirmed</h3><p>Thank you. Our team will finish your request soon.</p></div>;
   if (!r.codeSent) return <div className="banner banner--warn"><h3>Confirm your new email</h3><p>Our team will send a code to <b>{r.email}</b>. You will get a message here when it is sent.</p></div>;
   return (
-    <div className="banner banner--warn">
+    <div className="banner banner--warn" style={{ maxWidth: 560 }}>
       <h3>Enter the code sent to {r.email}</h3>
       <p className="small">You have {r.left} {r.left === 1 ? 'try' : 'tries'} left. After 3 wrong tries your request is cancelled and you must wait 30 days.</p>
       <OtpInput value={code} onChange={setCode} length={8} />
-      <div><Button loading={busy} onClick={submit}>Confirm code</Button></div>
+      <div style={{ marginTop: 12 }}><Button loading={busy} onClick={submit}>Confirm code</Button></div>
     </div>
   );
 }

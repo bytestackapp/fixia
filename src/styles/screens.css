@@ -267,3 +267,12 @@ body { overflow-x: hidden; }
 .stat-card b { font: 800 var(--t-2xl)/1 var(--font-display); color: var(--brand); }
 .stat-card span { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
 @media (max-width: 520px) { .stat-card { padding: 12px; } .stat-card b { font-size: var(--t-xl); } }
+
+/* ── switch loading state ── */
+.switch { transition: background .2s ease; }
+.switch.is-loading { opacity: 1 !important; cursor: progress; }
+.switch span { display: grid; place-items: center; line-height: 0; }
+.switch__spin { display: block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--brand); animation: spin .7s linear infinite; }
+.listing__top { align-items: center; }
+
+.acard__info--stack { grid-template-columns: 1fr; }

@@ -29,7 +29,7 @@ export function Load({ q, children, rows = 4 }) {
 export const Head = ({ title, sub, children }) => <header className="page-head"><div className="cluster" style={{ justifyContent: 'space-between' }}><h1 style={{ fontSize: 'var(--t-xl)' }}>{title}</h1>{children}</div>{sub && <p>{sub}</p>}</header>;
 
 /* Every row is a card: first column = title, column with an empty label = action icons, the rest = small label/value pairs */
-export function Table({ cols, rows, empty = 'Nothing here.' }) {
+export function Table({ cols, rows, empty = 'Nothing here.', stack }) {
   if (!rows.length) return <Empty title={empty} />;
   const [head, ...rest] = cols;
   const act = rest.find((c) => c[0] === '');
@@ -42,7 +42,7 @@ export function Table({ cols, rows, empty = 'Nothing here.' }) {
             <div className="acard__title">{head[1](r)}</div>
             {act && <div className="acard__actions">{act[1](r)}</div>}
           </div>
-          {info.length > 0 && <dl className="acard__info">{info.map((c) => <div key={c[0]}><dt>{c[0]}</dt><dd>{c[1](r)}</dd></div>)}</dl>}
+          {info.length > 0 && <dl className={`acard__info${stack ? ' acard__info--stack' : ''}`}>{info.map((c) => <div key={c[0]}><dt>{c[0]}</dt><dd>{c[1](r)}</dd></div>)}</dl>}
         </li>
       ))}
     </ul>

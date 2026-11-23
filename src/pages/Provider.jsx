@@ -28,7 +28,8 @@ export default function Provider() {
   const book = useAct('bookings.create', { ...refetchAll, ok: 'Booking sent. The provider has been notified. Track it under Bookings.', onSuccess: () => { setDlg(null); bumpAd(); } });
   const report = useAct('report.submit', { ...refetchAll, ok: 'Report received. Our team will review it within 24–48 hours.', onSuccess: () => setDlg(null) });
 
-  const back = <button className="back" onClick={() => (window.history.length > 1 ? nav(-1) : nav('/'))}>← Back</button>;
+  const goBack = () => (window.history.length > 1 ? nav(-1) : nav('/'));
+  const back = <div style={{ marginBottom: 'var(--s3)' }}><Button variant="secondary" size="sm" onClick={goBack}>← Back</Button></div>;
   if (isLoading) return <>{back}<RowsSkeleton rows={2} /></>;
   if (error) return <>{back}<ErrorState error={error} retry={error.status === 404 ? undefined : refetch} /></>;
 
@@ -50,7 +51,6 @@ export default function Provider() {
 
   return (
     <>
-      {back}
       <header className="hero">
         {!isOwn && (
           <div className="hero__actions">
@@ -130,9 +130,11 @@ export default function Provider() {
         ) : <Empty title="No reviews yet">Only customers who completed a booking can leave a review.</Empty>}
       </section>
 
+      <div style={{ marginTop: 'var(--s4)' }}><Button variant="secondary" onClick={goBack}>← Back</Button></div>
+
       <Dialog open={dlg === 'book'} onClose={() => setDlg(null)} title={`Book ${p.name}`}>
         <p className="muted small">Agree on the details with the provider first (Contact), then describe the job here so both of you have a record.</p>
-        <Field as="select" label="Service" value={form.listing} onChange={(e) => setForm({ ...form, listing: e.target.value })}><option value="">Select…</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}{l.priceLabel ? ` · ${l.priceLabel}` : ''}</option>)}</Field>
+        <Field as="select" label="Service" value={form.listing} onChange={(e) => setForm({ ...form, listing: e.target.value })}><option value="">Select…</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}</Field>
         <Field as="textarea" label="Job description" maxLength={500} placeholder="e.g. Aircon cleaning, 1 unit 1.5HP, agreed ₱500, Quezon City" value={form.text} onChange={(e) => setForm({ ...form, text: e.target.value })} />
         <div className="dlg__actions"><Button loading={book.isPending} onClick={() => book.mutate({ providerId: id, listingId: form.listing, message: form.text })}>Send booking</Button><Button variant="quiet" onClick={() => setDlg(null)}>Cancel</Button></div>
       </Dialog>

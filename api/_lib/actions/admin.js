@@ -276,6 +276,7 @@ A['uncat.list'] = async () => {
   const ps = rows.length ? (await sb(`providers?id=in.(${[...new Set(rows.map((r) => q(r.provider_id)))].join(',')})&select=id,biz_name`)) || [] : [];
   return { items: rows.map((l) => ({ ...l, provider: ps.find((p) => p.id === l.provider_id)?.biz_name })) };
 };
+A['uncat.delete'] = async (_a, { id }) => del(`listings?id=eq.${q(id)}&cat_main=eq.other`);
 A['uncat.reassign'] = async (_a, { id, category, sub }) => { need(category && sub?.trim(), 'Choose a category and a service.'); await patch(`listings?id=eq.${q(id)}`, { cat_main: category, cat_sub: sub.trim(), other_service_desc: null }); };
 
 /* ── upgrades ── */

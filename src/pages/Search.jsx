@@ -32,7 +32,7 @@ export default function Search() {
     if (patch.cat !== undefined && patch.cat !== sp.get('cat')) next.delete('sub');
     if (next.toString() !== sp.toString()) setSp(next, { replace: true });
   }
-  const pickCat = (k) => { set({ cat: k, sub: '' }); setCatOpen(false); };
+  const pickCat = (k) => { set({ cat: k, sub: '' }); setCatOpen(false); if (k) setSubOpen(true); };
   const pickSub = (s) => { set({ sub: s }); setSubOpen(false); };
 
   const { data, error, isLoading, isFetching, refetch } = useProviders({ ...p, ...loc });
@@ -103,6 +103,7 @@ export default function Search() {
             <li key={s}><button type="button" className={`sub-card${p.sub === s ? ' is-on' : ''}`} onClick={() => pickSub(s)}>{s}<ChevronRight size={16} aria-hidden="true" /></button></li>
           ))}
         </ul>
+        <div className="dlg__actions"><Button variant="secondary" onClick={() => { setSubOpen(false); setCatOpen(true); }}>← Back</Button></div>
       </Dialog>
 
       <Dialog open={filterOpen} onClose={() => setFilterOpen(false)} title="Filter">

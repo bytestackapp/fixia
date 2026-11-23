@@ -35,6 +35,7 @@ export function StarPicker({ value, onChange }) {
   );
 }
 
-export function Switch({ checked, onChange, label, disabled }) {
-  return <button type="button" role="switch" aria-checked={checked} aria-label={label} disabled={disabled} className="switch" onClick={() => onChange(!checked)}><span /></button>;
+export function Switch({ checked, onChange, label, disabled, loading }) {
+  return <button type="button" role="switch" aria-checked={checked} aria-label={label} aria-busy={loading || undefined} disabled={disabled || loading} className={`switch${loading ? ' is-loading' : ''}`} onClick={() => onChange(!checked)}><span>{loading && <i className="switch__spin" aria-hidden="true" />}</span></button>;
 }
+
