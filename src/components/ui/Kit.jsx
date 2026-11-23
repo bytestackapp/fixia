@@ -8,11 +8,18 @@ export const Tabs = ({ items, value, onChange, label = 'Sections' }) => (
   </div>
 );
 
-export const Stepper = ({ steps, current, muted = [] }) => (
-  <ol className="steps" aria-label="Progress">
-    {steps.map((s, i) => <li key={s} aria-current={i === current ? 'step' : undefined} aria-disabled={muted.includes(s) || undefined} className={[i < current ? 'is-done' : '', muted.includes(s) ? 'is-muted' : ''].filter(Boolean).join(' ')}><span className="num">{i + 1}</span> {s}</li>)}
-  </ol>
-);
+export const Stepper = ({ steps, current, muted = [] }) => {
+  const n = steps.length;
+  const visible = Math.min(4, n);                                   // badges shown at once
+  const start = Math.max(0, Math.min(current - 1, n - visible));    // first badge in view
+  return (
+    <div className="steps-win">
+      <ol className="steps" aria-label="Progress" style={{ width: `${(n / visible) * 100}%`, transform: `translateX(-${(start * 100) / n}%)` }}>
+        {steps.map((s, i) => <li key={s} style={{ flex: 'none', minWidth: 0, width: `${100 / n}%` }} aria-current={i === current ? 'step' : undefined} aria-disabled={muted.includes(s) || undefined} className={[i < current ? 'is-done' : '', muted.includes(s) ? 'is-muted' : ''].filter(Boolean).join(' ')}><span className="num">{i + 1}</span> {s}</li>)}
+      </ol>
+    </div>
+  );
+};
 
 export const Status = ({ kind = 'neutral', children }) => <span className={`pill pill--${kind}`}>{children}</span>;
 

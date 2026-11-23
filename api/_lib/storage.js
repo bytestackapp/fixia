@@ -22,3 +22,17 @@ export async function remove(publicUrl) {
   if (!m || !BUCKETS.includes(m[1])) return;
   await fetch(`${URL_}/storage/v1/object/${m[1]}/${m[2]}`, { method: 'DELETE', headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }).catch(() => {});
 }
+
+
+// Private files (government IDs): makes a link that works for 10 minutes, for admin review only.
+export async function signedUrl(publicUrl) {
+  const m = /\/storage\/v1\/object\/(?:public|sign)\/([^/?]+)\/([^?]+)/.exec(publicUrl || '');
+  if (!m || !BUCKETS.includes(m[1])) return publicUrl || null;
+  try {
+    const r = await fetch(`${URL_}/storage/v1/object/sign/${m[1]}/${m[2]}`, {
+      method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ expiresIn: 600 }),
+    });
+    const j = await r.json();
+    return j.signedURL ? `${URL_}/storage/v1${j.signedURL}` : null;
+  } catch { return null; }
+}

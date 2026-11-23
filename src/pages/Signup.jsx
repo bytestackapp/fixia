@@ -20,6 +20,15 @@ import { peso, PERIOD } from '../lib/format.js';
 import './Login.css';
 
 const refCode = () => localStorage.getItem('fixia.ref') || null;
+
+/* Keeps sign-up progress in this tab, so a reload or a discarded tab does not lose it. */
+const SAVE = 'fixia.signup.';
+function usePersist(key, initial) {
+  const [v, setV] = useState(() => { try { const x = JSON.parse(sessionStorage.getItem(SAVE + key)); return x ?? initial; } catch { return initial; } });
+  useEffect(() => { try { sessionStorage.setItem(SAVE + key, JSON.stringify(v)); } catch { /* storage full: skip */ } }, [key, v]);
+  return [v, setV];
+}
+const forget = () => { try { Object.keys(sessionStorage).filter((k) => k.startsWith(SAVE)).forEach((k) => sessionStorage.removeItem(k)); } catch { /* ignore */ } };
 const ID_TYPES = ['PhilSys / National ID', "Driver's License", 'Passport', 'SSS / GSIS ID', 'Postal ID', "Voter's ID", 'PRC ID', 'TIN ID', 'Other Government ID'];
 const Page = ({ children, wide }) => <div className="login"><main className="login__main" style={{ alignContent: 'start', maxWidth: wide ? 560 : 460 }}><div className="stack stack--lg" style={{ width: '100%' }}>{children}</div></main></div>;
 const Perk = ({ children }) => <div className="perk"><Check size={12} aria-hidden="true" />{children}</div>;
@@ -55,9 +64,9 @@ export function SignupChoice() {
 
 /* shared first steps: details → email code */
 function useAccountSteps(role) {
-  const [d, setD] = useState({ firstName: '', lastName: '', email: '', phone: '', username: '', password: '', confirm: '' });
+  const [d, setD] = usePersist(`${role}.d`, { firstName: '', lastName: '', email: '', phone: '', username: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({}), [busy, setBusy] = useState(false);
-  const [code, setCode] = useState(''), [proof, setProof] = useState('');
+  const [code, setCode] = usePersist(`${role}.code`, ''), [proof, setProof] = usePersist(`${role}.proof`, '');
   const set = (k) => (e) => setD((x) => ({ ...x, [k]: e.target.value }));
 
   function validate() {
@@ -202,8 +211,8 @@ function AgreeNote({ checked, onChange }) {
 
 export function SignupCustomer() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
-  const s = useAccountSteps('regular'); const [step, setStep] = useState(0); const [needsCode, setNeedsCode] = useState(true);
-  const { plans } = usePlans('regular'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
+  const s = useAccountSteps('regular'); const [step, setStep] = usePersist('regular.step', 0); const [needsCode, setNeedsCode] = usePersist('regular.needsCode', true);
+  const { plans } = usePlans('regular'); const [plan, setPlan] = usePersist('regular.plan', ''); const [agree, setAgree] = usePersist('regular.agree', false);
   const [done, setDone] = useState(null);
   useEffect(() => { if (plans && !plan) setPlan(plans.find((p) => p.price === 0)?.id || plans[0]?.id); }, [plans, plan]);
   if (user) return <Navigate to="/" replace />;
@@ -224,7 +233,7 @@ export function SignupCustomer() {
     s.setBusy(true);
     try {
       const { token, user: u } = await api('auth', { action: 'register.regular', ...s.d, proof: s.proof, referredBy: refCode(), ...(payment ? { packageId: plan, payment } : {}) });
-      localStorage.removeItem('fixia.ref');
+      localStorage.removeItem('fixia.ref'); forget();
       if (payment) setDone({ token, u });      // he reads the notice first, then enters the app
       else { adopt(token, u); toast('Welcome to Fixia!'); nav('/', { replace: true }); }
     } catch (e) { toast(e.message, 'error'); }
@@ -235,6 +244,7 @@ export function SignupCustomer() {
     s.setBusy(true);
     try {
       const { url } = await api('auth', { action: 'signup.pay', ...s.d, role: 'regular', proof: s.proof, referredBy: refCode(), packageId: plan, method });
+      forget();
       window.location.href = url;
     } catch (e) { toast(e.message, 'error'); s.setBusy(false); }
   }
@@ -264,11 +274,13 @@ export function SignupCustomer() {
 
 export function SignupProvider() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
-  const s = useAccountSteps('provider'); const [step, setStep] = useState(0); const [needsCode, setNeedsCode] = useState(true);
-  const { plans } = usePlans('provider'); const [plan, setPlan] = useState(''); const [agree, setAgree] = useState(false);
-  const [biz, setBiz] = useState(''), [street, setStreet] = useState(''), [place, setPlace] = useState({});
-  const [avatar, setAvatar] = useState(''), [idType, setIdType] = useState(''), [idFile, setIdFile] = useState('');
+  const s = useAccountSteps('provider'); const [step, setStep] = usePersist('provider.step', 0); const [needsCode, setNeedsCode] = usePersist('provider.needsCode', true);
+  const { plans } = usePlans('provider'); const [plan, setPlan] = usePersist('provider.plan', ''); const [agree, setAgree] = usePersist('provider.agree', false);
+  const [biz, setBiz] = usePersist('provider.biz', ''), [street, setStreet] = usePersist('provider.street', ''), [place, setPlace] = useState({});
+  const [avatar, setAvatar] = usePersist('provider.avatar', ''), [idType, setIdType] = usePersist('provider.idType', ''), [idFile, setIdFile] = usePersist('provider.idFile', '');
   const [done, setDone] = useState(null);
+  // the location is not saved, so after a reload go back to the Business step to pick it again
+  useEffect(() => { const bizAt = needsCode ? 2 : 1; if (step > bizAt && !place.regionName) setStep(bizAt); }, []);   // eslint-disable-line
   if (user) return <Navigate to="/" replace />;
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
@@ -295,7 +307,7 @@ export function SignupProvider() {
     s.setBusy(true);
     try {
       const out = await api('auth', { action: 'register.provider', ...body(), ...(payment ? { payment } : {}) });
-      localStorage.removeItem('fixia.ref');
+      localStorage.removeItem('fixia.ref'); forget();
       if (payment) setDone(out);
       else { adopt(out.token, out.user); toast('Application sent. We will review it within 24–48 hours.'); nav('/profile', { replace: true }); }
     } catch (e) { bad(e.message); }
@@ -306,6 +318,7 @@ export function SignupProvider() {
     s.setBusy(true);
     try {
       const { url } = await api('auth', { action: 'signup.pay', ...body(), role: 'provider', method });
+      forget();
       window.location.href = url;
     } catch (e) { bad(e.message); s.setBusy(false); }
   }
@@ -313,7 +326,7 @@ export function SignupProvider() {
   const finish = () => { if (!done) return; adopt(done.token, done.user); nav('/profile', { replace: true }); };
 
   return (
-    <Page wide>
+    <Page>
       <div className="logo-wrap"><Logo /></div><h1 style={{ textAlign: 'center' }}>Offer your services</h1>
       <Stepper steps={steps} current={step} muted={muted} />
       {name === 'Details' && <DetailsForm s={s} onNext={next} />}

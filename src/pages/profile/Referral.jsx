@@ -31,7 +31,7 @@ export default function Referral({ data }) {
       </section>
       <section className="stack"><h2>How to earn points</h2>
         <p className="muted small">Share your link. You earn points when the people you invite do one of these:</p>
-        <dl className="defs"><dt>Customer, free plan</dt><dd>+1 after their first finished job</dd><dt>Customer, paid plan</dt><dd>+3 when they pay</dd><dt>Provider, paid plan</dt><dd>+5 when approved</dd></dl>
+        <dl className="defs"><dt>Customer - Free Plan:</dt><dd>+1 after their first completed booking</dd><dt>Customer - Paid Plan:</dt><dd>+3 after successful payment</dd><dt>Provider - Paid Plan:</dt><dd>+5 after account approval</dd></dl>
       </section>
       <section className="stack"><h2>Redeem points ({r.points} point{r.points === 1 ? '' : 's'})</h2>
         <p className="muted small">Swap your points for a free plan.</p>

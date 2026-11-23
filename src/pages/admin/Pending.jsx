@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Eye, Check, Pause, X } from 'lucide-react';
-import { useAdm, useDo, Load, Head, Table, IconBtn, Prompt, Detail } from './kit.jsx';
+import { useAdm, useDo, Load, Head, Table, Menu, Prompt, Detail } from './kit.jsx';
 import Dialog, { Confirm } from '../../components/ui/Dialog.jsx';
 import { Tabs, Status } from '../../components/ui/Kit.jsx';
 import { fdate } from '../../lib/format.js';
@@ -17,9 +17,14 @@ export default function Pending() {
         <Table empty="No applications here." rows={d.items.filter((p) => p.status === tab)} cols={[
           ['Business', (p) => <><b>{p.biz_name}</b><br /><span className="muted">{p.user?.first_name} {p.user?.last_name}</span></>],
           ['Location', (p) => [p.city_name, p.province_name].filter(Boolean).join(', ')],
-          ['Plan / payment', (p) => <>{p.user?.package_name}<br /><Status kind={p.user?.payment_status === 'verified' ? 'ok' : p.user?.payment_status === 'free' ? 'neutral' : 'warn'}>{p.user?.payment_status || 'none'}</Status></>],
+          ['Plan / payment', (p) => <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>{p.user?.package_name}<Status kind={p.user?.payment_status === 'verified' ? 'ok' : p.user?.payment_status === 'free' ? 'neutral' : 'warn'}>{p.user?.payment_status || 'none'}</Status></span>],
           ['Applied', (p) => fdate(p.created_at)],
-          ['', (p) => <div className="actions-cell"><IconBtn icon={Eye} label="Review" onClick={() => setView(p)} /><IconBtn icon={Check} label="Approve" variant="primary" onClick={() => setAsk({ k: 'approve', p })} /><IconBtn icon={Pause} label="Hold" onClick={() => setAsk({ k: 'hold', p })} /><IconBtn icon={X} label="Reject" variant="danger" onClick={() => setAsk({ k: 'reject', p })} /></div>],
+          ['', (p) => <Menu items={[
+            { icon: Eye, label: 'Review details', onClick: () => setView(p) },
+            { icon: Check, label: 'Approve', onClick: () => setAsk({ k: 'approve', p }) },
+            { icon: Pause, label: 'Put on hold', onClick: () => setAsk({ k: 'hold', p }) },
+            { icon: X, label: 'Reject', danger: true, onClick: () => setAsk({ k: 'reject', p }) },
+          ]} />],
         ]} />
       )}</Load>
       <Dialog open={!!view} onClose={() => setView(null)} title={view?.biz_name} wide>

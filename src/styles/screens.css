@@ -252,3 +252,18 @@ body { overflow-x: hidden; }
 
 .plans--methods .pm__logo { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 82px; }
 .plans--methods .pm__fallback { height: auto; aspect-ratio: 1 / 1; width: 100%; max-width: 86px; font-size: .78rem; text-align: center; padding: 4px; }
+
+/* ── sliding step badges (4 visible at a time) ── */
+.steps-win { overflow: hidden; margin-bottom: var(--s5); }
+.steps-win .steps { overflow: visible; margin-bottom: 0; transition: transform .45s cubic-bezier(.4, 0, .2, 1); will-change: transform; }
+.steps li .num, .steps li, .steps li:not(:last-child)::after { transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, opacity .3s ease; }
+
+/* ── Profile > Plan: cards keep a sensible width, 2+ per row ── */
+.ptab .plans { grid-template-columns: repeat(auto-fill, minmax(140px, 260px)); justify-content: start; }
+
+/* ── Admin overview stat cards ── */
+.stat-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: var(--s5); }
+.stat-card { display: grid; gap: 4px; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-sm); }
+.stat-card b { font: 800 var(--t-2xl)/1 var(--font-display); color: var(--brand); }
+.stat-card span { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
+@media (max-width: 520px) { .stat-card { padding: 12px; } .stat-card b { font-size: var(--t-xl); } }

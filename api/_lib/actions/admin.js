@@ -1,7 +1,7 @@
 /* Admin-only actions. Guarded in api/admin.js: nobody without role "admin" reaches any of this. */
 import { sb, q } from '../db.js';
 import { httpError } from '../auth.js';
-import { remove } from '../storage.js';
+import { remove, signedUrl } from '../storage.js';
 import { mail } from '../mail.js';
 import { pushTo } from '../push.js';
 import { credit } from '../referral.js';
@@ -29,7 +29,8 @@ A.dash = async () => {
 A['pending.list'] = async () => {
   const rows = (await sb('providers?status=in.(pending,needs_compliance)&order=created_at.asc')) || [];
   const us = rows.length ? (await sb(`users?id=in.(${rows.map((r) => q(r.user_id)).join(',')})&select=id,first_name,last_name,email,phone,payment_method,payment_reference,payment_amount,payment_status,package_name`)) || [] : [];
-  return { items: rows.map((p) => ({ ...p, user: us.find((u) => u.id === p.user_id) })) };
+  const items = await Promise.all(rows.map(async (p) => ({ ...p, id_file_url: p.id_file_url ? await signedUrl(p.id_file_url) : null, user: us.find((u) => u.id === p.user_id) })));
+  return { items };
 };
 A['provider.approve'] = async (_a, { providerId }) => {
   const prov = need((await sb(`providers?id=eq.${q(providerId)}&limit=1`))?.[0], 'Provider not found.');
