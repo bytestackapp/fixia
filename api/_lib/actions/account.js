@@ -269,9 +269,13 @@ export async function adsList(user) {
 export async function adsTrack(user, { id, kind }) {
   if (kind === 'click') return void sb('rpc/increment_ad_click', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id } }).catch(() => {});
   await sb('rpc/increment_ad_impression', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id } }).catch(() => {});
-  const ad = (await sb(`ads?id=eq.${q(id)}&select=impression_count,impression_quota,click_count&limit=1`))?.[0];
+  const ad = (await sb(`ads?id=eq.${q(id)}&select=impression_count,impression_quota,click_count,created_at&limit=1`))?.[0];
   if (ad && ad.impression_count >= (ad.impression_quota || 5000)) {
-    await sb(`ads_batches?ad_id=eq.${q(id)}&status=eq.active`, { method: 'PATCH', prefer: 'return=minimal', body: { status: 'completed', completed_at: new Date().toISOString(), impression_count: ad.impression_count, click_count: ad.click_count || 0 } });
+    const now = new Date().toISOString();
+    const upd = await sb(`ads_batches?ad_id=eq.${q(id)}&status=eq.active`, { method: 'PATCH', body: { status: 'completed', completed_at: now, impression_count: ad.impression_count, click_count: ad.click_count || 0 } });
+    if (!upd?.length && !(await sb(`ads_batches?ad_id=eq.${q(id)}&select=id&limit=1`))?.length) {
+      await sb('ads_batches', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id, batch_number: 1, impression_quota: ad.impression_quota || 5000, impression_count: ad.impression_count, click_count: ad.click_count || 0, status: 'completed', started_at: ad.created_at, completed_at: now } });
+    }
     await sb(`ads?id=eq.${q(id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { is_active: false } });
   }
 }

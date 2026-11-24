@@ -148,7 +148,7 @@ A['package.delete'] = async (_a, { id }) => { if (KEEP.includes(id)) throw httpE
 A['ads.list'] = async () => ({ items: (await sb('ads?order=type.asc,created_at.asc')) || [] });
 A['ad.save'] = async (_a, d) => {
   need(d.advertiser?.trim() && d.title?.trim(), 'Advertiser and title are required.');
-  const row = { type: d.type, advertiser: d.advertiser, title: d.title, description: d.description || '', icon: '', link_url: d.linkUrl || '#', cta_label: d.ctaLabel || 'Learn more', bg_color: d.bgColor || '#0F1A27', notes: d.notes || '', impression_quota: Math.max(5, parseInt(d.quota) || 5000) };
+  const row = { type: d.type, advertiser: d.advertiser, title: d.title, description: d.description || '', icon: '', link_url: d.linkUrl || '#', cta_label: d.ctaLabel || 'Learn more', bg_color: d.bgColor || '#0F1A27', notes: d.notes || '', impression_quota: Math.max(1, parseInt(d.quota) || 5000) };
   if (typeof d.image === 'string' && d.image.startsWith('data:')) row.image_url = (await upload('fixia-portfolio', `ad_${Date.now()}`, d.image)).url;
   else if (d.image === '') row.image_url = null;
   if (d.id) {
@@ -169,11 +169,23 @@ A['ad.rerun'] = async (_a, { id, quota }) => {
   if (batches.some((b) => b.status === 'active')) await patch(`ads_batches?ad_id=eq.${q(id)}&status=eq.active`, { status: 'completed', completed_at: new Date().toISOString(), impression_count: ad.impression_count, click_count: ad.click_count || 0 });
   else if (!batches.length) await sb('ads_batches', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id, batch_number: 1, impression_quota: ad.impression_quota, impression_count: ad.impression_count, click_count: ad.click_count || 0, status: 'completed', started_at: ad.created_at, completed_at: new Date().toISOString() } });
   const n = batches.length + (batches.length ? 1 : 2);
-  const qta = Math.max(5, parseInt(quota) || ad.impression_quota);
+  const qta = Math.max(1, parseInt(quota) || ad.impression_quota);
   await sb('ads_batches', { method: 'POST', prefer: 'return=minimal', body: { ad_id: id, batch_number: n, impression_quota: qta, impression_count: 0, status: 'active', started_at: new Date().toISOString() } });
   await patch(`ads?id=eq.${q(id)}`, { impression_count: 0, click_count: 0, impression_quota: qta, is_active: true });
 };
-A['ad.batches'] = async (_a, { type }) => ({ items: (await sb(`ads_batches?order=started_at.desc&limit=200`)) || [], ads: (await sb(`ads?${type ? `type=eq.${q(type)}&` : ''}select=id,title,advertiser,type`)) || [] });
+A['ad.batches'] = async () => {
+  const [ads, all] = await Promise.all([
+    sb('ads?select=id,title,advertiser,type,impression_count,click_count,impression_quota,created_at'),
+    sb('ads_batches?order=started_at.desc&limit=1000'),
+  ]);
+  const hasAny = new Set((all || []).map((b) => b.ad_id));
+  const done = (all || []).filter((b) => b.status === 'completed');
+  // ads that finished before history existed (no batch rows at all)
+  const old = (ads || []).filter((a) => !hasAny.has(a.id) && a.impression_count >= (a.impression_quota || 5000))
+    .map((a) => ({ id: `ad-${a.id}`, ad_id: a.id, batch_number: 1, impression_quota: a.impression_quota, impression_count: a.impression_count, click_count: a.click_count || 0, status: 'completed', started_at: a.created_at, completed_at: null }));
+  const items = [...done, ...old].sort((x, y) => new Date(y.completed_at || y.started_at) - new Date(x.completed_at || x.started_at));
+  return { items, ads: (ads || []).map(({ id, title, advertiser, type }) => ({ id, title, advertiser, type })) };
+};
 A['rotation.stats'] = async () => ({ items: (await sb('providers?or=(is_featured.eq.true,featured_impressions.gt.0)&select=id,biz_name,is_elite,is_featured,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc')) || [] });
 A['rotation.reactivate'] = async (_a, { id } = {}) => {
   const quota = parseInt((await settings()).featured_impression_quota) || 200;

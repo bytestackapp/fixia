@@ -50,12 +50,12 @@ export function Table({ cols, rows, empty = 'Nothing here.', stack }) {
 }
 
 /* a dialog that asks for a reason (or note) before doing something */
-export function Prompt({ open, title, label, required, confirmLabel = 'Confirm', danger, busy, onClose, onSubmit, children }) {
+export function Prompt({ open, title, label, required, confirmLabel = 'Confirm', danger, busy, onClose, onSubmit, children, type, min, placeholder }) {
   const [v, setV] = useState('');
   return (
     <Dialog open={open} onClose={() => { setV(''); onClose(); }} title={title}>
       {children}
-      {label && <Field as="textarea" label={label} value={v} onChange={(e) => setV(e.target.value)} />}
+      {label && <Field as={type ? 'input' : 'textarea'} type={type} min={min} inputMode={type === 'number' ? 'numeric' : undefined} placeholder={placeholder} label={label} value={v} onChange={(e) => setV(e.target.value)} />}
       <div className="dlg__actions"><Button variant={danger ? 'danger' : 'primary'} loading={busy} disabled={required && !v.trim()} onClick={() => { onSubmit(v); setV(''); }}>{confirmLabel}</Button><Button variant="quiet" onClick={() => { setV(''); onClose(); }}>Cancel</Button></div>
     </Dialog>
   );

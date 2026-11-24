@@ -353,3 +353,11 @@ body { overflow-x: hidden; }
 .ad__cta { margin: 0; align-self: center; white-space: nowrap; padding: 6px 14px; background: var(--brand); border: 0; border-radius: 999px; color: #fff; font-weight: 800; font-size: .72rem; text-decoration: none; }
 .ad__cta:hover { background: var(--brand-dark); }
 .main .rows > li.ad { grid-column: auto; }
+
+/* Ads history table: fits its content, wraps long text, scrolls inside a height limit */
+.hist-wrap { width: fit-content; max-width: 100%; max-height: 60dvh; overflow: auto; }
+.hist-wrap .table { width: auto; }
+.hist-wrap .table th { position: sticky; top: 0; z-index: 1; background: var(--card); }
+.hist-wrap .table td { white-space: normal; overflow-wrap: anywhere; }
+.hist-wrap .table td.num { white-space: nowrap; }
+
