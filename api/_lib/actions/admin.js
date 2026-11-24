@@ -43,8 +43,11 @@ A['provider.approve'] = async (_a, { providerId }) => {
   if (pkg?.is_featured) { body.featured_quota = parseInt((await settings()).featured_impression_quota) || 500; body.featured_impressions = 0; } else { body.featured_quota = 0; }
   await patch(`providers?id=eq.${q(providerId)}`, body);
   await patch(`users?id=eq.${q(prov.user_id)}`, { status: 'active' });
+  // paid plan approved by admin: start the subscription period now
+  const paidPlan = !!pkg && pkg.price > 0;
+  if (paidPlan && !u.subscription_end) await applyPackage(u, pkg, PERIOD_DAYS[pkg.period] ?? null, { payment_status: 'verified' });
   await notify(prov.user_id, 'Application approved', 'Your provider account is active. Add your services and start receiving bookings. Welcome to Fixia!', 'welcome');
-  if (['verified', 'paid'].includes(u.payment_status)) await credit(prov.user_id, 5).catch(() => {});
+  if (paidPlan || ['verified', 'paid'].includes(u.payment_status)) await credit(prov.user_id, 5).catch(() => {});
   mail('provider_approved', { email: u.email, fullName: `${u.first_name} ${u.last_name}`, bizName: prov.biz_name });
 };
 A['provider.reject'] = async (_a, { providerId, reason }) => {

@@ -13,7 +13,8 @@ export function calcUpgrade(user, cur, next) {
   const end = user.subscription_end ? new Date(user.subscription_end).getTime() : Date.now();
   const remainingDays = Math.max(0, Math.floor((end - Date.now()) / DAY));
   const curDays = PERIOD_DAYS[cur?.period] || 30;
-  const remainingValue = cur && cur.price > 0 ? +((remainingDays / curDays) * cur.price).toFixed(2) : 0;
+  const paidPlan = cur && cur.price > 0 && user.payment_method !== 'referral';   // no credit for plans redeemed with points
+  const remainingValue = paidPlan ? +((remainingDays / curDays) * cur.price).toFixed(2) : 0;
   const newDays = PERIOD_DAYS[next.period] ?? null;
   const carryoverDays = newDays === null || !next.price ? 0 : Math.round(remainingValue / (next.price / newDays));
   return { remainingDays, remainingValue, newPlanPrice: next.price, newPeriodDays: newDays, carryoverDays, totalDays: newDays === null ? null : newDays + carryoverDays };

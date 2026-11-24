@@ -53,7 +53,7 @@ export default function Checkout() {
     <>
       <header className="page-head"><h1>Payment</h1></header>
       <div className="stack stack--lg" style={{ maxWidth: 560 }}>
-        <div className="sec" style={{ marginBottom: 0 }}>
+        <div className="sec sec--tint" style={{ marginBottom: 0 }}>
           <dl className="defs" style={{ marginTop: 0 }}>
             <dt>Plan</dt><dd>{plan.name}</dd><dt>Billing</dt><dd>{PERIOD[plan.period] || plan.period}</dd><dt>Price</dt><dd className="num">{peso(plan.price)}</dd>
             {data.carryoverDays > 0 && <><dt>Credit</dt><dd>+{data.carryoverDays} days from your current plan</dd></>}

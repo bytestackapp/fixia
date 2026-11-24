@@ -26,7 +26,7 @@ export default function Plan({ data }) {
             fontWeight: 700,
             ...(end && left <= 7 ? { color: 'var(--danger)' } : {})
           }}>
-            {end ? `${left} day${left === 1 ? '' : 's'}` : 'Never'}
+            {end ? `${left} day${left === 1 ? '' : 's'}` : plan?.price > 0 && plan.period !== 'lifetime' ? 'Starts once approved' : 'Never'}
           </span>
         </div>
       </div>

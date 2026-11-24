@@ -19,8 +19,8 @@ function FeaturedCard({ p }) {
           {p.avatarUrl ? <img src={p.avatarUrl} alt="" loading="lazy" /> : <span aria-hidden="true">{p.name.trim().charAt(0).toUpperCase() || '?'}</span>}
         </span>
         {p.isElite && <span className="fcard__badge">Elite</span>}
+        <span className="fcard__rating"><Star size={12} fill="currentColor" strokeWidth={0} aria-hidden="true" />{p.reviews ? p.rating.toFixed(1) : 'New'}</span>
         <span className="fcard__body">
-          <span className="fcard__rating"><Star size={10} fill="currentColor" strokeWidth={0} aria-hidden="true" />{p.reviews ? p.rating.toFixed(1) : 'New'}</span>
           <span className="fcard__name">{p.name}</span>
           {p.services[0] && <span className="fcard__service">{p.services[0]}</span>}
           {where && <span className="fcard__loc"><MapPin size={9} aria-hidden="true" />{where}</span>}

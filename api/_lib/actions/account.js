@@ -78,9 +78,9 @@ export async function plans(user) {
   return { items: (await sb(`packages?type=eq.${type}&is_active=eq.true&order=sort_order.asc&select=id,name,price,period,icon,popular,badge_label,features,listing_limit,booking_limit,ads_free,referral_points_required`)) || [] };
 }
 export async function upgradeCalc(user, { packageId }) {
-  const [next, cur, u] = await Promise.all([getPackage(packageId), getPackage(user.package_id), sb(`users?id=eq.${q(user.id)}&select=subscription_end&limit=1`).then((r) => r[0])]);
+  const [next, cur, u] = await Promise.all([getPackage(packageId), getPackage(user.package_id), sb(`users?id=eq.${q(user.id)}&select=subscription_end,payment_method&limit=1`).then((r) => r[0])]);
   if (!next || next.type !== (user.role === 'provider' ? 'provider' : 'regular')) throw httpError(404, 'Plan not found.');
-  return { plan: { id: next.id, name: next.name, price: next.price, period: next.period }, ...calcUpgrade({ subscription_end: u.subscription_end }, cur, next) };
+  return { plan: { id: next.id, name: next.name, price: next.price, period: next.period }, ...calcUpgrade({ subscription_end: u.subscription_end, payment_method: u.payment_method }, cur, next) };
 }
 
 /* ── listings (providers) ── */

@@ -261,6 +261,10 @@ body { overflow-x: hidden; }
 /* ── Profile > Plan: cards keep a sensible width, 2+ per row ── */
 .ptab .plans { grid-template-columns: repeat(auto-fill, minmax(140px, 260px)); justify-content: start; }
 
+/* Profile > Plan: no check marks (neither on each feature nor top-right of the card) */
+.ptab .plan__list li::before { content: none; }
+.ptab .plan__mark { display: none; }
+
 /* ── Admin overview stat cards ── */
 .stat-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: var(--s5); }
 .stat-card { display: grid; gap: 4px; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-sm); }
@@ -276,3 +280,34 @@ body { overflow-x: hidden; }
 .listing__top { align-items: center; }
 
 .acard__info--stack { grid-template-columns: 1fr; }
+
+/* Checkout: orange hint at the top of the plan card, fading down to white */
+.sec--tint { background: linear-gradient(180deg, var(--brand-light) 0%, var(--card) 60%); }
+
+/* Featured cards: big centred avatar, rating badge at the top right */
+.fcard__img { height: 92px; background: linear-gradient(180deg, #2E4468, var(--navy-mid)); }
+.fcard__img img, .fcard__img > span { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 2px solid rgba(255, 255, 255, .9); box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
+.fcard__img img { background: #fff; }
+.fcard__img > span { display: grid; place-items: center; background: var(--brand); color: #fff; }
+.fcard__rating { position: absolute; top: 8px; right: 8px; z-index: 1; padding: 3px 8px; background: rgba(0, 0, 0, .55); border-radius: 999px; font-size: .75rem; }
+.fcard__rating svg { width: 13px; height: 13px; }
+@media (min-width: 900px) {
+  .fcard__img { height: 136px; }
+  .fcard__img img, .fcard__img > span { width: 96px; height: 96px; border-radius: 22px; }
+  .fcard__img > span { font-size: 2.2rem; }
+  .fcard__rating { top: 10px; right: 10px; font-size: .85rem; padding: 4px 10px; }
+  .fcard__rating svg { width: 15px; height: 15px; }
+}
+
+/* Featured cards: at least 2 per line, wrap to the next line, name limited to 2 lines */
+.featured { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 0; overflow: visible; }
+.featured > li { flex: 1 1 calc(50% - 4px); min-width: 140px; max-width: 280px; }
+.fcard__name {
+  white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; text-overflow: ellipsis; line-height: 1.25; min-height: 2.5em; overflow-wrap: anywhere;
+}
+@media (min-width: 900px) {
+  .featured { gap: 14px; }
+  .featured > li { flex: 0 1 calc(33.333% - 10px); min-width: 220px; max-width: 300px; }
+}
+
