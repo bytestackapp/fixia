@@ -59,7 +59,7 @@ export default function Ads() {
           <Field label="Text (optional)" value={f.description} onChange={set('description')} />
           <div className="two"><Field label="Button label" value={f.ctaLabel} onChange={set('ctaLabel')} /><Field label="Link URL" type="url" value={f.linkUrl} onChange={set('linkUrl')} /></div>
           <div className="stack">
-            <span className="field__label">Image (optional, shown at the top of pop-ups)</span>
+            <span className="field__label">Image (optional): square for inline ads, wide for pop-ups</span>
             {f.image && <img src={f.image} alt="Ad preview" style={{ maxHeight: 140, objectFit: 'contain', border: '1px solid var(--line)', borderRadius: 10 }} />}
             <div className="cluster">
               <label className="btn btn--secondary btn--sm">{f.image ? 'Change image' : 'Choose image'}<input type="file" accept="image/*" className="sr-only" onChange={async (e) => { try { setCrop(await shrink(e.target.files[0], { max: 1600 })); } catch (err) { toast(err.message, 'error'); } e.target.value = ''; }} /></label>
@@ -70,7 +70,7 @@ export default function Ads() {
           <div className="dlg__actions"><Button loading={save.isPending} onClick={() => save.mutate({ ...f, quota: +f.quota }, { onSuccess: () => setF(null) })}>Save ad</Button><Button variant="quiet" onClick={() => setF(null)}>Cancel</Button></div>
         </div>}
       </Dialog>
-      <Cropper open={!!crop} src={crop} onClose={() => setCrop('')} onDone={(img) => { setF((x) => ({ ...x, image: img })); setCrop(''); }} />
+      <Cropper open={!!crop} src={crop} aspect={f?.type === 'inline' ? 1 : 19 / 11} onClose={() => setCrop('')} onDone={(img) => { setF((x) => ({ ...x, image: img })); setCrop(''); }} />
       <Prompt open={!!rerun} title={`Re-run ${rerun?.title}`} label="New impression quota" confirmLabel="Start new batch" busy={re.isPending} onClose={() => setRerun(null)} onSubmit={(v) => re.mutate({ id: rerun.id, quota: v || rerun.impression_quota }, { onSuccess: () => setRerun(null) })}><p className="muted small">Counts reset to zero. The finished batch is kept in history.</p></Prompt>
       <Confirm open={!!del} title={`Delete “${del?.title}”?`} confirmLabel="Delete" danger busy={rm.isPending} onClose={() => setDel(null)} onConfirm={() => rm.mutate({ id: del.id }, { onSuccess: () => setDel(null) })} />
     </>

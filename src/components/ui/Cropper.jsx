@@ -4,14 +4,15 @@ import Dialog from './Dialog.jsx';
 import Button from './Button.jsx';
 import { compressCanvas } from '../../lib/image.js';
 
-const ASPECT = 19 / 11, OUT_W = 760, MAX_ZOOM = 4;
+const MAX_ZOOM = 4;
 
 /* Drag to move, slider to zoom. The frame has the same shape as the image area of the pop-up ad. */
-export default function Cropper({ open, src, onClose, onDone }) {
+export default function Cropper({ open, src, onClose, onDone, aspect = 19 / 11 }) {
+  const ASPECT = aspect, OUT_W = aspect === 1 ? 320 : 760;
   const frame = useRef(null), imgRef = useRef(null), drag = useRef(null);
   const [nat, setNat] = useState(null), [zoom, setZoom] = useState(1), [pos, setPos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => { if (open) { setNat(null); setZoom(1); setPos({ x: 0, y: 0 }); } }, [open, src]);
+  useEffect(() => { if (open) { setZoom(1); setPos({ x: 0, y: 0 }); } else setNat(null); }, [open, src]);
 
   const r = nat ? nat.w / nat.h : 1;
   const fitW = Math.max(1, r / ASPECT);
@@ -42,8 +43,8 @@ export default function Cropper({ open, src, onClose, onDone }) {
   return (
     <Dialog open={open} onClose={onClose} title="Crop image">
       <p className="muted small">Drag the image to move it. Use the slider to zoom. The frame is exactly what shows in the pop-up ad.</p>
-      <div ref={frame} className="crop" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onWheel={(e) => setZ(zoom - e.deltaY * 0.002)}>
-        {src && <img ref={imgRef} src={src} alt="" draggable="false" onLoad={(e) => setNat({ w: e.target.naturalWidth, h: e.target.naturalHeight })}
+      <div ref={frame} className="crop" style={{ aspectRatio: String(ASPECT), width: '100%', maxWidth: ASPECT === 1 ? 420 : '100%', justifySelf: 'center' }} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onWheel={(e) => setZ(zoom - e.deltaY * 0.002)}>
+        {src && <img key={src.length + src.slice(-40)} ref={imgRef} src={src} alt="" draggable="false" onLoad={(e) => setNat({ w: e.target.naturalWidth, h: e.target.naturalHeight })}
           style={nat ? { width: `${fitW * zoom * 100}%`, left: `${(0.5 + pos.x) * 100}%`, top: `${(0.5 + pos.y) * 100}%` } : { opacity: 0 }} />}
       </div>
       <div className="crop__zoom">

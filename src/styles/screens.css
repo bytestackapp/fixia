@@ -340,3 +340,16 @@ body { overflow-x: hidden; }
               linear-gradient(to bottom, transparent calc(33.33% - .5px), rgba(255, 255, 255, .35) 33.33%, transparent calc(33.33% + .5px), transparent calc(66.66% - .5px), rgba(255, 255, 255, .35) 66.66%, transparent calc(66.66% + .5px)); }
 .crop__zoom { display: flex; align-items: center; gap: var(--s3); }
 .crop__zoom input[type='range'] { flex: 1; min-width: 0; accent-color: var(--brand); }
+
+/* Inline ad: same card as a provider row, light orange hint like the admin cards */
+.ad { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--s3); align-items: center; min-height: 96px; padding: 14px; background: linear-gradient(180deg, var(--brand-light) 0%, var(--card) 55%); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-sm); color: var(--text); }
+.ad__img { width: 48px; height: 48px; object-fit: cover; border-radius: 12px; background: var(--bg); }
+.ad__img--blank { display: grid; place-items: center; background: var(--navy); font: 800 1rem var(--font-display); color: #fff; }
+.ad__main { display: grid; gap: 2px; min-width: 0; }
+.ad__main > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ad__label { font: 700 .62rem var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--brand-dark); }
+.ad__title { font: 700 .95rem/1.25 var(--font-display); color: var(--text); }
+.ad__text { font-size: .75rem; color: var(--text-3); }
+.ad__cta { margin: 0; align-self: center; white-space: nowrap; padding: 6px 14px; background: var(--brand); border: 0; border-radius: 999px; color: #fff; font-weight: 800; font-size: .72rem; text-decoration: none; }
+.ad__cta:hover { background: var(--brand-dark); }
+.main .rows > li.ad { grid-column: auto; }

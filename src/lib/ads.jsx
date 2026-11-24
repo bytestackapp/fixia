@@ -18,9 +18,14 @@ export function InlineAd({ ad }) {
   useEffect(() => { if (!seen.has(ad.id)) { seen.add(ad.id); track(ad.id, 'impression'); } }, [ad.id]);
   return (
     <li className="ad">
-      <span className="ad__label">Sponsored</span>
-      <span className="ad__title">{ad.title}</span>
-      {ad.text && <span className="ad__text">{ad.text}</span>}
+      {ad.image
+        ? <img className="ad__img" src={ad.image} alt="" loading="lazy" />
+        : <span className="ad__img ad__img--blank" aria-hidden="true">{(ad.advertiser || 'Ad').trim().charAt(0).toUpperCase()}</span>}
+      <span className="ad__main">
+        <span className="ad__label">Sponsored · {ad.advertiser || 'Partner'}</span>
+        <span className="ad__title">{ad.title}</span>
+        {ad.text && <span className="ad__text">{ad.text}</span>}
+      </span>
       <a className="ad__cta" href={ad.link} target="_blank" rel="noopener noreferrer sponsored" onClick={() => track(ad.id, 'click')}>{ad.cta}</a>
     </li>
   );
