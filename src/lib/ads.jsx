@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { call } from './api.js';
 import { useAuth } from './auth.jsx';
 import Dialog from '../components/ui/Dialog.jsx';
-import Button from '../components/ui/Button.jsx';
+import { X } from 'lucide-react';
 
 export const useAds = () => {
   const { user } = useAuth();
@@ -56,7 +56,12 @@ export function PopupHost() {
     <Dialog open={!!ad} onClose={() => left <= 0 && setAd(null)} label="Advertisement" card>
       {ad && (
         <div className="adpop">
-          <div className="adpop__bar"><span className="adpop__tag">Ad</span><span>Sponsored by <b>{ad.advertiser || 'our partner'}</b></span></div>
+          <div className="adpop__bar">
+            <span className="adpop__tag">Ad</span><span>Sponsored by <b>{ad.advertiser || 'our partner'}</b></span>
+            <button type="button" className="adpop__close" disabled={left > 0} onClick={() => setAd(null)} aria-label={left > 0 ? `Close ad in ${left} seconds` : 'Close ad'}>
+              {left > 0 ? left : <X size={18} aria-hidden="true" />}
+            </button>
+          </div>
           {ad.image
             ? <img className="adpop__img" src={ad.image} alt="" />
             : <div className="adpop__hero" style={{ background: ad.color }}>{ad.advertiser}</div>}
@@ -64,7 +69,6 @@ export function PopupHost() {
             <h3>{ad.title}</h3>
             {ad.text && <p>{ad.text}</p>}
             <a className="btn btn--primary btn--block" href={ad.link} target="_blank" rel="noopener noreferrer sponsored" onClick={() => { track(ad.id, 'click'); setAd(null); }}>{ad.cta}</a>
-            <Button variant="quiet" block disabled={left > 0} onClick={() => setAd(null)}>{left > 0 ? `Skip ad in ${left}s` : 'Skip ad'}</Button>
             <p className="adpop__note">Ads are removed with any paid plan.</p>
           </div>
         </div>
