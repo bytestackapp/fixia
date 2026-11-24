@@ -53,17 +53,21 @@ export function PopupHost() {
   useEffect(() => { if (ad && left > 0) { const t = setTimeout(() => setLeft(left - 1), 1000); return () => clearTimeout(t); } }, [ad, left]);
 
   return (
-    <Dialog open={!!ad} onClose={() => left <= 0 && setAd(null)} title={ad?.title || ''} label="Advertisement">
+    <Dialog open={!!ad} onClose={() => left <= 0 && setAd(null)} label="Advertisement" card>
       {ad && (
-        <>
-          <p className="ad__label">Advertisement</p>
-          {ad.text && <p>{ad.text}</p>}
-          <div className="dlg__actions">
-            <a className="btn btn--primary" href={ad.link} target="_blank" rel="noopener noreferrer sponsored" onClick={() => { track(ad.id, 'click'); setAd(null); }}>{ad.cta}</a>
-            <Button variant="quiet" disabled={left > 0} onClick={() => setAd(null)}>{left > 0 ? `Skip in ${left}s` : 'Skip'}</Button>
+        <div className="adpop">
+          <div className="adpop__bar"><span className="adpop__tag">Ad</span><span>Sponsored by <b>{ad.advertiser || 'our partner'}</b></span></div>
+          {ad.image
+            ? <img className="adpop__img" src={ad.image} alt="" />
+            : <div className="adpop__hero" style={{ background: ad.color }}>{ad.advertiser}</div>}
+          <div className="adpop__body">
+            <h3>{ad.title}</h3>
+            {ad.text && <p>{ad.text}</p>}
+            <a className="btn btn--primary btn--block" href={ad.link} target="_blank" rel="noopener noreferrer sponsored" onClick={() => { track(ad.id, 'click'); setAd(null); }}>{ad.cta}</a>
+            <Button variant="quiet" block disabled={left > 0} onClick={() => setAd(null)}>{left > 0 ? `Skip ad in ${left}s` : 'Skip ad'}</Button>
+            <p className="adpop__note">Ads are removed with any paid plan.</p>
           </div>
-          <p className="field__hint">Ads are removed with any paid plan.</p>
-        </>
+        </div>
       )}
     </Dialog>
   );

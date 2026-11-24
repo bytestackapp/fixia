@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import { sb, q } from '../db.js';
 import { emailOfRequest } from './account.js';
 import { httpError } from '../auth.js';
-import { remove, signedUrl } from '../storage.js';
+import { upload, remove, signedUrl } from '../storage.js';
 import { mail } from '../mail.js';
 import { pushTo } from '../push.js';
 import { credit } from '../referral.js';
@@ -149,7 +149,13 @@ A['ads.list'] = async () => ({ items: (await sb('ads?order=type.asc,created_at.a
 A['ad.save'] = async (_a, d) => {
   need(d.advertiser?.trim() && d.title?.trim(), 'Advertiser and title are required.');
   const row = { type: d.type, advertiser: d.advertiser, title: d.title, description: d.description || '', icon: '', link_url: d.linkUrl || '#', cta_label: d.ctaLabel || 'Learn more', bg_color: d.bgColor || '#0F1A27', notes: d.notes || '', impression_quota: Math.max(5, parseInt(d.quota) || 5000) };
-  if (d.id) await patch(`ads?id=eq.${q(d.id)}`, row); else await sb('ads', { method: 'POST', prefer: 'return=minimal', body: { ...row, is_active: true, starts_at: new Date().toISOString() } });
+  if (typeof d.image === 'string' && d.image.startsWith('data:')) row.image_url = (await upload('fixia-portfolio', `ad_${Date.now()}`, d.image)).url;
+  else if (d.image === '') row.image_url = null;
+  if (d.id) {
+    const old = (await sb(`ads?id=eq.${q(d.id)}&select=image_url&limit=1`))?.[0]?.image_url;
+    await patch(`ads?id=eq.${q(d.id)}`, row);
+    if (old && 'image_url' in row && old !== row.image_url) await remove(old);
+  } else await sb('ads', { method: 'POST', prefer: 'return=minimal', body: { ...row, is_active: true, starts_at: new Date().toISOString() } });
 };
 A['ad.toggle'] = async (_a, { id, active }) => {
   const ad = need((await sb(`ads?id=eq.${q(id)}&limit=1`))?.[0], 'Ad not found.');

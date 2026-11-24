@@ -261,9 +261,9 @@ export async function messageAck(user, { id }) {
 /* ── ads ── */
 export async function adsList(user) {
   if (user.role !== 'regular' || user.ads_free) return { popup: [], inline: [], config: {} };
-  const [rows, s] = await Promise.all([sb('ads?is_active=eq.true&order=created_at.asc&select=id,type,title,description,icon,cta_label,bg_color,link_url,impression_count,impression_quota'), settings()]);
+  const [rows, s] = await Promise.all([sb('ads?is_active=eq.true&order=created_at.asc&select=id,type,title,description,icon,cta_label,bg_color,link_url,impression_count,impression_quota,advertiser,image_url'), settings()]);
   const live = (rows || []).filter((a) => (a.impression_count || 0) < (a.impression_quota || 5000));
-  const pick = (t) => live.filter((a) => a.type === t).map((a) => ({ id: a.id, title: a.title, text: a.description || '', cta: a.cta_label || 'Learn more', color: a.bg_color || '#0F1A27', link: a.link_url || '#' }));
+  const pick = (t) => live.filter((a) => a.type === t).map((a) => ({ id: a.id, title: a.title, text: a.description || '', advertiser: a.advertiser || '', image: a.image_url || '', cta: a.cta_label || 'Learn more', color: a.bg_color || '#0F1A27', link: a.link_url || '#' }));
   return { popup: pick('popup'), inline: pick('inline'), config: { actions: +s.ad_actions_per_popup || 3, minutes: +s.ad_min_minutes || 2, skip: +s.ad_skip_seconds || 5, inline: +s.inline_ad_interval || 4 } };
 }
 export async function adsTrack(user, { id, kind }) {

@@ -311,3 +311,17 @@ body { overflow-x: hidden; }
   .featured > li { flex: 0 1 calc(33.333% - 10px); min-width: 220px; max-width: 300px; }
 }
 
+/* Pop-up ad: centred card on every screen size, clearly an ad */
+.dlg--card:has(.adpop) { max-width: 380px; overflow: hidden; }
+.dlg--card .dlg__body:has(.adpop) { padding: 0; gap: 0; }
+.adpop__bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #F5F7FA; border-bottom: 1px solid var(--line); font-size: .72rem; color: var(--text-3); }
+.adpop__bar b { color: var(--text); }
+.adpop__tag { padding: 1px 7px; border-radius: 4px; background: var(--gold); color: #fff; font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.adpop__img { width: 100%; max-height: 220px; object-fit: cover; background: var(--bg); }
+.adpop__hero { display: grid; place-items: center; min-height: 140px; padding: 16px; color: #fff; font: 800 1.4rem var(--font-display); text-align: center; }
+.adpop__body { display: grid; gap: 10px; padding: 16px 20px 18px; }
+.adpop__body h3 { font-size: 1.15rem; }
+.adpop__body p { color: var(--text-2); font-size: .88rem; }
+.adpop__body .adpop__note { text-align: center; font-size: .68rem; color: var(--text-3); }
+.dlg--card .adpop__body h3 { text-align: left; }
+
