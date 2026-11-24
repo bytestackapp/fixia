@@ -35,8 +35,10 @@ export default function Cropper({ open, src, onClose, onDone }) {
     const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
     const dw = fitW * zoom * W, dh = dw / r;
     x.drawImage(imgRef.current, W * (0.5 + pos.x) - dw / 2, H * (0.5 + pos.y) - dh / 2, dw, dh);
-    onDone(c.toDataURL('image/jpeg', 0.88));
-  }
+    let q = 0.88, out = c.toDataURL('image/jpeg', q);
+    while (out.length * 0.75 > 48000 && q > 0.3) { q -= 0.07; out = c.toDataURL('image/jpeg', q); }
+    onDone(out);
+      }
 
   return (
     <Dialog open={open} onClose={onClose} title="Crop image">
