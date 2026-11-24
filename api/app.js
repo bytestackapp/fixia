@@ -14,7 +14,7 @@ export default route({
   'bookings.list': B.list, 'bookings.create': B.create, 'bookings.cancel': B.cancel, 'bookings.dispute': B.dispute,
   'bookings.providerCancel': B.providerCancel, 'bookings.done': B.markDone, 'bookings.complete': B.complete,
   'notifications.list': B.notifications, 'notifications.read': B.markRead, 'notifications.clear': B.clearRead, 'counts': B.counts,
-  'profile.get': A.profile, 'profile.update': A.updateProfile, 'password.change': A.changePassword, 'avatar.set': A.setAvatar,
+  'profile.get': A.profile, 'profile.update': A.updateProfile, 'password.change': A.changePassword, 'avatar.set': A.setAvatar, 'avatar.remove': A.removeAvatar,
   'plans.list': A.plans, 'upgrade.calc': A.upgradeCalc, 'upgrade.manual': A.upgradeManual,
   'pay.checkout': Pay.checkout, 'pay.verify': Pay.verify,
   'referral.redeem': R.redeem,

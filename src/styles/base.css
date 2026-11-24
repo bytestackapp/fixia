@@ -28,5 +28,9 @@ img { max-width: 100%; display: block; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+  /* one-time and decorative animations: skip them */
+  .splash__blob, .splash__logo, .splash__tag, .login::before, .login::after, .bg-shapes span { animation: none !important; }
+  /* loading dots: keep, but slow and gentle */
+  .splash__dots span { animation-duration: 1.8s !important; }
 }

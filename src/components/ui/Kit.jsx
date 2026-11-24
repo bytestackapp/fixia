@@ -27,7 +27,7 @@ export function StarPicker({ value, onChange }) {
   return (
     <div className="starpick" role="radiogroup" aria-label="Rating">
       {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} star${n > 1 ? 's' : ''}`} onClick={() => onChange(n)}>
+        <button key={n} type="button" role="radio" className={n <= value ? 'is-on' : undefined} aria-checked={value === n} aria-label={`${n} star${n > 1 ? 's' : ''}`} onClick={() => onChange(n)}>
           <Star size={30} fill={n <= value ? 'currentColor' : 'none'} strokeWidth={1.5} />
         </button>
       ))}

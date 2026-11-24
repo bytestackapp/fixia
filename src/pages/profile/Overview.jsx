@@ -8,11 +8,18 @@ import { toast } from '../../lib/toast.jsx';
 import { shrink } from '../../lib/image.js';
 import { fdate, daysLeft } from '../../lib/format.js';
 import Avatar from '../../components/Avatar.jsx';
+import { Confirm } from '../../components/ui/Dialog.jsx';
 
 export default function Overview({ data }) {
   const { refresh } = useAuth(); const qc = useQueryClient();
   const { account: a, plan, provider: p } = data;
-  const file = useRef(); const [busy, setBusy] = useState(false);
+  const file = useRef(); const [busy, setBusy] = useState(false); const [ask, setAsk] = useState(false);
+  async function removePhoto() {
+    setBusy(true);
+    try { await call('avatar.remove'); await Promise.all([qc.invalidateQueries({ queryKey: ['profile'] }), refresh()]); toast('Photo removed.'); setAsk(false); }
+    catch (err) { toast(err.message, 'error'); }
+    setBusy(false);
+  }
   async function avatar(e) {
     setBusy(true);
     try { await call('avatar.set', { dataUrl: await shrink(e.target.files[0], { square: 320 }) }); await Promise.all([qc.invalidateQueries({ queryKey: ['profile'] }), refresh()]); toast('Photo updated.'); }
@@ -28,7 +35,11 @@ export default function Overview({ data }) {
       <div className="profile-head">
         <Avatar name={p?.bizName || a.firstName} url={a.avatarUrl} size={88} />
         <div><h2>{p ? p.bizName : `${a.firstName} ${a.lastName}`}{p?.isElite && <span className="tag">Elite</span>}</h2>
-          <div className="meta"><span>@{a.username} · {p ? 'Provider' : 'Customer'}</span><span><label className="btn btn--quiet btn--sm" style={{ padding: 0 }}>{busy ? 'Uploading…' : 'Change photo'}<input ref={file} type="file" accept="image/*" className="sr-only" disabled={busy} onChange={avatar} /></label></span></div></div>
+          <div className="meta"><span>@{a.username} · {p ? 'Provider' : 'Customer'}</span><span className="cluster" style={{ gap: 'var(--s4)' }}>
+            <label className="btn btn--quiet btn--sm" style={{ padding: 0 }}>{busy ? 'Please wait…' : a.avatarUrl ? 'Change photo' : 'Add photo'}<input ref={file} type="file" accept="image/*" className="sr-only" disabled={busy} onChange={avatar} /></label>
+            {a.avatarUrl && <button type="button" className="btn btn--quiet btn--sm" style={{ padding: 0 }} disabled={busy} onClick={() => setAsk(true)}>Remove photo</button>}
+            <Confirm open={ask} title="Remove your photo?" confirmLabel="Remove" danger busy={busy} onClose={() => setAsk(false)} onConfirm={removePhoto}>Your photo will be deleted and the app will show a badge with your first letter instead.</Confirm>
+          </span></div></div>
       </div>
       <section className="sec" style={{ marginBottom: 0 }}><h2 className="sec__title">Basic Info</h2>
       <dl className="defs" style={{ margin: 0 }}>

@@ -40,7 +40,7 @@ A['provider.approve'] = async (_a, { providerId }) => {
   const u = (await sb(`users?id=eq.${q(prov.user_id)}&select=*&limit=1`))?.[0];
   const body = { status: 'approved', is_featured: !!pkg?.is_featured };
   if (prov.id_file_url) { await remove(prov.id_file_url); body.id_file_url = null; }     // ID is deleted once verified
-  if (pkg?.is_featured) { body.featured_quota = parseInt((await settings()).featured_impression_quota) || 500; body.featured_impressions = 0; }
+  if (pkg?.is_featured) { body.featured_quota = parseInt((await settings()).featured_impression_quota) || 500; body.featured_impressions = 0; } else { body.featured_quota = 0; }
   await patch(`providers?id=eq.${q(providerId)}`, body);
   await patch(`users?id=eq.${q(prov.user_id)}`, { status: 'active' });
   await notify(prov.user_id, 'Application approved', 'Your provider account is active. Add your services and start receiving bookings. Welcome to Fixia!', 'welcome');
@@ -75,7 +75,13 @@ A['provider.update'] = async (_a, d) => {
   const prov = need((await sb(`providers?id=eq.${q(d.id)}&limit=1`))?.[0], 'Provider not found.');
   const pkg = d.packageId ? await getPackage(d.packageId) : null;
   const p = { status: d.status, biz_name: d.bizName, region_name: d.regionName, province_name: d.provinceName, city_name: d.cityName, barangay_name: d.barangayName, street_addr: d.streetAddr };
-  if (pkg) { p.package_id = pkg.id; p.is_featured = !!pkg.is_featured; }
+  if (pkg) {
+    p.package_id = pkg.id; p.is_featured = !!pkg.is_featured;
+    if (prov.package_id !== pkg.id) {
+      p.featured_impressions = 0;
+      p.featured_quota = pkg.is_featured ? (parseInt((await settings()).featured_impression_quota) || 500) : 0;
+    }
+  }
   Object.keys(p).forEach((k) => p[k] === undefined && delete p[k]);
   await patch(`providers?id=eq.${q(d.id)}`, p);
   const u = { first_name: d.firstName, last_name: d.lastName, email: d.email?.toLowerCase(), phone: d.phone, payment_status: d.paymentStatus };
@@ -159,7 +165,7 @@ A['ad.rerun'] = async (_a, { id, quota }) => {
   await patch(`ads?id=eq.${q(id)}`, { impression_count: 0, click_count: 0, impression_quota: qta, is_active: true });
 };
 A['ad.batches'] = async (_a, { type }) => ({ items: (await sb(`ads_batches?order=started_at.desc&limit=200`)) || [], ads: (await sb(`ads?${type ? `type=eq.${q(type)}&` : ''}select=id,title,advertiser,type`)) || [] });
-A['rotation.stats'] = async () => ({ items: (await sb('providers?or=(is_featured.eq.true,featured_quota.gt.0)&select=id,biz_name,is_elite,is_featured,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc')) || [] });
+A['rotation.stats'] = async () => ({ items: (await sb('providers?or=(is_featured.eq.true,featured_impressions.gt.0)&select=id,biz_name,is_elite,is_featured,avg_rating,package_id,featured_impressions,featured_quota&order=featured_impressions.desc')) || [] });
 A['rotation.reactivate'] = async (_a, { id } = {}) => {
   const quota = parseInt((await settings()).featured_impression_quota) || 200;
   const done = id ? [{ id }] : (await sb('providers?is_featured=eq.false&featured_quota=gt.0&select=id')) || [];

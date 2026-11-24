@@ -82,20 +82,22 @@ export async function complete(user, { id, stars, comment, anonymous }, req) {
   const text = String(comment || '').slice(0, 500);
   const update = { status: 'completed', provider_has_unread: true, user_has_unread: false };
   if (n) Object.assign(update, { rating_stars: n, rating_comment: text, rated_at: new Date().toISOString() });
-  await patch(id, update);
   const prov = (await sb(`providers?id=eq.${q(inq.provider_id)}&select=id,user_id,biz_name&limit=1`))?.[0];
-  pushTo(prov?.user_id, { title: n ? `New ${n}-star rating` : 'Job confirmed complete', url: '/bookings' });
   if (n) {
     const u = (await sb(`users?id=eq.${q(inq.regular_user_id)}&select=first_name,last_name&limit=1`))?.[0];
     const full = u ? `${u.first_name} ${u.last_name}`.trim() : '';
     const name = anonymous && full ? full.split(' ').map((p) => p.slice(0, 3) + '***').join(' ') : full;
     await sb('ratings', { method: 'POST', prefer: 'return=minimal', body: { provider_id: inq.provider_id, regular_user_id: inq.regular_user_id, inquiry_id: id, stars: n, comment: text, is_anonymous: !!anonymous, display_name: name, user_ip: clientIp(req) } });
+    await patch(id, update);
     const all = (await sb(`ratings?provider_id=eq.${q(inq.provider_id)}&select=stars`)) || [];
     const avg = all.length ? Math.round((all.reduce((s, r) => s + r.stars, 0) / all.length) * 10) / 10 : 0;
     await sb(`providers?id=eq.${q(inq.provider_id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { avg_rating: avg, total_ratings: all.length } });
     const pu = (await sb(`users?id=eq.${q(prov.user_id)}&select=email&limit=1`))?.[0];
     if (pu) mail('rating_notify', { email: pu.email, bizName: prov.biz_name, stars: n, comment: text, newAvg: avg });
+  } else {
+    await patch(id, update);
   }
+  pushTo(prov?.user_id, { title: n ? `New ${n}-star rating` : 'Job confirmed complete', url: '/bookings' });
   // first finished job by a free member pays the referrer 1 point
   const booker = (await sb(`users?id=eq.${q(inq.regular_user_id)}&select=payment_status&limit=1`))?.[0];
   if (!booker?.payment_status || booker.payment_status === 'free') {

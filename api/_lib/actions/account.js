@@ -65,6 +65,13 @@ export async function setAvatar(user, { dataUrl }) {
   return { url };
 }
 
+export async function removeAvatar(user) {
+  const old = (await sb(`users?id=eq.${q(user.id)}&select=avatar_url&limit=1`))?.[0]?.avatar_url;
+  await sb(`users?id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { avatar_url: null } });
+  await sb(`providers?user_id=eq.${q(user.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { avatar_url: null } }).catch(() => {});
+  await remove(old);
+}
+
 /* ── plans ── */
 export async function plans(user) {
   const type = user.role === 'provider' ? 'provider' : 'regular';

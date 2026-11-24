@@ -51,11 +51,10 @@ export default function Bookings() {
                   </div>
                   <div className="booking__state">
                     <Status kind={kind}>{text}</Status>
-                    {b.rating && <span className="stars-chip" aria-label={`Rated ${b.rating.stars} out of 5`}>{b.rating.stars}<Star size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" /></span>}
-                    {b.unread && <span className="tag" style={{ marginLeft: 0 }}>New</span>}
                     <span className="prow__where">{ago(b.updatedAt)}</span>
                   </div>
                 </div>
+                {b.rating && <span className="stars" role="img" aria-label={`Rated ${b.rating.stars} out of 5`}>{Array.from({ length: 5 }, (_, k) => <Star key={k} size={14} fill={k < b.rating.stars ? 'currentColor' : 'none'} strokeWidth={k < b.rating.stars ? 0 : 1.5} />)}</span>}
                 <p className="booking__note">{b.message || 'No job details.'}</p>
                 <div className="cluster">
                   {b.with.phone && <><a className="btn btn--secondary btn--sm" href={`tel:${b.with.phone}`}>Call</a><a className="btn btn--secondary btn--sm" href={`sms:${b.with.phone}`}>SMS</a></>}
@@ -63,7 +62,7 @@ export default function Bookings() {
                   {!isPro && b.status === 'done' && <Button size="sm" onClick={() => setRate(b)}>Confirm and rate</Button>}
                   {!isPro && b.status === 'completed' && !b.rating && <Button size="sm" variant="secondary" onClick={() => setRate(b)}>Leave a rating</Button>}
                   {!isPro && b.status === 'done' && <Button size="sm" variant="quiet" onClick={() => setAsk({ kind: 'dispute', b })}>Dispute</Button>}
-                  {open && <Button size="sm" variant="quiet" onClick={() => setAsk({ kind: 'cancel', b })}>Cancel</Button>}
+                  {open && <Button size="sm" variant="secondary" onClick={() => setAsk({ kind: 'cancel', b })}>Cancel</Button>}
                 </div>
               </li>
             );

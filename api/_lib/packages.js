@@ -1,4 +1,5 @@
 import { sb, q } from './db.js';
+import { settings } from './settings.js';
 
 export const PERIOD_DAYS = { month: 30, '3month': 90, '6month': 180, year: 365, lifetime: null };
 export const FREE = { regular: 'regular-free', provider: 'provider-free' };
@@ -26,7 +27,8 @@ export async function applyPackage(user, pkg, totalDays, extra = {}) {
   if (user.role === 'provider') {
     const prov = (await sb(`providers?user_id=eq.${q(user.id)}&select=id&limit=1`))?.[0];
     if (prov) {
-      await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { package_id: pkg.id } });
+      const quota = parseInt((await settings()).featured_impression_quota) || 500;
+      await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { package_id: pkg.id, is_featured: !!pkg.is_featured, featured_impressions: 0, featured_quota: pkg.is_featured ? quota : 0 } });
       await sb(`listings?provider_id=eq.${q(prov.id)}&is_active=eq.false&deactivated_reason=eq.subscription_expired`, { method: 'PATCH', prefer: 'return=minimal', body: { is_active: true, deactivated_reason: null } });
     }
   }
@@ -45,7 +47,7 @@ export async function downgradeIfExpired(user) {
   if (user.role === 'provider') {
     const prov = (await sb(`providers?user_id=eq.${q(user.id)}&select=id&limit=1`))?.[0];
     if (prov) {
-      await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { package_id: free } });
+      await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { package_id: free, is_featured: false, featured_quota: 0 } });
       const ls = (await sb(`listings?provider_id=eq.${q(prov.id)}&is_active=eq.true&select=id`)) || [];
       hidden = ls.length;
       if (hidden) await sb(`listings?provider_id=eq.${q(prov.id)}&is_active=eq.true`, { method: 'PATCH', prefer: 'return=minimal', body: { is_active: false, deactivated_reason: 'subscription_expired' } });

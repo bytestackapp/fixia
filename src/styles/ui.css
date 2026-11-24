@@ -241,8 +241,8 @@ button.sub-card { width: 100%; text-align: left; cursor: pointer; }
 .switch:disabled { opacity: .5; cursor: not-allowed; }
 
 .starpick { display: flex; gap: var(--s2); }
-.starpick button { background: none; border: 0; padding: var(--s1); color: var(--gold); }
-.starpick button[aria-checked='false'] { color: var(--line-strong); }
+.starpick button { background: none; border: 0; padding: var(--s1); color: var(--line-strong); }
+.starpick button.is-on { color: var(--gold); }
 
 /* Plans */
 .plans { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
@@ -348,6 +348,8 @@ button.sub-card { width: 100%; text-align: left; cursor: pointer; }
 .acard { align-content: start; }
 .acard__top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3); }
 .acard__title { min-width: 0; overflow-wrap: anywhere; }
+.acard__title b { color: var(--brand); }
+.acard { background: linear-gradient(180deg, var(--brand-light) 0%, var(--card) 55%); }
 .acard__actions, .acard .actions-cell { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex: none; }
 .acard__info { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--s3); margin: 0; padding-top: var(--s3); border-top: 1px solid var(--line); }
 .acard__info dt { font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
