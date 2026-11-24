@@ -4,7 +4,7 @@ import { useAuth } from '../../lib/auth.jsx';
 import { useAct } from '../../lib/queries.js';
 import { call } from '../../lib/api.js';
 import { toast } from '../../lib/toast.jsx';
-import { fileToDataUrl } from '../../lib/image.js';
+import { shrink } from '../../lib/image.js';
 import Field from '../../components/ui/Field.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Dialog from '../../components/ui/Dialog.jsx';
@@ -119,7 +119,7 @@ function ChangeDialog({ open, onClose, current }) {
             </>
           )}
           <Field as="textarea" label="Why do you need this change?" value={s.why} onChange={(e) => setS({ ...s, why: e.target.value })} />
-          <label className="field" style={noDoc ? { opacity: .5 } : undefined}><span className="field__label">{needsProof ? 'Proof of the change (required, image or PDF)' : noDoc ? 'Supporting document (not needed for an email change)' : 'Supporting document (optional, image or PDF)'}</span><input key={fileKey} type="file" disabled={noDoc} accept="image/jpeg,image/png,application/pdf" onChange={async (e) => { const f = e.target.files[0]; if (f && f.size > 2_000_000) { toast('File must be under 2 MB.', 'error'); e.target.value = ''; return; } setS({ ...s, file: f ? await fileToDataUrl(f) : '' }); }} /></label>
+          <label className="field" style={noDoc ? { opacity: .5 } : undefined}><span className="field__label">{needsProof ? 'Proof of the change (required, image)' : noDoc ? 'Supporting document (not needed for an email change)' : 'Supporting document (optional, image)'}</span><input key={fileKey} type="file" disabled={noDoc} accept="image/jpeg,image/png" onChange={async (e) => { const f = e.target.files[0]; try { setS({ ...s, file: f ? await shrink(f, { max: 1600 }) : '' }); } catch (err) { toast(err.message, 'error'); e.target.value = ''; } }} /></label>
           <div className="dlg__actions"><Button disabled={!s.subject} onClick={review}>Send request</Button><Button variant="secondary" onClick={reset}>Clear form</Button><Button variant="secondary" onClick={onClose}>Cancel</Button></div>
         </div>
       </Dialog>

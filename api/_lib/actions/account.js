@@ -154,7 +154,7 @@ export async function changeSubmit(user, d) {
   const needsProof = ['Business Name Change', 'Location Change'].includes(d.subject) || !!multi.business_name || !!multi.location;
   if (needsProof && !d.file) throw httpError(400, 'Attach a proof document for this change.');
   let file = {};
-  if (d.file) { const up = await upload('fixia-requests', `${prov.id}_${Date.now()}`, d.file, { pdf: true }); file = { file_url: up.url, file_path: up.path }; }
+  if (d.file) { const up = await upload('fixia-requests', `${prov.id}_${Date.now()}`, d.file); file = { file_url: up.url, file_path: up.path }; }
   await sb('change_requests', { method: 'POST', prefer: 'return=minimal', body: { user_id: user.id, provider_id: prov.id, provider_name: prov.biz_name, subject: d.subject, requested_value: (d.requestedValue || '—').slice(0, 1200), explanation: d.explanation.trim().slice(0, 600), status: 'pending', ...file } });
   await sb(`providers?id=eq.${q(prov.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { last_change_at: new Date().toISOString() } });
 }

@@ -8,7 +8,7 @@ export async function upload(bucket, name, dataUrl, { pdf = false } = {}) {
   const m = /^data:([\w/+.-]+);base64,(.+)$/.exec(dataUrl || '');
   if (!m || !BUCKETS.includes(bucket) || !TYPES[m[1]] || (m[1] === 'application/pdf' && !pdf)) throw httpError(400, 'That file type is not allowed.');
   const buf = Buffer.from(m[2], 'base64');
-  if (buf.length > 3_000_000) throw httpError(400, 'That file is too large.');
+  if (buf.length > 51_200) throw httpError(400, 'That image is too large (max 50 KB).');
   const path = `${name}.${TYPES[m[1]]}`;
   const r = await fetch(`${URL_}/storage/v1/object/${bucket}/${path}`, {
     method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': m[1] }, body: buf,
