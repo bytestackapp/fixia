@@ -46,7 +46,7 @@ async function logout(_u, _p, req) {
 export default route({
   login, me, logout,
   'register.regular': reg.registerRegular, 'register.provider': reg.registerProvider,
-  'otp.send': reg.otpSend, 'otp.verify': reg.otpVerify,
+  'otp.send': reg.otpSend, 'otp.verify': reg.otpVerify, 'signup.check': reg.checkDetails,
   'reset.request': reg.resetRequest, 'reset.validate': reg.resetValidate, 'reset.confirm': reg.resetConfirm,
   'packages.public': reg.publicPackages, 'fees.public': publicFees,
   'signup.pay': Pay.signupCheckout, 'signup.finish': Pay.signupFinish,

@@ -85,9 +85,10 @@ function useAccountSteps(role) {
     if (first) toast(first, 'error');
     return !first;
   }
+  async function checkDetails() { await api('auth', { action: 'signup.check', ...d }); }
   async function sendCode() { return (await api('auth', { action: 'otp.send', email: d.email })).required; }
   async function verify() { setProof((await api('auth', { action: 'otp.verify', email: d.email, code })).proof); }
-  return { d, set, errors, busy, setBusy, code, setCode, proof, validate, sendCode, verify, role };
+  return { d, set, errors, busy, setBusy, code, setCode, proof, validate, checkDetails, sendCode, verify, role };
 }
 
 function DetailsForm({ s, onNext }) {
@@ -272,7 +273,7 @@ export function SignupCustomer() {
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
-    try { const req = await s.sendCode(); setNeedsCode(req); setStep(1); } catch (e) { toast(e.message, 'error'); setStep(0); }
+    try { await s.checkDetails(); const req = await s.sendCode(); setNeedsCode(req); setStep(1); } catch (e) { toast(e.message, 'error'); setStep(0); }
     s.setBusy(false);
   }
   // free plan: no payment. manual payment: account starts on Free, upgrade waits for approval.
@@ -341,7 +342,7 @@ export function SignupProvider() {
 
   async function next() {
     if (!s.validate()) return; s.setBusy(true);
-    try { const req = await s.sendCode(); setNeedsCode(req); setStep(1); } catch (e) { bad(e.message); }
+    try { await s.checkDetails(); const req = await s.sendCode(); setNeedsCode(req); setStep(1); } catch (e) { bad(e.message); }
     s.setBusy(false);
   }
   const go = (n) => setStep(n);

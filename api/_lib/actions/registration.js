@@ -22,7 +22,7 @@ function checkAccount(d) {
   v(USER.test((d.username || '').toLowerCase()), 'Username: 3–30 letters, numbers, dot or underscore.');
   v(typeof d.password === 'string' && d.password.length >= 8 && d.password.length <= 128, 'Password must be 8–128 characters.');
 }
-async function checkUnique(d) {
+export async function checkUnique(d) {
   const e = encodeURIComponent;
   const [em, un, ph] = await Promise.all([
     sb(`users?email=eq.${e(d.email.trim().toLowerCase())}&select=id&limit=1`),
@@ -74,6 +74,9 @@ export async function checkSignup(d, role) {
   checkAccount(d); await checkUnique(d); await requireProof(d);
   return role === 'provider' ? checkProvider(d) : planFor(d, 'regular');
 }
+
+/* ── used by the Details step: checks the details before the email code is sent ── */
+export const checkDetails = async (_u, d) => { checkAccount(d); await checkUnique(d); return { ok: true }; };
 
 /* ── creating accounts ── */
 async function insertRegular(d) {
