@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Wrench, Check, ChevronRight } from 'lucide-react';
 import { api } from '../lib/api.js';
@@ -20,6 +20,8 @@ import { peso, PERIOD } from '../lib/format.js';
 import './Login.css';
 
 const refCode = () => localStorage.getItem('fixia.ref') || null;
+const NATIVE = !!import.meta.env.VITE_NATIVE;
+const paidKey = (r) => ({ provider: 'okpro', support: 'support', fail: 'fail' }[r] || 'ok');
 
 /* Keeps sign-up progress in this tab, so a reload or a discarded tab does not lose it. */
 const SAVE = 'fixia.signup.';
@@ -186,6 +188,50 @@ function PayStep({ plan, busy, actionLabel, onBack, onPay }) {
   );
 }
 
+/* Android app only: the payment page opens in the phone's browser, so the app waits here
+   and keeps asking the server until the payment is confirmed. */
+function PayWait({ pid, url, onDone, onCancel }) {
+  const [busy, setBusy] = useState(false);
+  const live = useRef(true), inflight = useRef(false), done = useRef(onDone);
+  done.current = onDone;
+
+  async function check(manual) {
+    if (!live.current || inflight.current) return;
+    inflight.current = true; setBusy(true);
+    try {
+      const r = await api('auth', { action: 'signup.finish', pid });
+      live.current = false; done.current(r.role); return;
+    } catch (e) {
+      if (e.status === 409) { live.current = false; done.current('support'); return; }
+      if (e.status === 404) { live.current = false; done.current('fail'); return; }
+      if (manual) toast('Payment not confirmed yet. If you already paid, wait a few seconds and try again.', 'info');
+    }
+    inflight.current = false; setBusy(false);
+  }
+
+  useEffect(() => {
+    live.current = true;
+    const t = setInterval(() => check(false), 4000);
+    const vis = () => { if (document.visibilityState === 'visible') check(false); };
+    document.addEventListener('visibilitychange', vis);
+    return () => { live.current = false; clearInterval(t); document.removeEventListener('visibilitychange', vis); };
+  }, [pid]);   // eslint-disable-line
+
+  return (
+    <>
+      <div className="logo-wrap"><Logo /></div>
+      <div className="state-box">
+        <div className="ring" aria-hidden="true" />
+        <h1>Waiting for your payment</h1>
+        <p className="muted">Finish paying in your browser, then come back to this app. We will continue automatically.</p>
+      </div>
+      <Button block loading={busy} onClick={() => check(true)}>I have paid, check now</Button>
+      <Button block variant="secondary" onClick={() => { window.location.href = url; }}>Open payment page again</Button>
+      <Button block variant="quiet" onClick={onCancel}>Cancel</Button>
+    </>
+  );
+}
+
 function ReviewNotice({ open, text, onDone }) {
   return (
     <Dialog open={open} onClose={onDone} title="Payment under review">
@@ -213,9 +259,10 @@ export function SignupCustomer() {
   const { user, adopt } = useAuth(); const nav = useNavigate();
   const s = useAccountSteps('regular'); const [step, setStep] = usePersist('regular.step', 0); const [needsCode, setNeedsCode] = usePersist('regular.needsCode', true);
   const { plans } = usePlans('regular'); const [plan, setPlan] = usePersist('regular.plan', ''); const [agree, setAgree] = usePersist('regular.agree', false);
-  const [done, setDone] = useState(null);
+  const [done, setDone] = useState(null), [waiting, setWaiting] = useState(null);
   useEffect(() => { if (plans && !plan) setPlan(plans.find((p) => p.price === 0)?.id || plans[0]?.id); }, [plans, plan]);
   if (user) return <Navigate to="/" replace />;
+  if (waiting) return <Page><PayWait pid={waiting.pid} url={waiting.url} onDone={(r) => { forget(); nav(`/login?paid=${paidKey(r)}`, { replace: true }); }} onCancel={() => setWaiting(null)} /></Page>;
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
   const base = needsCode ? ['Details', 'Verify email', 'Plan'] : ['Details', 'Plan'];
@@ -243,9 +290,9 @@ export function SignupCustomer() {
   async function payOnline(method) {
     s.setBusy(true);
     try {
-      const { url } = await api('auth', { action: 'signup.pay', ...s.d, role: 'regular', proof: s.proof, referredBy: refCode(), packageId: plan, method });
-      forget();
-      window.location.href = url;
+      const { url, pid } = await api('auth', { action: 'signup.pay', ...s.d, role: 'regular', proof: s.proof, referredBy: refCode(), packageId: plan, method });
+      if (NATIVE) { setWaiting({ pid, url }); s.setBusy(false); window.location.href = url; }
+      else { forget(); window.location.href = url; }
     } catch (e) { toast(e.message, 'error'); s.setBusy(false); }
   }
   const onPay = (p) => (isManual(p.method) ? create(p) : payOnline(p.method));
@@ -262,7 +309,7 @@ export function SignupCustomer() {
           <p className="muted">Start free. You can upgrade any time.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
           <AgreeNote checked={agree} onChange={setAgree} />
-          <div className="vf-actions"><Button onClick={paid ? () => setStep(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Create account'}</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
+          <div className="vf-actions"><Button onClick={paid ? () => setStep(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue' : 'Create account'}</Button>{needsCode && <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>}</div>
         </div>
       )}
       {name === 'Payment' && <PayStep plan={picked} busy={s.busy} actionLabel="Create account" onBack={() => setStep(step - 1)} onPay={onPay} />}
@@ -278,10 +325,11 @@ export function SignupProvider() {
   const { plans } = usePlans('provider'); const [plan, setPlan] = usePersist('provider.plan', ''); const [agree, setAgree] = usePersist('provider.agree', false);
   const [biz, setBiz] = usePersist('provider.biz', ''), [street, setStreet] = usePersist('provider.street', ''), [place, setPlace] = useState({});
   const [avatar, setAvatar] = usePersist('provider.avatar', ''), [idType, setIdType] = usePersist('provider.idType', ''), [idFile, setIdFile] = usePersist('provider.idFile', '');
-  const [done, setDone] = useState(null);
+  const [done, setDone] = useState(null), [waiting, setWaiting] = useState(null);
   // the location is not saved, so after a reload go back to the Business step to pick it again
   useEffect(() => { const bizAt = needsCode ? 2 : 1; if (step > bizAt && !place.regionName) setStep(bizAt); }, []);   // eslint-disable-line
   if (user) return <Navigate to="/" replace />;
+  if (waiting) return <Page><PayWait pid={waiting.pid} url={waiting.url} onDone={(r) => { forget(); nav(`/login?paid=${paidKey(r)}`, { replace: true }); }} onCancel={() => setWaiting(null)} /></Page>;
   const picked = plans?.find((p) => p.id === plan);
   const paid = !!picked && picked.price > 0;
   const all = ['Details', 'Verify email', 'Business', 'Photos & ID', 'Plan'];
@@ -317,9 +365,9 @@ export function SignupProvider() {
   async function payOnline(method) {
     s.setBusy(true);
     try {
-      const { url } = await api('auth', { action: 'signup.pay', ...body(), role: 'provider', method });
-      forget();
-      window.location.href = url;
+      const { url, pid } = await api('auth', { action: 'signup.pay', ...body(), role: 'provider', method });
+      if (NATIVE) { setWaiting({ pid, url }); s.setBusy(false); window.location.href = url; }
+      else { forget(); window.location.href = url; }
     } catch (e) { bad(e.message); s.setBusy(false); }
   }
   const onPay = (p) => (isManual(p.method) ? create(p) : payOnline(p.method));
@@ -359,7 +407,7 @@ export function SignupProvider() {
           <p className="muted">Choose a plan. Our team reviews every application within 24–48 hours.</p>
           {plans ? <PlanPicker plans={plans} value={plan} onChange={setPlan} /> : <div className="skeleton" style={{ height: 120 }} />}
           <AgreeNote checked={agree} onChange={setAgree} />
-          <div className="vf-actions"><Button onClick={paid ? () => go(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue to payment' : 'Submit application'}</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
+          <div className="vf-actions"><Button onClick={paid ? () => go(step + 1) : () => create()} loading={s.busy} disabled={!plan || !agree}>{paid ? 'Continue' : 'Submit application'}</Button><Button variant="secondary" onClick={() => go(step - 1)}>Back</Button></div>
         </div>
       )}
       {name === 'Payment' && <PayStep plan={picked} busy={s.busy} actionLabel="Submit application" onBack={() => go(step - 1)} onPay={onPay} />}

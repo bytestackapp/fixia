@@ -234,15 +234,26 @@ A['users.search'] = async (_a, { text }) => {
   const t = String(text || '').replace(/[,()*%]/g, ' ').trim(); if (t.length < 2) return { items: [] };
   return { items: (await sb(`users?or=(email.ilike.*${encodeURIComponent(t)}*,first_name.ilike.*${encodeURIComponent(t)}*,last_name.ilike.*${encodeURIComponent(t)}*)&status=eq.active&limit=10&select=id,first_name,last_name,email,role`)) || [] };
 };
-A['message.send'] = async (_a, { templateId, to }) => {
-  const tpl = need((await sb(`message_templates?id=eq.${q(templateId)}&limit=1`))?.[0], 'Template not found.');
+A['message.send'] = async (_a, { templateId, title, body, type, to }) => {
+  const t = String(title || '').trim().slice(0, 100), b = String(body || '').trim().slice(0, 2000);
+  need(t && b, 'Title and message are required.');
+  const kind = ['announcement', 'warning', 'maintenance', 'welcome'].includes(type) ? type : 'announcement';
   const sel = 'users?select=id&status=eq.active&is_inactive=eq.false';
-  const users = to?.userId ? [{ id: to.userId }] : (await sb(`${sel}${to === 'regulars' ? '&role=eq.regular' : to === 'providers' ? '&role=eq.provider' : ''}`)) || [];
+  let users;
+  if (Array.isArray(to?.userIds)) {
+    const ids = [...new Set(to.userIds.filter(Boolean))].slice(0, 200);
+    users = ids.length ? (await sb(`${sel}&id=in.(${ids.map(q).join(',')})`)) || [] : [];
+  } else {
+    users = (await sb(`${sel}${to === 'regulars' ? '&role=eq.regular' : to === 'providers' ? '&role=eq.provider' : ''}`)) || [];
+  }
   need(users.length, 'No recipients found.');
-  const rows = users.map((u) => ({ user_id: u.id, title: tpl.title, body: tpl.body, type: tpl.type, icon: '', is_read: false }));
+  const rows = users.map((u) => ({ user_id: u.id, title: t, body: b, type: kind, icon: '', is_read: false }));
   for (let i = 0; i < rows.length; i += 100) await sb('user_messages', { method: 'POST', prefer: 'return=minimal', body: rows.slice(i, i + 100) });
-  pushTo(users.map((u) => u.id), { title: tpl.title, body: tpl.body, url: '/' });
-  await patch(`message_templates?id=eq.${q(templateId)}`, { send_count: (tpl.send_count || 0) + 1 });
+  pushTo(users.map((u) => u.id), { title: t, body: b, url: '/' });
+  if (templateId) {
+    const tpl = (await sb(`message_templates?id=eq.${q(templateId)}&select=send_count&limit=1`))?.[0];
+    if (tpl) await patch(`message_templates?id=eq.${q(templateId)}`, { send_count: (tpl.send_count || 0) + 1 });
+  }
   return { sent: users.length };
 };
 

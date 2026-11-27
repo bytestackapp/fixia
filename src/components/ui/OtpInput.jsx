@@ -41,7 +41,7 @@ export default function OtpInput({ value = '', onChange, length = 6 }) {
           inputMode="numeric"
           autoComplete={i === 0 ? 'one-time-code' : 'off'}
           autoFocus={i === 0}
-          maxLength={length}
+          maxLength={1}
           value={d}
           aria-label={`Digit ${i + 1}`}
           onChange={(e) => type(i, e)}

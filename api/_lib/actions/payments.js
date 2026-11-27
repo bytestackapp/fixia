@@ -116,7 +116,7 @@ export async function signupCheckout(_u, d) {
   try {
     const out = await startOnline(method, `pending:${saved.id}`, pkg, total, back, `${back}&cancelled=1`);
     await sb(`pending_signups?id=eq.${q(saved.id)}`, { method: 'PATCH', prefer: 'return=minimal', body: { ref: out.ref || null } });
-    return { url: out.url };
+    return { url: out.url, pid: saved.id };
   } catch (e) {
     await sb(`pending_signups?id=eq.${q(saved.id)}`, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
     throw e;

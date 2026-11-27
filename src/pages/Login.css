@@ -95,3 +95,22 @@
 .vf-actions { display: flex; gap: var(--s3); }
 .vf-actions .btn { flex: 1; }
 .vf-actions .btn--primary { flex: 2; }
+
+
+/* ═══ Phones: keep everything inside the card (sign-up steps) ═══ */
+.login { grid-template-columns: minmax(0, 1fr); }
+.login__main { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.login__main .stack { grid-template-columns: minmax(0, 1fr); }
+.login__main .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.login__main p, .login__main b, .login__main span { overflow-wrap: anywhere; }
+@media (max-width: 520px) {
+  .login { padding: var(--s4) var(--s3); }
+  .login__main { padding: 1.5rem 1.1rem; }
+}
+
+/* OTP boxes: always shrink to fit the card */
+.login__main .field { min-width: 0; width: 100%; }
+.login__main .otp { width: 100%; max-width: 100%; gap: 6px; }
+.login__main .otp__box { flex: 1 1 0; width: 0; min-width: 0; max-width: none; height: 52px; font-size: 1.2rem; }
+.login__main .vf-resend, .login__main .vf-actions { width: 100%; min-width: 0; }
+.login__main .vf-actions .btn { min-width: 0; padding-left: var(--s3); padding-right: var(--s3); }

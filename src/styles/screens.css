@@ -361,3 +361,24 @@ body { overflow-x: hidden; }
 .hist-wrap .table td { white-space: normal; overflow-wrap: anywhere; }
 .hist-wrap .table td.num { white-space: nowrap; }
 
+
+/* ═══ Phone fixes: no sideways scrolling, footer stays put ═══ */
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; overflow-x: clip; position: relative; }
+#root, .shell, .main, .admin, .amain { max-width: 100%; min-width: 0; overflow-x: clip; }
+.main > *, .amain > * { min-width: 0; max-width: 100%; }
+
+/* columns that held long text were stretching the page */
+.prow { grid-template-columns: 48px minmax(0, 1fr) auto; }
+.ad { grid-template-columns: 48px minmax(0, 1fr) auto; }
+.rows, .rows > li, .row, .acards { min-width: 0; }
+.booking__top { grid-template-columns: auto minmax(0, 1fr) auto; }
+.profile-head { grid-template-columns: auto minmax(0, 1fr); }
+.profile-head > * { min-width: 0; }
+.hero, .sec, .contact-bar, .stat-cards, .table-wrap { max-width: 100%; }
+img, svg, video, canvas { max-width: 100%; }
+
+/* footer: its own layer, always pinned to the bottom of the screen */
+.nav { position: fixed; left: 0; right: 0; bottom: 0; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
+@media (min-width: 900px) {
+  .nav { right: auto; top: 0; }
+}
